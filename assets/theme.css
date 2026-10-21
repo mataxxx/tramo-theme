@@ -1471,3 +1471,17 @@ a.header__user { text-decoration: none; color: inherit; }
   .header__account-desk { grid-column: 3; margin-right: 0; }
   .header__cart { grid-column: 4; }
 }
+
+/* Ronda 42: categorías pequeñas, solo imagen PNG sin fondo; video del producto al frente */
+.cats-heading { font-size: clamp(16px, 3vw, 22px); margin-bottom: 8px; }
+.cats-section { margin-top: 16px; }
+.cats-section .product-rail { gap: 4px; }
+.cats-section .product-rail__item { flex: 0 0 calc((100% - 4px * 4) / 5); }
+.cats-section .cats-tile { gap: 4px; }
+.cats-section .cats-tile__media, .cats-section .cats-tile__media:is(*) { width: 100%; max-width: 60px; aspect-ratio: 1 / 1; border-radius: 0; background: transparent !important; box-shadow: none !important; display: grid; place-items: center; overflow: visible; }
+.cats-section .cats-tile__media:empty { display: none; }
+.cats-section .cats-tile__media img { width: 100%; height: 100%; object-fit: contain; border-radius: 0; filter: drop-shadow(0 3px 4px rgba(0,0,0,.18)); }
+.cats-section .cats-tile__title { font-size: 11px; }
+@media (min-width: 750px) { .cats-section .product-rail { gap: 18px; } .cats-section .product-rail__item { flex: 0 0 96px; } .cats-section .cats-tile__media, .cats-section .cats-tile__media:is(*) { max-width: 72px; } .cats-section .cats-tile__title { font-size: 13px; } }
+
+.pvideo.is-open { position: fixed; inset: 0; z-index: 200; margin: 0; }
