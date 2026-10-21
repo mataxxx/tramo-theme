@@ -170,19 +170,14 @@
     var sec = $('.cats-section');
     if (!sec) return;
     var wrap = sec.closest('.shopify-section') || sec;
-    var ticking = false, last = -1;
-    var RANGE = 170; /* px de scroll durante los que se va encogiendo */
+    var ticking = false;
     function check() {
       ticking = false;
       var hh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
       var top = wrap.getBoundingClientRect().top;
-      var p = Math.max(0, Math.min(1, (hh + RANGE - top) / RANGE));
-      if ((window.scrollY || 0) < 10) p = 0;
-      p = Math.round(p * 200) / 200;
-      if (p === last) return;
-      last = p;
-      sec.style.setProperty('--p', p);
-      sec.classList.toggle('is-compact', p > 0.98);
+      var on = sec.classList.contains('is-compact');
+      var stuck = (window.scrollY || 0) > 20 && (on ? top <= hh + 16 : top <= hh + 2);
+      if (stuck !== on) sec.classList.toggle('is-compact', stuck);
     }
     function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(check); } }
     window.addEventListener('scroll', onScroll, { passive: true });
