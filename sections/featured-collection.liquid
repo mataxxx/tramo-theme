@@ -23,20 +23,26 @@
     {%- if section.settings.show_search and coll != blank -%}
       <button
         type="button"
-        class="category-search"
+        class="category-searchbar"
         data-search-collection="{{ coll.handle }}"
         data-search-title="{{ heading | escape }}"
         data-search-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?"
         aria-label="{{ section.settings.search_prefix }} {{ heading | escape }}"
       >
         {% render 'icon', name: 'search' %}
-        <span class="visually-hidden">{{ section.settings.search_prefix }} {{ heading }}</span>
+        <span>¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?</span>
       </button>
     {%- endif -%}
   </div>
 
   <div class="category-heading">
-    <h2 class="category-title">{{ heading }}</h2>
+    <h2 class="category-title">
+      {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
+        <a href="{{ coll.url }}" class="category-title__link" data-collection-expand>{{ heading }}</a>
+      {%- else -%}
+        {{ heading }}
+      {%- endif -%}
+    </h2>
     {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
       <button type="button" class="category-eye" data-collection-expand>
         {% render 'icon', name: 'eye' %}

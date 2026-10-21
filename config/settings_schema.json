@@ -354,7 +354,7 @@
         "id": "require_pay_choice",
         "label": "Pedir elegir el método de pago antes de finalizar",
         "info": "En el carrito aparece \"Paso 1\" y el botón de finalizar se activa al elegir. La elección queda guardada en el pedido.",
-        "default": true
+        "default": false
       },
       {
         "type": "text",

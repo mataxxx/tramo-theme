@@ -26,7 +26,11 @@
       <div class="duo__label">
         <span class="duo__label-text">
           {%- if icon_name != 'none' and icon_name != blank -%}<span class="duo__icon">{% render 'icon', name: icon_name %}</span>{%- endif -%}
-          <span>{{ label }}</span>
+          {%- if coll != blank -%}
+            <a href="{{ coll.url }}" class="duo__link" data-search-collection="{{ coll.handle }}" data-search-title="{{ label | escape }}" data-search-question="¿Cuál {{ section.settings[noun_key] | default: 'condimento' | escape }} buscas?">{{ label }}</a>
+          {%- else -%}
+            <span>{{ label }}</span>
+          {%- endif -%}
         </span>
         {%- if section.settings[note_key] != blank -%}<small class="duo__note">{{ section.settings[note_key] }}</small>{%- endif -%}
         {%- if coll != blank -%}

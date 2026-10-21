@@ -1068,7 +1068,7 @@
     if (comboBtn) { addCombo(comboBtn.closest('[data-combo]')); return; }
 
     var expandBtn = target.closest('[data-collection-expand]');
-    if (expandBtn) { expandCollection(expandBtn.closest('[data-category-section]')); return; }
+    if (expandBtn) { event.preventDefault(); expandCollection(expandBtn.closest('[data-category-section]')); return; }
     var collapseBtn = target.closest('[data-collection-collapse]');
     if (collapseBtn) { collapseCollection(collapseBtn.closest('[data-category-section]')); return; }
 
