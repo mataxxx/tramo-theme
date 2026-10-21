@@ -7,8 +7,8 @@
       {{ settings.popup_title | default: 'Producto agregado al carrito' }}
     </p>
     <div class="added-popup__item" data-added-item></div>
+    <div class="added-popup__timer" aria-hidden="true"><span data-added-timer></span></div>
     <div class="added-popup__actions">
-      <a href="/checkout" class="button button--full">{{ settings.popup_buy_now | default: 'Comprar ya' }}</a>
       <a href="{{ routes.cart_url }}" class="button button--outline button--full" data-added-view-cart>{{ settings.popup_view_cart | default: 'Ver carrito' }}</a>
       <button type="button" class="added-popup__continue" data-drawer-close>{{ settings.popup_continue | default: 'Seguir comprando' }}</button>
     </div>

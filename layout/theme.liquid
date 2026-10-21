@@ -90,6 +90,7 @@
     {% render 'quick-view-sheet' %}
     {% render 'cart-added-popup' %}
     {% render 'quick-choice' %}
+    {% render 'category-modal' %}
     <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
   {%- capture ecom_footer_content -%}{%- render 'ecom_footer' -%}{%- endcapture -%}{%- unless ecom_footer_content contains 'Liquid error' -%}{{ ecom_footer_content }}{%- endunless -%}</body>
 </html>

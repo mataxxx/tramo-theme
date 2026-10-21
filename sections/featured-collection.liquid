@@ -15,40 +15,15 @@
     assign heading = 'Colección'
   endif
 -%}
-<section class="category-section" data-category-section>
-  <div class="category-back" data-collection-back hidden>
-    <button type="button" class="category-back__btn" data-collection-collapse>
-      {% render 'icon', name: 'arrow-left' %} <span>{{ section.settings.back_label }}</span>
-    </button>
-    {%- if section.settings.show_search and coll != blank -%}
-      <button
-        type="button"
-        class="category-searchbar"
-        data-search-collection="{{ coll.handle }}"
-        data-search-title="{{ heading | escape }}"
-        data-search-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?"
-        aria-label="{{ section.settings.search_prefix }} {{ heading | escape }}"
-      >
-        {% render 'icon', name: 'search' %}
-        <span>¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?</span>
-      </button>
-    {%- endif -%}
-  </div>
-
+<section class="category-section" data-category-section data-category-scope>
   <div class="category-heading">
     <h2 class="category-title">
       {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
-        <a href="{{ coll.url }}" class="category-title__link" data-collection-expand>{{ heading }}</a>
+        <a href="{{ coll.url }}" class="category-title__link" data-category-open data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">{{ heading }}</a>
       {%- else -%}
         {{ heading }}
       {%- endif -%}
     </h2>
-    {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
-      <button type="button" class="category-eye" data-collection-expand>
-        {% render 'icon', name: 'eye' %}
-        <span>{{ section.settings.expand_label }}</span>
-      </button>
-    {%- endif -%}
   </div>
 
   <div class="product-rail" data-collection-rail tabindex="0" aria-label="{{ heading | escape }}">
@@ -77,10 +52,15 @@
   </div>
 
   {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
-    <div class="collection-grid" data-collection-grid hidden></div>
-    <template data-collection-template>
+    <div class="category-more">
+      <button type="button" class="category-eye" data-category-open data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">
+        {% render 'icon', name: 'eye' %}
+        <span>{{ section.settings.expand_label }}</span>
+      </button>
+    </div>
+    <template data-category-template>
       {%- for product in coll.products limit: section.settings.expand_limit -%}
-        <div class="collection-grid__item" style="--i: {{ forloop.index0 }}">
+        <div class="category-modal__item">
           {% render 'product-card', product: product, show_quick_add: section.settings.show_quick_add %}
         </div>
       {%- endfor -%}

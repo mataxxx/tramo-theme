@@ -22,29 +22,17 @@
         assign label = coll.title
       endif
     -%}
-    <div class="duo__row">
+    <div class="duo__row" data-category-scope>
       <div class="duo__label">
         <span class="duo__label-text">
           {%- if icon_name != 'none' and icon_name != blank -%}<span class="duo__icon">{% render 'icon', name: icon_name %}</span>{%- endif -%}
           {%- if coll != blank -%}
-            <a href="{{ coll.url }}" class="duo__link" data-search-collection="{{ coll.handle }}" data-search-title="{{ label | escape }}" data-search-question="¿Cuál {{ section.settings[noun_key] | default: 'condimento' | escape }} buscas?">{{ label }}</a>
+            <a href="{{ coll.url }}" class="duo__link" data-category-open data-category-title="{{ label | escape }}" data-category-question="¿Cuál {{ section.settings[noun_key] | default: 'condimento' | escape }} buscas?">{{ label }}</a>
           {%- else -%}
             <span>{{ label }}</span>
           {%- endif -%}
         </span>
         {%- if section.settings[note_key] != blank -%}<small class="duo__note">{{ section.settings[note_key] }}</small>{%- endif -%}
-        {%- if coll != blank -%}
-          <button
-            type="button"
-            class="duo__search"
-            data-search-collection="{{ coll.handle }}"
-            data-search-title="{{ label | escape }}"
-            data-search-question="¿Cuál {{ section.settings[noun_key] | default: 'condimento' | escape }} buscas?"
-            aria-label="Ver todo: {{ label | escape }}"
-          >
-            {% render 'icon', name: 'eye' %}<span>Ver todo</span>
-          </button>
-        {%- endif -%}
       </div>
       <div class="product-rail" tabindex="0" aria-label="{{ label | escape }}">
         {%- if coll != blank and coll.products.size > 0 -%}
@@ -67,6 +55,21 @@
           {%- endfor -%}
         {%- endif -%}
       </div>
+      {%- if coll != blank and coll.products.size > 0 -%}
+        <div class="category-more">
+          <button type="button" class="category-eye" data-category-open data-category-title="{{ label | escape }}" data-category-question="¿Cuál {{ section.settings[noun_key] | default: 'condimento' | escape }} buscas?">
+            {% render 'icon', name: 'eye' %}
+            <span>Ver todo</span>
+          </button>
+        </div>
+        <template data-category-template>
+          {%- for product in coll.products limit: 60 -%}
+            <div class="category-modal__item">
+              {% render 'product-card', product: product, show_quick_add: section.settings.show_quick_add %}
+            </div>
+          {%- endfor -%}
+        </template>
+      {%- endif -%}
     </div>
   {%- endfor -%}
 </section>

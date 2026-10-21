@@ -34,13 +34,13 @@
     assign shown_is_bulk = true
   endif
   assign show_from = false
-  if counted > 1 and min_price < max_price
-    assign show_from = true
-  endif
   assign subtitle = ''
-  unless product.has_only_default_variant
+  if product.variants.size > 1
+    assign show_from = true
+    assign subtitle = 'Varias presentaciones'
+  elsif product.has_only_default_variant == false
     assign subtitle = shown.title
-  endunless
+  endif
 -%}
 <article class="product-card{% unless product.available %} product-card--sold-out{% endunless %}" data-product-card>
   <a href="{{ product.url }}" class="product-card__media" data-quick-view="{{ product.url }}" aria-label="{{ product.title | escape }}">
@@ -79,7 +79,7 @@
         {%- if shown.compare_at_price > shown.price -%}<s class="price__compare">{{ shown.compare_at_price | money }}</s>{%- endif -%}
         <strong class="price__current">{{ shown.price | money }}</strong>
       </div>
-      {%- if show_quick_add and product.available -%}
+      {%- if show_quick_add and settings.card_quick_add and product.available -%}
         {%- if product.has_only_default_variant or shown_is_bulk == false -%}
           <button
             type="button"

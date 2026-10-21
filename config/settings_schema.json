@@ -378,6 +378,12 @@
         "content": "Al tocar el botón +"
       },
       {
+        "type": "checkbox",
+        "id": "card_quick_add",
+        "label": "Mostrar el botón + en las fichas de producto",
+        "default": false
+      },
+      {
         "type": "text",
         "id": "choice_title",
         "label": "Pregunta",

@@ -126,7 +126,7 @@
     if (!drawer) return null;
     if (!drawer.classList.contains('is-open')) {
       lastFocus = document.activeElement;
-      openDrawers().forEach(function (d) { if (d !== drawer) closeDrawer(d, true); });
+      if (!(opts && opts.stack)) openDrawers().forEach(function (d) { if (d !== drawer) closeDrawer(d, true); });
       drawer.hidden = false;
       document.body.classList.add('is-locked');
       requestAnimationFrame(function () {
@@ -244,6 +244,10 @@
       (detail ? '<small>' + esc(detail) + '</small>' : '') +
       '<span class="added-popup__price">' + formatMoney(item.final_line_price != null ? item.final_line_price : item.line_price) + '</span></span>';
     openDrawer('added');
+    var timer = $('[data-added-timer]');
+    if (timer) { timer.style.animation = 'none'; void timer.offsetWidth; timer.style.animation = ''; }
+    clearTimeout(showAddedPopup._t);
+    showAddedPopup._t = setTimeout(function () { closeDrawer($('[data-drawer="added"]'), true); }, 3000);
     return true;
   }
 
@@ -308,7 +312,15 @@
   var quickCache = {};
 
   function openQuickView(url) {
-    var drawer = openDrawer('quick-view');
+    var catOpen = $('[data-drawer="category"].is-open');
+    var drawer = openDrawer('quick-view', { stack: !!catOpen });
+    var backBtn = $('[data-quickview-back]');
+    if (backBtn) {
+      backBtn.hidden = !catOpen;
+      var bl = $('[data-quickview-back-label]', backBtn);
+      var ct = $('[data-category-modal-title]');
+      if (bl) bl.textContent = catOpen && ct ? 'Volver a ' + ct.textContent : 'Volver';
+    }
     var body = $('[data-quick-view-body]');
     if (!drawer || !body) { window.location.href = url; return; }
 
@@ -318,6 +330,7 @@
       if (panel) panel.scrollTop = 0;
       initProducts(body);
       initRails(body);
+      initPVideos(body);
       syncLikes();
     }
 
@@ -1067,6 +1080,10 @@
     var comboBtn = target.closest('[data-combo-add]');
     if (comboBtn) { addCombo(comboBtn.closest('[data-combo]')); return; }
 
+    var catOpener = target.closest('[data-category-open]');
+    if (catOpener) { event.preventDefault(); openCategory(catOpener); return; }
+    var qvBack = target.closest('[data-quickview-back]');
+    if (qvBack) { closeDrawer($('[data-drawer="quick-view"]'), true); return; }
     var expandBtn = target.closest('[data-collection-expand]');
     if (expandBtn) { event.preventDefault(); expandCollection(expandBtn.closest('[data-category-section]')); return; }
     var collapseBtn = target.closest('[data-collection-collapse]');
@@ -1206,6 +1223,77 @@
   }, true);
 
   /* ---------- Inicio ---------------------------------------------------- */
+  /* ---------- Ventana de categoría (Ver todo) ------------------------------ */
+  function normText(t) {
+    return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  function openCategory(opener) {
+    var scope = opener.closest('[data-category-scope]');
+    var tpl = scope && $('[data-category-template]', scope);
+    var grid = $('[data-category-grid]');
+    if (!tpl || !grid) { var href = opener.getAttribute('href'); if (href) window.location.href = href; return; }
+    grid.innerHTML = '';
+    grid.appendChild(tpl.content.cloneNode(true));
+    $$('.category-modal__item', grid).forEach(function (el, i) { el.style.setProperty('--i', i); });
+    var title = opener.getAttribute('data-category-title') || '';
+    var tEl = $('[data-category-modal-title]');
+    if (tEl) tEl.textContent = title;
+    var input = $('[data-category-filter]');
+    if (input) { input.value = ''; input.placeholder = opener.getAttribute('data-category-question') || 'Buscar...'; }
+    var empty = $('[data-category-empty]');
+    if (empty) empty.hidden = true;
+    var body = $('.category-modal__body');
+    if (body) body.scrollTop = 0;
+    openDrawer('category');
+    syncLikes();
+  }
+  document.addEventListener('input', function (event) {
+    var input = event.target.closest && event.target.closest('[data-category-filter]');
+    if (!input) return;
+    var q = normText(input.value.trim());
+    var shown = 0;
+    $$('.category-modal__item', $('[data-category-grid]')).forEach(function (el) {
+      var ok = !q || normText(el.textContent).indexOf(q) > -1;
+      el.hidden = !ok;
+      if (ok) shown++;
+    });
+    var empty = $('[data-category-empty]');
+    if (empty) empty.hidden = shown > 0;
+  });
+
+  /* ---------- Video del producto: reproducción automática siempre ---------- */
+  function keepPlaying(v) {
+    if (!v || v.__keep) return;
+    v.__keep = true;
+    v.muted = true;
+    v.defaultMuted = true;
+    v.setAttribute('playsinline', '');
+    v.setAttribute('webkit-playsinline', '');
+    function go() {
+      if (!v.isConnected || v.paused === false) return;
+      if (v.closest('.pvideo.is-paused')) return;
+      if (v.closest('.drawer') && !v.closest('.drawer.is-open')) return;
+      var p = v.play();
+      if (p && p.catch) p.catch(function () { /* se reintenta */ });
+    }
+    ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough', 'stalled', 'suspend', 'pause', 'waiting'].forEach(function (ev) { v.addEventListener(ev, function () { setTimeout(go, 30); }); });
+    go();
+    var tries = 0;
+    var iv = setInterval(function () {
+      if (!v.isConnected || ++tries > 40) { clearInterval(iv); return; }
+      go();
+    }, 500);
+    var once = function () { go(); document.removeEventListener('touchstart', once, true); document.removeEventListener('click', once, true); };
+    document.addEventListener('touchstart', once, true);
+    document.addEventListener('click', once, true);
+  }
+  function initPVideos(scope) {
+    $$('.pvideo__video', scope || document).forEach(keepPlaying);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) $$('.pvideo__video').forEach(function (v) { if (v.paused && !v.closest('.pvideo.is-paused')) v.play().catch(function () {}); });
+  });
+
   /* ---------- Elección al tocar + ---------------------------------------- */
   var choice = { id: null };
   function openChoice(btn) {
@@ -1312,7 +1400,7 @@
     savePayAttr(opt.value);
   });
 
-  function init() { initProducts(document); initRails(document); syncLikes(); syncPaySteps(); }
+  function init() { initProducts(document); initRails(document); initPVideos(document); syncLikes(); syncPaySteps(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
   // Editor de temas de Shopify: volver a iniciar al recargar una sección.
