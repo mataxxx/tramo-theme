@@ -21,7 +21,28 @@
     {% render 'product-variant-picker', product: product, form_id: form_id, section_id: form_id %}
     {% render 'product-quantity', product: product %}
     {% render 'product-buy-button', product: product, form_id: form_id %}
-    <a class="quick-view__more" href="{{ product.url }}">Ver detalles completos</a>
+
+    {%- if settings.quick_show_combo -%}
+      {% render 'product-combo', product: product, title: settings.quick_combo_title, text: settings.quick_combo_text, button_label: settings.quick_combo_button %}
+    {%- endif -%}
+    {%- if settings.quick_show_video and settings.quick_video_position == 'before_description' -%}
+      {% render 'product-video', product: product, title: settings.quick_video_title %}
+    {%- endif -%}
+    {%- if settings.quick_show_description and product.description != blank -%}
+      <div class="rte quick-view__description">{{ product.description }}</div>
+    {%- endif -%}
+    {%- if settings.quick_show_video and settings.quick_video_position != 'before_description' -%}
+      {% render 'product-video', product: product, title: settings.quick_video_title %}
+    {%- endif -%}
+    {%- if settings.quick_show_ask -%}
+      {% render 'product-ask', product: product, title: settings.quick_ask_title, text: settings.quick_ask_text, placeholder: settings.quick_ask_placeholder, button_label: settings.quick_ask_button, chip_1: settings.quick_ask_chip_1, chip_2: settings.quick_ask_chip_2, chip_3: settings.quick_ask_chip_3, endpoint: settings.quick_ask_endpoint, whatsapp_label: settings.quick_ask_whatsapp %}
+    {%- endif -%}
+    {%- if settings.quick_show_related -%}
+      {% render 'product-related', product: product, title: settings.quick_related_title %}
+    {%- endif -%}
+    {%- if settings.quick_show_full_link -%}
+      <a class="quick-view__more" href="{{ product.url }}">Ver detalles completos</a>
+    {%- endif -%}
   </div>
   {% render 'product-variants-json', product: product %}
 </div>

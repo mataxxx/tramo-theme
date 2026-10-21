@@ -276,6 +276,8 @@
 
     function render(html) {
       body.innerHTML = html;
+      var panel = body.parentElement;
+      if (panel) panel.scrollTop = 0;
       initProducts(body);
     }
 

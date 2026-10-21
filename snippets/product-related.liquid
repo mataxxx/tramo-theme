@@ -1,0 +1,14 @@
+{%- comment -%} Carrusel de relacionados. Parámetros: product, title {%- endcomment -%}
+{%- assign related = product.metafields.custom.related.value -%}
+{%- if related.size > 0 -%}
+  <div class="prelated">
+    <p class="prelated__title">{{ title }}</p>
+    <div class="product-rail prelated__rail" tabindex="0">
+      {%- for item in related -%}
+        <div class="product-rail__item">
+          {% render 'product-card', product: item, show_quick_add: true %}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}

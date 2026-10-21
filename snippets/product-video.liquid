@@ -1,0 +1,14 @@
+{%- comment -%} Video del producto (sin reproducción automática). Parámetros: product, title {%- endcomment -%}
+{%- assign pvideo = product.metafields.custom.video.value -%}
+{%- if pvideo != blank -%}
+  <div class="pvideo">
+    {%- if title != blank -%}<p class="pvideo__title">{{ title }}</p>{%- endif -%}
+    <div class="product-video__frame">
+      <video controls playsinline preload="metadata" poster="{{ pvideo.preview_image | image_url: width: 900 }}">
+        {%- for source in pvideo.sources -%}
+          <source src="{{ source.url }}" type="{{ source.mime_type }}">
+        {%- endfor -%}
+      </video>
+    </div>
+  </div>
+{%- endif -%}

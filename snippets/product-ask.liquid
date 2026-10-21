@@ -1,0 +1,36 @@
+{%- comment -%}
+  Preguntas sobre el producto (IA / WhatsApp).
+  Parámetros: product, title, text, placeholder, button_label, chip_1, chip_2, chip_3, endpoint, whatsapp_label
+{%- endcomment -%}
+{%- assign wa = settings.whatsapp_number | replace: '+', '' | replace: ' ', '' | replace: '-', '' -%}
+<div class="ask" data-ask data-endpoint="{{ endpoint | escape }}" data-wa="{{ wa }}" data-product-title="{{ product.title | escape }}" data-product-handle="{{ product.handle }}" data-product-url="{{ product.url | prepend: request.origin }}" data-product-desc="{{ product.description | strip_html | strip_newlines | truncate: 1200 | escape }}">
+  <p class="ask__title">{% render 'icon', name: 'sparkle' %} {{ title }}</p>
+  {%- if text != blank -%}<p class="ask__text muted small">{{ text }}</p>{%- endif -%}
+  <div class="ask__chips">
+    {%- for n in (1..3) -%}
+      {%- liquid
+        case n
+          when 1
+            assign chip = chip_1
+          when 2
+            assign chip = chip_2
+          else
+            assign chip = chip_3
+        endcase
+      -%}
+      {%- if chip != blank -%}
+        <button type="button" class="ask__chip" data-ask-chip>{{ chip }}</button>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+  <form class="ask__form" data-ask-form>
+    <input type="text" name="q" required maxlength="300" placeholder="{{ placeholder | escape }}" aria-label="Tu pregunta">
+    <button type="submit" class="button">{{ button_label }}</button>
+  </form>
+  <div class="ask__answer" data-ask-answer aria-live="polite" hidden></div>
+  {%- if wa != blank -%}
+    <a class="ask__wa" data-ask-wa href="https://wa.me/{{ wa }}?text={{ 'Hola, quiero preguntar sobre: ' | append: product.title | url_encode }}" target="_blank" rel="noopener">
+      {% render 'icon', name: 'chat' %} {{ whatsapp_label }}
+    </a>
+  {%- endif -%}
+</div>

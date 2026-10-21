@@ -134,6 +134,152 @@
     ]
   },
   {
+    "name": "Ventana del producto",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Esta es la ventana que se abre al tocar un producto. Aquí decides qué se muestra dentro."
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_show_description",
+        "label": "Mostrar descripción",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_show_video",
+        "label": "Mostrar video (si el producto lo tiene)",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "quick_video_position",
+        "label": "Posición del video",
+        "options": [
+          {
+            "value": "before_description",
+            "label": "Antes de la descripción"
+          },
+          {
+            "value": "after_description",
+            "label": "Después de la descripción"
+          }
+        ],
+        "default": "before_description"
+      },
+      {
+        "type": "text",
+        "id": "quick_video_title",
+        "label": "Título del video",
+        "default": "Míralo en acción"
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_show_combo",
+        "label": "Mostrar combo (si el producto lo tiene)",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "quick_combo_title",
+        "label": "Combo: título",
+        "default": "Llévalo en combo"
+      },
+      {
+        "type": "text",
+        "id": "quick_combo_text",
+        "label": "Combo: texto",
+        "default": "Agrega todo junto y ahorra."
+      },
+      {
+        "type": "text",
+        "id": "quick_combo_button",
+        "label": "Combo: texto del botón",
+        "default": "Agregar combo"
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_show_ask",
+        "label": "Mostrar preguntas (IA y WhatsApp)",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_title",
+        "label": "Preguntas: título",
+        "default": "¿Dudas sobre este producto?"
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_text",
+        "label": "Preguntas: texto",
+        "default": "Pregúntale a nuestro asistente o escríbenos por WhatsApp."
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_placeholder",
+        "label": "Preguntas: texto del campo",
+        "default": "Ej: ¿Para qué sirve? ¿Cómo se usa?"
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_button",
+        "label": "Preguntas: texto del botón",
+        "default": "Preguntar"
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_chip_1",
+        "label": "Pregunta sugerida 1",
+        "default": "¿Cómo se usa?"
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_chip_2",
+        "label": "Pregunta sugerida 2",
+        "default": "¿Con qué lo combino?"
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_chip_3",
+        "label": "Pregunta sugerida 3",
+        "default": "¿Cómo se conserva?"
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_endpoint",
+        "label": "Dirección del asistente IA",
+        "info": "Normalmente /apps/tramo/ai. Si la vacías, las preguntas van por WhatsApp.",
+        "default": "/apps/tramo/ai"
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_whatsapp",
+        "label": "Texto del botón de WhatsApp",
+        "default": "Prefiero hablar por WhatsApp"
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_show_related",
+        "label": "Mostrar relacionados (si el producto los tiene)",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "quick_related_title",
+        "label": "Relacionados: título",
+        "default": "También te puede gustar"
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_show_full_link",
+        "label": "Mostrar enlace \"Ver detalles completos\"",
+        "default": false
+      }
+    ]
+  },
+  {
     "name": "Carrito",
     "settings": [
       {

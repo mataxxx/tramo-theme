@@ -722,3 +722,12 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
 .category-more .button:hover { background: transparent; filter: none; text-decoration: underline; }
 .category-more .icon { width: 18px; height: 18px; transition: transform .2s; }
 .category-more .button:hover .icon { transform: translateY(2px); }
+
+/* Ventana del producto completa */
+.quick-view__description { margin-top: 18px; }
+.pvideo, .prelated { margin-top: 22px; }
+.pvideo__title, .prelated__title { font-family: var(--font-heading); font-size: 21px; margin-bottom: 10px; }
+.prelated__rail { padding-left: 0; padding-right: 0; margin-right: -4px; }
+.prelated__rail .product-rail__item { flex-basis: 150px; }
+.ask, .combo { grid-template-columns: minmax(0, 1fr); }
+.ask__form .button { flex-shrink: 0; }
