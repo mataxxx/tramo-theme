@@ -1364,3 +1364,10 @@ a.header__user { text-decoration: none; color: inherit; }
 .sticky-add .button { box-shadow: 0 6px 16px rgba(38,61,37,.28); }
 @media (max-width: 749px) { .product-info .sticky-add { bottom: 0; z-index: 45; } }
 @media (min-width: 750px) { .product-info .sticky-add { position: sticky; border-radius: 14px 14px 0 0; } }
+
+/* Ronda 29: agregar al carrito SIEMPRE pegado al pie de la pantalla */
+.sticky-add, .sticky-add:is(*) { position: fixed !important; left: 0; right: 0; bottom: 0 !important; margin: 0 !important; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); z-index: 70; border-radius: 0 !important; }
+.quick-view .sticky-add { left: auto; right: 0; width: min(560px, 100%); }
+@media (min-width: 750px) { .product-info .sticky-add { left: 0; right: 0; width: auto; } }
+.buy-form [data-add-button] { display: none; }
+.quick-view, .product-info { padding-bottom: 86px; }

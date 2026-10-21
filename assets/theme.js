@@ -383,7 +383,7 @@
 
     /* Botón de agregar flotante al pie: aparece cuando el original sale de la pantalla */
     (function () {
-      if (!addButton || !window.IntersectionObserver) return;
+      if (!addButton) return;
       var host = $('.product-info', root) || root;
       var bar = document.createElement('div');
       bar.className = 'sticky-add'; bar.hidden = true;
@@ -394,11 +394,7 @@
       sync();
       new MutationObserver(sync).observe(addButton, { childList: true, subtree: true, characterData: true, attributes: true });
       sb.addEventListener('click', function () { addButton.click(); });
-      var scroller = null;
-      new IntersectionObserver(function (entries) {
-        var e = entries[0];
-        bar.hidden = e.isIntersecting || e.boundingClientRect.top > 0;
-      }, { root: scroller, threshold: 0 }).observe(addButton);
+      bar.hidden = false;
     })();
     var errorEl = $('[data-form-error]', form);
     var normalWrap = $('[data-qty-normal]', root);
