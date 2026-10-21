@@ -1,31 +1,46 @@
 {%- style -%}
   #shopify-section-{{ section.id }} { padding-top: {{ section.settings.space_top }}px; padding-bottom: {{ section.settings.space_bottom }}px; }
 {%- endstyle -%}
-<nav class="cat-circles" aria-label="Categorías">
-  <div class="cat-circles__row">
-    {%- for block in section.blocks -%}
-      {%- assign coll = block.settings.collection -%}
-      {%- assign t = block.settings.title -%}
-      {%- if t == blank and coll != blank -%}{%- assign t = coll.title -%}{%- endif -%}
-      {%- assign img = block.settings.image -%}
-      {%- capture inner -%}
-        <span class="cat-circle__media">
-          {%- if img != blank -%}
-            {{ img | image_url: width: 240 | image_tag: widths: '120, 240', sizes: '84px', loading: 'lazy', alt: t }}
-          {%- else -%}
-            {% render 'icon', name: block.settings.icon %}
-          {%- endif -%}
-        </span>
-        <span class="cat-circle__title">{{ t }}</span>
-      {%- endcapture -%}
-      {%- if coll != blank -%}
-        <button type="button" class="cat-circle" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?" {{ block.shopify_attributes }}>{{ inner }}</button>
-      {%- else -%}
-        <span class="cat-circle" {{ block.shopify_attributes }}>{{ inner }}</span>
-      {%- endif -%}
-    {%- endfor -%}
-  </div>
-</nav>
+<div class="cats-wrap">
+  <button type="button" class="cats-btn" data-open="categories" aria-controls="CategoriesPanel">
+    {% render 'icon', name: 'grid' %}
+    <span>{{ section.settings.button_label }}</span>
+    {% render 'icon', name: 'chevron-right' %}
+  </button>
+</div>
+
+<div class="drawer drawer--modal drawer--cats" id="CategoriesPanel" data-drawer="categories" role="dialog" aria-modal="true" aria-label="{{ section.settings.panel_title | escape }}" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <section class="cats-panel">
+    <div class="cats-panel__head">
+      <h2>{{ section.settings.panel_title }}</h2>
+      <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+    </div>
+    <div class="cats-panel__grid">
+      {%- for block in section.blocks -%}
+        {%- assign coll = block.settings.collection -%}
+        {%- assign t = block.settings.title -%}
+        {%- if t == blank and coll != blank -%}{%- assign t = coll.title -%}{%- endif -%}
+        {%- assign img = block.settings.image -%}
+        {%- capture inner -%}
+          <span class="cats-tile__media">
+            {%- if img != blank -%}
+              {{ img | image_url: width: 400 | image_tag: widths: '200, 400', sizes: '180px', loading: 'lazy', alt: t }}
+            {%- else -%}
+              {% render 'icon', name: block.settings.icon %}
+            {%- endif -%}
+          </span>
+          <span class="cats-tile__title">{{ t }}</span>
+        {%- endcapture -%}
+        {%- if coll != blank -%}
+          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?" {{ block.shopify_attributes }}>{{ inner }}</button>
+        {%- else -%}
+          <span class="cats-tile" {{ block.shopify_attributes }}>{{ inner }}</span>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </section>
+</div>
 
 {% schema %}
 {
@@ -33,7 +48,9 @@
   "tag": "div",
   "max_blocks": 12,
   "settings": [
-    { "type": "paragraph", "content": "Atajos redondos a cada categoría. Al tocarlos se abre la ventana de la categoría." },
+    { "type": "paragraph", "content": "Un botón que abre una ventana con todas las categorías. Cada una abre su pop-up." },
+    { "type": "text", "id": "button_label", "label": "Texto del botón", "default": "Explorar categorías" },
+    { "type": "text", "id": "panel_title", "label": "Título de la ventana", "default": "Nuestras categorías" },
     { "type": "range", "id": "space_top", "label": "Espacio arriba", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 },
     { "type": "range", "id": "space_bottom", "label": "Espacio abajo", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 }
   ],

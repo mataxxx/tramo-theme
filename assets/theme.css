@@ -1379,3 +1379,26 @@ a.header__user { text-decoration: none; color: inherit; }
 .sticky-add .trust-bar--sticky[hidden] { display: none; }
 .sticky-add .trust-bar__list { gap: 2px 22px; }
 .quick-view, .product-info { padding-bottom: 130px; }
+
+/* Ronda 31: botón "Explorar categorías" + ventana con todas */
+.cats-wrap { padding: 16px 18px 6px; }
+.cats-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: var(--radius-button, 14px); background: var(--color-primary); color: var(--color-on-primary); font-weight: 700; font-size: 16px; padding: 15px 18px; box-shadow: 0 8px 20px rgba(38,61,37,.28); transition: transform .15s, filter .15s; }
+.cats-btn:hover { filter: brightness(1.1); }
+.cats-btn:active { transform: scale(.99); }
+.cats-btn .icon { width: 20px; height: 20px; }
+.cats-btn span { flex: 0 1 auto; }
+@media (min-width: 750px) { .cats-wrap { padding: 18px 3.5vw 8px; } .cats-btn { max-width: 420px; margin: 0 auto; } }
+.cats-panel { position: relative; width: min(640px, 100%); max-height: 92vh; max-height: 92dvh; overflow-y: auto; background: var(--color-bg); border-radius: 22px; box-shadow: 0 24px 70px rgba(0,0,0,.35); padding: 20px 18px 22px; transform: translateY(16px); opacity: 0; transition: transform .25s, opacity .25s; }
+.drawer.is-open .cats-panel { transform: none; opacity: 1; }
+.cats-panel__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.cats-panel__head h2 { font-size: clamp(24px, 5vw, 34px); letter-spacing: -.5px; }
+.cats-panel__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 560px) { .cats-panel__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cats-tile { display: grid; gap: 8px; border: 0; background: transparent; padding: 0; text-align: center; color: var(--color-primary); }
+.cats-tile__media { display: grid; place-items: center; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden; background: linear-gradient(160deg, color-mix(in srgb, var(--color-primary) 85%, #fff), var(--color-primary)); color: rgba(255,255,255,.92); box-shadow: 0 6px 14px rgba(38,61,37,.24); transition: transform .15s; }
+.cats-tile__media img { width: 100%; height: 100%; object-fit: cover; }
+.cats-tile__media .icon { width: 40px; height: 40px; stroke-width: 1.5; }
+.cats-tile:hover .cats-tile__media { transform: translateY(-2px); }
+.cats-tile__title { font-weight: 700; font-size: 14px; line-height: 1.2; }
+.drawer--cats { z-index: 50; }
+.drawer--category { z-index: 56; }
