@@ -1344,3 +1344,10 @@ a.header__user { text-decoration: none; color: inherit; }
 .cat-circle, .cat-circle:is(*) { aspect-ratio: 1 / 1; }
 @media (min-width: 750px) { .cat-circle { aspect-ratio: 1 / 1; } }
 @media (min-width: 1100px) { .cat-circle { aspect-ratio: 1 / 1; } }
+
+/* Ronda 26: texto debajo del cuadro, más aire arriba */
+.cat-circles { padding-top: 18px; }
+.cat-circle, .cat-circle:is(*) { aspect-ratio: auto; display: grid; align-content: start; gap: 7px; background: transparent; box-shadow: none; border-radius: 0; overflow: visible; color: var(--color-primary); }
+.cat-circle__media, .cat-circle__media:is(*) { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden; padding-bottom: 0; box-shadow: 0 5px 12px rgba(38,61,37,.22); }
+.cat-circle__title, .cat-circle__title:is(*) { position: static; padding: 0 2px; background: none; color: var(--color-primary); font-size: 12px; font-weight: 700; line-height: 1.2; text-align: center; }
+@media (min-width: 750px) { .cat-circle__media, .cat-circle__media:is(*) { border-radius: 20px; } .cat-circle__title, .cat-circle__title:is(*) { font-size: 14px; } }
