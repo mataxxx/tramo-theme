@@ -75,7 +75,7 @@
     {%- endif -%}
     <div class="product-card__row">
       <div class="price{% if shown.compare_at_price > shown.price %} price--sale{% endif %}" data-price>
-        {%- if show_from -%}<span class="price__from">Desde</span>{%- endif -%}
+        {%- if show_from or product.tags contains 'especiero-modelo' -%}<span class="price__from">Desde</span>{%- endif -%}
         {%- if shown.compare_at_price > shown.price -%}<s class="price__compare">{{ shown.compare_at_price | money }}</s>{%- endif -%}
         <strong class="price__current">{{ shown.price | money }}</strong>
       </div>

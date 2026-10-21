@@ -1581,3 +1581,10 @@ a.header__user { text-decoration: none; color: inherit; }
 .rack-teaser p { margin: 6px 0 12px; }
 .rack-teaser .button { background: var(--color-primary); color: var(--color-on-primary); }
 @media (min-width: 750px) { .rack-teaser { grid-template-columns: auto 1fr auto; margin: 10px 3.5vw 30px; padding: 26px 34px; } }
+
+.rack-cta { display: grid; gap: 8px; margin: 6px 0 10px; }
+.rack-cta .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.rack-cta .icon { width: 20px; height: 20px; }
+.rack-cta__note { text-align: center; font-size: 13px; color: var(--color-muted); margin: 0; }
+.rack-teaser__photo img { width: 100%; max-width: 300px; border-radius: 16px; display: block; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
+@media (min-width: 750px) { .rack-teaser { grid-template-columns: auto 1fr auto auto; } }

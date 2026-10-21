@@ -106,7 +106,7 @@
     }
 
     function selectModel(id) {
-      var m = data.models.filter(function (x) { return String(x.id) === String(id); })[0];
+      var m = data.models.filter(function (x) { return String(x.id) === String(id) || x.handle === id; })[0];
       if (!m) return;
       var prev = state.slots.slice(0, m.slots);
       state.model = m;
@@ -205,6 +205,7 @@
         .catch(function (e) { alert(e.message || 'No se pudo agregar al carrito'); updateBar(); });
     }
 
+    root._rackSelect = selectModel;
     root.addEventListener('click', function (e) {
       var t = e.target;
       var m = t.closest('[data-model]'); if (m) { selectModel(m.getAttribute('data-model')); return; }
@@ -228,7 +229,12 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !picker.hidden) closePicker(); });
   }
 
-  function boot() { $$('[data-rack]').forEach(init); }
+  function preselect(root) {
+    var q = new URLSearchParams(window.location.search).get('modelo');
+    if (!q || !root._rackSelect) return;
+    root._rackSelect(q);
+  }
+  function boot() { $$('[data-rack]').forEach(function (r) { init(r); preselect(r); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   document.addEventListener('shopify:section:load', boot);
 })();

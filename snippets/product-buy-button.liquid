@@ -2,6 +2,13 @@
   Formulario de compra. Parámetros: product, form_id, label (opcional)
 {%- endcomment -%}
 {%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- if product.tags contains 'especiero-modelo' -%}
+  <div class="rack-cta">
+    <a class="button button--full" href="/pages/especiero?modelo={{ product.handle }}">{% render 'icon', name: 'mortar' %} Armar mi especiero</a>
+    <p class="rack-cta__note">Base de madera hecha a mano en Costa Rica. Tú eliges las especias.</p>
+  </div>
+{%- else -%}
+
 {% form 'product', product, id: form_id, class: 'buy-form', novalidate: 'novalidate', data-product-form: '' %}
   <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id {% unless current_variant.available %}disabled{% endunless %}>
   <input type="hidden" name="quantity" value="1" data-quantity-field>
@@ -30,3 +37,4 @@
     <li class="trust-bar__item">{% render 'icon', name: 'truck' %}<span>{{ settings.sticky_trust_2 | default: 'Entrega rápida' }}</span></li>
   </ul>
 </div>
+{%- endif -%}

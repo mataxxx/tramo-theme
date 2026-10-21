@@ -9,7 +9,9 @@
   endif
 -%}
 <div class="price{% if target.compare_at_price > target.price %} price--sale{% endif %}" data-price>
-  {%- if prefix_from and variant == blank and product.price_varies -%}
+  {%- if product.tags contains 'especiero-modelo' -%}
+    <span class="price__from">Desde</span>
+  {%- elsif prefix_from and variant == blank and product.price_varies -%}
     <span class="price__from">Desde</span>
   {%- endif -%}
   {%- if target.compare_at_price > target.price -%}
