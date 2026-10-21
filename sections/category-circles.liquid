@@ -4,12 +4,8 @@
 <section class="category-section cats-section">
   <div class="category-heading">
     <h2 class="category-title">
-      <span class="category-title__icon">{% render 'icon', name: 'grid' %}</span>
       <a href="#" class="category-title__link" data-open="categories" role="button">{{ section.settings.heading }}</a>
     </h2>
-    <button type="button" class="category-see" data-open="categories" aria-controls="CategoriesPanel">
-      <span>{{ section.settings.button_label }}</span>{% render 'icon', name: 'chevron-right' %}
-    </button>
   </div>
   <div class="product-rail" tabindex="0" aria-label="{{ section.settings.heading | escape }}">
     {%- for block in section.blocks -%}

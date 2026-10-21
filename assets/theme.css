@@ -1415,3 +1415,6 @@ a.header__user { text-decoration: none; color: inherit; }
 .cats-section .cats-tile { width: 100%; }
 .cats-section .cats-tile__media .icon { width: 44px; height: 44px; }
 .cats-section .cats-tile__title { font-size: 15px; }
+
+/* Ronda 34 */
+.cats-section { margin-top: 26px; }
