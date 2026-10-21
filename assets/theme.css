@@ -1408,3 +1408,10 @@ a.header__user { text-decoration: none; color: inherit; }
 .cats-btn, .cats-btn:is(*) { width: auto; max-width: none; margin: 0; padding: 10px 20px; font-size: 14px; gap: 8px; box-shadow: 0 5px 14px rgba(38,61,37,.25); }
 .cats-btn .icon { width: 17px; height: 17px; }
 @media (min-width: 750px) { .cats-wrap { padding: 18px 3.5vw 36px; } }
+
+/* Ronda 33: categorías con el mismo look del carrusel de especias */
+.cats-section { margin-bottom: 8px; }
+.cats-section .category-title__link { text-decoration: none; color: inherit; }
+.cats-section .cats-tile { width: 100%; }
+.cats-section .cats-tile__media .icon { width: 44px; height: 44px; }
+.cats-section .cats-tile__title { font-size: 15px; }
