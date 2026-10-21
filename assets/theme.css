@@ -1402,3 +1402,9 @@ a.header__user { text-decoration: none; color: inherit; }
 .cats-tile__title { font-weight: 700; font-size: 14px; line-height: 1.2; }
 .drawer--cats { z-index: 50; }
 .drawer--category { z-index: 56; }
+
+/* Ronda 32: botón de categorías más pequeño, centrado y con aire */
+.cats-wrap { display: flex; justify-content: center; padding: 16px 18px 30px; }
+.cats-btn, .cats-btn:is(*) { width: auto; max-width: none; margin: 0; padding: 10px 20px; font-size: 14px; gap: 8px; box-shadow: 0 5px 14px rgba(38,61,37,.25); }
+.cats-btn .icon { width: 17px; height: 17px; }
+@media (min-width: 750px) { .cats-wrap { padding: 18px 3.5vw 36px; } }
