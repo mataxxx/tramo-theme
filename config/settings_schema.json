@@ -10,47 +10,177 @@
   {
     "name": "Colores",
     "settings": [
-      { "type": "color", "id": "color_background", "label": "Fondo de la página", "default": "#f7f3e9" },
-      { "type": "color", "id": "color_surface", "label": "Fondo de tarjetas y paneles", "default": "#fffdf8" },
-      { "type": "color", "id": "color_text", "label": "Texto", "default": "#151914" },
-      { "type": "color", "id": "color_muted", "label": "Texto secundario", "default": "#77786f" },
-      { "type": "color", "id": "color_primary", "label": "Color principal (botones, hero)", "default": "#263d25" },
-      { "type": "color", "id": "color_on_primary", "label": "Texto sobre color principal", "default": "#ffffff" },
-      { "type": "color", "id": "color_line", "label": "Líneas y bordes", "default": "#e4dfd2" },
-      { "type": "color", "id": "color_accent", "label": "Acento (ofertas, avisos)", "default": "#b94720" }
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Fondo de la página",
+        "default": "#f7f3e9"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Fondo de tarjetas y paneles",
+        "default": "#fffdf8"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Texto",
+        "default": "#151914"
+      },
+      {
+        "type": "color",
+        "id": "color_muted",
+        "label": "Texto secundario",
+        "default": "#77786f"
+      },
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Color principal (botones, hero)",
+        "default": "#263d25"
+      },
+      {
+        "type": "color",
+        "id": "color_on_primary",
+        "label": "Texto sobre color principal",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "color_line",
+        "label": "Líneas y bordes",
+        "default": "#e4dfd2"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Acento (ofertas, avisos)",
+        "default": "#b94720"
+      }
     ]
   },
   {
     "name": "Tipografía",
     "settings": [
-      { "type": "font_picker", "id": "type_heading_font", "label": "Fuente de títulos", "default": "lora_n4" },
-      { "type": "font_picker", "id": "type_body_font", "label": "Fuente de texto", "default": "assistant_n4" }
+      {
+        "type": "font_picker",
+        "id": "type_heading_font",
+        "label": "Fuente de títulos",
+        "default": "lora_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Fuente de texto",
+        "default": "assistant_n4"
+      },
+      {
+        "type": "range",
+        "id": "type_body_size",
+        "label": "Tamaño base del texto",
+        "min": 13,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "default": 16
+      }
     ]
   },
   {
     "name": "Diseño",
     "settings": [
-      { "type": "range", "id": "page_width", "label": "Ancho máximo de la página", "min": 1100, "max": 1600, "step": 20, "unit": "px", "default": 1440 },
-      { "type": "range", "id": "radius_card", "label": "Redondeo de tarjetas", "min": 0, "max": 24, "step": 2, "unit": "px", "default": 12 },
-      { "type": "range", "id": "radius_button", "label": "Redondeo de botones", "min": 0, "max": 30, "step": 2, "unit": "px", "default": 8 }
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Ancho máximo de la página",
+        "min": 1100,
+        "max": 1600,
+        "step": 20,
+        "unit": "px",
+        "default": 1440
+      },
+      {
+        "type": "range",
+        "id": "radius_card",
+        "label": "Redondeo de tarjetas",
+        "min": 0,
+        "max": 24,
+        "step": 2,
+        "unit": "px",
+        "default": 12
+      },
+      {
+        "type": "range",
+        "id": "radius_button",
+        "label": "Redondeo de botones",
+        "min": 0,
+        "max": 30,
+        "step": 2,
+        "unit": "px",
+        "default": 8
+      }
     ]
   },
   {
     "name": "Logo e icono",
     "settings": [
-      { "type": "image_picker", "id": "favicon", "label": "Icono de pestaña (favicon)", "info": "Cuadrado, mínimo 32 x 32 px." }
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Icono de pestaña (favicon)",
+        "info": "Cuadrado, mínimo 32 x 32 px."
+      }
     ]
   },
   {
     "name": "Carrito",
     "settings": [
       {
+        "type": "header",
+        "content": "Al agregar un producto"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_popup",
+        "label": "Mostrar aviso de producto agregado",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "popup_title",
+        "label": "Título del aviso",
+        "default": "Producto agregado al carrito"
+      },
+      {
+        "type": "text",
+        "id": "popup_view_cart",
+        "label": "Texto del botón de carrito",
+        "default": "Ver carrito"
+      },
+      {
+        "type": "text",
+        "id": "popup_continue",
+        "label": "Texto del botón de seguir",
+        "default": "Seguir comprando"
+      },
+      {
+        "type": "header",
+        "content": "Carrito"
+      },
+      {
         "type": "select",
         "id": "cart_type",
-        "label": "Al agregar un producto",
+        "label": "Al abrir el carrito",
         "options": [
-          { "value": "drawer", "label": "Abrir el carrito lateral" },
-          { "value": "page", "label": "Ir a la página del carrito" }
+          {
+            "value": "drawer",
+            "label": "Abrir el carrito lateral"
+          },
+          {
+            "value": "page",
+            "label": "Ir a la página del carrito"
+          }
         ],
         "default": "drawer"
       }
@@ -63,20 +193,63 @@
         "type": "paragraph",
         "content": "El granel funciona con una variante cuyo precio es el de una unidad de peso (por ejemplo 10 g). La cantidad en el carrito son esas unidades, y el tema muestra gramos."
       },
-      { "type": "text", "id": "bulk_variant_name", "label": "Nombre de la opción a granel", "default": "A granel", "info": "Debe coincidir exactamente con el valor de la opción en el producto." },
-      { "type": "number", "id": "bulk_unit_grams", "label": "Gramos por unidad", "default": 10, "info": "El precio de la variante a granel debe ser el precio de esta cantidad de gramos." },
-      { "type": "number", "id": "bulk_min_grams", "label": "Mínimo a granel (g)", "default": 250 },
-      { "type": "number", "id": "bulk_button_step", "label": "Salto de los botones + y − (g)", "default": 50 }
+      {
+        "type": "text",
+        "id": "bulk_variant_name",
+        "label": "Nombre de la opción a granel",
+        "default": "A granel",
+        "info": "Debe coincidir exactamente con el valor de la opción en el producto."
+      },
+      {
+        "type": "number",
+        "id": "bulk_unit_grams",
+        "label": "Gramos por unidad",
+        "default": 10,
+        "info": "El precio de la variante a granel debe ser el precio de esta cantidad de gramos."
+      },
+      {
+        "type": "number",
+        "id": "bulk_min_grams",
+        "label": "Mínimo a granel (g)",
+        "default": 250
+      },
+      {
+        "type": "number",
+        "id": "bulk_button_step",
+        "label": "Salto de los botones + y − (g)",
+        "default": 50
+      }
     ]
   },
   {
     "name": "Redes sociales",
     "settings": [
-      { "type": "text", "id": "whatsapp_number", "label": "WhatsApp (solo números, con código de país)", "info": "Ejemplo: 50688887777" },
-      { "type": "url", "id": "social_instagram", "label": "Instagram" },
-      { "type": "url", "id": "social_facebook", "label": "Facebook" },
-      { "type": "url", "id": "social_tiktok", "label": "TikTok" },
-      { "type": "url", "id": "social_youtube", "label": "YouTube" }
+      {
+        "type": "text",
+        "id": "whatsapp_number",
+        "label": "WhatsApp (solo números, con código de país)",
+        "info": "Ejemplo: 50688887777"
+      },
+      {
+        "type": "url",
+        "id": "social_instagram",
+        "label": "Instagram"
+      },
+      {
+        "type": "url",
+        "id": "social_facebook",
+        "label": "Facebook"
+      },
+      {
+        "type": "url",
+        "id": "social_tiktok",
+        "label": "TikTok"
+      },
+      {
+        "type": "url",
+        "id": "social_youtube",
+        "label": "YouTube"
+      }
     ]
   }
 ]

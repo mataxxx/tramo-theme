@@ -107,7 +107,7 @@
     openDrawers().forEach(function (d) { closeDrawer(d, keepFocus); });
   }
 
-  function openDrawer(name) {
+  function openDrawer(name, opts) {
     var drawer = $('[data-drawer="' + name + '"]');
     if (!drawer) return null;
     if (!drawer.classList.contains('is-open')) {
@@ -122,7 +122,7 @@
         var target = $('[data-search-input]', drawer) || $('.close-button, [data-drawer-close]:not(.drawer__backdrop)', drawer);
         if (target && typeof target.focus === 'function') target.focus({ preventScroll: true });
       }, 60);
-      if (name === 'reels') startReels();
+      if (name === 'reels') { setReelsView(opts && opts.view); startReels(); }
     }
     return drawer;
   }
@@ -184,14 +184,35 @@
     }).then(parseJSON);
   }
 
-  function afterAdd() {
+  function openCartView() {
+    var drawer = $('[data-drawer="cart"]');
+    if (T.cartDrawer === 'drawer' && drawer) {
+      openDrawer('cart');
+    } else {
+      window.location.href = T.routes.cart;
+    }
+  }
+
+  function showAddedPopup(item) {
+    var box = $('[data-added-item]');
+    if (!box) return false;
+    var isBulk = item.variant_options && item.variant_options.indexOf(BULK.name) > -1;
+    var detail = isBulk ? BULK.name + ' · ' + (item.quantity * BULK.unit) + ' g'
+      : (item.variant_title ? item.variant_title + (item.quantity > 1 ? ' · x' + item.quantity : '') : (item.quantity > 1 ? 'x' + item.quantity : ''));
+    var img = item.image ? sizedImage(item.image, 160) : '';
+    box.innerHTML =
+      '<span class="added-popup__img">' + (img ? '<img src="' + esc(img) + '" alt="" width="80" height="80">' : '') + '</span>' +
+      '<span class="added-popup__info"><strong>' + esc(item.product_title || item.title) + '</strong>' +
+      (detail ? '<small>' + esc(detail) + '</small>' : '') +
+      '<span class="added-popup__price">' + formatMoney(item.final_line_price != null ? item.final_line_price : item.line_price) + '</span></span>';
+    openDrawer('added');
+    return true;
+  }
+
+  function afterAdd(item) {
     return refreshCart().then(function () {
-      var drawer = $('[data-drawer="cart"]');
-      if (T.cartDrawer === 'drawer' && drawer) {
-        openDrawer('cart');
-      } else {
-        window.location.href = T.routes.cart;
-      }
+      if (T.cartPopup && item && showAddedPopup(item)) return;
+      openCartView();
     });
   }
 
@@ -436,9 +457,9 @@
       addButton.disabled = true;
       addButton.setAttribute('aria-busy', 'true');
       addToCart(parseInt(idInput.value, 10), quantity)
-        .then(function () {
+        .then(function (item) {
           if (inQuickView) closeDrawer($('[data-drawer="quick-view"]'), true);
-          return afterAdd();
+          return afterAdd(item);
         })
         .catch(function (error) {
           if (errorEl) { errorEl.textContent = error.message || 'No se pudo agregar al carrito'; errorEl.hidden = false; }
@@ -590,6 +611,29 @@
     $$('[data-reel] video').forEach(function (v) { v.pause(); });
   }
 
+  function reelsWrap() { return $('[data-reels-wrap]'); }
+
+  function setReelsView(view, index) {
+    var wrap = reelsWrap();
+    if (!wrap) return;
+    view = view === 'grid' || view === 'feed' ? view : (wrap.getAttribute('data-default-view') || 'feed');
+    wrap.setAttribute('data-view', view);
+    var grid = $('[data-reels-grid]', wrap);
+    if (grid) grid.hidden = view !== 'grid';
+    var feed = $('[data-reels]', wrap);
+    if (view === 'grid') {
+      pauseAllReels();
+      if (grid) grid.scrollTop = 0;
+    } else if (feed) {
+      var reels = $$('[data-reel]', feed);
+      var target = reels[index || 0];
+      requestAnimationFrame(function () {
+        if (target) feed.scrollTop = target.offsetTop;
+        startReels();
+      });
+    }
+  }
+
   function startReels() {
     var container = $('[data-reels]');
     if (!container) return;
@@ -622,7 +666,23 @@
     if (opener) {
       var name = opener.getAttribute('data-open');
       event.preventDefault();
-      if (name === 'search') openSearch(null); else openDrawer(name);
+      if (name === 'search') openSearch(null);
+      else if (name === 'reels') openDrawer(name, { view: opener.getAttribute('data-reels-view') });
+      else openDrawer(name);
+      return;
+    }
+
+    var showGrid = target.closest('[data-reels-show-grid]');
+    if (showGrid) { setReelsView('grid'); return; }
+
+    var tile = target.closest('[data-reel-tile]');
+    if (tile) { setReelsView('feed', parseInt(tile.getAttribute('data-reel-tile'), 10) || 0); return; }
+
+    var viewCart = target.closest('[data-added-view-cart]');
+    if (viewCart) {
+      event.preventDefault();
+      closeDrawer($('[data-drawer="added"]'), true);
+      openCartView();
       return;
     }
 

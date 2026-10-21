@@ -1,0 +1,74 @@
+{%- comment -%}
+  Tarjeta de pedido (estilo seguimiento tipo Uber).
+  Parámetros:
+    order  - pedido del cliente (opcional; si falta se dibuja un ejemplo)
+    steps  - bloques "status" de la sección (etapas del pedido)
+  El estado se define con etiquetas del pedido en el administrador de Shopify.
+{%- endcomment -%}
+{%- liquid
+  assign current = 0
+  assign cancelled = false
+  assign total_steps = steps.size
+  if order != blank
+    assign tags_down = order.tags | join: '|' | downcase | split: '|'
+    for step in steps
+      assign tag_key = step.settings.tag | strip | downcase
+      if tag_key != blank and tags_down contains tag_key
+        assign current = forloop.index0
+      endif
+    endfor
+    if order.cancelled
+      assign cancelled = true
+    elsif current == 0 and order.fulfillment_status == 'fulfilled'
+      assign current = total_steps | minus: 1
+    endif
+  else
+    assign current = 1
+  endif
+  if current >= total_steps
+    assign current = total_steps | minus: 1
+  endif
+-%}
+<article class="order-card{% if cancelled %} order-card--cancelled{% endif %}">
+  <header class="order-card__head">
+    <div>
+      <strong class="order-card__number">{% if order != blank %}{{ order.name }}{% else %}#1001{% endif %}</strong>
+      <small class="order-card__date">{% if order != blank %}{{ order.created_at | date: '%d/%m/%Y' }}{% else %}Ejemplo{% endif %}</small>
+    </div>
+    <span class="order-card__total">{% if order != blank %}{{ order.total_price | money }}{% else %}{{ 12500 | times: 100 | money }}{% endif %}</span>
+  </header>
+
+  {%- if order != blank -%}
+    <div class="order-card__items">
+      {%- for item in order.line_items limit: 4 -%}
+        <span class="order-card__thumb">
+          {%- if item.image -%}
+            {{ item.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: item.title }}
+          {%- endif -%}
+        </span>
+      {%- endfor -%}
+      <span class="order-card__count">{{ order.item_count }} {% if order.item_count == 1 %}artículo{% else %}artículos{% endif %}</span>
+    </div>
+  {%- endif -%}
+
+  <div class="order-card__status">
+    {%- if cancelled -%}
+      <span class="order-chip order-chip--cancelled">Cancelado</span>
+    {%- elsif total_steps > 0 -%}
+      <div class="order-card__state">
+        <span class="order-chip">{{ steps[current].settings.label }}</span>
+        {%- if steps[current].settings.description != blank -%}
+          <small>{{ steps[current].settings.description }}</small>
+        {%- endif -%}
+      </div>
+      <ol class="order-steps" style="--steps: {{ total_steps }};">
+        {%- for step in steps -%}
+          <li class="{% if forloop.index0 <= current %}is-done{% endif %}{% if forloop.index0 == current %} is-current{% endif %}">
+            <span class="order-steps__dot"></span>
+            <span class="order-steps__label">{{ step.settings.label }}</span>
+          </li>
+        {%- endfor -%}
+      </ol>
+    {%- endif -%}
+  </div>
+</article>

@@ -43,6 +43,7 @@
         --page-width: {{ settings.page_width }}px;
         --radius-card: {{ settings.radius_card }}px;
         --radius-button: {{ settings.radius_button }}px;
+        --body-size: {{ settings.type_body_size | default: 16 }}px;
       }
     {%- endstyle -%}
 
@@ -53,6 +54,7 @@
       window.TRAMO = {
         moneyFormat: {{ shop.money_format | json }},
         cartDrawer: {{ settings.cart_type | default: 'drawer' | json }},
+        cartPopup: {{ settings.cart_popup | json }},
         routes: {
           root: {{ routes.root_url | json }},
           cart: {{ routes.cart_url | json }},
@@ -85,6 +87,7 @@
     {% sections 'overlay-group' %}
 
     {% render 'quick-view-sheet' %}
+    {% render 'cart-added-popup' %}
     <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
   </body>
 </html>

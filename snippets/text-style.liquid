@@ -1,0 +1,37 @@
+{%- comment -%}
+  Genera el CSS de un texto editable (fuente, tamaño, color) a partir de los ajustes de la sección.
+  Parámetros: s (section.settings), p (prefijo de los ajustes), sel (selector CSS completo)
+  Se debe usar dentro de un bloque {% style %}.
+{%- endcomment -%}
+{%- liquid
+  assign k_custom = p | append: '_custom_font'
+  assign k_font = p | append: '_font'
+  assign k_size = p | append: '_size'
+  assign k_size_m = p | append: '_size_mobile'
+  assign k_color = p | append: '_color'
+  assign use_font = false
+  if s[k_custom] and s[k_font] != blank
+    assign use_font = true
+  endif
+-%}
+{%- if use_font -%}
+  {{ s[k_font] | font_face: font_display: 'swap' }}
+{%- endif -%}
+{{ sel }} {
+  {%- if use_font %}
+  font-family: {{ s[k_font].family }}, {{ s[k_font].fallback_families }};
+  font-weight: {{ s[k_font].weight }};
+  font-style: {{ s[k_font].style }};
+  {%- endif %}
+  {%- if s[k_color] != blank %}
+  color: {{ s[k_color] }};
+  {%- endif %}
+  {%- if s[k_size_m] > 0 %}
+  font-size: {{ s[k_size_m] }}px;
+  {%- endif %}
+}
+{%- if s[k_size] > 0 %}
+@media (min-width: 750px) {
+  {{ sel }} { font-size: {{ s[k_size] }}px; }
+}
+{%- endif %}

@@ -16,9 +16,44 @@
       "settings": {
         "title": "¿Qué estás buscando?",
         "placeholder": "Busca por nombre...",
-        "helper": "También puedes buscar por categoría",
-        "categories_menu": ""
-      }
+        "helper": "También puedes buscar por categoría"
+      },
+      "blocks": {
+        "c1": {
+          "type": "category",
+          "settings": {
+            "collection": "frontpage",
+            "title": "Especias"
+          }
+        },
+        "c2": {
+          "type": "category",
+          "settings": {
+            "collection": "test2",
+            "title": "Semillas & Granos"
+          }
+        },
+        "c3": {
+          "type": "category",
+          "settings": {
+            "collection": "frutas-otros-deshidratados",
+            "title": "Frutas & otros deshidratados"
+          }
+        },
+        "c4": {
+          "type": "category",
+          "settings": {
+            "collection": "insumos-para-reposteria",
+            "title": "Insumos para Repostería"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ]
     },
     "reels": {
       "type": "reels",
@@ -31,7 +66,9 @@
           }
         }
       },
-      "block_order": ["reel-1"],
+      "block_order": [
+        "reel-1"
+      ],
       "settings": {}
     },
     "bottom-nav": {
@@ -43,7 +80,57 @@
         "label_cart": "Carrito",
         "show_videos": true
       }
+    },
+    "account-panel": {
+      "type": "account-panel",
+      "blocks": {
+        "s1": {
+          "type": "status",
+          "settings": {
+            "label": "Recibido",
+            "tag": "",
+            "description": "Recibimos tu pedido."
+          }
+        },
+        "s2": {
+          "type": "status",
+          "settings": {
+            "label": "Preparando",
+            "tag": "estado-preparando",
+            "description": "Estamos preparando tu pedido."
+          }
+        },
+        "s3": {
+          "type": "status",
+          "settings": {
+            "label": "En camino",
+            "tag": "estado-en-camino",
+            "description": "Tu pedido va en camino."
+          }
+        },
+        "s4": {
+          "type": "status",
+          "settings": {
+            "label": "Entregado",
+            "tag": "estado-entregado",
+            "description": "Pedido entregado. ¡Buen provecho!"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ],
+      "settings": {}
     }
   },
-  "order": ["cart-drawer", "search-overlay", "reels", "bottom-nav"]
+  "order": [
+    "cart-drawer",
+    "search-overlay",
+    "account-panel",
+    "reels",
+    "bottom-nav"
+  ]
 }

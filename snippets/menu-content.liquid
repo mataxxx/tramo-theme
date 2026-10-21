@@ -1,0 +1,86 @@
+{%- comment -%}
+  Contenido del menú (se usa en el panel móvil y en la barra lateral fija de escritorio).
+  Parámetros: s (ajustes de la sección encabezado), ctx ('drawer' o 'sidebar')
+{%- endcomment -%}
+{%- liquid
+  assign menu_obj = s.menu
+  assign image_pos = s.menu_image_position | default: 'top'
+  assign has_image = false
+  if s.menu_image != blank
+    assign has_image = true
+  endif
+-%}
+
+{%- if has_image and image_pos == 'top' -%}
+  {% render 'menu-image', s: s %}
+{%- endif -%}
+
+<nav class="menu-list" aria-label="Menú principal">
+  {%- if menu_obj != blank and menu_obj.links.size > 0 -%}
+    <ul>
+      {%- for link in menu_obj.links -%}
+        {%- liquid
+          assign skip = false
+          if s.hide_home and link.type == 'frontpage_link'
+            assign skip = true
+          endif
+          if s.hide_home and link.url == routes.root_url
+            assign skip = true
+          endif
+          if s.hide_catalog and link.type == 'catalog_link'
+            assign skip = true
+          endif
+          if s.hide_catalog and link.url == routes.all_products_collection_url
+            assign skip = true
+          endif
+          if s.hide_contact and link.url contains '/pages/contact'
+            assign skip = true
+          endif
+        -%}
+        {%- unless skip -%}
+          <li>
+            <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title }}</a>
+            {%- if link.links.size > 0 -%}
+              <ul class="menu-list__sub">
+                {%- for child in link.links -%}
+                  <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </li>
+        {%- endunless -%}
+      {%- endfor -%}
+    </ul>
+  {%- elsif request.design_mode -%}
+    <p class="muted small">Elige un menú en la configuración del encabezado.</p>
+  {%- endif -%}
+</nav>
+
+{%- if s.show_videos_link -%}
+  <button type="button" class="menu-videos" data-open="reels" data-reels-view="grid">
+    <span class="menu-videos__icon">{% render 'icon', name: 'video' %}</span>
+    <span class="menu-videos__text">
+      <strong>{{ s.videos_label | default: 'Videos' }}</strong>
+      <small>{{ s.videos_sub | default: 'Ver todos los videos' }}</small>
+    </span>
+    {% render 'icon', name: 'chevron-right' %}
+  </button>
+{%- endif -%}
+
+{%- if ctx == 'drawer' and s.show_account -%}
+  <div class="menu-account">
+    {%- if customer -%}
+      <button type="button" class="button button--outline button--full" data-open="account">
+        {% render 'icon', name: 'user' %} Mi cuenta
+      </button>
+    {%- else -%}
+      <a href="{{ routes.account_login_url }}" class="button button--full">
+        {% render 'icon', name: 'user' %} Iniciar sesión
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{%- if has_image and image_pos == 'bottom' -%}
+  {% render 'menu-image', s: s %}
+{%- endif -%}

@@ -1,3 +1,7 @@
+{%- style -%}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .page-header h1' -%}
+  {% render 'text-style', s: section.settings, p: 'heading', sel: text_sel %}
+{%- endstyle -%}
 {%- paginate collection.products by section.settings.products_per_page -%}
   <section class="collection-page page-width">
     <header class="page-header">
@@ -38,10 +42,74 @@
 {
   "name": "Página de colección",
   "settings": [
-    { "type": "range", "id": "products_per_page", "label": "Productos por página", "min": 8, "max": 48, "step": 4, "default": 24 },
-    { "type": "checkbox", "id": "show_description", "label": "Mostrar descripción", "default": true },
-    { "type": "checkbox", "id": "show_sort", "label": "Mostrar ordenar por", "default": true },
-    { "type": "checkbox", "id": "show_quick_add", "label": "Mostrar botón + para agregar rápido", "default": true }
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Productos por página",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Mostrar descripción",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Mostrar ordenar por",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Mostrar botón + para agregar rápido",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Texto: título"
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color"
+    }
   ]
 }
 {% endschema %}

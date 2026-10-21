@@ -1,0 +1,6 @@
+{%- comment -%} Imagen de diseño del menú. Parámetro: s (ajustes del encabezado) {%- endcomment -%}
+{%- if s.menu_image != blank -%}
+  {%- if s.menu_image_link != blank -%}<a href="{{ s.menu_image_link }}" class="menu-image">{%- else -%}<div class="menu-image">{%- endif -%}
+    {{ s.menu_image | image_url: width: 600 | image_tag: widths: '300, 450, 600', sizes: '300px', loading: 'lazy', alt: s.menu_image.alt }}
+  {%- if s.menu_image_link != blank -%}</a>{%- else -%}</div>{%- endif -%}
+{%- endif -%}

@@ -1,22 +1,62 @@
-<header class="site-header{% if section.settings.sticky %} site-header--sticky{% endif %}" data-site-header>
+{%- liquid
+  assign s = section.settings
+  assign sidebar_on = s.show_sidebar
+  assign bg_image = false
+  if s.menu_image != blank and s.menu_image_position == 'background'
+    assign bg_image = true
+  endif
+-%}
+{%- style -%}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .brand-mark__title' -%}
+  {% render 'text-style', s: s, p: 'brand', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .brand-mark__subtitle' -%}
+  {% render 'text-style', s: s, p: 'sub', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .brand-mark__note' -%}
+  {% render 'text-style', s: s, p: 'note', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .menu-list > ul > li > a' -%}
+  {% render 'text-style', s: s, p: 'menu', sel: text_sel %}
+
+  #shopify-section-{{ section.id }} .brand-mark__logo { width: {{ s.logo_width_mobile }}px; max-width: 100%; height: auto; }
+  @media (min-width: 750px) {
+    #shopify-section-{{ section.id }} .brand-mark__logo { width: {{ s.logo_width }}px; }
+  }
+  .side-nav, .drawer--left .drawer__panel { --menu-bg: {{ s.sidebar_bg }}; }
+  .side-nav { width: {{ s.sidebar_width }}px; }
+  {%- if bg_image %}
+  .side-nav, .drawer--left .drawer__panel {
+    background-image: linear-gradient(rgba(0,0,0,{{ s.menu_overlay | divided_by: 100.0 }}), rgba(0,0,0,{{ s.menu_overlay | divided_by: 100.0 }})), url('{{ s.menu_image | image_url: width: 900 }}');
+    background-size: cover;
+    background-position: center;
+  }
+  {%- endif %}
+  {%- if sidebar_on %}
+  @media (min-width: 1000px) {
+    body { padding-left: {{ s.sidebar_width }}px; }
+    .site-header .header__menu { display: none; }
+    .side-nav { display: flex; }
+  }
+  {%- endif %}
+{%- endstyle -%}
+
+<header class="site-header{% if s.sticky %} site-header--sticky{% endif %}" data-site-header>
   <button type="button" class="icon-button header__menu" data-open="menu" aria-label="Abrir menú" aria-controls="MenuDrawer">
     {% render 'icon', name: 'menu' %}
   </button>
 
   <a href="{{ routes.root_url }}" class="brand-mark" aria-label="{{ shop.name | escape }}">
-    {%- if section.settings.logo != blank -%}
-      {{ section.settings.logo | image_url: width: 600 | image_tag: widths: '200, 300, 400, 600', sizes: '300px', class: 'brand-mark__logo', loading: 'eager', alt: shop.name }}
+    {%- if s.logo != blank -%}
+      {{ s.logo | image_url: width: 800 | image_tag: widths: '200, 300, 400, 600, 800', sizes: '(min-width: 750px) 400px, 200px', class: 'brand-mark__logo', loading: 'eager', alt: shop.name }}
     {%- else -%}
-      {%- if section.settings.brand_title != blank -%}
-        <strong class="brand-mark__title">{{ section.settings.brand_title | escape | newline_to_br }}</strong>
+      {%- if s.brand_title != blank -%}
+        <strong class="brand-mark__title">{{ s.brand_title | escape | newline_to_br }}</strong>
       {%- else -%}
         <strong class="brand-mark__title">{{ shop.name }}</strong>
       {%- endif -%}
-      {%- if section.settings.brand_subtitle != blank -%}
-        <span class="brand-mark__subtitle">{{ section.settings.brand_subtitle }}</span>
+      {%- if s.brand_subtitle != blank -%}
+        <span class="brand-mark__subtitle">{{ s.brand_subtitle }}</span>
       {%- endif -%}
-      {%- if section.settings.brand_note != blank -%}
-        <small class="brand-mark__note">{{ section.settings.brand_note }}</small>
+      {%- if s.brand_note != blank -%}
+        <small class="brand-mark__note">{{ s.brand_note }}</small>
       {%- endif -%}
     {%- endif -%}
   </a>
@@ -25,6 +65,19 @@
     <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">
       {% render 'icon', name: 'search' %}
     </button>
+    {%- if s.show_account -%}
+      {%- if customer -%}
+        <button type="button" class="header__account header__account--in" data-open="account" aria-label="Mi cuenta">
+          {% render 'icon', name: 'user' %}
+          <span class="header__account-label">{{ customer.first_name | default: 'Mi cuenta' }}</span>
+        </button>
+      {%- else -%}
+        <a href="{{ routes.account_login_url }}" class="header__account" aria-label="Iniciar sesión">
+          {% render 'icon', name: 'user' %}
+          <span class="header__account-label">Iniciar sesión</span>
+        </a>
+      {%- endif -%}
+    {%- endif -%}
     <a href="{{ routes.cart_url }}" class="icon-button header__cart" data-open-cart aria-label="Ver carrito">
       {% render 'icon', name: 'cart' %}
       <span class="count-bubble" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
@@ -32,50 +85,389 @@
   </div>
 </header>
 
+{%- comment -%} Barra lateral fija (solo computadora) {%- endcomment -%}
+{%- if sidebar_on -%}
+  <aside class="side-nav{% if bg_image %} side-nav--image{% endif %}" aria-label="Menú">
+    <div class="side-nav__inner">
+      {% render 'menu-content', s: s, ctx: 'sidebar' %}
+    </div>
+  </aside>
+{%- endif -%}
+
+{%- comment -%} Panel del menú (móvil y tablet) {%- endcomment -%}
 <div class="drawer drawer--left" id="MenuDrawer" data-drawer="menu" role="dialog" aria-modal="true" aria-label="Menú" hidden>
   <div class="drawer__backdrop" data-drawer-close></div>
-  <aside class="drawer__panel">
+  <aside class="drawer__panel{% if bg_image %} drawer__panel--image{% endif %}">
     <header class="drawer__header">
       <p class="drawer__title">Menú</p>
       <button type="button" class="icon-button" data-drawer-close aria-label="Cerrar menú">{% render 'icon', name: 'close' %}</button>
     </header>
-    <nav class="drawer__body menu-list" aria-label="Menú principal">
-      {%- assign menu_obj = section.settings.menu -%}
-      {%- if menu_obj != blank and menu_obj.links.size > 0 -%}
-        <ul>
-          {%- for link in menu_obj.links -%}
-            <li>
-              <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title }}</a>
-              {%- if link.links.size > 0 -%}
-                <ul class="menu-list__sub">
-                  {%- for child in link.links -%}
-                    <li><a href="{{ child.url }}">{{ child.title }}</a></li>
-                  {%- endfor -%}
-                </ul>
-              {%- endif -%}
-            </li>
-          {%- endfor -%}
-        </ul>
-      {%- else -%}
-        <p class="muted">Agrega un menú desde la configuración de esta sección.</p>
-      {%- endif -%}
-    </nav>
+    <div class="drawer__body">
+      {% render 'menu-content', s: s, ctx: 'drawer' %}
+    </div>
   </aside>
 </div>
 
 {% schema %}
 {
   "name": "Encabezado",
-  "enabled_on": { "groups": ["header"] },
+  "enabled_on": {
+    "groups": [
+      "header"
+    ]
+  },
   "settings": [
-    { "type": "header", "content": "Marca" },
-    { "type": "image_picker", "id": "logo", "label": "Logo (opcional)", "info": "Si subes un logo, reemplaza el texto de marca." },
-    { "type": "textarea", "id": "brand_title", "label": "Nombre (admite varias líneas)", "default": "TRAMO\nSAN RAFAEL #1" },
-    { "type": "text", "id": "brand_subtitle", "label": "Subtítulo", "default": "— FUNDADORES —" },
-    { "type": "text", "id": "brand_note", "label": "Nota pequeña", "default": "Desde 1946" },
-    { "type": "header", "content": "Navegación" },
-    { "type": "link_list", "id": "menu", "label": "Menú del botón de la izquierda", "default": "main-menu" },
-    { "type": "checkbox", "id": "sticky", "label": "Encabezado fijo al hacer scroll", "default": false }
+    {
+      "type": "header",
+      "content": "Marca"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo (opcional)",
+      "info": "Si subes un logo, reemplaza el texto de marca."
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Tamaño del logo en computadora",
+      "min": 40,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mobile",
+      "label": "Tamaño del logo en móvil",
+      "min": 40,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "textarea",
+      "id": "brand_title",
+      "label": "Nombre (admite varias líneas)",
+      "default": "TRAMO\nSAN RAFAEL #1"
+    },
+    {
+      "type": "text",
+      "id": "brand_subtitle",
+      "label": "Subtítulo",
+      "default": "— FUNDADORES —"
+    },
+    {
+      "type": "text",
+      "id": "brand_note",
+      "label": "Nota pequeña",
+      "default": "Desde 1946"
+    },
+    {
+      "type": "header",
+      "content": "Texto: nombre de marca"
+    },
+    {
+      "type": "checkbox",
+      "id": "brand_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "brand_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "brand_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "brand_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "Color",
+      "default": "#263d25"
+    },
+    {
+      "type": "header",
+      "content": "Texto: subtítulo"
+    },
+    {
+      "type": "checkbox",
+      "id": "sub_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "sub_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "sub_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "sub_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "sub_color",
+      "label": "Color",
+      "default": "#263d25"
+    },
+    {
+      "type": "header",
+      "content": "Texto: nota pequeña"
+    },
+    {
+      "type": "checkbox",
+      "id": "note_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "note_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "note_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "note_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "note_color",
+      "label": "Color",
+      "default": "#263d25"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Encabezado fijo al hacer scroll",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Cuenta de usuario"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Mostrar botón de cuenta",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Menú"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menú",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_home",
+      "label": "Ocultar \"Inicio\"",
+      "info": "El inicio ya siempre está disponible.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_catalog",
+      "label": "Ocultar \"Catálogo\"",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_contact",
+      "label": "Ocultar \"Contacto\"",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_videos_link",
+      "label": "Mostrar acceso a videos en el menú",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "videos_label",
+      "label": "Videos: título",
+      "default": "Videos"
+    },
+    {
+      "type": "text",
+      "id": "videos_sub",
+      "label": "Videos: texto pequeño",
+      "default": "Ver todos los videos"
+    },
+    {
+      "type": "header",
+      "content": "Menú fijo en computadora"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sidebar",
+      "label": "Mostrar el menú siempre visible en computadora",
+      "info": "En el celular el menú sigue escondido en el botón de las tres rayas.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "sidebar_width",
+      "label": "Ancho del menú",
+      "min": 220,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 280
+    },
+    {
+      "type": "color",
+      "id": "sidebar_bg",
+      "label": "Color de fondo del menú",
+      "default": "#fffdf8"
+    },
+    {
+      "type": "header",
+      "content": "Imagen de diseño del menú"
+    },
+    {
+      "type": "image_picker",
+      "id": "menu_image",
+      "label": "Imagen",
+      "info": "Sirve para que el diseñador agregue una imagen decorativa al menú."
+    },
+    {
+      "type": "select",
+      "id": "menu_image_position",
+      "label": "Posición de la imagen",
+      "options": [
+        {
+          "value": "top",
+          "label": "Arriba del menú"
+        },
+        {
+          "value": "bottom",
+          "label": "Abajo del menú"
+        },
+        {
+          "value": "background",
+          "label": "Como fondo del menú"
+        }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "url",
+      "id": "menu_image_link",
+      "label": "Enlace de la imagen (opcional)"
+    },
+    {
+      "type": "range",
+      "id": "menu_overlay",
+      "label": "Oscurecer imagen de fondo",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 35,
+      "info": "Solo si la imagen es de fondo, para que el texto se lea."
+    },
+    {
+      "type": "header",
+      "content": "Texto: enlaces del menú"
+    },
+    {
+      "type": "checkbox",
+      "id": "menu_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "menu_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "menu_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "menu_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "menu_color",
+      "label": "Color"
+    }
   ]
 }
 {% endschema %}

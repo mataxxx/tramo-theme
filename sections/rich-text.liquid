@@ -1,3 +1,9 @@
+{%- style -%}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .rich-text__heading' -%}
+  {% render 'text-style', s: section.settings, p: 'heading', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .rich-text .rte' -%}
+  {% render 'text-style', s: section.settings, p: 'text', sel: text_sel %}
+{%- endstyle -%}
 <section class="rich-text rich-text--{{ section.settings.align }}">
   {%- if section.settings.heading != blank -%}
     <h2 class="rich-text__heading">{{ section.settings.heading }}</h2>
@@ -14,21 +20,131 @@
 {
   "name": "Texto con título",
   "settings": [
-    { "type": "text", "id": "heading", "label": "Título", "default": "Nuestra historia" },
-    { "type": "richtext", "id": "text", "label": "Texto", "default": "<p>Cuéntales a tus clientes quién eres y desde cuándo preparas lo que vendes.</p>" },
-    { "type": "text", "id": "button_label", "label": "Texto del botón" },
-    { "type": "url", "id": "button_link", "label": "Enlace del botón" },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Nuestra historia"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto",
+      "default": "<p>Cuéntales a tus clientes quién eres y desde cuándo preparas lo que vendes.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón"
+    },
     {
       "type": "select",
       "id": "align",
       "label": "Alineación",
       "options": [
-        { "value": "left", "label": "Izquierda" },
-        { "value": "center", "label": "Centro" }
+        {
+          "value": "left",
+          "label": "Izquierda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        }
       ],
       "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Texto: título"
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color"
+    },
+    {
+      "type": "header",
+      "content": "Texto: contenido"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color"
     }
   ],
-  "presets": [{ "name": "Texto con título" }]
+  "presets": [
+    {
+      "name": "Texto con título"
+    }
+  ]
 }
 {% endschema %}

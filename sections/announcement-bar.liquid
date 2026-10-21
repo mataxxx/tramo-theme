@@ -1,20 +1,173 @@
-{%- if section.settings.text != blank -%}
-  <div class="announcement" role="region" aria-label="Anuncio">
-    {%- if section.settings.link != blank -%}
-      <a href="{{ section.settings.link }}" class="announcement__text">{{ section.settings.text }}</a>
-    {%- else -%}
-      <p class="announcement__text">{{ section.settings.text }}</p>
-    {%- endif -%}
+{%- style -%}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .announcement__item' -%}
+  {% render 'text-style', s: section.settings, p: 'text', sel: text_sel %}
+{%- endstyle -%}
+
+{%- liquid
+  assign speed = section.settings.speed | default: 4
+  assign duration = 11 | minus: speed | times: 7
+  assign classes = 'announcement'
+  if section.settings.animate
+    assign classes = classes | append: ' announcement--animated'
+  else
+    assign classes = classes | append: ' announcement--static'
+  endif
+  if section.settings.direction == 'right'
+    assign classes = classes | append: ' announcement--right'
+  endif
+  if section.settings.pause_on_hover
+    assign classes = classes | append: ' announcement--pause'
+  endif
+-%}
+
+{%- if section.blocks.size > 0 -%}
+  <div
+    class="{{ classes }}"
+    style="--announce-duration: {{ duration }}s; --announce-bg: {{ section.settings.bg_color }};"
+    role="region"
+    aria-label="Anuncio"
+  >
+    <div class="announcement__track">
+      {%- for round in (1..2) -%}
+        <ul class="announcement__group" role="list"{% if round == 2 %} aria-hidden="true"{% endif %}>
+          {%- for block in section.blocks -%}
+            <li class="announcement__item"{% if round == 1 %} {{ block.shopify_attributes }}{% endif %}>
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}"{% if round == 2 %} tabindex="-1"{% endif %}>{{ block.settings.text }}</a>
+              {%- else -%}
+                {{ block.settings.text }}
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endfor -%}
+    </div>
   </div>
 {%- endif -%}
 
 {% schema %}
 {
   "name": "Barra de anuncio",
-  "enabled_on": { "groups": ["header"] },
+  "enabled_on": {
+    "groups": [
+      "header"
+    ]
+  },
+  "max_blocks": 8,
   "settings": [
-    { "type": "text", "id": "text", "label": "Texto", "default": "Envíos a todo el país" },
-    { "type": "url", "id": "link", "label": "Enlace (opcional)" }
+    {
+      "type": "header",
+      "content": "Movimiento"
+    },
+    {
+      "type": "checkbox",
+      "id": "animate",
+      "label": "Mover el texto hacia el lado",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Velocidad",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 4,
+      "info": "1 = lenta, 10 = rápida"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Dirección",
+      "options": [
+        {
+          "value": "left",
+          "label": "Hacia la izquierda"
+        },
+        {
+          "value": "right",
+          "label": "Hacia la derecha"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pausar al pasar el mouse",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Texto"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Fondo"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#263d25"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Mensaje",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Envíos a todo el país"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace (opcional)"
+        }
+      ]
+    }
   ]
 }
 {% endschema %}

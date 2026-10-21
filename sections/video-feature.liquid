@@ -1,3 +1,9 @@
+{%- style -%}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .video-feature__heading' -%}
+  {% render 'text-style', s: section.settings, p: 'heading', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .video-feature__copy p' -%}
+  {% render 'text-style', s: section.settings, p: 'text', sel: text_sel %}
+{%- endstyle -%}
 {%- liquid
   assign video = section.settings.video
   assign has_media = false
@@ -59,15 +65,137 @@
 {
   "name": "Video destacado",
   "settings": [
-    { "type": "video", "id": "video", "label": "Video (subido a Shopify)" },
-    { "type": "text", "id": "video_url", "label": "O enlace directo a un video .mp4", "info": "Solo se usa si no subes un video arriba." },
-    { "type": "image_picker", "id": "poster", "label": "Imagen de portada del video" },
-    { "type": "text", "id": "kicker", "label": "Texto pequeño", "default": "Desde nuestra cocina" },
-    { "type": "text", "id": "heading", "label": "Título", "default": "El sabor empieza aquí" },
-    { "type": "textarea", "id": "text", "label": "Texto", "default": "Conoce cómo preparamos nuestros blends especiales al momento." },
-    { "type": "text", "id": "button_label", "label": "Texto del botón" },
-    { "type": "url", "id": "button_link", "label": "Enlace del botón" }
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video (subido a Shopify)"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "O enlace directo a un video .mp4",
+      "info": "Solo se usa si no subes un video arriba."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Imagen de portada del video"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Texto pequeño",
+      "default": "Desde nuestra cocina"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "El sabor empieza aquí"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Texto",
+      "default": "Conoce cómo preparamos nuestros blends especiales al momento."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón"
+    },
+    {
+      "type": "header",
+      "content": "Texto: título"
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color"
+    },
+    {
+      "type": "header",
+      "content": "Texto: descripción"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color"
+    }
   ],
-  "presets": [{ "name": "Video destacado" }]
+  "presets": [
+    {
+      "name": "Video destacado"
+    }
+  ]
 }
 {% endschema %}

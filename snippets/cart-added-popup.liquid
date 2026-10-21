@@ -1,0 +1,15 @@
+<div class="drawer drawer--modal" id="CartAdded" data-drawer="added" role="dialog" aria-modal="true" aria-labelledby="CartAddedTitle" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <div class="added-popup">
+    <button type="button" class="close-button close-button--static added-popup__close" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+    <p class="added-popup__title" id="CartAddedTitle">
+      <span class="added-popup__check">{% render 'icon', name: 'check' %}</span>
+      {{ settings.popup_title | default: 'Producto agregado al carrito' }}
+    </p>
+    <div class="added-popup__item" data-added-item></div>
+    <div class="added-popup__actions">
+      <a href="{{ routes.cart_url }}" class="button button--full" data-added-view-cart>{{ settings.popup_view_cart | default: 'Ver carrito' }}</a>
+      <button type="button" class="button button--outline button--full" data-drawer-close>{{ settings.popup_continue | default: 'Seguir comprando' }}</button>
+    </div>
+  </div>
+</div>

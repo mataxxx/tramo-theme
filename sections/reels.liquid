@@ -1,8 +1,16 @@
 <div class="drawer drawer--center drawer--reels" id="ReelsOverlay" data-drawer="reels" role="dialog" aria-modal="true" aria-label="Videos" hidden>
   <div class="drawer__backdrop" data-drawer-close></div>
-  <div class="reels-wrap">
-  <button type="button" class="close-button" data-drawer-close aria-label="Cerrar videos">{% render 'icon', name: 'close' %}</button>
-  <section class="reels" data-reels>
+  <div class="reels-wrap" data-reels-wrap data-default-view="{{ section.settings.default_view }}" data-view="{{ section.settings.default_view }}">
+    <div class="reels-bar">
+      <button type="button" class="reels-bar__btn" data-reels-show-grid>
+        {% render 'icon', name: 'grid' %}
+        <span>{{ section.settings.all_label | default: 'Ver todos los videos' }}</span>
+      </button>
+      <p class="reels-bar__title" data-reels-grid-title>{{ section.settings.grid_title | default: 'Todos los videos' }}</p>
+      <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar videos">{% render 'icon', name: 'close' %}</button>
+    </div>
+
+    <section class="reels" data-reels>
 
     {%- if section.blocks.size == 0 -%}
       <div class="reel reel--empty">
@@ -72,7 +80,28 @@
         </div>
       </article>
     {%- endfor -%}
-  </section>
+    </section>
+
+    <section class="reels-grid" data-reels-grid style="--reel-cols: {{ section.settings.grid_columns }};" hidden>
+      {%- for block in section.blocks -%}
+        {%- assign tile_video = block.settings.video -%}
+        <button type="button" class="reel-tile" data-reel-tile="{{ forloop.index0 }}" aria-label="{{ block.settings.heading | escape }}">
+          {%- if block.settings.poster != blank -%}
+            {{ block.settings.poster | image_url: width: 400 | image_tag: widths: '200, 300, 400', sizes: '(min-width: 750px) 230px, 33vw', loading: 'lazy', class: 'reel-tile__media', alt: '' }}
+          {%- elsif tile_video != blank and tile_video.preview_image != blank -%}
+            {{ tile_video.preview_image | image_url: width: 400 | image_tag: widths: '200, 300, 400', sizes: '(min-width: 750px) 230px, 33vw', loading: 'lazy', class: 'reel-tile__media', alt: '' }}
+          {%- elsif block.settings.video_url != blank -%}
+            <video class="reel-tile__media" muted playsinline preload="metadata" src="{{ block.settings.video_url }}#t=0.1"></video>
+          {%- else -%}
+            <span class="reel-tile__media reel-tile__media--empty"></span>
+          {%- endif -%}
+          <span class="reel-tile__play">{% render 'icon', name: 'play' %}</span>
+          {%- if block.settings.heading != blank -%}
+            <span class="reel-tile__title">{{ block.settings.heading }}</span>
+          {%- endif -%}
+        </button>
+      {%- endfor -%}
+    </section>
   </div>
 </div>
 
@@ -82,7 +111,20 @@
   "enabled_on": { "groups": ["aside"] },
   "max_blocks": 12,
   "settings": [
-    { "type": "paragraph", "content": "Cada bloque es un video vertical. Se abren desde el botón \"Videos\" de la barra inferior." }
+    { "type": "paragraph", "content": "Cada bloque es un video vertical. Se abren desde el botón \"Videos\" de la barra inferior y del menú." },
+    {
+      "type": "select",
+      "id": "default_view",
+      "label": "Vista al abrir desde la barra inferior",
+      "options": [
+        { "value": "feed", "label": "Un video a la vez (pantalla completa)" },
+        { "value": "grid", "label": "Cuadrícula con todos los videos" }
+      ],
+      "default": "feed"
+    },
+    { "type": "range", "id": "grid_columns", "label": "Columnas de la cuadrícula", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "text", "id": "all_label", "label": "Texto del botón \"ver todos\"", "default": "Ver todos los videos" },
+    { "type": "text", "id": "grid_title", "label": "Título de la cuadrícula", "default": "Todos los videos" }
   ],
   "blocks": [
     {

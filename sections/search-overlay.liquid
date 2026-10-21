@@ -1,3 +1,7 @@
+{%- style -%}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .search-panel__header h2' -%}
+  {% render 'text-style', s: section.settings, p: 'title', sel: text_sel %}
+{%- endstyle -%}
 <div class="drawer drawer--top" id="SearchOverlay" data-drawer="search" role="dialog" aria-modal="true" aria-label="Buscar" hidden>
   <div class="drawer__backdrop" data-drawer-close></div>
   <section class="search-panel" data-search-panel>
@@ -23,16 +27,36 @@
       {%- if section.settings.helper != blank -%}
         <p class="search-helper">{{ section.settings.helper }}</p>
       {%- endif -%}
-      {%- assign cat_menu = section.settings.categories_menu -%}
-      {%- if cat_menu != blank and cat_menu.links.size > 0 -%}
-        <div class="category-search-list">
-          {%- for link in cat_menu.links -%}
-            {%- if link.type == 'collection_link' -%}
-              <button type="button" data-search-collection="{{ link.object.handle }}" data-search-title="{{ link.title | escape }}">
-                {{ link.title }} {% render 'icon', name: 'chevron-right' %}
-              </button>
+      {%- if section.blocks.size > 0 -%}
+        <div class="category-tiles">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign coll = block.settings.collection
+              assign tile_title = block.settings.title
+              if tile_title == blank and coll != blank
+                assign tile_title = coll.title
+              endif
+              assign tile_image = block.settings.image
+              if tile_image == blank and coll != blank
+                assign tile_image = coll.featured_image
+              endif
+            -%}
+            {%- capture tile_inner -%}
+              <span class="category-tile__media">
+                {%- if tile_image != blank -%}
+                  {{ tile_image | image_url: width: 500 | image_tag: widths: '250, 375, 500', sizes: '(min-width: 750px) 190px, 45vw', loading: 'lazy', alt: tile_title }}
+                {%- else -%}
+                  {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+              </span>
+              <span class="category-tile__title">{{ tile_title }}</span>
+            {%- endcapture -%}
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" class="category-tile" {{ block.shopify_attributes }}>{{ tile_inner }}</a>
+            {%- elsif coll != blank -%}
+              <button type="button" class="category-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ tile_title | escape }}" {{ block.shopify_attributes }}>{{ tile_inner }}</button>
             {%- else -%}
-              <a href="{{ link.url }}">{{ link.title }} {% render 'icon', name: 'chevron-right' %}</a>
+              <span class="category-tile" {{ block.shopify_attributes }}>{{ tile_inner }}</span>
             {%- endif -%}
           {%- endfor -%}
         </div>
@@ -53,16 +77,103 @@
 {% schema %}
 {
   "name": "Búsqueda",
-  "enabled_on": { "groups": ["aside"] },
+  "enabled_on": {
+    "groups": [
+      "aside"
+    ]
+  },
   "settings": [
-    { "type": "text", "id": "title", "label": "Título", "default": "¿Qué estás buscando?" },
-    { "type": "text", "id": "placeholder", "label": "Texto del buscador", "default": "Busca por nombre..." },
-    { "type": "text", "id": "helper", "label": "Texto de ayuda", "default": "También puedes buscar por categoría" },
     {
-      "type": "link_list",
-      "id": "categories_menu",
-      "label": "Menú de categorías",
-      "info": "Usa un menú cuyos enlaces sean colecciones. Cada una abre la búsqueda dentro de esa categoría."
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "¿Qué estás buscando?"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Texto del buscador",
+      "default": "Busca por nombre..."
+    },
+    {
+      "type": "text",
+      "id": "helper",
+      "label": "Texto de ayuda",
+      "default": "También puedes buscar por categoría"
+    },
+    {
+      "type": "header",
+      "content": "Texto: título"
+    },
+    {
+      "type": "checkbox",
+      "id": "title_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "title_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color"
+    }
+  ],
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Categoría",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen",
+          "info": "Si la dejas vacía se usa la imagen de la colección."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título (opcional)",
+          "info": "Si lo dejas vacío se usa el nombre de la colección."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Colección",
+          "info": "Al tocarla se busca dentro de esa categoría."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace (opcional)",
+          "info": "Si pones un enlace, la tarjeta lleva a esa página en vez de buscar."
+        }
+      ]
     }
   ]
 }

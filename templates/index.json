@@ -7,14 +7,6 @@
         "text": "Especias, ingredientes\ny sabores del mundo\ndesde 1946."
       }
     },
-    "video": {
-      "type": "video-feature",
-      "settings": {
-        "kicker": "Desde nuestra cocina",
-        "heading": "El sabor empieza aquí",
-        "text": "Conoce cómo preparamos nuestros blends especiales al momento."
-      }
-    },
     "especias": {
       "type": "featured-collection",
       "settings": {
@@ -46,7 +38,6 @@
   },
   "order": [
     "hero",
-    "video",
     "especias",
     "semillas",
     "frutas",

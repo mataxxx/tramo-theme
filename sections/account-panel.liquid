@@ -1,0 +1,222 @@
+{%- style -%}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .account-panel .drawer__title' -%}
+  {% render 'text-style', s: section.settings, p: 'title', sel: text_sel %}
+{%- endstyle -%}
+
+<div class="drawer drawer--right" id="AccountPanel" data-drawer="account" role="dialog" aria-modal="true" aria-label="{{ section.settings.title | escape }}" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <aside class="drawer__panel account-panel">
+    <header class="drawer__header">
+      <p class="drawer__title">{{ section.settings.title }}</p>
+      <button type="button" class="icon-button" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+    </header>
+
+    <div class="account-panel__body">
+      {%- if customer -%}
+        <div class="account-card">
+          <span class="account-card__avatar" aria-hidden="true">{{ customer.first_name | default: customer.email | slice: 0 | upcase }}</span>
+          <div class="account-card__text">
+            <strong>{{ section.settings.greeting }} {{ customer.first_name | default: customer.email }}</strong>
+            <small>{{ customer.email }}</small>
+          </div>
+        </div>
+
+        <ul class="account-links" role="list">
+          <li>
+            <a href="{{ routes.account_url }}">
+              {% render 'icon', name: 'map-pin' %}
+              <span>{{ section.settings.profile_label }}</span>
+              {% render 'icon', name: 'chevron-right' %}
+            </a>
+          </li>
+          <li>
+            <a href="{{ routes.account_url }}">
+              {% render 'icon', name: 'package' %}
+              <span>{{ section.settings.orders_link_label }}</span>
+              {% render 'icon', name: 'chevron-right' %}
+            </a>
+          </li>
+        </ul>
+
+        <h3 class="account-section-title">{{ section.settings.orders_title }}</h3>
+        {%- if customer.orders.size > 0 -%}
+          <div class="order-list">
+            {%- for order in customer.orders limit: section.settings.orders_to_show -%}
+              {% render 'order-card', order: order, steps: section.blocks %}
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <p class="muted account-empty">{{ section.settings.empty_text }}</p>
+        {%- endif -%}
+
+        <a href="{{ routes.account_logout_url }}" class="button button--outline button--full account-logout">
+          {% render 'icon', name: 'logout' %} {{ section.settings.logout_label }}
+        </a>
+      {%- else -%}
+        <div class="account-signed-out">
+          <p>{{ section.settings.signed_out_text }}</p>
+          <a href="{{ routes.account_login_url }}" class="button button--full">{% render 'icon', name: 'user' %} {{ section.settings.login_label }}</a>
+        </div>
+        {%- if request.design_mode -%}
+          <h3 class="account-section-title">Vista de ejemplo de un pedido</h3>
+          <div class="order-list">
+            {% render 'order-card', steps: section.blocks %}
+          </div>
+          <p class="muted small">Esta tarjeta solo se ve aquí, en el editor.</p>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </aside>
+</div>
+
+{% schema %}
+{
+  "name": "Cuenta de usuario",
+  "enabled_on": {
+    "groups": [
+      "aside"
+    ]
+  },
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "El estado de cada pedido se cambia desde el administrador de Shopify: abre el pedido y agrega la etiqueta de la etapa (por ejemplo estado-en-camino)."
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título del panel",
+      "default": "Mi cuenta"
+    },
+    {
+      "type": "text",
+      "id": "greeting",
+      "label": "Saludo",
+      "default": "Hola,"
+    },
+    {
+      "type": "text",
+      "id": "profile_label",
+      "label": "Enlace: información y direcciones",
+      "default": "Información y direcciones"
+    },
+    {
+      "type": "text",
+      "id": "orders_link_label",
+      "label": "Enlace: todas mis compras",
+      "default": "Compras pasadas"
+    },
+    {
+      "type": "text",
+      "id": "orders_title",
+      "label": "Título de pedidos recientes",
+      "default": "Mis pedidos"
+    },
+    {
+      "type": "range",
+      "id": "orders_to_show",
+      "label": "Pedidos a mostrar",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Texto sin pedidos",
+      "default": "Cuando hagas un pedido, aparecerá aquí con su estado."
+    },
+    {
+      "type": "text",
+      "id": "logout_label",
+      "label": "Botón de cerrar sesión",
+      "default": "Cerrar sesión"
+    },
+    {
+      "type": "header",
+      "content": "Sin iniciar sesión"
+    },
+    {
+      "type": "text",
+      "id": "signed_out_text",
+      "label": "Texto",
+      "default": "Inicia sesión para ver tus pedidos y datos."
+    },
+    {
+      "type": "text",
+      "id": "login_label",
+      "label": "Botón de iniciar sesión",
+      "default": "Iniciar sesión"
+    },
+    {
+      "type": "header",
+      "content": "Texto: título del panel"
+    },
+    {
+      "type": "checkbox",
+      "id": "title_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "title_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "status",
+      "name": "Etapa del pedido",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Nombre de la etapa",
+          "default": "Recibido"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Etiqueta del pedido en Shopify",
+          "info": "Déjala vacía en la primera etapa (es la que se usa por defecto). Ejemplo: estado-en-camino"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Texto de ayuda",
+          "default": "Recibimos tu pedido."
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,3 +1,11 @@
+{%- style -%}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .product-info__title' -%}
+  {% render 'text-style', s: section.settings, p: 'title', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .product-info__price .price__current' -%}
+  {% render 'text-style', s: section.settings, p: 'price', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .product-info__description' -%}
+  {% render 'text-style', s: section.settings, p: 'desc', sel: text_sel %}
+{%- endstyle -%}
 {%- assign form_id = 'product-form-' | append: section.id -%}
 <section class="product-page page-width" data-product-root data-section-id="{{ section.id }}">
   <div class="product-gallery" data-gallery>
@@ -89,35 +97,206 @@
   "name": "Producto",
   "tag": "div",
   "blocks": [
-    { "type": "@app" },
-    { "type": "type", "name": "Categoría (tipo de producto)", "limit": 1 },
-    { "type": "title", "name": "Título", "limit": 1 },
-    { "type": "price", "name": "Precio", "limit": 1 },
-    { "type": "variant_picker", "name": "Presentaciones", "limit": 1 },
-    { "type": "quantity", "name": "Cantidad / granel", "limit": 1 },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "type",
+      "name": "Categoría (tipo de producto)",
+      "limit": 1
+    },
+    {
+      "type": "title",
+      "name": "Título",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Precio",
+      "limit": 1
+    },
+    {
+      "type": "variant_picker",
+      "name": "Presentaciones",
+      "limit": 1
+    },
+    {
+      "type": "quantity",
+      "name": "Cantidad / granel",
+      "limit": 1
+    },
     {
       "type": "buy_buttons",
       "name": "Botón de compra",
       "limit": 1,
       "settings": [
-        { "type": "text", "id": "label", "label": "Texto del botón", "default": "Agregar al carrito" }
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Texto del botón",
+          "default": "Agregar al carrito"
+        }
       ]
     },
-    { "type": "description", "name": "Descripción", "limit": 1 },
+    {
+      "type": "description",
+      "name": "Descripción",
+      "limit": 1
+    },
     {
       "type": "text",
       "name": "Texto libre",
       "settings": [
-        { "type": "richtext", "id": "text", "label": "Texto", "default": "<p>Texto adicional</p>" }
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Texto adicional</p>"
+        }
       ]
     },
     {
       "type": "collapsible",
       "name": "Desplegable",
       "settings": [
-        { "type": "text", "id": "heading", "label": "Título", "default": "Conservación" },
-        { "type": "richtext", "id": "content", "label": "Contenido", "default": "<p>Guardar en un lugar fresco y seco.</p>" }
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Conservación"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Contenido",
+          "default": "<p>Guardar en un lugar fresco y seco.</p>"
+        }
       ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Texto: nombre del producto"
+    },
+    {
+      "type": "checkbox",
+      "id": "title_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "title_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color"
+    },
+    {
+      "type": "header",
+      "content": "Texto: precio"
+    },
+    {
+      "type": "checkbox",
+      "id": "price_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "price_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "price_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Color"
+    },
+    {
+      "type": "header",
+      "content": "Texto: descripción"
+    },
+    {
+      "type": "checkbox",
+      "id": "desc_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "desc_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "desc_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "desc_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "desc_color",
+      "label": "Color"
     }
   ]
 }

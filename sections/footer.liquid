@@ -1,9 +1,23 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} .site-footer {
+    {%- if section.settings.bg_color != blank %} background: {{ section.settings.bg_color }};{% endif %}
+    {%- if section.settings.text_color != blank %} color: {{ section.settings.text_color }};{% endif %}
+  }
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .footer-heading' -%}
+  {% render 'text-style', s: section.settings, p: 'heading', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .site-footer .rte, #shopify-section-' | append: section.id | append: ' .footer-links a' -%}
+  {% render 'text-style', s: section.settings, p: 'text', sel: text_sel %}
+{%- endstyle -%}
 <footer class="site-footer">
   <div class="site-footer__grid">
     {%- for block in section.blocks -%}
       <div class="footer-block footer-block--{{ block.type }}" {{ block.shopify_attributes }}>
         {%- case block.type -%}
           {%- when 'brand' -%}
+            {%- if block.settings.logo != blank -%}
+              {%- assign footer_logo_style = 'width:' | append: block.settings.logo_width | append: 'px;max-width:100%;height:auto' -%}
+              {{ block.settings.logo | image_url: width: 600 | image_tag: class: 'footer-logo', loading: 'lazy', alt: shop.name, style: footer_logo_style }}
+            {%- endif -%}
             {%- if block.settings.brand_title != blank -%}
               <p class="footer-brand">{{ block.settings.brand_title | escape | newline_to_br }}</p>
             {%- endif -%}
@@ -88,12 +102,129 @@
 {% schema %}
 {
   "name": "Pie de página",
-  "enabled_on": { "groups": ["footer"] },
+  "enabled_on": {
+    "groups": [
+      "footer"
+    ]
+  },
   "max_blocks": 6,
   "settings": [
-    { "type": "checkbox", "id": "show_social", "label": "Mostrar redes sociales", "info": "Los enlaces se configuran en Configuración del tema → Redes sociales.", "default": true },
-    { "type": "checkbox", "id": "show_payment_icons", "label": "Mostrar métodos de pago", "default": true },
-    { "type": "text", "id": "copyright", "label": "Texto de derechos (opcional)" }
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Mostrar redes sociales",
+      "info": "Los enlaces se configuran en Configuración del tema → Redes sociales.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Mostrar métodos de pago",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "copyright",
+      "label": "Texto de derechos (opcional)"
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#263d25"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Texto: títulos de columna"
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color"
+    },
+    {
+      "type": "header",
+      "content": "Texto: contenido y enlaces"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color"
+    }
   ],
   "blocks": [
     {
@@ -101,25 +232,74 @@
       "name": "Marca",
       "limit": 1,
       "settings": [
-        { "type": "textarea", "id": "brand_title", "label": "Nombre", "default": "TRAMO\nSAN RAFAEL #1" },
-        { "type": "text", "id": "brand_subtitle", "label": "Subtítulo", "default": "— FUNDADORES —" },
-        { "type": "richtext", "id": "text", "label": "Texto" }
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo (opcional)",
+          "info": "Si subes un logo se muestra arriba del texto."
+        },
+        {
+          "type": "range",
+          "id": "logo_width",
+          "label": "Tamaño del logo",
+          "min": 40,
+          "max": 400,
+          "step": 10,
+          "unit": "px",
+          "default": 160
+        },
+        {
+          "type": "textarea",
+          "id": "brand_title",
+          "label": "Nombre",
+          "default": "TRAMO\nSAN RAFAEL #1"
+        },
+        {
+          "type": "text",
+          "id": "brand_subtitle",
+          "label": "Subtítulo",
+          "default": "— FUNDADORES —"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto"
+        }
       ]
     },
     {
       "type": "menu",
       "name": "Menú",
       "settings": [
-        { "type": "text", "id": "heading", "label": "Título", "default": "Tienda" },
-        { "type": "link_list", "id": "menu", "label": "Menú", "default": "footer" }
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Tienda"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menú",
+          "default": "footer"
+        }
       ]
     },
     {
       "type": "text",
       "name": "Texto",
       "settings": [
-        { "type": "text", "id": "heading", "label": "Título", "default": "Contacto" },
-        { "type": "richtext", "id": "text", "label": "Texto" }
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Contacto"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto"
+        }
       ]
     }
   ]

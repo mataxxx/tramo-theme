@@ -11,6 +11,10 @@
   @media (min-width: 750px) {
     #shopify-section-{{ section.id }} .hero { --hero-height: {{ hero_height }}px; }
   }
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .hero__heading' -%}
+  {% render 'text-style', s: section.settings, p: 'heading', sel: text_sel %}
+  {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .hero__text' -%}
+  {% render 'text-style', s: section.settings, p: 'text', sel: text_sel %}
 {%- endstyle -%}
 
 <section class="hero hero--{{ section.settings.text_align }}" aria-label="{{ section.settings.heading | strip_newlines | escape }}">
@@ -50,27 +54,179 @@
   "tag": "div",
   "class": "section-hero",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Imagen", "info": "Si la dejas vacía se usa la foto de especias incluida en el tema." },
-    { "type": "textarea", "id": "heading", "label": "Título (admite varias líneas)", "default": "DE NUESTRA\nTRADICIÓN A\nTU MESA" },
-    { "type": "textarea", "id": "text", "label": "Texto", "default": "Especias, ingredientes\ny sabores del mundo\ndesde 1946." },
-    { "type": "text", "id": "button_label", "label": "Texto del botón" },
-    { "type": "url", "id": "button_link", "label": "Enlace del botón" },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen",
+      "info": "Si la dejas vacía se usa la foto de especias incluida en el tema."
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título (admite varias líneas)",
+      "default": "DE NUESTRA\nTRADICIÓN A\nTU MESA"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Texto",
+      "default": "Especias, ingredientes\ny sabores del mundo\ndesde 1946."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón"
+    },
     {
       "type": "select",
       "id": "text_align",
       "label": "Posición del texto",
       "options": [
-        { "value": "left", "label": "Izquierda" },
-        { "value": "center", "label": "Centro" }
+        {
+          "value": "left",
+          "label": "Izquierda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        }
       ],
       "default": "left"
     },
-    { "type": "header", "content": "Apariencia" },
-    { "type": "color", "id": "overlay_color", "label": "Color de la capa", "default": "#1e351d" },
-    { "type": "range", "id": "overlay_opacity", "label": "Intensidad de la capa", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 90 },
-    { "type": "range", "id": "height_desktop", "label": "Altura en computadora", "min": 240, "max": 700, "step": 10, "unit": "px", "default": 420 },
-    { "type": "range", "id": "height_mobile", "label": "Altura en móvil", "min": 180, "max": 600, "step": 10, "unit": "px", "default": 260 }
+    {
+      "type": "header",
+      "content": "Apariencia"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Color de la capa",
+      "default": "#1e351d"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Intensidad de la capa",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "label": "Altura en computadora",
+      "min": 160,
+      "max": 700,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Altura en móvil",
+      "min": 120,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 190
+    },
+    {
+      "type": "header",
+      "content": "Texto: título"
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Fuente",
+      "default": "lora_n4"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#fffdf5"
+    },
+    {
+      "type": "header",
+      "content": "Texto: descripción"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_custom_font",
+      "label": "Usar otra fuente",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Fuente",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Tamaño en computadora",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Tamaño en móvil",
+      "min": 10,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color",
+      "default": "#fffdf5"
+    }
   ],
-  "presets": [{ "name": "Portada (hero)" }]
+  "presets": [
+    {
+      "name": "Portada (hero)"
+    }
+  ]
 }
 {% endschema %}
