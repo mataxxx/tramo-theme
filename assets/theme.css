@@ -1336,3 +1336,11 @@ a.header__user { text-decoration: none; color: inherit; }
   .cat-circle { flex-basis: calc((100% - 7vw - 36px) / 4); }
 }
 @media (min-width: 1100px) { .cat-circles__row { grid-template-columns: none; } .cat-circle { aspect-ratio: 2 / 2.6; } }
+
+/* Ronda 25: portada a todo el ancho; categorías cuadradas */
+.hero-slider { margin: 0; border-radius: 0; }
+.trust-bar { margin: 0 0 10px; border-radius: 0; }
+@media (min-width: 750px) { .hero-slider { margin: 0; border-radius: 0; } .trust-bar { margin: 0 0 10px; border-radius: 0; } }
+.cat-circle, .cat-circle:is(*) { aspect-ratio: 1 / 1; }
+@media (min-width: 750px) { .cat-circle { aspect-ratio: 1 / 1; } }
+@media (min-width: 1100px) { .cat-circle { aspect-ratio: 1 / 1; } }
