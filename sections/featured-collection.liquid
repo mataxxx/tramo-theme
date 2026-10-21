@@ -25,6 +25,11 @@
         {{ heading }}
       {%- endif -%}
     </h2>
+    {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
+      <button type="button" class="category-see" data-category-open data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">
+        {% render 'icon', name: 'pin' %}<span>{{ section.settings.expand_label | default: 'Ver' }}</span>
+      </button>
+    {%- endif -%}
   </div>
 
   <div class="product-rail" data-collection-rail tabindex="0" aria-label="{{ heading | escape }}">
@@ -53,12 +58,6 @@
   </div>
 
   {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
-    <div class="category-more">
-      <button type="button" class="category-eye" data-category-open data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">
-        {% render 'icon', name: 'pin' %}
-        <span>{{ section.settings.expand_label | default: 'Ver categoría' }}</span>
-      </button>
-    </div>
     <template data-category-template>
       {%- for product in coll.products limit: section.settings.expand_limit -%}
         {% render 'category-item', product: product %}
@@ -160,7 +159,7 @@
       "type": "text",
       "id": "expand_label",
       "label": "Texto del botón",
-      "default": "Ver categoría"
+      "default": "Ver"
     },
     {
       "type": "range",
