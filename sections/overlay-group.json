@@ -205,13 +205,34 @@
             "cta_label": "Ver mis pedidos",
             "show_whatsapp": true
           }
+        },
+        "h5": {
+          "type": "topic",
+          "settings": {
+            "icon": "leaf",
+            "title": "Quiénes somos",
+            "summary": "Especias desde 1946",
+            "content": "<p><strong>Tramo San Rafael #1</strong> es un tramo familiar de especias, granos y condimentos en Costa Rica, vendiendo con cariño desde 1946.</p><p>Seleccionamos cada producto para que cocines con sabor auténtico, ya sea en presentaciones listas o a granel, justo la cantidad que necesitas.</p>"
+          }
+        },
+        "h6": {
+          "type": "topic",
+          "settings": {
+            "icon": "info",
+            "title": "Términos y condiciones",
+            "summary": "Compras, envíos y devoluciones",
+            "content": "<p><strong>Precios y pagos.</strong> Los precios están en colones (CRC) e incluyen los impuestos aplicables. El pago se realiza de forma segura al finalizar la compra.</p><p><strong>Envíos.</strong> El costo y el tiempo de entrega se calculan según tu dirección. Los plazos son estimados.</p><p><strong>Productos a granel.</strong> El peso final puede variar levemente; se cobra según la cantidad solicitada.</p><p><strong>Cambios y devoluciones.</strong> Por tratarse de alimentos, solo aceptamos cambios por producto dañado o error en el pedido, reportado dentro de las 48 horas posteriores a la entrega.</p><p><strong>Contacto.</strong> Para cualquier consulta escríbenos por WhatsApp.</p><p><em>Texto base: edítalo y valídalo con tu asesor legal.</em></p>",
+            "show_whatsapp": true
+          }
         }
       },
       "block_order": [
         "h1",
         "h2",
         "h3",
-        "h4"
+        "h4",
+        "h5",
+        "h6"
       ],
       "settings": {
         "title": "¿En qué te ayudamos?",

@@ -1204,3 +1204,33 @@ body:has(.drawer--left.is-open) .bottom-nav { transform: translateY(110%); anima
 .spice__option input:checked + .spice__box { border-color: #c0392b; background: #fdecea; color: #8e1f14; }
 .spice__option input:focus-visible + .spice__box { outline: 2px solid #c0392b; outline-offset: 2px; }
 .cart-line__prop { color: #8e1f14; }
+
+
+/* Ronda 16 */
+/* Sin zoom accidental al tocar rápido (flechas, cantidad a granel) */
+html, body, button, a, label, summary, [role="button"], .rail-arrow, .qty, .qty * { touch-action: manipulation; }
+input, select, textarea { font-size: 16px; }
+@media (min-width: 750px) { input, select, textarea { font-size: inherit; } }
+
+/* Picor: 3 niveles con color */
+.spice__options { gap: 10px; }
+.spice__box { gap: 8px; padding: 9px 16px; border-width: 2px; font-weight: 700; }
+.spice__option--1 .spice__box { background: #fffbe0; border-color: #f6e27a; color: #8a6d00; }
+.spice__option--1 .spice__chilis { color: #e0b400; }
+.spice__option--2 .spice__box { background: #fff1e2; border-color: #f7c08a; color: #964a00; }
+.spice__option--2 .spice__chilis { color: #ef8a1c; }
+.spice__option--3 .spice__box { background: #fdeceb; border-color: #f2a39b; color: #9b1c12; }
+.spice__option--3 .spice__chilis { color: #d92d20; }
+.spice__option--1 input:checked + .spice__box { background: #ffe97a; border-color: #e0b400; color: #6b5300; box-shadow: 0 3px 10px rgba(224,180,0,.35); }
+.spice__option--2 input:checked + .spice__box { background: #ffc78a; border-color: #ef8a1c; color: #7a3a00; box-shadow: 0 3px 10px rgba(239,138,28,.35); }
+.spice__option--3 input:checked + .spice__box { background: #ff9d92; border-color: #d92d20; color: #7a120a; box-shadow: 0 3px 10px rgba(217,45,32,.35); }
+.spice__option input:focus-visible + .spice__box { outline: 2px solid currentColor; }
+
+/* Filtros de región visibles (sin esconderse al costado) */
+.category-modal__chips { flex-wrap: wrap; overflow: visible; }
+
+/* Búsqueda sin botón */
+.search-field input[type="search"] { width: 100%; }
+
+/* Usuario a la izquierda */
+a.header__user { text-decoration: none; color: inherit; }

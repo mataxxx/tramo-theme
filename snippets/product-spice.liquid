@@ -2,7 +2,7 @@
   Nivel de picor (solo si el producto tiene activado "Producto picante" en Shopify). Va dentro del formulario.
 {%- endcomment -%}
 {%- if product.metafields.custom.picante.value -%}
-  {%- assign levels = settings.spice_levels | default: 'Suave, Medio, Picante, Muy picante' | split: ',' -%}
+  {%- assign levels = settings.spice_levels | default: 'Bajo, Medio, Alto' | split: ',' -%}
   {%- assign spice_default = settings.spice_default | default: 'Medio' | strip | downcase -%}
   <fieldset class="spice">
     <legend class="spice__title">{% render 'icon', name: 'chili' %} {{ settings.spice_title | default: 'Nivel de picor' }}</legend>
@@ -11,7 +11,7 @@
         {%- assign name = lv | strip -%}
         {%- assign name_low = name | downcase -%}
         {%- if name != blank -%}
-          <label class="spice__option">
+          <label class="spice__option spice__option--{{ forloop.index }}">
             <input type="radio" name="properties[Nivel de picor]" value="{{ name | escape }}"{% if name_low == spice_default %} checked{% endif %}>
             <span class="spice__box"><span class="spice__chilis" aria-hidden="true">{% for i in (1..forloop.index) %}{% render 'icon', name: 'chili' %}{% endfor %}</span><span>{{ name }}</span></span>
           </label>

@@ -10,7 +10,7 @@
   endif
 -%}
 <li class="cart-line" data-cart-line="{{ item.key }}" data-line-index="{{ index }}"{% if is_bulk %} data-bulk{% endif %}>
-  <a href="{{ item.url }}" class="cart-line__image">
+  <a href="{{ item.product.url }}" class="cart-line__image" data-quick-view="{{ item.product.url }}">
     {%- if item.image -%}
       {{ item.image | image_url: width: 200 | image_tag: widths: '100, 200', sizes: '90px', loading: 'lazy', alt: item.image.alt }}
     {%- else -%}
@@ -18,7 +18,7 @@
     {%- endif -%}
   </a>
   <div class="cart-line__info">
-    <a href="{{ item.url }}" class="cart-line__title">{{ item.product.title }}</a>
+    <a href="{{ item.product.url }}" class="cart-line__title" data-quick-view="{{ item.product.url }}">{{ item.product.title }}</a>
     {%- unless item.product.has_only_default_variant -%}
       {%- if is_bulk -%}
         <p class="cart-line__variant">{{ settings.bulk_variant_name }} · {{ item.quantity | times: bulk_unit }} g</p>

@@ -30,9 +30,15 @@
 {%- endstyle -%}
 
 <header class="site-header{% if s.sticky %} site-header--sticky{% endif %}{% if s.scroll_shadow %} site-header--shadow{% endif %}{% if s.scroll_shrink %} site-header--shrink{% endif %}" data-site-header>
-  <button type="button" class="icon-button header__menu" data-open="menu" aria-label="Abrir menú" aria-controls="MenuDrawer">
-    {% render 'icon', name: 'menu' %}
-  </button>
+  {%- if customer -%}
+    <button type="button" class="icon-button header__menu header__user" data-open="account" aria-label="Mi cuenta">
+      {% render 'icon', name: 'user' %}
+    </button>
+  {%- else -%}
+    <a href="{{ routes.storefront_login_url }}" class="icon-button header__menu header__user" aria-label="Iniciar sesión">
+      {% render 'icon', name: 'user' %}
+    </a>
+  {%- endif -%}
 
   <a href="{{ routes.root_url }}" class="brand-mark" aria-label="{{ shop.name | escape }}">
     {%- if s.logo != blank -%}
@@ -67,19 +73,6 @@
         {% render 'icon', name: 'heart' %}
         <span class="count-bubble" data-likes-count hidden>0</span>
       </button>
-    {%- endif -%}
-    {%- if s.show_account_top -%}
-      {%- if customer -%}
-        <button type="button" class="header__account header__account--in" data-open="account" aria-label="Mi cuenta">
-          {% render 'icon', name: 'user' %}
-          <span class="header__account-label">{{ customer.first_name | default: 'Mi cuenta' }}</span>
-        </button>
-      {%- else -%}
-        <a href="{{ routes.storefront_login_url }}" class="header__account" aria-label="Iniciar sesión">
-          {% render 'icon', name: 'user' %}
-          <span class="header__account-label">Iniciar sesión</span>
-        </a>
-      {%- endif -%}
     {%- endif -%}
     {%- if s.show_cart_top -%}
       <a href="{{ routes.cart_url }}" class="icon-button header__cart" data-open-cart aria-label="Ver carrito">

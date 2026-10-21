@@ -78,7 +78,7 @@
         "collection": "condimentos-de-la-casa",
         "heading": "Condimentos de la casa",
         "search_noun": "condimento",
-        "icon": "house-hand",
+        "icon": "none",
         "popup_search": "icon"
       }
     },
@@ -88,7 +88,7 @@
         "collection": "condimentos-del-mundo",
         "heading": "Condimentos del mundo",
         "search_noun": "condimento",
-        "icon": "globe-hand",
+        "icon": "none",
         "popup_search": "icon",
         "filter_tags": "África, Asia, Europa, América, Medio Oriente"
       }

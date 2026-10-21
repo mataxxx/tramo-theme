@@ -398,7 +398,7 @@
         "type": "text",
         "id": "spice_levels",
         "label": "Niveles (separados por coma, de menos a más)",
-        "default": "Suave, Medio, Picante, Muy picante"
+        "default": "Bajo, Medio, Alto"
       },
       {
         "type": "text",
