@@ -1327,3 +1327,12 @@ a.header__user { text-decoration: none; color: inherit; }
 .cat-circle { aspect-ratio: 2 / 3.4; }
 .cat-circle__title { font-size: 11px; }
 @media (min-width: 750px) { .cat-circle { aspect-ratio: 2 / 3; } }
+
+/* Ronda 24: 4 visibles, una sola fila con flecha */
+.cat-circles__row { display: flex; flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 18px; gap: 8px; padding: 0 18px 4px; }
+.cat-circle { flex: 0 0 calc((100% - 36px - 24px) / 4); scroll-snap-align: start; }
+@media (min-width: 750px) {
+  .cat-circles__row { gap: 12px; padding: 0 3.5vw 4px; scroll-padding-left: 3.5vw; }
+  .cat-circle { flex-basis: calc((100% - 7vw - 36px) / 4); }
+}
+@media (min-width: 1100px) { .cat-circles__row { grid-template-columns: none; } .cat-circle { aspect-ratio: 2 / 2.6; } }

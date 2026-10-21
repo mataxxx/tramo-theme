@@ -561,7 +561,7 @@
   var ARROW_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
   var activeRail = null;
   function initRails(scope) {
-    $$('.product-rail', scope || document).forEach(function (rail) {
+    $$('.product-rail, .cat-circles__row', scope || document).forEach(function (rail) {
       if (rail.parentNode.classList.contains('rail-wrap')) return;
       var wrap = document.createElement('div');
       wrap.className = 'rail-wrap';
