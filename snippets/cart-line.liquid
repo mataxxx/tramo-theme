@@ -26,6 +26,9 @@
         <p class="cart-line__variant">{{ item.variant.title }}</p>
       {%- endif -%}
     {%- endunless -%}
+    {%- for prop in item.properties -%}
+      {%- if prop.last != blank and prop.first.first != '_' -%}<p class="cart-line__variant cart-line__prop">{{ prop.first }}: {{ prop.last }}</p>{%- endif -%}
+    {%- endfor -%}
     {%- for discount in item.line_level_discount_allocations -%}
       <p class="cart-line__discount">{{ discount.discount_application.title }} (-{{ discount.amount | money }})</p>
     {%- endfor -%}

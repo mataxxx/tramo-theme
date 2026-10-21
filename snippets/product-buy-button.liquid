@@ -5,6 +5,7 @@
 {% form 'product', product, id: form_id, class: 'buy-form', novalidate: 'novalidate', data-product-form: '' %}
   <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id {% unless current_variant.available %}disabled{% endunless %}>
   <input type="hidden" name="quantity" value="1" data-quantity-field>
+  {% render 'product-spice', product: product %}
   <button
     type="submit"
     class="button button--full"

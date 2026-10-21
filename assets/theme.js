@@ -214,11 +214,24 @@
     });
   }
 
-  function addToCart(variantId, quantity) {
+  function formProps(form) {
+    var props = {};
+    if (!form) return props;
+    $$('input[name^="properties["]', form).forEach(function (input) {
+      if ((input.type === 'radio' || input.type === 'checkbox') && !input.checked) return;
+      var m = input.name.match(/^properties\[(.+)\]$/);
+      if (m && input.value) props[m[1]] = input.value;
+    });
+    return props;
+  }
+
+  function addToCart(variantId, quantity, props) {
+    var body = { id: variantId, quantity: quantity };
+    if (props && Object.keys(props).length) body.properties = props;
     return fetch(T.routes.cartAdd, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ id: variantId, quantity: quantity })
+      body: JSON.stringify(body)
     }).then(parseJSON);
   }
 
@@ -511,7 +524,7 @@
       var quantity = currentQuantity(variant);
       addButton.disabled = true;
       addButton.setAttribute('aria-busy', 'true');
-      addToCart(parseInt(idInput.value, 10), quantity)
+      addToCart(parseInt(idInput.value, 10), quantity, formProps(form))
         .then(function (item) {
           if (inQuickView) closeDrawer($('[data-drawer="quick-view"]'), true);
           return afterAdd(item);
@@ -532,7 +545,7 @@
         var variant = findVariant(selectedOptions());
         var quantity = currentQuantity(variant);
         buyNow.disabled = true;
-        addToCart(parseInt(idInput.value, 10), quantity)
+        addToCart(parseInt(idInput.value, 10), quantity, formProps(form))
           .then(function () { window.location.href = '/checkout'; })
           .catch(function (error) {
             buyNow.disabled = false;

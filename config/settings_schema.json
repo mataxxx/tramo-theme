@@ -382,6 +382,32 @@
       },
       {
         "type": "header",
+        "content": "Productos picantes"
+      },
+      {
+        "type": "paragraph",
+        "content": "En Shopify, dentro del producto, activa \"Producto picante\" (campos personalizados). Así aparece el selector de picor."
+      },
+      {
+        "type": "text",
+        "id": "spice_title",
+        "label": "Título del selector",
+        "default": "Nivel de picor"
+      },
+      {
+        "type": "text",
+        "id": "spice_levels",
+        "label": "Niveles (separados por coma, de menos a más)",
+        "default": "Suave, Medio, Picante, Muy picante"
+      },
+      {
+        "type": "text",
+        "id": "spice_default",
+        "label": "Nivel preseleccionado",
+        "default": "Medio"
+      },
+      {
+        "type": "header",
         "content": "Al tocar el botón +"
       },
       {

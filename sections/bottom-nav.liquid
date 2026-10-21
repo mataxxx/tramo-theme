@@ -1,8 +1,4 @@
 <nav class="bottom-nav" aria-label="Navegación rápida">
-  <a href="{{ routes.root_url }}" class="bottom-nav__item{% if request.page_type == 'index' %} is-active{% endif %}">
-    {% render 'icon', name: 'home' %}
-    <span>{{ section.settings.label_home }}</span>
-  </a>
   {%- if section.settings.show_videos -%}
     <button type="button" class="bottom-nav__item" data-open="reels">
       {% render 'icon', name: 'video' %}
@@ -17,11 +13,6 @@
     {% render 'icon', name: 'help' %}
     <span>{{ section.settings.label_help }}</span>
   </button>
-  <a href="{{ routes.cart_url }}" class="bottom-nav__item bottom-nav__cart" data-open-cart>
-    {% render 'icon', name: 'cart' %}
-    <span>{{ section.settings.label_cart }}</span>
-    <span class="count-bubble" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
-  </a>
 </nav>
 
 {%- if section.settings.show_float_videos -%}

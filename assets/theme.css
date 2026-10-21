@@ -1173,3 +1173,34 @@ body:has(.drawer--left.is-open) .bottom-nav { transform: translateY(110%); anima
 .category-more, .duo__row .category-more { justify-content: flex-end; }
 .category-title__icon { display: inline-grid; vertical-align: -.12em; margin-right: 10px; color: var(--color-primary); }
 .category-title__icon .icon { width: .8em; height: .8em; stroke-width: 1.5; }
+
+
+/* Ronda 15 */
+/* Header móvil: menú básico a la izquierda; usuario y carrito a la derecha */
+@media (max-width: 749px) {
+  .header__menu:not(.header__menu--right) { visibility: visible; pointer-events: auto; }
+  .header__cart { display: inline-grid; }
+  .header__menu--right { display: none; }
+  .header__actions { gap: 4px; }
+}
+.header__menu--right { display: none !important; }
+
+/* Barra de abajo con 3 botones */
+@media (max-width: 749px) {
+  .bottom-nav { justify-content: space-around; padding-left: 14px; padding-right: 14px; }
+  .bottom-nav__item { max-width: 120px; }
+}
+
+/* Picor */
+.spice { border: 0; padding: 0; margin: 0 0 10px; display: grid; gap: 8px; min-width: 0; }
+.spice__title { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; padding: 0; color: var(--color-primary); }
+.spice__title .icon { width: 18px; height: 18px; }
+.spice__options { display: flex; flex-wrap: wrap; gap: 8px; }
+.spice__option { cursor: pointer; }
+.spice__option input { position: absolute; opacity: 0; pointer-events: none; }
+.spice__box { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border: 1.5px solid var(--color-line); border-radius: 999px; background: var(--color-surface); font-size: 14px; font-weight: 600; transition: border-color .15s, background .15s, color .15s; }
+.spice__chilis { display: inline-flex; color: #c0392b; }
+.spice__chilis .icon { width: 14px; height: 14px; margin-right: -3px; }
+.spice__option input:checked + .spice__box { border-color: #c0392b; background: #fdecea; color: #8e1f14; }
+.spice__option input:focus-visible + .spice__box { outline: 2px solid #c0392b; outline-offset: 2px; }
+.cart-line__prop { color: #8e1f14; }
