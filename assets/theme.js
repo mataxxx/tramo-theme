@@ -767,7 +767,58 @@
       if (source && !slot.firstChild) slot.innerHTML = '<div class="account-panel__body">' + source.innerHTML + '</div>';
     });
   }
+  /* Pedidos reales desde el servicio propio (App Proxy). Si falla, se queda lo que dibujó Liquid. */
+  function orderCardHTML(order, steps) {
+    var tags = (order.tags || []).map(function (x) { return String(x).toLowerCase(); });
+    var current = 0;
+    steps.forEach(function (st, i) { if (st.tag && tags.indexOf(st.tag) > -1) current = i; });
+    if (!order.cancelled && current === 0 && order.fulfillment === 'FULFILLED') current = steps.length - 1;
+    var thumbs = (order.items || []).map(function (it) {
+      return '<span class="order-card__thumb">' + (it.image ? '<img src="' + esc(it.image) + '" alt="" loading="lazy" width="42" height="42">' : '') + '</span>';
+    }).join('');
+    var date = order.date ? new Date(order.date).toLocaleDateString('es-CR') : '';
+    var status;
+    if (order.cancelled) {
+      status = '<span class="order-chip order-chip--cancelled">Cancelado</span>';
+    } else if (steps.length) {
+      var st = steps[current];
+      status = '<div class="order-card__state"><span class="order-chip">' + esc(st.label) + '</span>' + (st.description ? '<small>' + esc(st.description) + '</small>' : '') + '</div>' +
+        '<ol class="order-steps" style="--steps: ' + steps.length + ';">' + steps.map(function (s2, i) {
+          return '<li class="' + (i <= current ? 'is-done' : '') + (i === current ? ' is-current' : '') + '"><span class="order-steps__dot"></span><span class="order-steps__label">' + esc(s2.label) + '</span></li>';
+        }).join('') + '</ol>';
+    } else { status = ''; }
+    return '<article class="order-card' + (order.cancelled ? ' order-card--cancelled' : '') + '">' +
+      '<header class="order-card__head"><div><strong class="order-card__number">' + esc(order.name) + '</strong><small class="order-card__date">' + esc(date) + '</small></div>' +
+      '<span class="order-card__total">' + formatMoney(order.totalCents) + '</span></header>' +
+      '<div class="order-card__items">' + thumbs + '<span class="order-card__count">' + order.itemCount + (order.itemCount === 1 ? ' artículo' : ' artículos') + '</span></div>' +
+      '<div class="order-card__status">' + status + '</div></article>';
+  }
+
+  function loadOrders() {
+    var region = $('#AccountPanel [data-orders-region]');
+    if (!region) return Promise.resolve();
+    var endpoint = region.getAttribute('data-orders-endpoint');
+    if (!endpoint) return Promise.resolve();
+    var steps = [];
+    try { steps = JSON.parse($('[data-order-steps]', region).textContent); } catch (e) { /* sin etapas */ }
+    var limit = parseInt(region.getAttribute('data-orders-limit'), 10) || 5;
+    return fetch(endpoint, { headers: { Accept: 'application/json' } })
+      .then(function (r) { if (!r.ok) throw new Error('x'); return r.json(); })
+      .then(function (data) {
+        if (!data || !data.loggedIn) return;
+        var list = $('.order-list, .account-empty', region);
+        var html = data.orders.length
+          ? '<div class="order-list">' + data.orders.slice(0, limit).map(function (o) { return orderCardHTML(o, steps); }).join('') + '</div>'
+          : '<p class="muted account-empty">' + esc(region.getAttribute('data-empty-text')) + '</p>';
+        if (list) list.outerHTML = html;
+        $$('[data-account-slot]').forEach(function (slot) { slot.innerHTML = ''; });
+        fillAccountSlots();
+      })
+      .catch(function () { /* se mantiene lo que ya se ve */ });
+  }
+
   fillAccountSlots();
+  loadOrders();
   document.addEventListener('shopify:section:load', fillAccountSlots);
 
   /* ---------- Eventos globales ----------------------------------------- */

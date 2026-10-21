@@ -38,6 +38,8 @@
           </li>
         </ul>
 
+        <div data-orders-region data-orders-endpoint="{{ section.settings.orders_endpoint }}" data-orders-limit="{{ section.settings.orders_to_show }}" data-empty-text="{{ section.settings.empty_text | escape }}">
+        <script type="application/json" data-order-steps>[{% for b in section.blocks %}{"label":{{ b.settings.label | json }},"tag":{{ b.settings.tag | strip | downcase | json }},"description":{{ b.settings.description | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}]</script>
         <h3 class="account-section-title">{{ section.settings.orders_title }}</h3>
         {%- if customer.orders.size > 0 -%}
           <div class="order-list">
@@ -48,6 +50,7 @@
         {%- else -%}
           <p class="muted account-empty">{{ section.settings.empty_text }}</p>
         {%- endif -%}
+        </div>
 
         <a href="{{ routes.account_logout_url }}" class="button button--outline button--full account-logout">
           {% render 'icon', name: 'logout' %} {{ section.settings.logout_label }}

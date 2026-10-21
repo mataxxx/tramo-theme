@@ -1,0 +1,9 @@
+name = "tramo-backend"
+main = "worker.js"
+compatibility_date = "2025-10-01"
+
+# Las claves NO van aquí. Se guardan con: npx wrangler secret put NOMBRE
+[vars]
+SHOPIFY_SHOP = "tramo-san-rafael-1"
+CLAUDE_MODEL = "claude-haiku-5-5"
+STORE_INFO = "Tienda en San Rafael, Costa Rica. Envíos a todo el país. Venta por presentaciones y a granel."
