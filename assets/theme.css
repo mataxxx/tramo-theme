@@ -1433,3 +1433,4 @@ a.header__user { text-decoration: none; color: inherit; }
 .cats-section { margin-bottom: 0; }
 .cats-section .product-rail { padding-bottom: 2px; }
 .cats-section + * , .shopify-section:has(> .cats-section) + .shopify-section .category-section { margin-top: 0; }
+.drawer--sheet { z-index: 60; }
