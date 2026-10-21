@@ -64,6 +64,14 @@
   </button>
 {%- endif -%}
 
+{%- if s.show_likes -%}
+  <button type="button" class="menu-about" data-open="likes">
+    <span class="menu-about__icon">{% render 'icon', name: 'heart' %}</span>
+    <span class="menu-about__text"><strong>Favoritos</strong></span>
+    {% render 'icon', name: 'chevron-right' %}
+  </button>
+{%- endif -%}
+
 {%- if s.show_help -%}
   <button type="button" class="menu-about" data-open="help">
     <span class="menu-about__icon">{% render 'icon', name: 'help' %}</span>

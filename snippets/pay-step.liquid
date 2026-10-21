@@ -1,0 +1,29 @@
+{%- comment -%}
+  Paso 1 del carrito: elegir método de pago. Va dentro del formulario del carrito.
+  Guarda la elección en el pedido como "Método de pago".
+{%- endcomment -%}
+{%- if settings.show_pay_methods and settings.require_pay_choice and settings.pay_methods != blank -%}
+  {%- assign chosen = cart.attributes['Método de pago'] -%}
+  <fieldset class="pay-step" data-pay-step>
+    <legend class="pay-step__title">{{ settings.pay_step_title }}</legend>
+    <div class="pay-step__options">
+      {%- assign methods = settings.pay_methods | split: ',' -%}
+      {%- for m in methods -%}
+        {%- assign name = m | strip -%}
+        {%- assign low = name | downcase -%}
+        {%- assign mi = 'tag' -%}
+        {%- if low contains 'sinpe' -%}{%- assign mi = 'phone' -%}
+        {%- elsif low contains 'transfer' or low contains 'banco' or low contains 'depósito' -%}{%- assign mi = 'bank' -%}
+        {%- elsif low contains 'tarjeta' or low contains 'visa' or low contains 'master' -%}{%- assign mi = 'card' -%}
+        {%- endif -%}
+        {%- if name != blank -%}
+          <label class="pay-option{% if low contains 'sinpe' %} pay-option--sinpe{% endif %}">
+            <input type="radio" name="attributes[Método de pago]" value="{{ name | escape }}" data-pay-option{% if chosen == name %} checked{% endif %}>
+            <span class="pay-option__box">{% render 'icon', name: mi %}<span>{{ name }}</span></span>
+          </label>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    <p class="pay-step__hint" data-pay-hint{% if chosen != blank %} hidden{% endif %}>{{ settings.pay_step_hint }}</p>
+  </fieldset>
+{%- endif -%}

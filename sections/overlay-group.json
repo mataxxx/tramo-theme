@@ -218,6 +218,10 @@
         "subtitle": "Aquí estamos para que compres con tranquilidad.",
         "show_whatsapp": true
       }
+    },
+    "likes-panel": {
+      "type": "likes-panel",
+      "settings": {}
     }
   },
   "order": [
@@ -226,6 +230,7 @@
     "account-panel",
     "about-panel",
     "reels",
+    "likes-panel",
     "bottom-nav",
     "help-panel"
   ]

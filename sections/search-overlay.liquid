@@ -21,6 +21,7 @@
         data-search-input
         aria-label="Buscar"
       >
+      <button type="submit" class="search-field__btn">{{ section.settings.button_label | default: 'Buscar' }}</button>
     </form>
 
     <div data-search-global>
@@ -54,7 +55,7 @@
             {%- if block.settings.link != blank -%}
               <a href="{{ block.settings.link }}" class="category-tile" {{ block.shopify_attributes }}>{{ tile_inner }}</a>
             {%- elsif coll != blank -%}
-              <button type="button" class="category-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ tile_title | escape }}" data-search-question="¿Qué {{ block.settings.search_noun | default: 'producto' | escape }} estás buscando?" {{ block.shopify_attributes }}>{{ tile_inner }}</button>
+              <button type="button" class="category-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ tile_title | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?" {{ block.shopify_attributes }}>{{ tile_inner }}</button>
             {%- else -%}
               <span class="category-tile" {{ block.shopify_attributes }}>{{ tile_inner }}</span>
             {%- endif -%}
@@ -83,6 +84,7 @@
     ]
   },
   "settings": [
+    { "type": "text", "id": "button_label", "label": "Texto del botón de buscar", "default": "Buscar" },
     {
       "type": "text",
       "id": "title",

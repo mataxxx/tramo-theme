@@ -64,6 +64,8 @@
     {%- endunless -%}
   </a>
 
+  <button type="button" class="like-btn" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar {{ product.title | escape }} en favoritos">{% render 'icon', name: 'heart' %}</button>
+
   <div class="product-card__info">
     <h3 class="product-card__title">
       <a href="{{ product.url }}" data-quick-view="{{ product.url }}">{{ product.title }}</a>

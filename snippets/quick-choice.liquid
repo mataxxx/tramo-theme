@@ -1,0 +1,12 @@
+<div class="drawer drawer--modal" id="QuickChoice" data-drawer="choice" role="dialog" aria-modal="true" aria-labelledby="QuickChoiceTitle" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <div class="added-popup choice-popup">
+    <button type="button" class="close-button close-button--static added-popup__close" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+    <p class="added-popup__title" id="QuickChoiceTitle">{{ settings.choice_title | default: '¿Deseas?' }}</p>
+    <div class="added-popup__item" data-choice-item></div>
+    <div class="added-popup__actions">
+      <button type="button" class="button button--full buy-now buy-now--solid" data-choice-buy>{{ settings.choice_buy | default: 'Comprar ya' }}</button>
+      <button type="button" class="button button--outline button--full" data-choice-add>{{ settings.choice_add | default: 'Agregar al carrito y seguir viendo' }}</button>
+    </div>
+  </div>
+</div>

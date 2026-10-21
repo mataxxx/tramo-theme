@@ -158,6 +158,10 @@
         "label": "Posición del video",
         "options": [
           {
+            "value": "on_image",
+            "label": "Miniatura sobre la foto (se agranda al tocarla)"
+          },
+          {
             "value": "before_description",
             "label": "Antes de la descripción"
           },
@@ -166,7 +170,7 @@
             "label": "Después de la descripción"
           }
         ],
-        "default": "before_description"
+        "default": "on_image"
       },
       {
         "type": "text",
@@ -203,6 +207,12 @@
         "id": "quick_show_ask",
         "label": "Mostrar preguntas (IA y WhatsApp)",
         "default": true
+      },
+      {
+        "type": "text",
+        "id": "quick_ask_trigger",
+        "label": "Texto del botón para preguntar",
+        "default": "¿Preguntas sobre el producto? Haz clic aquí"
       },
       {
         "type": "text",
@@ -308,7 +318,7 @@
         "type": "text",
         "id": "popup_buy_now",
         "label": "Texto del botón de comprar ahora",
-        "default": "Comprar ahora"
+        "default": "Comprar ya"
       },
       {
         "type": "text",
@@ -331,7 +341,7 @@
         "type": "text",
         "id": "buy_now_label",
         "label": "Texto de comprar ahora",
-        "default": "Comprar ahora"
+        "default": "Comprar ya"
       },
       {
         "type": "checkbox",
@@ -340,10 +350,50 @@
         "default": true
       },
       {
+        "type": "checkbox",
+        "id": "require_pay_choice",
+        "label": "Pedir elegir el método de pago antes de finalizar",
+        "info": "En el carrito aparece \"Paso 1\" y el botón de finalizar se activa al elegir. La elección queda guardada en el pedido.",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "pay_step_title",
+        "label": "Título del paso",
+        "default": "Paso 1 · Elige cómo vas a pagar"
+      },
+      {
+        "type": "text",
+        "id": "pay_step_hint",
+        "label": "Aviso mientras no elija",
+        "default": "Elige un método para activar “Finalizar compra”."
+      },
+      {
         "type": "text",
         "id": "pay_methods_title",
-        "label": "Título de métodos de pago",
-        "default": "Puedes pagar con"
+        "label": "Título junto a los métodos en los productos (opcional)"
+      },
+      {
+        "type": "header",
+        "content": "Al tocar el botón +"
+      },
+      {
+        "type": "text",
+        "id": "choice_title",
+        "label": "Pregunta",
+        "default": "¿Deseas?"
+      },
+      {
+        "type": "text",
+        "id": "choice_buy",
+        "label": "Botón 1",
+        "default": "Comprar ya"
+      },
+      {
+        "type": "text",
+        "id": "choice_add",
+        "label": "Botón 2",
+        "default": "Agregar al carrito y seguir viendo"
       },
       {
         "type": "text",

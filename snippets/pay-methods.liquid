@@ -14,7 +14,7 @@
         {%- elsif low contains 'transfer' or low contains 'banco' or low contains 'depósito' -%}{%- assign mi = 'bank' -%}
         {%- elsif low contains 'tarjeta' or low contains 'visa' or low contains 'master' -%}{%- assign mi = 'card' -%}
         {%- endif -%}
-        {%- if name != blank -%}<li class="pay-methods__item">{% render 'icon', name: mi %}<span>{{ name }}</span></li>{%- endif -%}
+        {%- if name != blank -%}<li class="pay-methods__item{% if low contains 'sinpe' %} pay-methods__item--sinpe{% endif %}">{% render 'icon', name: mi %}<span>{{ name }}</span></li>{%- endif -%}
       {%- endfor -%}
     </ul>
   </div>

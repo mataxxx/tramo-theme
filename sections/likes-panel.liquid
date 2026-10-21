@@ -1,0 +1,30 @@
+<div class="drawer drawer--right" id="LikesPanel" data-drawer="likes" role="dialog" aria-modal="true" aria-label="{{ section.settings.title | escape }}" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <aside class="drawer__panel">
+    <header class="drawer__header">
+      <p class="drawer__title">{{ section.settings.title }}</p>
+      <button type="button" class="icon-button" data-drawer-close aria-label="Cerrar favoritos">{% render 'icon', name: 'close' %}</button>
+    </header>
+    <div class="likes-body">
+      <p class="muted small likes-note">{{ section.settings.note }}</p>
+      <ul class="likes-list" data-likes-list role="list"></ul>
+      <div class="likes-empty" data-likes-empty>
+        {% render 'icon', name: 'heart' %}
+        <p>{{ section.settings.empty_text }}</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+{% schema %}
+{
+  "name": "Favoritos",
+  "enabled_on": { "groups": ["aside"] },
+  "settings": [
+    { "type": "paragraph", "content": "Se abre con el corazón del encabezado y del menú. Los favoritos se guardan en el navegador de cada cliente." },
+    { "type": "text", "id": "title", "label": "Título", "default": "Mis favoritos" },
+    { "type": "text", "id": "note", "label": "Nota", "default": "Los productos que marques con el corazón aparecen aquí." },
+    { "type": "text", "id": "empty_text", "label": "Texto cuando no hay favoritos", "default": "Aún no tienes favoritos. Toca el corazón de un producto para guardarlo." }
+  ]
+}
+{% endschema %}

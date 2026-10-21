@@ -35,10 +35,10 @@
             class="duo__search"
             data-search-collection="{{ coll.handle }}"
             data-search-title="{{ label | escape }}"
-            data-search-question="¿Qué {{ section.settings[noun_key] | default: 'condimento' | escape }} estás buscando?"
-            aria-label="Buscar en {{ label | escape }}"
+            data-search-question="¿Cuál {{ section.settings[noun_key] | default: 'condimento' | escape }} buscas?"
+            aria-label="Ver todo: {{ label | escape }}"
           >
-            {% render 'icon', name: 'search' %}<span class="visually-hidden">Buscar</span>
+            {% render 'icon', name: 'eye' %}<span>Ver todo</span>
           </button>
         {%- endif -%}
       </div>

@@ -20,21 +20,27 @@
     <button type="button" class="category-back__btn" data-collection-collapse>
       {% render 'icon', name: 'arrow-left' %} <span>{{ section.settings.back_label }}</span>
     </button>
-  </div>
-
-  <div class="category-heading">
-    <h2 class="category-title">{{ heading }}</h2>
     {%- if section.settings.show_search and coll != blank -%}
       <button
         type="button"
         class="category-search"
-        aria-label="{{ section.settings.search_prefix }} {{ heading | escape }}"
         data-search-collection="{{ coll.handle }}"
         data-search-title="{{ heading | escape }}"
-        data-search-question="¿Qué {{ section.settings.search_noun | default: 'producto' | escape }} estás buscando?"
+        data-search-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?"
+        aria-label="{{ section.settings.search_prefix }} {{ heading | escape }}"
       >
         {% render 'icon', name: 'search' %}
         <span class="visually-hidden">{{ section.settings.search_prefix }} {{ heading }}</span>
+      </button>
+    {%- endif -%}
+  </div>
+
+  <div class="category-heading">
+    <h2 class="category-title">{{ heading }}</h2>
+    {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
+      <button type="button" class="category-eye" data-collection-expand>
+        {% render 'icon', name: 'eye' %}
+        <span>{{ section.settings.expand_label }}</span>
       </button>
     {%- endif -%}
   </div>
@@ -65,12 +71,6 @@
   </div>
 
   {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
-    <div class="category-more" data-collection-more>
-      <button type="button" class="button button--outline button--small button--pill" data-collection-expand>
-        {{ section.settings.expand_label }} {{ heading | downcase }}
-        {% render 'icon', name: 'chevron-down' %}
-      </button>
-    </div>
     <div class="collection-grid" data-collection-grid hidden></div>
     <template data-collection-template>
       {%- for product in coll.products limit: section.settings.expand_limit -%}
@@ -143,8 +143,8 @@
       "type": "text",
       "id": "expand_label",
       "label": "Texto del botón",
-      "default": "Ver todas las",
-      "info": "Se muestra: texto + nombre de la categoría. Ej: Ver todas las especias"
+      "default": "Ver todo",
+      "info": "Texto junto al ojito, arriba a la derecha del título."
     },
     {
       "type": "range",

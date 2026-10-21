@@ -4,6 +4,12 @@
 {%- endcomment -%}
 {%- assign wa = settings.whatsapp_number | replace: '+', '' | replace: ' ', '' | replace: '-', '' -%}
 <div class="ask" data-ask data-endpoint="{{ endpoint | escape }}" data-wa="{{ wa }}" data-product-title="{{ product.title | escape }}" data-product-handle="{{ product.handle }}" data-product-url="{{ product.url | prepend: request.origin }}" data-product-desc="{{ product.description | strip_html | strip_newlines | truncate: 1200 | escape }}">
+  <button type="button" class="ask__trigger" data-ask-open aria-expanded="false">
+    {% render 'icon', name: 'chat' %}
+    <span>{{ trigger | default: '¿Preguntas sobre el producto? Haz clic aquí' }}</span>
+    {% render 'icon', name: 'chevron-down' %}
+  </button>
+  <div class="ask__body" data-ask-body hidden>
   <p class="ask__title">{% render 'icon', name: 'sparkle' %} {{ title }}</p>
   {%- if text != blank -%}<p class="ask__text muted small">{{ text }}</p>{%- endif -%}
   <div class="ask__chips">
@@ -35,4 +41,5 @@
     </div>
   </form>
   <div class="ask__answer" data-ask-answer aria-live="polite" hidden></div>
+  </div>
 </div>

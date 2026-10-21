@@ -2,6 +2,9 @@
 {%- assign form_id = 'quick-form-' | append: product.id -%}
 <div class="quick-view" data-product-root data-section-id="quick-{{ product.id }}">
   <div class="quick-view__media">
+    {%- if settings.quick_show_video and settings.quick_video_position == 'on_image' -%}
+      {% render 'product-video', product: product, title: '' %}
+    {%- endif -%}
     {%- if product.featured_media -%}
       {{
         product.featured_media
@@ -16,7 +19,10 @@
     {%- if product.type != blank -%}
       <p class="eyebrow">{{ product.type }}</p>
     {%- endif -%}
-    <h2 class="quick-view__title">{{ product.title }}</h2>
+    <div class="quick-view__titlerow">
+      <h2 class="quick-view__title">{{ product.title }}</h2>
+      <button type="button" class="like-btn like-btn--inline" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button>
+    </div>
     <div class="quick-view__price">{% render 'price', product: product, variant: product.selected_or_first_available_variant %}</div>
     {% render 'product-variant-picker', product: product, form_id: form_id, section_id: form_id %}
     {% render 'product-quantity', product: product %}
@@ -31,11 +37,11 @@
     {%- if settings.quick_show_description and product.description != blank -%}
       <div class="rte quick-view__description">{{ product.description }}</div>
     {%- endif -%}
-    {%- if settings.quick_show_video and settings.quick_video_position != 'before_description' -%}
+    {%- if settings.quick_show_video and settings.quick_video_position == 'after_description' -%}
       {% render 'product-video', product: product, title: settings.quick_video_title %}
     {%- endif -%}
     {%- if settings.quick_show_ask -%}
-      {% render 'product-ask', product: product, title: settings.quick_ask_title, text: settings.quick_ask_text, placeholder: settings.quick_ask_placeholder, button_label: settings.quick_ask_button, chip_1: settings.quick_ask_chip_1, chip_2: settings.quick_ask_chip_2, chip_3: settings.quick_ask_chip_3, endpoint: settings.quick_ask_endpoint, whatsapp_label: settings.quick_ask_whatsapp %}
+      {% render 'product-ask', product: product, title: settings.quick_ask_title, text: settings.quick_ask_text, placeholder: settings.quick_ask_placeholder, button_label: settings.quick_ask_button, chip_1: settings.quick_ask_chip_1, chip_2: settings.quick_ask_chip_2, chip_3: settings.quick_ask_chip_3, endpoint: settings.quick_ask_endpoint, trigger: settings.quick_ask_trigger, whatsapp_label: settings.quick_ask_whatsapp %}
     {%- endif -%}
     {%- if settings.quick_show_related -%}
       {% render 'product-related', product: product, title: settings.quick_related_title %}

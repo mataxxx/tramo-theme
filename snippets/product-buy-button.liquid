@@ -22,7 +22,7 @@
   </button>
   {%- if settings.buy_now -%}
     <button type="button" class="button button--outline button--full buy-now" data-buy-now {% unless current_variant.available %}disabled{% endunless %}>
-      {{ settings.buy_now_label | default: 'Comprar ahora' }}
+      {{ settings.buy_now_label | default: 'Comprar ya' }}
     </button>
   {%- endif -%}
   <p class="form-error" data-form-error role="alert" hidden></p>

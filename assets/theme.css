@@ -781,9 +781,6 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
   .drawer--reels .reels-wrap[data-view="grid"] { width: min(760px, 100%); }
 }
 
-@media (max-width: 749px) {
-  .drawer--reels .reels-wrap { height: calc(100dvh - 62px - env(safe-area-inset-bottom)); }
-}
 
 
 /* Ronda 8: encabezado fijo, confianza, ayuda, tarjetas ------------------- */
@@ -910,3 +907,113 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
 @media (min-width: 750px) { .rail-arrow { width: 44px; height: 44px; } .rail-arrow--next { right: 2.2vw; } .rail-arrow--prev { left: 2.2vw; } }
 .category-section.is-expanded .rail-arrow { display: none !important; }
 .trust-bar { margin: 0 0 8px; }
+
+
+/* Ronda 10 ------------------------------------------------------------- */
+/* Visor de videos: tarjeta con fondo visible detrás */
+.drawer--reels { background: transparent; padding: 10px 10px calc(76px + env(safe-area-inset-bottom)); align-items: stretch; justify-content: center; }
+.drawer--reels .drawer__backdrop { background: rgba(10, 14, 10, .55); backdrop-filter: blur(3px); opacity: 0; }
+.drawer--reels.is-open .drawer__backdrop { opacity: 1; }
+.drawer--reels .reels-wrap { width: 100%; max-width: 460px; height: 100%; border-radius: 22px; overflow: hidden; box-shadow: 0 22px 60px rgba(0,0,0,.45); }
+@media (min-width: 750px) {
+  .drawer--reels { padding: 3vh 16px; align-items: center; background: transparent; }
+  .drawer--reels .reels-wrap { width: min(430px, calc(94vh * 9 / 16)); height: 94vh; max-height: 880px; }
+  .drawer--reels .reels-wrap[data-view="grid"] { width: min(760px, 100%); }
+}
+
+/* Ver todo (ojo) */
+.category-eye, .duo__search { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--color-primary); background: transparent; color: var(--color-primary); border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 600; width: auto; height: auto; flex-shrink: 0; }
+.category-eye:hover, .duo__search:hover { background: var(--color-primary); color: var(--color-on-primary); }
+.category-eye .icon, .duo__search .icon { width: 19px; height: 19px; }
+@media (min-width: 750px) { .duo__search { border-color: rgba(255,255,255,.75); color: inherit; margin-top: 6px; } .duo__search:hover { background: rgba(255,255,255,.18); color: inherit; } }
+.category-back { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.category-more { display: none; }
+
+/* Búsqueda: barra larga y botón llamativo */
+.drawer--top { padding: 3vh 10px; }
+.search-panel { width: min(760px, 100%); padding: 18px 14px; }
+@media (min-width: 750px) { .drawer--top { padding: 6vh 16px; } .search-panel { padding: 24px; } }
+.search-field { padding: 6px 6px 6px 16px; gap: 10px; background: var(--color-bg); border: 1.5px solid var(--color-primary); }
+.search-field input[type="search"] { font-size: 17px; padding: 10px 0; min-width: 0; flex: 1; }
+.search-field__btn { flex-shrink: 0; border: 0; border-radius: var(--radius-button); background: var(--color-primary); color: var(--color-on-primary); font-weight: 700; font-size: 15px; padding: 12px 20px; box-shadow: 0 6px 16px rgba(38,61,37,.28); }
+.search-field__btn:hover { filter: brightness(1.1); }
+
+/* Preguntar sobre el producto: colapsado */
+.ask__trigger { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; padding: 13px 14px; border: 1.5px dashed var(--color-primary); border-radius: 14px; background: color-mix(in srgb, var(--color-primary) 6%, transparent); color: var(--color-primary); font-weight: 600; font-size: 15px; }
+.ask__trigger > span { flex: 1; }
+.ask__trigger .icon { width: 20px; height: 20px; flex-shrink: 0; transition: transform .2s; }
+.ask__trigger[aria-expanded="true"] .icon:last-child { transform: rotate(180deg); }
+.ask__body { margin-top: 12px; display: grid; gap: 10px; }
+.ask__body[hidden] { display: none; }
+
+/* Video del producto: miniatura que se agranda */
+.pvideo--mini { margin: 0; }
+.quick-view__media { position: relative; }
+.quick-view__media .pvideo--mini { position: absolute; right: 12px; bottom: 12px; z-index: 3; }
+.pvideo--mini .pvideo__phone { width: 92px; border-radius: 16px; border: 2px solid #fff; box-shadow: 0 8px 22px rgba(0,0,0,.35); transition: transform .15s; animation: pvideo-pulse 2.6s ease-in-out infinite; }
+.pvideo--mini .pvideo__phone:hover { transform: scale(1.05); }
+@keyframes pvideo-pulse { 0%, 100% { box-shadow: 0 8px 22px rgba(0,0,0,.35), 0 0 0 0 rgba(255,255,255,.7); } 50% { box-shadow: 0 8px 22px rgba(0,0,0,.35), 0 0 0 7px rgba(255,255,255,0); } }
+@media (min-width: 750px) { .pvideo--mini .pvideo__phone { width: 110px; } }
+.pvideo--mini .pvideo__play, .pvideo--mini .pvideo__mute, .pvideo--mini .pvideo__close, .pvideo--mini .pvideo__bar, .pvideo__backdrop { display: none; }
+.pvideo__badge { position: absolute; left: 6px; bottom: 6px; display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px 3px 5px; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 700; pointer-events: none; }
+.pvideo__badge .icon { width: 11px; height: 11px; fill: currentColor; }
+.pvideo__close { position: absolute; top: 12px; left: 12px; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; padding: 0; z-index: 2; }
+.pvideo__close .icon { width: 19px; height: 19px; }
+.pvideo.is-open { z-index: 120; }
+.pvideo.is-open .pvideo__backdrop { display: block; position: fixed; inset: 0; background: rgba(10, 14, 10, .62); backdrop-filter: blur(3px); }
+.pvideo.is-open .pvideo__phone { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(88vw, 380px, calc((100dvh - 110px) * 9 / 16)); border: 0; border-radius: 22px; animation: none; box-shadow: 0 24px 70px rgba(0,0,0,.5); z-index: 1; }
+.pvideo.is-open .pvideo__badge { display: none; }
+.pvideo.is-open .pvideo__mute, .pvideo.is-open .pvideo__close, .pvideo.is-open .pvideo__bar { display: grid; }
+.pvideo.is-open .pvideo__bar { display: block; }
+.pvideo.is-open .pvideo__play { display: grid; opacity: 0; }
+.pvideo.is-open.is-paused .pvideo__play { opacity: 1; transform: none; }
+
+/* Comprar ya */
+.buy-now { background: var(--color-accent, #c0392b); border-color: transparent; color: #fff; font-weight: 700; letter-spacing: .2px; box-shadow: 0 8px 20px color-mix(in srgb, var(--color-accent, #c0392b) 40%, transparent); }
+.buy-now:hover { filter: brightness(1.08); background: var(--color-accent, #c0392b); color: #fff; }
+.buy-now--solid { box-shadow: 0 8px 20px color-mix(in srgb, var(--color-accent, #c0392b) 40%, transparent); }
+.choice-popup .added-popup__actions { margin-top: 4px; }
+
+/* Métodos de pago: SINPE azul y paso 1 */
+.pay-methods__item--sinpe { background: #0b5ed7; border-color: #0b5ed7; color: #fff; }
+.pay-methods__item--sinpe .icon { color: #fff; }
+.pay-step { border: 1.5px solid var(--color-line); border-radius: 14px; padding: 12px; margin: 0 0 14px; display: grid; gap: 10px; min-width: 0; }
+.pay-step__title { font-weight: 700; font-size: 15px; padding: 0 6px; color: var(--color-primary); }
+.pay-step__options { display: flex; flex-wrap: wrap; gap: 8px; }
+.pay-option { cursor: pointer; }
+.pay-option input { position: absolute; opacity: 0; pointer-events: none; }
+.pay-option__box { display: inline-flex; align-items: center; gap: 7px; padding: 9px 13px; border: 1.5px solid var(--color-line); border-radius: 999px; background: var(--color-surface); font-size: 14px; font-weight: 600; transition: border-color .15s, background .15s, color .15s; }
+.pay-option__box .icon { width: 18px; height: 18px; color: var(--color-primary); }
+.pay-option input:checked + .pay-option__box { border-color: var(--color-primary); background: var(--color-primary); color: var(--color-on-primary); }
+.pay-option input:checked + .pay-option__box .icon { color: inherit; }
+.pay-option input:focus-visible + .pay-option__box { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.pay-option--sinpe .pay-option__box { border-color: #0b5ed7; color: #0b5ed7; }
+.pay-option--sinpe .pay-option__box .icon { color: #0b5ed7; }
+.pay-option--sinpe input:checked + .pay-option__box { background: #0b5ed7; border-color: #0b5ed7; color: #fff; }
+.pay-option--sinpe input:checked + .pay-option__box .icon { color: #fff; }
+.pay-step__hint { font-size: 13px; color: var(--color-muted); }
+[data-checkout-button]:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Favoritos */
+.like-btn { position: absolute; top: 8px; right: 8px; z-index: 2; width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); color: #333; box-shadow: 0 3px 10px rgba(0,0,0,.18); padding: 0; transition: transform .15s; }
+.like-btn:hover { transform: scale(1.1); }
+.like-btn .icon { width: 19px; height: 19px; }
+.like-btn[aria-pressed="true"] { color: #d6284a; }
+.like-btn[aria-pressed="true"] .icon { fill: currentColor; animation: like-pop .3s ease; }
+@keyframes like-pop { 0% { transform: scale(.7); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.like-btn--inline { position: static; box-shadow: none; background: var(--color-bg); flex-shrink: 0; }
+.like-btn--row { position: static; box-shadow: none; background: transparent; }
+.quick-view__titlerow { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.header__likes { position: relative; }
+.likes-body { padding: 14px 18px; display: grid; gap: 12px; align-content: start; overflow-y: auto; }
+.likes-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.like-row { display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-line); border-radius: 14px; padding: 8px; background: var(--color-surface); }
+.like-row__main { flex: 1; display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 0; }
+.like-row__img { width: 64px; height: 64px; border-radius: 10px; overflow: hidden; background: #e9e2d0; flex-shrink: 0; }
+.like-row__img img { width: 100%; height: 100%; object-fit: cover; }
+.like-row__info { display: grid; gap: 2px; min-width: 0; }
+.like-row__info strong { font-size: 15px; line-height: 1.25; }
+.like-row__info span { color: var(--color-muted); font-size: 14px; }
+.likes-empty { display: grid; justify-items: center; gap: 10px; text-align: center; padding: 30px 10px; color: var(--color-muted); }
+.likes-empty[hidden] { display: none; }
+.likes-empty .icon { width: 40px; height: 40px; }

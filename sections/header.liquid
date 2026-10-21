@@ -62,6 +62,12 @@
         <span>{{ s.search_placeholder }}</span>
       </button>
     {%- endif -%}
+    {%- if s.show_likes -%}
+      <button type="button" class="icon-button header__likes" data-open="likes" aria-label="Favoritos">
+        {% render 'icon', name: 'heart' %}
+        <span class="count-bubble" data-likes-count hidden>0</span>
+      </button>
+    {%- endif -%}
     {%- if s.show_account_top -%}
       {%- if customer -%}
         <button type="button" class="header__account header__account--in" data-open="account" aria-label="Mi cuenta">
@@ -325,6 +331,12 @@
       "id": "search_placeholder",
       "label": "Texto de la barra de búsqueda (computadora)",
       "default": "Buscar productos..."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_likes",
+      "label": "Corazón de favoritos",
+      "default": true
     },
     {
       "type": "checkbox",
