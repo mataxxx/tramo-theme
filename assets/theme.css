@@ -1419,50 +1419,12 @@ a.header__user { text-decoration: none; color: inherit; }
 /* Ronda 34 */
 .cats-section { margin-top: 26px; }
 
-/* Ronda 35: categorías compactas pegadas bajo el header */
-.shopify-section:has(> .cats-section) { position: sticky; top: var(--header-h, 0px); z-index: 29; }
-.cats-section { background: var(--color-surface); margin-bottom: 8px; transition: padding .2s ease; }
-.cats-section .category-heading { transition: opacity .15s, max-height .2s, padding .2s; max-height: 80px; overflow: hidden; }
-.cats-section.is-compact { margin-top: 0; margin-bottom: 0; padding-bottom: 2px; box-shadow: 0 6px 14px rgba(38,61,37,.10); }
-.cats-section.is-compact .category-heading { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; }
-.cats-section.is-compact .product-rail { padding-top: 6px; padding-bottom: 6px; gap: 8px; }
-.cats-section.is-compact .product-rail__item { flex-basis: 62px; }
-.cats-section.is-compact .cats-tile { gap: 3px; }
-.cats-section.is-compact .cats-tile__media { border-radius: 12px; box-shadow: none; }
-.cats-section.is-compact .cats-tile__media .icon { width: 22px; height: 22px; }
-.cats-section.is-compact .cats-tile__title { font-size: 10px; font-weight: 600; }
-@media (min-width: 750px) { .cats-section.is-compact .product-rail__item { flex-basis: 74px; } }
-
-/* Ronda 36: 4–5 visibles y animación suave */
-.cats-section, .cats-section .category-heading, .cats-section .product-rail, .cats-section .product-rail__item, .cats-section .cats-tile, .cats-section .cats-tile__media, .cats-section .cats-tile__title, .cats-section .cats-tile__media .icon { transition-duration: .4s; transition-timing-function: cubic-bezier(.22,.61,.36,1); }
-.cats-section .category-heading { transition-property: max-height, opacity, padding; }
-.cats-section .product-rail { transition-property: padding, gap; }
-.cats-section .product-rail__item { transition-property: flex-basis; }
-.cats-section .cats-tile { transition-property: gap; }
-.cats-section .cats-tile__media { transition-property: border-radius, box-shadow; }
-.cats-section .cats-tile__media .icon { transition-property: width, height; }
-.cats-section .cats-tile__title { transition-property: font-size; }
-.cats-section.is-compact .product-rail__item { flex-basis: calc((100% - 28px) / 4.5); }
-@media (min-width: 750px) { .cats-section.is-compact .product-rail__item { flex-basis: 84px; } }
-@media (prefers-reduced-motion: reduce) { .cats-section * { transition: none !important; } }
-
-/* Ronda 37: encogimiento progresivo según el scroll (--p de 0 a 1) */
-.cats-section { --p: 0; --full: clamp(150px, 42vw, 290px); --small: calc((100vw - 64px) / 4.5); }
-@media (min-width: 750px) { .cats-section { --full: 205px; --small: 84px; } }
-@media (min-width: 1100px) { .cats-section { --full: 225px; } }
-.cats-section, .cats-section * { transition: none !important; }
-.cats-section .category-heading { max-height: calc(80px * (1 - var(--p))); opacity: calc(1 - var(--p) * 1.4); padding-top: 0; padding-bottom: calc(12px * (1 - var(--p))); overflow: hidden; }
-.cats-section .product-rail { gap: calc(18px - 10px * var(--p)); padding-top: calc(6px * var(--p)); padding-bottom: calc(14px - 8px * var(--p)); }
-.cats-section .product-rail__item, .cats-section.is-compact .product-rail__item { flex-basis: calc(var(--full) + (var(--small) - var(--full)) * var(--p)); }
-.cats-section .cats-tile, .cats-section.is-compact .cats-tile { gap: calc(8px - 5px * var(--p)); }
-.cats-section .cats-tile__media, .cats-section.is-compact .cats-tile__media { border-radius: calc(18px - 6px * var(--p)); box-shadow: 0 calc(6px * (1 - var(--p))) calc(14px * (1 - var(--p))) rgba(38,61,37,calc(.24 * (1 - var(--p)))); }
-.cats-section .cats-tile__media .icon, .cats-section.is-compact .cats-tile__media .icon { width: calc(44px - 22px * var(--p)); height: calc(44px - 22px * var(--p)); }
-.cats-section .cats-tile__title, .cats-section.is-compact .cats-tile__title { font-size: calc(15px - 5px * var(--p)); }
-.cats-section, .cats-section.is-compact { margin-bottom: calc(8px * (1 - var(--p))); box-shadow: 0 6px 14px rgba(38,61,37,calc(.10 * var(--p))); padding-bottom: calc(2px * var(--p)); }
-
-/* Ronda 38: cierre suave tipo puerta de cocina (arranca rápido y frena despacio) */
-@property --p { syntax: '<number>'; inherits: true; initial-value: 0; }
-.cats-section { transition: --p .9s cubic-bezier(.16, 1, .3, 1) !important; --p: 0; }
-.cats-section.is-compact { --p: 1; }
-.cats-section *:not(.cats-section) { transition: none !important; }
-@media (prefers-reduced-motion: reduce) { .cats-section { transition: none !important; } }
+/* Ronda 39: categorías sin pegar al header, cajitas pequeñas (3–4 visibles) */
+.cats-section { margin-top: 26px; margin-bottom: 8px; }
+.cats-section .product-rail { gap: 10px; }
+.cats-section .product-rail__item { flex: 0 0 calc((100% - 30px) / 4); }
+.cats-section .cats-tile { gap: 5px; }
+.cats-section .cats-tile__media { border-radius: 14px; box-shadow: 0 4px 10px rgba(38,61,37,.2); }
+.cats-section .cats-tile__media .icon { width: 26px; height: 26px; }
+.cats-section .cats-tile__title { font-size: 11.5px; }
+@media (min-width: 750px) { .cats-section .product-rail { gap: 14px; } .cats-section .product-rail__item { flex: 0 0 120px; } .cats-section .cats-tile__media .icon { width: 32px; height: 32px; } .cats-section .cats-tile__title { font-size: 13px; } }
