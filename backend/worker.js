@@ -3,7 +3,8 @@
 //   GET  /apps/tramo/orders  -> pedidos del cliente que inició sesión (con etiquetas de estado)
 //   POST /apps/tramo/ai      -> respuestas de IA sobre un producto (Claude)
 // Variables (secretas) que necesita: SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, SHOPIFY_SHOP, ANTHROPIC_API_KEY
-// Opcionales: CLAUDE_MODEL, STORE_INFO, WHATSAPP_TEXT
+// IA: por defecto usa Workers AI de Cloudflare (gratis, sin clave). Si no hay AI, usa Claude con ANTHROPIC_API_KEY.
+// Opcionales: AI_MODEL, CLAUDE_MODEL, STORE_INFO
 
 const enc = new TextEncoder();
 
@@ -12,7 +13,7 @@ function hex(buf) {
 }
 
 // Verifica que la petición venga realmente de Shopify (firma del App Proxy).
-export async function verifyProxy(url, secret) {
+async function verifyProxy(url, secret) {
   const params = new URLSearchParams(url.search);
   const signature = params.get('signature');
   if (!signature) return false;
@@ -153,15 +154,29 @@ async function handleAI(request, url, env) {
     '--- INFORMACIÓN DEL PRODUCTO ---\n' + info
   ].filter(Boolean).join('\n');
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: env.CLAUDE_MODEL || 'claude-haiku-5-5', max_tokens: 350, system, messages: [{ role: 'user', content: question }] })
-  });
-  if (!res.ok) return json({ answer: 'No pude responder ahora. Escríbenos por WhatsApp y te ayudamos.' }, 502);
-  const data = await res.json();
-  const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim();
-  return json({ answer: text || 'No pude encontrar una respuesta. Escríbenos por WhatsApp.' });
+  let text = '';
+  if (env.AI) {
+    // Cloudflare Workers AI (gratis dentro del límite diario)
+    try {
+      const out = await env.AI.run(env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+        messages: [{ role: 'system', content: system }, { role: 'user', content: question }],
+        max_tokens: 300
+      });
+      text = String((out && (out.response || (out.result && out.result.response))) || '').trim();
+    } catch (e) { text = ''; }
+  } else if (env.ANTHROPIC_API_KEY) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: env.CLAUDE_MODEL || 'claude-haiku-5-5', max_tokens: 350, system, messages: [{ role: 'user', content: question }] })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim();
+    }
+  }
+  if (!text) return json({ answer: 'No pude responder ahora. Escríbenos por WhatsApp y te ayudamos.' }, 502);
+  return json({ answer: text });
 }
 
 export default {

@@ -1,35 +1,50 @@
 # Servidor de Tramo (pedidos con estado + IA)
 
-Un solo servicio pequeño (Cloudflare Worker, gratis para este uso) que Shopify conecta a tu tienda con un **App Proxy**:
+Un servicio pequeño en Cloudflare (gratis) que Shopify conecta a tu tienda con un App Proxy:
 
-- `tu-tienda/apps/tramo/orders` → pedidos del cliente que inició sesión (monto, productos, etiquetas de estado).
-- `tu-tienda/apps/tramo/ai` → respuestas de IA sobre el producto (usa Claude).
+- `tu-tienda/apps/tramo/orders` → pedidos del cliente que inició sesión, con su estado.
+- `tu-tienda/apps/tramo/ai` → respuestas de IA sobre el producto.
 
-Shopify firma cada petición; el servicio rechaza cualquier cosa que no venga de tu tienda, y solo devuelve los pedidos del cliente con sesión iniciada.
+Shopify firma cada petición. El servicio rechaza todo lo que no venga de tu tienda, y solo devuelve los pedidos del cliente con sesión iniciada.
 
-## Pasos para encenderlo (una sola vez)
+No necesitas terminal: todo se hace desde las páginas web.
 
-1. **App en Shopify** (Dev Dashboard → Apps → Crear app, "Tramo Backend"):
-   - Permisos (scopes): `read_orders`, `read_customers`, `read_products`.
-   - App proxy: prefijo `apps`, subruta `tramo`, URL = la del Worker (paso 2).
-   - Publicar la versión e instalarla en la tienda. Copiar Client ID y Client secret.
-   - Nota: el método de claves automáticas solo funciona si la tienda está en la misma organización del Dev Dashboard.
-2. **Worker** (cuenta gratis de Cloudflare):
-   ```
-   cd backend
-   npx wrangler deploy
-   npx wrangler secret put SHOPIFY_CLIENT_ID
-   npx wrangler secret put SHOPIFY_CLIENT_SECRET
-   npx wrangler secret put ANTHROPIC_API_KEY
-   ```
-3. Listo: el tema ya apunta a `/apps/tramo/orders` y `/apps/tramo/ai`.
+## Paso 1. Cloudflare (la IA y el servicio)
 
-Para pedidos con más de 60 días de antigüedad hay que pedir a Shopify el permiso `read_all_orders`.
+1. Crea una cuenta gratis en https://dash.cloudflare.com
+2. Menú **Workers & Pages** → **Create** → **Create Worker** → nombre `tramo-backend` → **Deploy**.
+3. Botón **Edit code**. Borra todo, pega el contenido de `backend/worker.js` (en GitHub: mataxxx/tramo-theme → backend → worker.js) → **Deploy**.
+4. Anota la dirección del Worker (algo como `https://tramo-backend.TU-USUARIO.workers.dev`).
+5. **Settings → Bindings → Add → Workers AI**, nombre de variable exacto: `AI`. (Esto activa la IA gratis; no hay que pagar ni crear claves.)
+6. **Settings → Variables and Secrets** → agrega:
+   - `SHOPIFY_SHOP` (texto) = `tramo-san-rafael-1`
+   - `STORE_INFO` (texto, opcional) = datos de tu tienda que la IA puede usar (envíos, horarios…)
+   - `SHOPIFY_CLIENT_ID` (secreto) y `SHOPIFY_CLIENT_SECRET` (secreto) → se llenan en el paso 2.
+
+## Paso 2. App en Shopify
+
+1. Entra a https://dev.shopify.com → **Apps** → **Create app** → nombre `Tramo Backend`.
+2. En la versión de la app, **Access scopes**: `read_orders`, `read_customers`, `read_products`.
+3. **App proxy**: prefijo `apps`, subruta `tramo`, URL = la dirección del Worker del paso 1.
+4. **Release** (publicar la versión) y luego **Install** en tu tienda.
+5. En **Settings** copia el **Client ID** y el **Client secret**, y pégalos en los secretos del paso 1.6.
+
+Nota: el Client ID/secret solo sirven para obtener acceso si la tienda está en la misma organización del Dev Dashboard. Si Shopify responde `shop_not_permitted`, avísame y cambiamos el método.
+
+## Paso 3. Probar
+
+1. En tu tienda inicia sesión con un cliente que tenga pedidos y abre el menú: deben aparecer.
+2. En un producto con el bloque de preguntas, escribe una pregunta: debe responder la IA.
 
 ## Estado del pedido (tipo Uber)
 
-En Shopify, abre el pedido y agrega la etiqueta de la etapa (`estado-preparando`, `estado-en-camino`, `estado-entregado`). Las etapas y etiquetas se editan en el personalizador (Cuenta de usuario).
+En Shopify abre el pedido y agrega la etiqueta de la etapa: `estado-preparando`, `estado-en-camino`, `estado-entregado`. Las etapas y etiquetas se editan en el personalizador (Cuenta de usuario).
 
-## Prueba local de la verificación de firma
+## Sobre la IA
+
+- Por defecto usa **Workers AI** de Cloudflare (modelo Llama): sin clave y con una cuota diaria gratis. Para cambiar de modelo, crea la variable `AI_MODEL`.
+- Opcional: si prefieres Claude, quita el binding `AI` y agrega el secreto `ANTHROPIC_API_KEY`.
+
+## Prueba de la verificación de firma (opcional)
 
 `node backend/test-signature.mjs`

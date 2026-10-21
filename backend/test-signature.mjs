@@ -1,11 +1,15 @@
-import { verifyProxy } from './worker.js';
+import worker from './worker.js';
 import crypto from 'node:crypto';
-// La firma se calcula con el método de la documentación de Shopify (parámetros ordenados y pegados, HMAC-SHA256).
+// Prueba: el servicio solo acepta peticiones firmadas por Shopify (método de la documentación).
 const secret = 'hush';
+const env = { SHOPIFY_CLIENT_SECRET: secret };
 const ts = Math.floor(Date.now() / 1000);
-const msg = `extra=1,2logged_in_customer_id=1path_prefix=/apps/tramoshop=tienda.myshopify.comtimestamp=${ts}`;
+const msg = `logged_in_customer_id=path_prefix=/apps/tramoshop=tienda.myshopify.comtimestamp=${ts}`;
 const sig = crypto.createHmac('sha256', secret).update(msg).digest('hex');
-const ok = new URL(`https://x.com/orders?extra=1&extra=2&shop=tienda.myshopify.com&logged_in_customer_id=1&path_prefix=%2Fapps%2Ftramo&timestamp=${ts}&signature=${sig}`);
-console.log('firma válida aceptada:', await verifyProxy(ok, secret));
-console.log('cliente alterado rechazado:', !(await verifyProxy(new URL(ok.href.replace('customer_id=1', 'customer_id=2')), secret)));
-console.log('secreto incorrecto rechazado:', !(await verifyProxy(ok, 'otro')));
+const url = `https://x.com/ping?shop=tienda.myshopify.com&logged_in_customer_id=&path_prefix=%2Fapps%2Ftramo&timestamp=${ts}&signature=${sig}`;
+const ok = await worker.fetch(new Request(url), env);
+console.log('firma válida -> 200:', ok.status === 200);
+const bad = await worker.fetch(new Request(url.replace('tienda', 'otra')), env);
+console.log('firma alterada -> 401:', bad.status === 401);
+const none = await worker.fetch(new Request('https://x.com/ping'), env);
+console.log('sin firma -> 401:', none.status === 401);
