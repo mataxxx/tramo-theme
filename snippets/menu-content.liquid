@@ -1,5 +1,5 @@
 {%- comment -%}
-  Contenido del menú (se usa en el panel móvil y en la barra lateral fija de escritorio).
+  Contenido del menú (se usa en el panel móvil ).
   Parámetros: s (ajustes de la sección encabezado), ctx ('drawer' o 'sidebar')
 {%- endcomment -%}
 {%- liquid
@@ -56,23 +56,18 @@
   {%- endif -%}
 </nav>
 
-{%- if s.show_videos_link -%}
-  <button type="button" class="menu-videos" data-open="reels" data-reels-view="grid">
-    <span class="menu-videos__icon">{% render 'icon', name: 'video' %}</span>
-    <span class="menu-videos__text">
-      <strong>{{ s.videos_label | default: 'Videos' }}</strong>
-      <small>{{ s.videos_sub | default: 'Ver todos los videos' }}</small>
-    </span>
+{%- if s.show_about -%}
+  <button type="button" class="menu-about" data-open="about">
+    <span class="menu-about__icon">{% render 'icon', name: 'info' %}</span>
+    <span class="menu-about__text"><strong>{{ s.about_label | default: 'Quiénes somos' }}</strong></span>
     {% render 'icon', name: 'chevron-right' %}
   </button>
 {%- endif -%}
 
-{%- if ctx == 'drawer' and s.show_account -%}
+{%- if s.show_account -%}
   <div class="menu-account">
     {%- if customer -%}
-      <button type="button" class="button button--outline button--full" data-open="account">
-        {% render 'icon', name: 'user' %} Mi cuenta
-      </button>
+      <div class="menu-account__slot" data-account-slot></div>
     {%- else -%}
       <a href="{{ routes.account_login_url }}" class="button button--full">
         {% render 'icon', name: 'user' %} Iniciar sesión

@@ -1,7 +1,6 @@
 {%- liquid
   assign s = section.settings
-  assign sidebar_on = s.show_sidebar
-  assign bg_image = false
+    assign bg_image = false
   if s.menu_image != blank and s.menu_image_position == 'background'
     assign bg_image = true
   endif
@@ -20,20 +19,12 @@
   @media (min-width: 750px) {
     #shopify-section-{{ section.id }} .brand-mark__logo { width: {{ s.logo_width }}px; }
   }
-  .side-nav, .drawer--left .drawer__panel { --menu-bg: {{ s.sidebar_bg }}; }
-  .side-nav { width: {{ s.sidebar_width }}px; }
+  .drawer--left .drawer__panel { --menu-bg: {{ s.menu_bg }}; }
   {%- if bg_image %}
-  .side-nav, .drawer--left .drawer__panel {
+  .drawer--left .drawer__panel {
     background-image: linear-gradient(rgba(0,0,0,{{ s.menu_overlay | divided_by: 100.0 }}), rgba(0,0,0,{{ s.menu_overlay | divided_by: 100.0 }})), url('{{ s.menu_image | image_url: width: 900 }}');
     background-size: cover;
     background-position: center;
-  }
-  {%- endif %}
-  {%- if sidebar_on %}
-  @media (min-width: 1000px) {
-    body { padding-left: {{ s.sidebar_width }}px; }
-    .site-header .header__menu { display: none; }
-    .side-nav { display: flex; }
   }
   {%- endif %}
 {%- endstyle -%}
@@ -65,6 +56,9 @@
     <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">
       {% render 'icon', name: 'search' %}
     </button>
+    <button type="button" class="icon-button header__videos" data-open="reels" data-reels-view="grid" aria-label="Videos">
+      {% render 'icon', name: 'video' %}
+    </button>
     {%- if s.show_account -%}
       {%- if customer -%}
         <button type="button" class="header__account header__account--in" data-open="account" aria-label="Mi cuenta">
@@ -84,15 +78,6 @@
     </a>
   </div>
 </header>
-
-{%- comment -%} Barra lateral fija (solo computadora) {%- endcomment -%}
-{%- if sidebar_on -%}
-  <aside class="side-nav{% if bg_image %} side-nav--image{% endif %}" aria-label="Menú">
-    <div class="side-nav__inner">
-      {% render 'menu-content', s: s, ctx: 'sidebar' %}
-    </div>
-  </aside>
-{%- endif -%}
 
 {%- comment -%} Panel del menú (móvil y tablet) {%- endcomment -%}
 <div class="drawer drawer--left" id="MenuDrawer" data-drawer="menu" role="dialog" aria-modal="true" aria-label="Menú" hidden>
@@ -338,46 +323,23 @@
     },
     {
       "type": "checkbox",
-      "id": "show_videos_link",
-      "label": "Mostrar acceso a videos en el menú",
+      "id": "show_about",
+      "label": "Mostrar \"Quiénes somos\" en el menú",
       "default": true
     },
     {
       "type": "text",
-      "id": "videos_label",
-      "label": "Videos: título",
-      "default": "Videos"
-    },
-    {
-      "type": "text",
-      "id": "videos_sub",
-      "label": "Videos: texto pequeño",
-      "default": "Ver todos los videos"
+      "id": "about_label",
+      "label": "Quiénes somos: texto",
+      "default": "Quiénes somos"
     },
     {
       "type": "header",
-      "content": "Menú fijo en computadora"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_sidebar",
-      "label": "Mostrar el menú siempre visible en computadora",
-      "info": "En el celular el menú sigue escondido en el botón de las tres rayas.",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "sidebar_width",
-      "label": "Ancho del menú",
-      "min": 220,
-      "max": 400,
-      "step": 10,
-      "unit": "px",
-      "default": 280
+      "content": "Colores del menú"
     },
     {
       "type": "color",
-      "id": "sidebar_bg",
+      "id": "menu_bg",
       "label": "Color de fondo del menú",
       "default": "#fffdf8"
     },

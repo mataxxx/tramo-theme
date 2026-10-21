@@ -1,0 +1,26 @@
+{%- assign pvideo = product.metafields.custom.video.value -%}
+{%- if pvideo != blank -%}
+  <section class="product-video page-width">
+    {%- if section.settings.heading != blank -%}<h2 class="product-video__title">{{ section.settings.heading }}</h2>{%- endif -%}
+    <div class="product-video__frame">
+      <video controls playsinline preload="metadata" poster="{{ pvideo.preview_image | image_url: width: 1100 }}">
+        {%- for source in pvideo.sources -%}
+          <source src="{{ source.url }}" type="{{ source.mime_type }}">
+        {%- endfor -%}
+      </video>
+    </div>
+  </section>
+{%- elsif request.design_mode -%}
+  <section class="product-video page-width"><p class="muted small">Video del producto: este producto no tiene video (campo "video" del producto).</p></section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Video del producto",
+  "settings": [
+    { "type": "paragraph", "content": "Solo se muestra en los productos que tengan un video cargado en su campo \"video\"." },
+    { "type": "text", "id": "heading", "label": "Título", "default": "Míralo en acción" }
+  ],
+  "presets": [{ "name": "Video del producto" }]
+}
+{% endschema %}

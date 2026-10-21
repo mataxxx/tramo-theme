@@ -31,10 +31,29 @@ Ejemplo: si el kilo cuesta ₡28.000, la variante "A granel" cuesta ₡280. El m
 
 - Textos: fuente, tamaño (computadora/móvil) y color en cada sección.
 - Barra de anuncios con desplazamiento lateral y velocidad.
-- Menú: barra lateral fija en computadora, panel en móvil; imagen de diseño; ocultar Inicio/Catálogo/Contacto.
-- Videos: botón "Ver todos los videos" abre una cuadrícula estilo TikTok.
+- Menú (tres rayas, también en computadora): imagen de diseño, ocultar Inicio/Catálogo/Contacto, "Quiénes somos" y la cuenta con pedidos.
+- Inicio: botón de búsqueda junto al título y "Ver toda la colección" que expande con animación.
+- Videos: se abren desde la barra inferior (móvil) o el icono de video del encabezado (computadora); cuadrícula estilo TikTok.
 - Popup "producto agregado" (ver carrito / seguir comprando).
 - Logo con tamaño en encabezado y pie de página.
+
+## Campos por producto (metafields)
+
+Para activar cosas solo en ciertos productos, crea estos campos en Shopify (Configuración > Datos personalizados > Productos), espacio `custom`:
+
+| Nombre/clave | Tipo | Para qué |
+|---|---|---|
+| `video` | Archivo (video) | Muestra el video en la página del producto |
+| `related` | Lista de productos | Carrusel "También te puede gustar" con los que tú elijas |
+| `combo_items` | Lista de productos | Activa el bloque "Llévalo en combo" con estos productos |
+| `combo_percent` | Entero | Porcentaje que se muestra (ej. 10) |
+| `combo_code` | Texto | Código de descuento real (créalo en Descuentos); el tema lo aplica al agregar el combo |
+
+Sin el campo, la sección no aparece en ese producto.
+
+## Preguntas con IA
+
+El bloque "Preguntas (IA y WhatsApp)" abre WhatsApp con la pregunta si no hay asistente configurado. Para respuestas con IA hace falta un servicio aparte (recibe `{question, product}` y responde `{answer}`); su dirección se pega en el bloque.
 
 ## Notas
 - Textos del tema en español fijo (sin traducciones).

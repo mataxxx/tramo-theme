@@ -14,8 +14,8 @@
     "search-overlay": {
       "type": "search-overlay",
       "settings": {
-        "title": "¿Qué estás buscando?",
-        "placeholder": "Busca por nombre...",
+        "title": "¿Qué producto estás buscando?",
+        "placeholder": "Escribe el nombre del producto...",
         "helper": "También puedes buscar por categoría"
       },
       "blocks": {
@@ -124,12 +124,45 @@
         "s4"
       ],
       "settings": {}
+    },
+    "about-panel": {
+      "type": "about-panel",
+      "blocks": {
+        "f1": {
+          "type": "fact",
+          "settings": {
+            "value": "1946",
+            "label": "Desde"
+          }
+        },
+        "f2": {
+          "type": "fact",
+          "settings": {
+            "value": "+75",
+            "label": "Años de tradición"
+          }
+        },
+        "f3": {
+          "type": "fact",
+          "settings": {
+            "value": "CR",
+            "label": "Hecho en Costa Rica"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "settings": {}
     }
   },
   "order": [
     "cart-drawer",
     "search-overlay",
     "account-panel",
+    "about-panel",
     "reels",
     "bottom-nav"
   ]

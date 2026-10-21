@@ -24,6 +24,9 @@
             {%- if block.settings.brand_subtitle != blank -%}
               <p class="footer-brand__sub">{{ block.settings.brand_subtitle }}</p>
             {%- endif -%}
+            {%- if section.settings.show_about -%}
+              <button type="button" class="footer-about" data-open="about">{{ section.settings.about_label }}</button>
+            {%- endif -%}
             {%- if block.settings.text != blank -%}
               <div class="rte">{{ block.settings.text }}</div>
             {%- endif -%}
@@ -224,6 +227,22 @@
       "type": "color",
       "id": "text_color",
       "label": "Color"
+    },
+    {
+      "type": "header",
+      "content": "Quiénes somos"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_about",
+      "label": "Mostrar enlace \"Quiénes somos\"",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "about_label",
+      "label": "Texto del enlace",
+      "default": "Quiénes somos"
     }
   ],
   "blocks": [

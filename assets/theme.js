@@ -655,6 +655,121 @@
     $$('[data-reel]', container).forEach(function (reel) { reelObserver.observe(reel); });
   }
 
+  /* ---------- Preguntas del producto (IA / WhatsApp) -------------------- */
+  function waLink(box, question) {
+    var text = 'Hola, quiero preguntar sobre ' + box.getAttribute('data-product-title') + (question ? ': ' + question : '');
+    return 'https://wa.me/' + box.getAttribute('data-wa') + '?text=' + encodeURIComponent(text);
+  }
+
+  function askQuestion(box, question) {
+    var answer = $('[data-ask-answer]', box);
+    var endpoint = box.getAttribute('data-endpoint');
+    var wa = box.getAttribute('data-wa');
+    var link = $('[data-ask-wa]', box);
+    if (link) link.href = waLink(box, question);
+    if (!endpoint) {
+      if (wa) { window.open(waLink(box, question), '_blank', 'noopener'); }
+      else showToast('Pregunta no disponible por ahora');
+      return;
+    }
+    answer.hidden = false;
+    answer.className = 'ask__answer is-loading';
+    answer.textContent = 'Pensando…';
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: question,
+        product: {
+          title: box.getAttribute('data-product-title'),
+          handle: box.getAttribute('data-product-handle'),
+          url: box.getAttribute('data-product-url'),
+          description: box.getAttribute('data-product-desc')
+        }
+      })
+    })
+      .then(function (r) { if (!r.ok) throw new Error('x'); return r.json(); })
+      .then(function (data) {
+        answer.className = 'ask__answer';
+        answer.textContent = data.answer || 'No pude encontrar una respuesta. Escríbenos por WhatsApp.';
+      })
+      .catch(function () {
+        answer.className = 'ask__answer is-error';
+        answer.textContent = 'No pude responder ahora. Puedes preguntarnos por WhatsApp.';
+      });
+  }
+
+  document.addEventListener('submit', function (event) {
+    var form = event.target.closest && event.target.closest('[data-ask-form]');
+    if (!form) return;
+    event.preventDefault();
+    var q = form.elements.q.value.trim();
+    if (q) askQuestion(form.closest('[data-ask]'), q);
+  });
+
+  /* ---------- Combo ---------------------------------------------------- */
+  function addCombo(box) {
+    var btn = $('[data-combo-add]', box);
+    var items = JSON.parse(box.getAttribute('data-combo-items'));
+    var code = box.getAttribute('data-combo-code');
+    btn.disabled = true;
+    fetch(T.routes.cartAdd, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ items: items })
+    })
+      .then(parseJSON)
+      .then(function () { return code ? fetch('/discount/' + encodeURIComponent(code), { credentials: 'same-origin' }).catch(function () {}) : null; })
+      .then(function () {
+        return afterAdd({
+          product_title: box.getAttribute('data-combo-title'),
+          variant_title: box.getAttribute('data-combo-count') + ' productos',
+          quantity: 1,
+          final_line_price: parseInt(box.getAttribute('data-combo-final'), 10)
+        });
+      })
+      .catch(function (error) { showToast(error.message || 'No se pudo agregar el combo'); })
+      .then(function () { btn.disabled = false; });
+  }
+
+  /* ---------- Ver toda la colección (expandir en el inicio) --------------- */
+  var expandedFrom = null;
+
+  function expandCollection(section) {
+    var grid = $('[data-collection-grid]', section);
+    var tpl = $('[data-collection-template]', section);
+    if (!grid || !tpl) return;
+    if (!grid.firstChild) grid.appendChild(tpl.content.cloneNode(true));
+    var wrap = section.closest('.shopify-section');
+    expandedFrom = window.scrollY;
+    section.classList.add('is-expanded');
+    if (wrap) wrap.classList.add('is-expanded-section');
+    document.body.classList.add('has-expanded');
+    grid.hidden = false;
+    $('[data-collection-back]', section).hidden = false;
+    window.scrollTo({ top: 0 });
+  }
+
+  function collapseCollection(section) {
+    var wrap = section.closest('.shopify-section');
+    section.classList.remove('is-expanded');
+    if (wrap) wrap.classList.remove('is-expanded-section');
+    document.body.classList.remove('has-expanded');
+    $('[data-collection-grid]', section).hidden = true;
+    $('[data-collection-back]', section).hidden = true;
+    window.scrollTo({ top: expandedFrom || 0 });
+  }
+
+  /* ---------- Cuenta dentro del menú (copia la ficha de cuenta) ---------- */
+  function fillAccountSlots() {
+    var source = $('#AccountPanel .account-panel__body');
+    $$('[data-account-slot]').forEach(function (slot) {
+      if (source && !slot.firstChild) slot.innerHTML = '<div class="account-panel__body">' + source.innerHTML + '</div>';
+    });
+  }
+  fillAccountSlots();
+  document.addEventListener('shopify:section:load', fillAccountSlots);
+
   /* ---------- Eventos globales ----------------------------------------- */
   document.addEventListener('click', function (event) {
     var target = event.target;
@@ -671,6 +786,21 @@
       else openDrawer(name);
       return;
     }
+
+    var chip = target.closest('[data-ask-chip]');
+    if (chip) {
+      var askBox = chip.closest('[data-ask]');
+      askBox.querySelector('input[name="q"]').value = chip.textContent.trim();
+      askQuestion(askBox, chip.textContent.trim());
+      return;
+    }
+    var comboBtn = target.closest('[data-combo-add]');
+    if (comboBtn) { addCombo(comboBtn.closest('[data-combo]')); return; }
+
+    var expandBtn = target.closest('[data-collection-expand]');
+    if (expandBtn) { expandCollection(expandBtn.closest('[data-category-section]')); return; }
+    var collapseBtn = target.closest('[data-collection-collapse]');
+    if (collapseBtn) { collapseCollection(collapseBtn.closest('[data-category-section]')); return; }
 
     var showGrid = target.closest('[data-reels-show-grid]');
     if (showGrid) { setReelsView('grid'); return; }

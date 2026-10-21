@@ -23,7 +23,7 @@
 
         <ul class="account-links" role="list">
           <li>
-            <a href="{{ routes.account_url }}">
+            <a href="{{ routes.account_addresses_url }}">
               {% render 'icon', name: 'map-pin' %}
               <span>{{ section.settings.profile_label }}</span>
               {% render 'icon', name: 'chevron-right' %}
@@ -99,13 +99,13 @@
       "type": "text",
       "id": "profile_label",
       "label": "Enlace: información y direcciones",
-      "default": "Información y direcciones"
+      "default": "Mis direcciones e información"
     },
     {
       "type": "text",
       "id": "orders_link_label",
       "label": "Enlace: todas mis compras",
-      "default": "Compras pasadas"
+      "default": "Mis pedidos"
     },
     {
       "type": "text",

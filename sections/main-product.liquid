@@ -83,6 +83,85 @@
               <div class="rte">{{ block.settings.content }}</div>
             </details>
           {%- endif -%}
+        {%- when 'combo' -%}
+          {%- liquid
+            assign combo_items = product.metafields.custom.combo_items.value
+            assign combo_pct = product.metafields.custom.combo_percent.value | default: 0
+            assign combo_code = product.metafields.custom.combo_code.value
+          -%}
+          {%- if combo_items.size > 0 -%}
+            {%- liquid
+              assign combo_base = product.selected_or_first_available_variant
+              assign combo_total = combo_base.price
+              assign combo_ids = combo_base.id | prepend: '[{"id":' | append: ',"quantity":1}'
+              for it in combo_items
+                assign v = it.selected_or_first_available_variant
+                assign combo_total = combo_total | plus: v.price
+                assign combo_ids = combo_ids | append: ',{"id":' | append: v.id | append: ',"quantity":1}'
+              endfor
+              assign combo_ids = combo_ids | append: ']'
+              assign combo_final = combo_total
+              if combo_pct > 0 and combo_code != blank
+                assign rest = 100 | minus: combo_pct
+                assign combo_final = combo_total | times: rest | divided_by: 100
+              endif
+              assign combo_count = combo_items.size | plus: 1
+            -%}
+            <div class="combo" data-combo data-combo-items='{{ combo_ids }}' data-combo-code="{{ combo_code | escape }}" data-combo-title="{{ block.settings.title | escape }}" data-combo-final="{{ combo_final }}" data-combo-count="{{ combo_count }}" {{ block.shopify_attributes }}>
+              <p class="combo__title">{% render 'icon', name: 'tag' %} {{ block.settings.title }}</p>
+              {%- if block.settings.text != blank -%}<p class="combo__text muted small">{{ block.settings.text }}</p>{%- endif -%}
+              <ul class="combo__list" role="list">
+                <li class="combo__item combo__item--base">
+                  <span class="combo__thumb">{%- if product.featured_media -%}{{ product.featured_media | image_url: width: 120 | image_tag: loading: 'lazy', alt: product.title }}{%- endif -%}</span>
+                  <span class="combo__name">{{ product.title }}</span>
+                </li>
+                {%- for it in combo_items -%}
+                  <li class="combo__item">
+                    <span class="combo__plus" aria-hidden="true">+</span>
+                    <span class="combo__thumb">{%- if it.featured_media -%}{{ it.featured_media | image_url: width: 120 | image_tag: loading: 'lazy', alt: it.title }}{%- endif -%}</span>
+                    <a class="combo__name" href="{{ it.url }}">{{ it.title }}</a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+              <div class="combo__total">
+                <span class="combo__prices">
+                  {%- if combo_final < combo_total -%}<s>{{ combo_total | money }}</s>{%- endif -%}
+                  <strong>{{ combo_final | money }}</strong>
+                  {%- if combo_final < combo_total -%}<em class="combo__badge">-{{ combo_pct }}%</em>{%- endif -%}
+                </span>
+                <button type="button" class="button" data-combo-add>{{ block.settings.button_label }}</button>
+              </div>
+              {%- if request.design_mode and combo_pct > 0 and combo_code == blank -%}
+                <p class="small muted">Falta el código de descuento del combo (campo "combo_code" del producto) para que el descuento se aplique.</p>
+              {%- endif -%}
+            </div>
+          {%- elsif request.design_mode -%}
+            <p class="small muted" {{ block.shopify_attributes }}>Combo: este producto no tiene productos de combo asignados (campo "combo_items").</p>
+          {%- endif -%}
+        {%- when 'ask' -%}
+          {%- assign wa = settings.whatsapp_number | replace: '+', '' | replace: ' ', '' | replace: '-', '' -%}
+          <div class="ask" data-ask data-endpoint="{{ block.settings.ai_endpoint | escape }}" data-wa="{{ wa }}" data-product-title="{{ product.title | escape }}" data-product-handle="{{ product.handle }}" data-product-url="{{ product.url | prepend: request.origin }}" data-product-desc="{{ product.description | strip_html | strip_newlines | truncate: 1200 | escape }}" {{ block.shopify_attributes }}>
+            <p class="ask__title">{% render 'icon', name: 'sparkle' %} {{ block.settings.title }}</p>
+            {%- if block.settings.text != blank -%}<p class="ask__text muted small">{{ block.settings.text }}</p>{%- endif -%}
+            <div class="ask__chips">
+              {%- for n in (1..3) -%}
+                {%- assign chip_key = 'chip_' | append: n -%}
+                {%- if block.settings[chip_key] != blank -%}
+                  <button type="button" class="ask__chip" data-ask-chip>{{ block.settings[chip_key] }}</button>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            <form class="ask__form" data-ask-form>
+              <input type="text" name="q" required maxlength="300" placeholder="{{ block.settings.placeholder | escape }}" aria-label="Tu pregunta">
+              <button type="submit" class="button">{{ block.settings.button_label }}</button>
+            </form>
+            <div class="ask__answer" data-ask-answer aria-live="polite" hidden></div>
+            {%- if wa != blank -%}
+              <a class="ask__wa" data-ask-wa href="https://wa.me/{{ wa }}?text={{ 'Hola, quiero preguntar sobre: ' | append: product.title | url_encode }}" target="_blank" rel="noopener">
+                {% render 'icon', name: 'chat' %} {{ block.settings.whatsapp_label }}
+              </a>
+            {%- endif -%}
+          </div>
         {%- when '@app' -%}
           {% render block %}
       {%- endcase -%}
@@ -170,6 +249,96 @@
           "id": "content",
           "label": "Contenido",
           "default": "<p>Guardar en un lugar fresco y seco.</p>"
+        }
+      ]
+    },
+    {
+      "type": "combo",
+      "name": "Combo (por producto)",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Solo se muestra en los productos que tengan productos de combo asignados (campo del producto \"combo_items\")."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Llévalo en combo"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Agrega todo junto y ahorra."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "default": "Agregar combo"
+        }
+      ]
+    },
+    {
+      "type": "ask",
+      "name": "Preguntas (IA y WhatsApp)",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "¿Dudas sobre este producto?"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Pregúntale a nuestro asistente o escríbenos por WhatsApp."
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Texto del campo",
+          "default": "Ej: ¿Para qué sirve? ¿Cómo se usa?"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "default": "Preguntar"
+        },
+        {
+          "type": "text",
+          "id": "chip_1",
+          "label": "Pregunta sugerida 1",
+          "default": "¿Cómo se usa?"
+        },
+        {
+          "type": "text",
+          "id": "chip_2",
+          "label": "Pregunta sugerida 2",
+          "default": "¿Con qué lo combino?"
+        },
+        {
+          "type": "text",
+          "id": "chip_3",
+          "label": "Pregunta sugerida 3",
+          "default": "¿Cómo se conserva?"
+        },
+        {
+          "type": "url",
+          "id": "ai_endpoint",
+          "label": "Dirección del asistente IA (opcional)",
+          "info": "Si la dejas vacía, la pregunta se envía por WhatsApp. Requiere un servicio aparte que responda con IA."
+        },
+        {
+          "type": "text",
+          "id": "whatsapp_label",
+          "label": "Texto del botón de WhatsApp",
+          "default": "Prefiero hablar por WhatsApp"
         }
       ]
     }
