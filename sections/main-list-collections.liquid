@@ -1,0 +1,28 @@
+<section class="page-width">
+  <header class="page-header"><h1>{{ section.settings.title }}</h1></header>
+  <ul class="collection-grid" role="list">
+    {%- for collection in collections -%}
+      <li>
+        <a href="{{ collection.url }}" class="collection-tile">
+          <div class="collection-tile__media">
+            {%- if collection.featured_image -%}
+              {{ collection.featured_image | image_url: width: 600 | image_tag: widths: '300, 450, 600', sizes: '(min-width: 750px) 25vw, 50vw', loading: 'lazy', alt: collection.featured_image.alt }}
+            {%- else -%}
+              <div class="product-card__placeholder">{{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+            {%- endif -%}
+          </div>
+          <h2 class="collection-tile__title">{{ collection.title }}</h2>
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+</section>
+
+{% schema %}
+{
+  "name": "Lista de colecciones",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Título", "default": "Categorías" }
+  ]
+}
+{% endschema %}

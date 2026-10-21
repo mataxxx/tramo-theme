@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "heading": "DE NUESTRA\nTRADICIÓN A\nTU MESA",
+        "text": "Especias, ingredientes\ny sabores del mundo\ndesde 1946."
+      }
+    },
+    "video": {
+      "type": "video-feature",
+      "settings": {
+        "kicker": "Desde nuestra cocina",
+        "heading": "El sabor empieza aquí",
+        "text": "Conoce cómo preparamos nuestros blends especiales al momento."
+      }
+    },
+    "especias": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "frontpage",
+        "heading": "Especias"
+      }
+    },
+    "semillas": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "test2",
+        "heading": "Semillas & Granos"
+      }
+    },
+    "frutas": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "frutas-otros-deshidratados",
+        "heading": "Frutas & otros deshidratados"
+      }
+    },
+    "reposteria": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "insumos-para-reposteria",
+        "heading": "Insumos para Repostería"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "video",
+    "especias",
+    "semillas",
+    "frutas",
+    "reposteria"
+  ]
+}

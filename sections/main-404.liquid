@@ -1,0 +1,15 @@
+<section class="page-width page-width--narrow not-found">
+  <h1>{{ section.settings.title }}</h1>
+  <p>{{ section.settings.text }}</p>
+  <a href="{{ routes.all_products_collection_url }}" class="button">Seguir comprando</a>
+</section>
+
+{% schema %}
+{
+  "name": "Página 404",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Título", "default": "Página no encontrada" },
+    { "type": "text", "id": "text", "label": "Texto", "default": "La página que buscas no existe o fue movida." }
+  ]
+}
+{% endschema %}

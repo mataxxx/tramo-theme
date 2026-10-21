@@ -1,0 +1,41 @@
+{%- comment -%}
+  Cantidad: unidades normales y gramos para la variante a granel.
+  Parámetro: product
+{%- endcomment -%}
+{%- liquid
+  assign bulk_unit = settings.bulk_unit_grams | default: 10
+  assign bulk_min = settings.bulk_min_grams | default: 250
+  assign bulk_step = settings.bulk_button_step | default: 50
+-%}
+<div class="product-quantity" data-product-quantity>
+  <div class="qty" data-qty-normal>
+    <span class="field-label">Cantidad</span>
+    <div class="qty__controls">
+      <button type="button" class="qty__btn" data-qty-minus aria-label="Disminuir cantidad">{% render 'icon', name: 'minus' %}</button>
+      <input type="number" class="qty__input" data-qty-input value="1" min="1" inputmode="numeric" aria-label="Cantidad">
+      <button type="button" class="qty__btn" data-qty-plus aria-label="Aumentar cantidad">{% render 'icon', name: 'plus' %}</button>
+    </div>
+  </div>
+
+  <div class="qty qty--bulk" data-qty-bulk hidden>
+    <label class="field-label" for="bulk-grams-{{ product.id }}">Cantidad a granel</label>
+    <div class="qty__controls">
+      <button type="button" class="qty__btn" data-bulk-minus aria-label="Disminuir gramos">{% render 'icon', name: 'minus' %}</button>
+      <input
+        type="number"
+        class="qty__input qty__input--wide"
+        id="bulk-grams-{{ product.id }}"
+        data-bulk-input
+        value="{{ bulk_min }}"
+        min="{{ bulk_min }}"
+        step="{{ bulk_unit }}"
+        inputmode="numeric"
+      >
+      <span class="qty__unit">g</span>
+      <button type="button" class="qty__btn" data-bulk-plus aria-label="Aumentar gramos" data-step="{{ bulk_step }}">{% render 'icon', name: 'plus' %}</button>
+    </div>
+    <p class="bulk-note" data-bulk-note>
+      Desde {{ bulk_min }} g · incrementos de {{ bulk_unit }} g<span data-bulk-kg></span>
+    </p>
+  </div>
+</div>

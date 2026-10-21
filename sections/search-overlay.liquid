@@ -1,0 +1,69 @@
+<div class="drawer drawer--top" id="SearchOverlay" data-drawer="search" role="dialog" aria-modal="true" aria-label="Buscar" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <section class="search-panel" data-search-panel>
+    <div class="search-panel__header">
+      <h2 data-search-heading data-default-title="{{ section.settings.title | escape }}">{{ section.settings.title }}</h2>
+      <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar búsqueda">{% render 'icon', name: 'close' %}</button>
+    </div>
+
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-field" data-search-form>
+      {% render 'icon', name: 'search' %}
+      <input type="hidden" name="type" value="product">
+      <input
+        type="search"
+        name="q"
+        autocomplete="off"
+        placeholder="{{ section.settings.placeholder | escape }}"
+        data-search-input
+        aria-label="Buscar"
+      >
+    </form>
+
+    <div data-search-global>
+      {%- if section.settings.helper != blank -%}
+        <p class="search-helper">{{ section.settings.helper }}</p>
+      {%- endif -%}
+      {%- assign cat_menu = section.settings.categories_menu -%}
+      {%- if cat_menu != blank and cat_menu.links.size > 0 -%}
+        <div class="category-search-list">
+          {%- for link in cat_menu.links -%}
+            {%- if link.type == 'collection_link' -%}
+              <button type="button" data-search-collection="{{ link.object.handle }}" data-search-title="{{ link.title | escape }}">
+                {{ link.title }} {% render 'icon', name: 'chevron-right' %}
+              </button>
+            {%- else -%}
+              <a href="{{ link.url }}">{{ link.title }} {% render 'icon', name: 'chevron-right' %}</a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="search-sort" data-search-sort hidden>
+      <span>Ordenar por</span>
+      <button type="button" class="is-active" data-sort="default">Destacados</button>
+      <button type="button" data-sort="title">A–Z</button>
+      <button type="button" data-sort="price">Precio</button>
+    </div>
+
+    <div class="search-results" data-search-results aria-live="polite"></div>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Búsqueda",
+  "enabled_on": { "groups": ["aside"] },
+  "settings": [
+    { "type": "text", "id": "title", "label": "Título", "default": "¿Qué estás buscando?" },
+    { "type": "text", "id": "placeholder", "label": "Texto del buscador", "default": "Busca por nombre..." },
+    { "type": "text", "id": "helper", "label": "Texto de ayuda", "default": "También puedes buscar por categoría" },
+    {
+      "type": "link_list",
+      "id": "categories_menu",
+      "label": "Menú de categorías",
+      "info": "Usa un menú cuyos enlaces sean colecciones. Cada una abre la búsqueda dentro de esa categoría."
+    }
+  ]
+}
+{% endschema %}

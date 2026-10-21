@@ -1,0 +1,22 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "type": { "type": "type" },
+        "title": { "type": "title" },
+        "price": { "type": "price" },
+        "variant_picker": { "type": "variant_picker" },
+        "quantity": { "type": "quantity" },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": { "label": "Agregar al carrito" }
+        },
+        "description": { "type": "description" }
+      },
+      "block_order": ["type", "title", "price", "variant_picker", "quantity", "buy_buttons", "description"],
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

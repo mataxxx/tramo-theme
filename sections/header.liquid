@@ -1,0 +1,81 @@
+<header class="site-header{% if section.settings.sticky %} site-header--sticky{% endif %}" data-site-header>
+  <button type="button" class="icon-button header__menu" data-open="menu" aria-label="Abrir menú" aria-controls="MenuDrawer">
+    {% render 'icon', name: 'menu' %}
+  </button>
+
+  <a href="{{ routes.root_url }}" class="brand-mark" aria-label="{{ shop.name | escape }}">
+    {%- if section.settings.logo != blank -%}
+      {{ section.settings.logo | image_url: width: 600 | image_tag: widths: '200, 300, 400, 600', sizes: '300px', class: 'brand-mark__logo', loading: 'eager', alt: shop.name }}
+    {%- else -%}
+      {%- if section.settings.brand_title != blank -%}
+        <strong class="brand-mark__title">{{ section.settings.brand_title | escape | newline_to_br }}</strong>
+      {%- else -%}
+        <strong class="brand-mark__title">{{ shop.name }}</strong>
+      {%- endif -%}
+      {%- if section.settings.brand_subtitle != blank -%}
+        <span class="brand-mark__subtitle">{{ section.settings.brand_subtitle }}</span>
+      {%- endif -%}
+      {%- if section.settings.brand_note != blank -%}
+        <small class="brand-mark__note">{{ section.settings.brand_note }}</small>
+      {%- endif -%}
+    {%- endif -%}
+  </a>
+
+  <div class="header__actions">
+    <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">
+      {% render 'icon', name: 'search' %}
+    </button>
+    <a href="{{ routes.cart_url }}" class="icon-button header__cart" data-open-cart aria-label="Ver carrito">
+      {% render 'icon', name: 'cart' %}
+      <span class="count-bubble" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+    </a>
+  </div>
+</header>
+
+<div class="drawer drawer--left" id="MenuDrawer" data-drawer="menu" role="dialog" aria-modal="true" aria-label="Menú" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <aside class="drawer__panel">
+    <header class="drawer__header">
+      <p class="drawer__title">Menú</p>
+      <button type="button" class="icon-button" data-drawer-close aria-label="Cerrar menú">{% render 'icon', name: 'close' %}</button>
+    </header>
+    <nav class="drawer__body menu-list" aria-label="Menú principal">
+      {%- assign menu_obj = section.settings.menu -%}
+      {%- if menu_obj != blank and menu_obj.links.size > 0 -%}
+        <ul>
+          {%- for link in menu_obj.links -%}
+            <li>
+              <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title }}</a>
+              {%- if link.links.size > 0 -%}
+                <ul class="menu-list__sub">
+                  {%- for child in link.links -%}
+                    <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <p class="muted">Agrega un menú desde la configuración de esta sección.</p>
+      {%- endif -%}
+    </nav>
+  </aside>
+</div>
+
+{% schema %}
+{
+  "name": "Encabezado",
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    { "type": "header", "content": "Marca" },
+    { "type": "image_picker", "id": "logo", "label": "Logo (opcional)", "info": "Si subes un logo, reemplaza el texto de marca." },
+    { "type": "textarea", "id": "brand_title", "label": "Nombre (admite varias líneas)", "default": "TRAMO\nSAN RAFAEL #1" },
+    { "type": "text", "id": "brand_subtitle", "label": "Subtítulo", "default": "— FUNDADORES —" },
+    { "type": "text", "id": "brand_note", "label": "Nota pequeña", "default": "Desde 1946" },
+    { "type": "header", "content": "Navegación" },
+    { "type": "link_list", "id": "menu", "label": "Menú del botón de la izquierda", "default": "main-menu" },
+    { "type": "checkbox", "id": "sticky", "label": "Encabezado fijo al hacer scroll", "default": false }
+  ]
+}
+{% endschema %}

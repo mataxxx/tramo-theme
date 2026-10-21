@@ -1,0 +1,64 @@
+{%- comment -%}
+  Línea del carrito. Parámetros: item, index
+{%- endcomment -%}
+{%- liquid
+  assign bulk_unit = settings.bulk_unit_grams | default: 10
+  assign bulk_min = settings.bulk_min_grams | default: 250
+  assign is_bulk = false
+  if item.variant.options contains settings.bulk_variant_name
+    assign is_bulk = true
+  endif
+-%}
+<li class="cart-line" data-cart-line="{{ item.key }}" data-line-index="{{ index }}"{% if is_bulk %} data-bulk{% endif %}>
+  <a href="{{ item.url }}" class="cart-line__image">
+    {%- if item.image -%}
+      {{ item.image | image_url: width: 200 | image_tag: widths: '100, 200', sizes: '90px', loading: 'lazy', alt: item.image.alt }}
+    {%- else -%}
+      <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+    {%- endif -%}
+  </a>
+  <div class="cart-line__info">
+    <a href="{{ item.url }}" class="cart-line__title">{{ item.product.title }}</a>
+    {%- unless item.product.has_only_default_variant -%}
+      {%- if is_bulk -%}
+        <p class="cart-line__variant">{{ settings.bulk_variant_name }} · {{ item.quantity | times: bulk_unit }} g</p>
+      {%- else -%}
+        <p class="cart-line__variant">{{ item.variant.title }}</p>
+      {%- endif -%}
+    {%- endunless -%}
+    {%- for discount in item.line_level_discount_allocations -%}
+      <p class="cart-line__discount">{{ discount.discount_application.title }} (-{{ discount.amount | money }})</p>
+    {%- endfor -%}
+
+    <div class="cart-line__row">
+      <div class="qty__controls qty__controls--small">
+        {%- if is_bulk -%}
+          <button type="button" class="qty__btn" data-line-bulk-minus aria-label="Disminuir gramos">{% render 'icon', name: 'minus' %}</button>
+          <input
+            type="number"
+            class="qty__input qty__input--wide"
+            data-line-grams
+            value="{{ item.quantity | times: bulk_unit }}"
+            min="{{ bulk_min }}"
+            step="{{ bulk_unit }}"
+            inputmode="numeric"
+            aria-label="Gramos"
+          >
+          <span class="qty__unit">g</span>
+          <button type="button" class="qty__btn" data-line-bulk-plus aria-label="Aumentar gramos">{% render 'icon', name: 'plus' %}</button>
+        {%- else -%}
+          <button type="button" class="qty__btn" data-line-minus aria-label="Disminuir cantidad">{% render 'icon', name: 'minus' %}</button>
+          <input type="number" class="qty__input" data-line-qty value="{{ item.quantity }}" min="0" inputmode="numeric" aria-label="Cantidad">
+          <button type="button" class="qty__btn" data-line-plus aria-label="Aumentar cantidad">{% render 'icon', name: 'plus' %}</button>
+        {%- endif -%}
+      </div>
+      <div class="cart-line__price">
+        {%- if item.original_line_price > item.final_line_price -%}
+          <s>{{ item.original_line_price | money }}</s>
+        {%- endif -%}
+        <strong>{{ item.final_line_price | money }}</strong>
+      </div>
+      <button type="button" class="icon-button" data-line-remove aria-label="Quitar {{ item.product.title | escape }}">{% render 'icon', name: 'trash' %}</button>
+    </div>
+  </div>
+</li>

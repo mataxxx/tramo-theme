@@ -1,0 +1,127 @@
+<footer class="site-footer">
+  <div class="site-footer__grid">
+    {%- for block in section.blocks -%}
+      <div class="footer-block footer-block--{{ block.type }}" {{ block.shopify_attributes }}>
+        {%- case block.type -%}
+          {%- when 'brand' -%}
+            {%- if block.settings.brand_title != blank -%}
+              <p class="footer-brand">{{ block.settings.brand_title | escape | newline_to_br }}</p>
+            {%- endif -%}
+            {%- if block.settings.brand_subtitle != blank -%}
+              <p class="footer-brand__sub">{{ block.settings.brand_subtitle }}</p>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <div class="rte">{{ block.settings.text }}</div>
+            {%- endif -%}
+          {%- when 'menu' -%}
+            {%- if block.settings.heading != blank -%}
+              <h2 class="footer-heading">{{ block.settings.heading }}</h2>
+            {%- endif -%}
+            {%- if block.settings.menu != blank -%}
+              <ul class="footer-links">
+                {%- for link in block.settings.menu.links -%}
+                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          {%- when 'text' -%}
+            {%- if block.settings.heading != blank -%}
+              <h2 class="footer-heading">{{ block.settings.heading }}</h2>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <div class="rte">{{ block.settings.text }}</div>
+            {%- endif -%}
+        {%- endcase -%}
+      </div>
+    {%- endfor -%}
+
+    {%- if section.settings.show_social -%}
+      {%- liquid
+        assign has_social = false
+        if settings.whatsapp_number != blank or settings.social_instagram != blank or settings.social_facebook != blank or settings.social_tiktok != blank or settings.social_youtube != blank
+          assign has_social = true
+        endif
+      -%}
+      {%- if has_social -%}
+        <div class="footer-block footer-block--social">
+          <h2 class="footer-heading">Síguenos</h2>
+          <ul class="footer-links">
+            {%- if settings.whatsapp_number != blank -%}
+              <li><a href="https://wa.me/{{ settings.whatsapp_number | strip }}" rel="noopener" target="_blank">WhatsApp</a></li>
+            {%- endif -%}
+            {%- if settings.social_instagram != blank -%}
+              <li><a href="{{ settings.social_instagram }}" rel="noopener" target="_blank">Instagram</a></li>
+            {%- endif -%}
+            {%- if settings.social_facebook != blank -%}
+              <li><a href="{{ settings.social_facebook }}" rel="noopener" target="_blank">Facebook</a></li>
+            {%- endif -%}
+            {%- if settings.social_tiktok != blank -%}
+              <li><a href="{{ settings.social_tiktok }}" rel="noopener" target="_blank">TikTok</a></li>
+            {%- endif -%}
+            {%- if settings.social_youtube != blank -%}
+              <li><a href="{{ settings.social_youtube }}" rel="noopener" target="_blank">YouTube</a></li>
+            {%- endif -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+
+  <div class="site-footer__bottom">
+    <p>
+      {%- if section.settings.copyright != blank -%}
+        {{ section.settings.copyright }}
+      {%- else -%}
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+      {%- endif -%}
+    </p>
+    {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+      <ul class="payment-icons" role="list">
+        {%- for type in shop.enabled_payment_types -%}
+          <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Pie de página",
+  "enabled_on": { "groups": ["footer"] },
+  "max_blocks": 6,
+  "settings": [
+    { "type": "checkbox", "id": "show_social", "label": "Mostrar redes sociales", "info": "Los enlaces se configuran en Configuración del tema → Redes sociales.", "default": true },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Mostrar métodos de pago", "default": true },
+    { "type": "text", "id": "copyright", "label": "Texto de derechos (opcional)" }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Marca",
+      "limit": 1,
+      "settings": [
+        { "type": "textarea", "id": "brand_title", "label": "Nombre", "default": "TRAMO\nSAN RAFAEL #1" },
+        { "type": "text", "id": "brand_subtitle", "label": "Subtítulo", "default": "— FUNDADORES —" },
+        { "type": "richtext", "id": "text", "label": "Texto" }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Menú",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Tienda" },
+        { "type": "link_list", "id": "menu", "label": "Menú", "default": "footer" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Texto",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Contacto" },
+        { "type": "richtext", "id": "text", "label": "Texto" }
+      ]
+    }
+  ]
+}
+{% endschema %}

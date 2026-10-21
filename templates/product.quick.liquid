@@ -1,0 +1,27 @@
+{%- layout none -%}
+{%- assign form_id = 'quick-form-' | append: product.id -%}
+<div class="quick-view" data-product-root data-section-id="quick-{{ product.id }}">
+  <div class="quick-view__media">
+    {%- if product.featured_media -%}
+      {{
+        product.featured_media
+        | image_url: width: 900
+        | image_tag: widths: '450, 600, 900', sizes: '(min-width: 750px) 560px, 100vw', alt: product.featured_media.alt
+      }}
+    {%- else -%}
+      <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+    {%- endif -%}
+  </div>
+  <div class="quick-view__content">
+    {%- if product.type != blank -%}
+      <p class="eyebrow">{{ product.type }}</p>
+    {%- endif -%}
+    <h2 class="quick-view__title">{{ product.title }}</h2>
+    <div class="quick-view__price">{% render 'price', product: product, variant: product.selected_or_first_available_variant %}</div>
+    {% render 'product-variant-picker', product: product, form_id: form_id, section_id: form_id %}
+    {% render 'product-quantity', product: product %}
+    {% render 'product-buy-button', product: product, form_id: form_id %}
+    <a class="quick-view__more" href="{{ product.url }}">Ver detalles completos</a>
+  </div>
+  {% render 'product-variants-json', product: product %}
+</div>

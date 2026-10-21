@@ -1,0 +1,40 @@
+{
+  "name": "Pie de página",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "brand": {
+          "type": "brand",
+          "settings": {
+            "brand_title": "TRAMO\nSAN RAFAEL #1",
+            "brand_subtitle": "— FUNDADORES —",
+            "text": "<p>Especias, ingredientes y sabores del mundo desde 1946.</p>"
+          }
+        },
+        "menu": {
+          "type": "menu",
+          "settings": {
+            "heading": "Tienda",
+            "menu": "footer"
+          }
+        },
+        "contact": {
+          "type": "text",
+          "settings": {
+            "heading": "Contacto",
+            "text": "<p>San Rafael, Costa Rica</p>"
+          }
+        }
+      },
+      "block_order": ["brand", "menu", "contact"],
+      "settings": {
+        "show_social": true,
+        "show_payment_icons": true,
+        "copyright": ""
+      }
+    }
+  },
+  "order": ["footer"]
+}

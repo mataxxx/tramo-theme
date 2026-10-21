@@ -1,0 +1,36 @@
+<nav class="bottom-nav" aria-label="Navegación rápida">
+  <a href="{{ routes.root_url }}" class="bottom-nav__item{% if request.page_type == 'index' %} is-active{% endif %}">
+    {% render 'icon', name: 'home' %}
+    <span>{{ section.settings.label_home }}</span>
+  </a>
+  <button type="button" class="bottom-nav__item" data-open="search">
+    {% render 'icon', name: 'search' %}
+    <span>{{ section.settings.label_search }}</span>
+  </button>
+  {%- if section.settings.show_videos -%}
+    <button type="button" class="bottom-nav__item" data-open="reels">
+      {% render 'icon', name: 'video' %}
+      <span>{{ section.settings.label_videos }}</span>
+    </button>
+  {%- endif -%}
+  <a href="{{ routes.cart_url }}" class="bottom-nav__item bottom-nav__cart" data-open-cart>
+    {% render 'icon', name: 'cart' %}
+    <span>{{ section.settings.label_cart }}</span>
+    <span class="count-bubble" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+  </a>
+</nav>
+
+{% schema %}
+{
+  "name": "Barra inferior móvil",
+  "enabled_on": { "groups": ["aside"] },
+  "settings": [
+    { "type": "paragraph", "content": "Solo se muestra en celulares." },
+    { "type": "text", "id": "label_home", "label": "Texto: inicio", "default": "Inicio" },
+    { "type": "text", "id": "label_search", "label": "Texto: buscar", "default": "Buscar" },
+    { "type": "checkbox", "id": "show_videos", "label": "Mostrar botón de videos", "default": true },
+    { "type": "text", "id": "label_videos", "label": "Texto: videos", "default": "Videos" },
+    { "type": "text", "id": "label_cart", "label": "Texto: carrito", "default": "Carrito" }
+  ]
+}
+{% endschema %}

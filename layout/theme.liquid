@@ -1,0 +1,90 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_primary }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; Página {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {%- if page_description -%}
+      <meta name="description" content="{{ page_description | escape }}">
+    {%- endif -%}
+
+    {% render 'meta-tags' %}
+
+    {{ content_for_header }}
+
+    {%- style -%}
+      {{ settings.type_heading_font | font_face: font_display: 'swap' }}
+      {{ settings.type_body_font | font_face: font_display: 'swap' }}
+
+      :root {
+        --color-bg: {{ settings.color_background }};
+        --color-surface: {{ settings.color_surface }};
+        --color-text: {{ settings.color_text }};
+        --color-muted: {{ settings.color_muted }};
+        --color-primary: {{ settings.color_primary }};
+        --color-on-primary: {{ settings.color_on_primary }};
+        --color-line: {{ settings.color_line }};
+        --color-accent: {{ settings.color_accent }};
+        --font-heading: {{ settings.type_heading_font.family }}, {{ settings.type_heading_font.fallback_families }}, Georgia, serif;
+        --font-body: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }}, Arial, sans-serif;
+        --page-width: {{ settings.page_width }}px;
+        --radius-card: {{ settings.radius_card }}px;
+        --radius-button: {{ settings.radius_button }}px;
+      }
+    {%- endstyle -%}
+
+    <link rel="stylesheet" href="{{ 'theme.css' | asset_url }}">
+    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+    <script>
+      document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+      window.TRAMO = {
+        moneyFormat: {{ shop.money_format | json }},
+        cartDrawer: {{ settings.cart_type | default: 'drawer' | json }},
+        routes: {
+          root: {{ routes.root_url | json }},
+          cart: {{ routes.cart_url | json }},
+          cartAdd: {{ routes.cart_add_url | append: '.js' | json }},
+          cartChange: {{ routes.cart_change_url | append: '.js' | json }},
+          cartJson: {{ routes.cart_url | append: '.js' | json }},
+          search: {{ routes.search_url | json }},
+          predictiveSearch: {{ routes.predictive_search_url | append: '.json' | json }}
+        },
+        bulk: {
+          name: {{ settings.bulk_variant_name | default: 'A granel' | json }},
+          unit: {{ settings.bulk_unit_grams | default: 10 | json }},
+          min: {{ settings.bulk_min_grams | default: 250 | json }},
+          step: {{ settings.bulk_button_step | default: 50 | json }}
+        }
+      };
+    </script>
+  </head>
+
+  <body class="template-{{ template.name | handleize }}">
+    <a class="skip-link" href="#MainContent">{{ 'general.skip_to_content' | t }}</a>
+
+    {% sections 'header-group' %}
+
+    <main id="MainContent" class="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+    {% sections 'overlay-group' %}
+
+    {% render 'quick-view-sheet' %}
+    <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

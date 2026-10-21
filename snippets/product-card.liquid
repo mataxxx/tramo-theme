@@ -1,0 +1,69 @@
+{%- comment -%}
+  Tarjeta de producto. Parámetros: product, show_quick_add (bool), lazy (bool)
+{%- endcomment -%}
+{%- liquid
+  assign first_variant = product.selected_or_first_available_variant
+  assign first_is_bulk = false
+  if first_variant.options contains settings.bulk_variant_name
+    assign first_is_bulk = true
+  endif
+  assign subtitle = ''
+  unless product.has_only_default_variant
+    assign subtitle = first_variant.title
+  endunless
+-%}
+<article class="product-card{% unless product.available %} product-card--sold-out{% endunless %}" data-product-card>
+  <a href="{{ product.url }}" class="product-card__media" data-quick-view="{{ product.url }}" aria-label="{{ product.title | escape }}">
+    {%- if product.featured_media -%}
+      {{
+        product.featured_media
+        | image_url: width: 600
+        | image_tag:
+          widths: '240, 360, 480, 600',
+          sizes: '(min-width: 750px) 290px, 45vw',
+          loading: 'lazy',
+          alt: product.featured_media.alt
+      }}
+    {%- else -%}
+      <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+    {%- endif -%}
+    {%- unless product.available -%}
+      <span class="badge">Agotado</span>
+    {%- elsif product.compare_at_price > product.price -%}
+      <span class="badge badge--sale">Oferta</span>
+    {%- endunless -%}
+  </a>
+
+  <div class="product-card__info">
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}" data-quick-view="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    {%- if subtitle != blank -%}
+      <p class="product-card__subtitle">{{ subtitle }}</p>
+    {%- endif -%}
+    <div class="product-card__row">
+      {% render 'price', product: product, variant: first_variant %}
+      {%- if show_quick_add and product.available -%}
+        {%- if product.has_only_default_variant or first_is_bulk == false -%}
+          <button
+            type="button"
+            class="quick-add"
+            data-quick-add="{{ first_variant.id }}"
+            aria-label="Agregar {{ product.title | escape }} al carrito"
+          >
+            {% render 'icon', name: 'plus' %}
+          </button>
+        {%- else -%}
+          <button
+            type="button"
+            class="quick-add"
+            data-quick-view="{{ product.url }}"
+            aria-label="Elegir presentación de {{ product.title | escape }}"
+          >
+            {% render 'icon', name: 'plus' %}
+          </button>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+</article>

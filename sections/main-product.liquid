@@ -1,0 +1,124 @@
+{%- assign form_id = 'product-form-' | append: section.id -%}
+<section class="product-page page-width" data-product-root data-section-id="{{ section.id }}">
+  <div class="product-gallery" data-gallery>
+    <div class="product-gallery__strip" data-gallery-strip>
+      {%- for media in product.media -%}
+        {%- assign loading_mode = 'lazy' -%}
+        {%- if forloop.first -%}{%- assign loading_mode = 'eager' -%}{%- endif -%}
+        <div class="product-gallery__slide" data-media-id="{{ media.id }}">
+          {{
+            media.preview_image
+            | image_url: width: 1100
+            | image_tag:
+              widths: '450, 600, 800, 1100',
+              sizes: '(min-width: 750px) 50vw, 100vw',
+              loading: loading_mode,
+              alt: media.alt
+          }}
+        </div>
+      {%- else -%}
+        <div class="product-gallery__slide">
+          <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+    {%- if product.media.size > 1 -%}
+      <ul class="product-gallery__thumbs" role="list">
+        {%- for media in product.media -%}
+          <li>
+            <button type="button" class="thumb" data-thumb="{{ media.id }}" aria-label="Ver imagen {{ forloop.index }}">
+              {{ media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+
+  <div class="product-info">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'type' -%}
+          {%- if product.type != blank -%}
+            <p class="eyebrow" {{ block.shopify_attributes }}>{{ product.type }}</p>
+          {%- endif -%}
+        {%- when 'title' -%}
+          <h1 class="product-info__title" {{ block.shopify_attributes }}>{{ product.title }}</h1>
+        {%- when 'price' -%}
+          <div class="product-info__price" {{ block.shopify_attributes }}>
+            {% render 'price', product: product, variant: product.selected_or_first_available_variant %}
+          </div>
+        {%- when 'variant_picker' -%}
+          <div {{ block.shopify_attributes }}>
+            {% render 'product-variant-picker', product: product, form_id: form_id, section_id: section.id %}
+          </div>
+        {%- when 'quantity' -%}
+          <div {{ block.shopify_attributes }}>
+            {% render 'product-quantity', product: product %}
+          </div>
+        {%- when 'buy_buttons' -%}
+          <div {{ block.shopify_attributes }}>
+            {% render 'product-buy-button', product: product, form_id: form_id, label: block.settings.label %}
+          </div>
+        {%- when 'description' -%}
+          {%- if product.description != blank -%}
+            <div class="rte product-info__description" {{ block.shopify_attributes }}>{{ product.description }}</div>
+          {%- endif -%}
+        {%- when 'text' -%}
+          {%- if block.settings.text != blank -%}
+            <div class="rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+          {%- endif -%}
+        {%- when 'collapsible' -%}
+          {%- if block.settings.content != blank -%}
+            <details class="collapsible" {{ block.shopify_attributes }}>
+              <summary>{{ block.settings.heading }}</summary>
+              <div class="rte">{{ block.settings.content }}</div>
+            </details>
+          {%- endif -%}
+        {%- when '@app' -%}
+          {% render block %}
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+
+  {% render 'product-variants-json', product: product %}
+</section>
+
+{% schema %}
+{
+  "name": "Producto",
+  "tag": "div",
+  "blocks": [
+    { "type": "@app" },
+    { "type": "type", "name": "Categoría (tipo de producto)", "limit": 1 },
+    { "type": "title", "name": "Título", "limit": 1 },
+    { "type": "price", "name": "Precio", "limit": 1 },
+    { "type": "variant_picker", "name": "Presentaciones", "limit": 1 },
+    { "type": "quantity", "name": "Cantidad / granel", "limit": 1 },
+    {
+      "type": "buy_buttons",
+      "name": "Botón de compra",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Texto del botón", "default": "Agregar al carrito" }
+      ]
+    },
+    { "type": "description", "name": "Descripción", "limit": 1 },
+    {
+      "type": "text",
+      "name": "Texto libre",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Texto", "default": "<p>Texto adicional</p>" }
+      ]
+    },
+    {
+      "type": "collapsible",
+      "name": "Desplegable",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Conservación" },
+        { "type": "richtext", "id": "content", "label": "Contenido", "default": "<p>Guardar en un lugar fresco y seco.</p>" }
+      ]
+    }
+  ]
+}
+{% endschema %}

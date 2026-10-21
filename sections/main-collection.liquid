@@ -1,0 +1,47 @@
+{%- paginate collection.products by section.settings.products_per_page -%}
+  <section class="collection-page page-width">
+    <header class="page-header">
+      <h1>{{ collection.title }}</h1>
+      {%- if section.settings.show_description and collection.description != blank -%}
+        <div class="rte">{{ collection.description }}</div>
+      {%- endif -%}
+    </header>
+
+    <div class="collection-toolbar">
+      <p class="muted">{{ collection.products_count }} productos</p>
+      {%- if section.settings.show_sort and collection.products_count > 1 -%}
+        <label class="visually-hidden" for="SortBy">Ordenar por</label>
+        <select id="SortBy" class="field field--select" data-sort-select>
+          {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      {%- endif -%}
+    </div>
+
+    {%- if collection.products.size > 0 -%}
+      <ul class="product-grid" role="list">
+        {%- for product in collection.products -%}
+          <li>{% render 'product-card', product: product, show_quick_add: section.settings.show_quick_add %}</li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="empty-state">No hay productos en esta colección.</p>
+    {%- endif -%}
+
+    {% render 'pagination', paginate: paginate %}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Página de colección",
+  "settings": [
+    { "type": "range", "id": "products_per_page", "label": "Productos por página", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "checkbox", "id": "show_description", "label": "Mostrar descripción", "default": true },
+    { "type": "checkbox", "id": "show_sort", "label": "Mostrar ordenar por", "default": true },
+    { "type": "checkbox", "id": "show_quick_add", "label": "Mostrar botón + para agregar rápido", "default": true }
+  ]
+}
+{% endschema %}

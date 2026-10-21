@@ -1,0 +1,24 @@
+{%- comment -%}
+  Formulario de compra. Parámetros: product, form_id, label (opcional)
+{%- endcomment -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{% form 'product', product, id: form_id, class: 'buy-form', novalidate: 'novalidate', data-product-form: '' %}
+  <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id {% unless current_variant.available %}disabled{% endunless %}>
+  <input type="hidden" name="quantity" value="1" data-quantity-field>
+  <button
+    type="submit"
+    class="button button--full"
+    data-add-button
+    {% unless current_variant.available %}disabled{% endunless %}
+  >
+    <span data-add-label>
+      {%- if current_variant.available -%}
+        {{ label | default: 'Agregar al carrito' }}
+      {%- else -%}
+        Agotado
+      {%- endif -%}
+    </span>
+    <span class="button__price" data-add-price>{% if current_variant.available %}· {{ current_variant.price | money }}{% endif %}</span>
+  </button>
+  <p class="form-error" data-form-error role="alert" hidden></p>
+{% endform %}

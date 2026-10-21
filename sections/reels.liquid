@@ -1,0 +1,103 @@
+<div class="drawer drawer--center drawer--reels" id="ReelsOverlay" data-drawer="reels" role="dialog" aria-modal="true" aria-label="Videos" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <div class="reels-wrap">
+  <button type="button" class="close-button" data-drawer-close aria-label="Cerrar videos">{% render 'icon', name: 'close' %}</button>
+  <section class="reels" data-reels>
+
+    {%- if section.blocks.size == 0 -%}
+      <div class="reel reel--empty">
+        <p>Agrega videos desde el personalizador (sección "Videos").</p>
+      </div>
+    {%- endif -%}
+
+    {%- for block in section.blocks -%}
+      {%- assign video = block.settings.video -%}
+      <article class="reel" data-reel {{ block.shopify_attributes }}>
+        {%- if video != blank -%}
+          <video
+            class="reel__video"
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster="{% if block.settings.poster != blank %}{{ block.settings.poster | image_url: width: 900 }}{% else %}{{ video.preview_image | image_url: width: 900 }}{% endif %}"
+          >
+            {%- for source in video.sources -%}
+              <source src="{{ source.url }}" type="{{ source.mime_type }}">
+            {%- endfor -%}
+          </video>
+        {%- elsif block.settings.video_url != blank -%}
+          <video
+            class="reel__video"
+            muted
+            loop
+            playsinline
+            preload="none"
+            {% if block.settings.poster != blank %}poster="{{ block.settings.poster | image_url: width: 900 }}"{% endif %}
+          >
+            <source src="{{ block.settings.video_url }}" type="video/mp4">
+          </video>
+        {%- elsif block.settings.poster != blank -%}
+          {{ block.settings.poster | image_url: width: 900 | image_tag: loading: 'lazy', class: 'reel__video', alt: '' }}
+        {%- else -%}
+          <div class="reel__video reel__video--empty"></div>
+        {%- endif -%}
+
+        <div class="reel__gradient"></div>
+
+        <div class="reel__copy">
+          {%- if block.settings.kicker != blank -%}
+            <small>{{ block.settings.kicker }}</small>
+          {%- endif -%}
+          {%- if block.settings.heading != blank -%}
+            <h2>{{ block.settings.heading }}</h2>
+          {%- endif -%}
+          {%- if block.settings.product != blank -%}
+            <a
+              href="{{ block.settings.product.url }}"
+              class="button button--light button--small"
+              data-quick-view="{{ block.settings.product.url }}"
+              data-close-reels
+            >{{ block.settings.button_label | default: 'Ver producto' }}</a>
+          {%- endif -%}
+        </div>
+
+        <div class="reel__actions">
+          <button type="button" class="reel__action" data-reel-like aria-pressed="false" aria-label="Me gusta">{% render 'icon', name: 'heart' %}</button>
+          <button type="button" class="reel__action" data-reel-share data-share-title="{{ block.settings.heading | escape }}" data-share-url="{{ block.settings.product.url | default: routes.root_url | prepend: request.origin }}" aria-label="Compartir">{% render 'icon', name: 'send' %}</button>
+          <button type="button" class="reel__action" data-reel-toggle aria-label="Pausar o reproducir">
+            <span data-icon-pause>{% render 'icon', name: 'pause' %}</span>
+            <span data-icon-play hidden>{% render 'icon', name: 'play' %}</span>
+          </button>
+        </div>
+      </article>
+    {%- endfor -%}
+  </section>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Videos",
+  "enabled_on": { "groups": ["aside"] },
+  "max_blocks": 12,
+  "settings": [
+    { "type": "paragraph", "content": "Cada bloque es un video vertical. Se abren desde el botón \"Videos\" de la barra inferior." }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Video",
+      "settings": [
+        { "type": "video", "id": "video", "label": "Video (subido a Shopify)" },
+        { "type": "text", "id": "video_url", "label": "O enlace directo a un video .mp4", "info": "Solo se usa si no subes un video arriba." },
+        { "type": "image_picker", "id": "poster", "label": "Imagen de portada" },
+        { "type": "text", "id": "kicker", "label": "Texto pequeño", "default": "Preparado al momento" },
+        { "type": "text", "id": "heading", "label": "Título", "default": "Así tostamos el comino" },
+        { "type": "product", "id": "product", "label": "Producto relacionado" },
+        { "type": "text", "id": "button_label", "label": "Texto del botón", "default": "Ver producto" }
+      ]
+    }
+  ]
+}
+{% endschema %}

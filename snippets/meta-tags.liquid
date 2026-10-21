@@ -1,0 +1,20 @@
+{%- liquid
+  assign og_title = page_title | default: shop.name
+  assign og_url = canonical_url
+  assign og_type = 'website'
+  if request.page_type == 'product'
+    assign og_type = 'product'
+  endif
+-%}
+<meta property="og:site_name" content="{{ shop.name | escape }}">
+<meta property="og:url" content="{{ og_url }}">
+<meta property="og:title" content="{{ og_title | escape }}">
+<meta property="og:type" content="{{ og_type }}">
+{%- if page_description %}
+  <meta property="og:description" content="{{ page_description | escape }}">
+{%- endif -%}
+{%- if page_image %}
+  <meta property="og:image" content="http:{{ page_image | image_url: width: 1200 }}">
+  <meta property="og:image:secure_url" content="https:{{ page_image | image_url: width: 1200 }}">
+{%- endif -%}
+<meta name="twitter:card" content="summary_large_image">

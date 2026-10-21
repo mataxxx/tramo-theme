@@ -1,0 +1,24 @@
+{
+  "name": "Encabezado",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "settings": {
+        "text": "Envíos a todo el país · Especias y sabores desde 1946",
+        "link": ""
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "brand_title": "TRAMO\nSAN RAFAEL #1",
+        "brand_subtitle": "— FUNDADORES —",
+        "brand_note": "Desde 1946",
+        "menu": "main-menu",
+        "sticky": false
+      }
+    }
+  },
+  "order": ["announcement-bar", "header"]
+}

@@ -1,0 +1,49 @@
+{
+  "name": "Paneles y navegación móvil",
+  "type": "aside",
+  "sections": {
+    "cart-drawer": {
+      "type": "cart-drawer",
+      "settings": {
+        "title": "Tu carrito",
+        "empty_text": "Tu carrito está vacío",
+        "checkout_label": "Finalizar compra",
+        "show_note": false
+      }
+    },
+    "search-overlay": {
+      "type": "search-overlay",
+      "settings": {
+        "title": "¿Qué estás buscando?",
+        "placeholder": "Busca por nombre...",
+        "helper": "También puedes buscar por categoría",
+        "categories_menu": ""
+      }
+    },
+    "reels": {
+      "type": "reels",
+      "blocks": {
+        "reel-1": {
+          "type": "reel",
+          "settings": {
+            "kicker": "Preparado al momento",
+            "heading": "Así tostamos el comino"
+          }
+        }
+      },
+      "block_order": ["reel-1"],
+      "settings": {}
+    },
+    "bottom-nav": {
+      "type": "bottom-nav",
+      "settings": {
+        "label_home": "Inicio",
+        "label_search": "Buscar",
+        "label_videos": "Videos",
+        "label_cart": "Carrito",
+        "show_videos": true
+      }
+    }
+  },
+  "order": ["cart-drawer", "search-overlay", "reels", "bottom-nav"]
+}

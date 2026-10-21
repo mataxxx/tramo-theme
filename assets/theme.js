@@ -1,0 +1,726 @@
+/* ==========================================================================
+   Tramo — JavaScript del tema (sin dependencias)
+   - Paneles (menú, carrito, búsqueda, videos, vista rápida)
+   - Carrito AJAX con soporte de venta a granel (gramos)
+   - Selector de variantes y cantidad
+   - Búsqueda global y por categoría
+   - Videos tipo reel
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var T = window.TRAMO || {};
+  var BULK = T.bulk || { name: 'A granel', unit: 10, min: 250, step: 50 };
+  var ROOT = (T.routes && T.routes.root) || '/';
+
+  /* ---------- Utilidades ------------------------------------------------ */
+  function $(selector, scope) { return (scope || document).querySelector(selector); }
+  function $$(selector, scope) { return Array.prototype.slice.call((scope || document).querySelectorAll(selector)); }
+
+  function esc(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function debounce(fn, wait) {
+    var timer;
+    return function () {
+      var args = arguments, ctx = this;
+      clearTimeout(timer);
+      timer = setTimeout(function () { fn.apply(ctx, args); }, wait);
+    };
+  }
+
+  function formatMoney(cents, format) {
+    var formatString = format || T.moneyFormat || '{{amount}}';
+    var placeholder = /\{\{\s*(\w+)\s*\}\}/;
+    var match = formatString.match(placeholder);
+    if (!match) return String(cents);
+
+    function withDelimiters(number, precision, thousands, decimal) {
+      precision = typeof precision === 'undefined' ? 2 : precision;
+      thousands = typeof thousands === 'undefined' ? ',' : thousands;
+      decimal = typeof decimal === 'undefined' ? '.' : decimal;
+      if (isNaN(number) || number == null) return '0';
+      var fixed = (number / 100).toFixed(precision).split('.');
+      var whole = fixed[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+      return whole + (fixed[1] ? decimal + fixed[1] : '');
+    }
+
+    var value;
+    switch (match[1]) {
+      case 'amount_no_decimals': value = withDelimiters(cents, 0); break;
+      case 'amount_with_comma_separator': value = withDelimiters(cents, 2, '.', ','); break;
+      case 'amount_no_decimals_with_comma_separator': value = withDelimiters(cents, 0, '.', ','); break;
+      case 'amount_no_decimals_with_space_separator': value = withDelimiters(cents, 0, ' '); break;
+      case 'amount_with_space_separator': value = withDelimiters(cents, 2, ' ', ','); break;
+      case 'amount_with_apostrophe_separator': value = withDelimiters(cents, 2, "'", '.'); break;
+      default: value = withDelimiters(cents, 2);
+    }
+    return formatString.replace(placeholder, value);
+  }
+
+  function parseJSON(response) {
+    return response.json().then(function (data) {
+      if (!response.ok) {
+        var error = new Error(data.description || data.message || 'Error');
+        error.data = data;
+        throw error;
+      }
+      return data;
+    });
+  }
+
+  function showToast(message) {
+    var toast = $('[data-toast]');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.hidden = false;
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function () { toast.hidden = true; }, 3200);
+  }
+
+  /* ---------- Paneles --------------------------------------------------- */
+  var lastFocus = null;
+
+  function openDrawers() {
+    return $$('.drawer.is-open');
+  }
+
+  function closeDrawer(drawer, keepFocus) {
+    if (!drawer || drawer.hidden) return;
+    drawer.classList.remove('is-open');
+    setTimeout(function () {
+      if (!drawer.classList.contains('is-open')) drawer.hidden = true;
+    }, 280);
+    if (drawer.getAttribute('data-drawer') === 'reels') pauseAllReels();
+    if (!openDrawers().filter(function (d) { return d !== drawer; }).length) {
+      document.body.classList.remove('is-locked');
+    }
+    if (!keepFocus && lastFocus && document.contains(lastFocus)) {
+      try { lastFocus.focus(); } catch (e) { /* noop */ }
+    }
+  }
+
+  function closeAllDrawers(keepFocus) {
+    openDrawers().forEach(function (d) { closeDrawer(d, keepFocus); });
+  }
+
+  function openDrawer(name) {
+    var drawer = $('[data-drawer="' + name + '"]');
+    if (!drawer) return null;
+    if (!drawer.classList.contains('is-open')) {
+      lastFocus = document.activeElement;
+      openDrawers().forEach(function (d) { if (d !== drawer) closeDrawer(d, true); });
+      drawer.hidden = false;
+      document.body.classList.add('is-locked');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { drawer.classList.add('is-open'); });
+      });
+      setTimeout(function () {
+        var target = $('[data-search-input]', drawer) || $('.close-button, [data-drawer-close]:not(.drawer__backdrop)', drawer);
+        if (target && typeof target.focus === 'function') target.focus({ preventScroll: true });
+      }, 60);
+      if (name === 'reels') startReels();
+    }
+    return drawer;
+  }
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' && event.target.matches && event.target.matches('[data-line-qty], [data-line-grams]')) {
+      event.preventDefault();
+      event.target.blur();
+      return;
+    }
+    var open = openDrawers();
+    if (!open.length) return;
+    if (event.key === 'Escape') {
+      closeDrawer(open[open.length - 1]);
+      return;
+    }
+    if (event.key === 'Tab') {
+      var drawer = open[open.length - 1];
+      var focusable = $$('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])', drawer)
+        .filter(function (el) { return el.offsetParent !== null; });
+      if (!focusable.length) return;
+      var first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+  });
+
+  /* ---------- Carrito --------------------------------------------------- */
+  function updateCount(count) {
+    $$('[data-cart-count]').forEach(function (el) {
+      el.textContent = count;
+      el.hidden = !count;
+    });
+  }
+
+  function refreshCart() {
+    return Promise.all([
+      fetch(T.routes.cartJson, { headers: { Accept: 'application/json' } }).then(parseJSON),
+      fetch(ROOT + '?sections=cart-drawer').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
+    ]).then(function (results) {
+      var cart = results[0];
+      var sections = results[1] || {};
+      updateCount(cart.item_count);
+      if (sections['cart-drawer']) {
+        var doc = new DOMParser().parseFromString(sections['cart-drawer'], 'text/html');
+        var fresh = $('[data-cart-drawer-body]', doc);
+        var current = $('[data-cart-drawer-body]');
+        if (fresh && current) current.innerHTML = fresh.innerHTML;
+      }
+      return cart;
+    });
+  }
+
+  function addToCart(variantId, quantity) {
+    return fetch(T.routes.cartAdd, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ id: variantId, quantity: quantity })
+    }).then(parseJSON);
+  }
+
+  function afterAdd() {
+    return refreshCart().then(function () {
+      var drawer = $('[data-drawer="cart"]');
+      if (T.cartDrawer === 'drawer' && drawer) {
+        openDrawer('cart');
+      } else {
+        window.location.href = T.routes.cart;
+      }
+    });
+  }
+
+  function changeLine(lineEl, quantity) {
+    var key = lineEl.getAttribute('data-cart-line');
+    lineEl.classList.add('is-updating');
+    var onCartPage = !!$('[data-cart-page]');
+    fetch(T.routes.cartChange, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ id: key, quantity: quantity })
+    })
+      .then(parseJSON)
+      .then(function () { return onCartPage ? window.location.reload() : refreshCart(); })
+      .catch(function (error) {
+        showToast(error.message || 'No se pudo actualizar el carrito');
+        if (onCartPage) window.location.reload(); else refreshCart();
+      });
+  }
+
+  function roundToUnit(grams) {
+    var unit = BULK.unit || 10;
+    var value = Math.round((parseInt(grams, 10) || BULK.min) / unit) * unit;
+    return Math.max(BULK.min, value);
+  }
+
+  function handleLineEvent(event) {
+    var lineEl = event.target.closest && event.target.closest('[data-cart-line]');
+    if (!lineEl) return false;
+    var target = event.target;
+    var isBulk = lineEl.hasAttribute('data-bulk');
+    var qtyInput = $('[data-line-qty]', lineEl);
+    var gramsInput = $('[data-line-grams]', lineEl);
+
+    if (event.type === 'click') {
+      var btn = target.closest('button');
+      if (!btn) return false;
+      if (btn.hasAttribute('data-line-remove')) { changeLine(lineEl, 0); return true; }
+      if (btn.hasAttribute('data-line-minus')) { changeLine(lineEl, Math.max(0, (parseInt(qtyInput.value, 10) || 1) - 1)); return true; }
+      if (btn.hasAttribute('data-line-plus')) { changeLine(lineEl, (parseInt(qtyInput.value, 10) || 0) + 1); return true; }
+      if (btn.hasAttribute('data-line-bulk-minus') || btn.hasAttribute('data-line-bulk-plus')) {
+        var current = parseInt(gramsInput.value, 10) || BULK.min;
+        var next = btn.hasAttribute('data-line-bulk-plus') ? current + BULK.step : current - BULK.step;
+        changeLine(lineEl, roundToUnit(next) / BULK.unit);
+        return true;
+      }
+    } else if (event.type === 'change') {
+      if (isBulk && target === gramsInput) { changeLine(lineEl, roundToUnit(gramsInput.value) / BULK.unit); return true; }
+      if (!isBulk && target === qtyInput) { changeLine(lineEl, Math.max(0, parseInt(qtyInput.value, 10) || 0)); return true; }
+    }
+    return false;
+  }
+
+  /* ---------- Vista rápida --------------------------------------------- */
+  var quickCache = {};
+
+  function openQuickView(url) {
+    var drawer = openDrawer('quick-view');
+    var body = $('[data-quick-view-body]');
+    if (!drawer || !body) { window.location.href = url; return; }
+
+    function render(html) {
+      body.innerHTML = html;
+      initProducts(body);
+    }
+
+    if (quickCache[url]) { render(quickCache[url]); return; }
+
+    body.innerHTML = '<p class="quick-view__loading">Cargando…</p>';
+    var join = url.indexOf('?') > -1 ? '&' : '?';
+    fetch(url + join + 'view=quick')
+      .then(function (r) { if (!r.ok) throw new Error('quick view'); return r.text(); })
+      .then(function (html) {
+        if (html.indexOf('data-product-root') === -1) throw new Error('quick view');
+        quickCache[url] = html;
+        render(html);
+      })
+      .catch(function () { window.location.href = url; });
+  }
+
+  /* ---------- Producto: variantes, granel y compra -------------------- */
+  function initProducts(scope) {
+    $$('[data-product-root]', scope || document).forEach(initProduct);
+  }
+
+  function initProduct(root) {
+    if (!root || root._tramoInit) return;
+    var jsonEl = $('[data-product-json]', root);
+    var form = $('form[data-product-form]', root);
+    if (!jsonEl || !form) return;
+    root._tramoInit = true;
+
+    var data = JSON.parse(jsonEl.textContent);
+    var variants = data.variants;
+    var idInput = $('[data-variant-id]', form);
+    var qtyField = $('[data-quantity-field]', form);
+    var addButton = $('[data-add-button]', form);
+    var addLabel = $('[data-add-label]', form);
+    var addPrice = $('[data-add-price]', form);
+    var errorEl = $('[data-form-error]', form);
+    var normalWrap = $('[data-qty-normal]', root);
+    var bulkWrap = $('[data-qty-bulk]', root);
+    var qtyInput = $('[data-qty-input]', root);
+    var bulkInput = $('[data-bulk-input]', root);
+    var bulkKg = $('[data-bulk-kg]', root);
+    var priceEl = $('[data-price]', root);
+    var groups = $$('.variant-picker__group', root);
+    var inQuickView = !!root.closest('#QuickView');
+    var defaultLabel = addLabel ? addLabel.textContent.trim() : 'Agregar al carrito';
+    if (!/\S/.test(defaultLabel) || defaultLabel === 'Agotado') defaultLabel = 'Agregar al carrito';
+
+    function selectedOptions() {
+      return groups.map(function (group) {
+        var checked = $('input:checked', group);
+        return checked ? checked.value : null;
+      });
+    }
+
+    function findVariant(options) {
+      if (!groups.length) return variants[0];
+      for (var i = 0; i < variants.length; i++) {
+        var match = true;
+        for (var j = 0; j < options.length; j++) {
+          if (variants[i].options[j] !== options[j]) { match = false; break; }
+        }
+        if (match) return variants[i];
+      }
+      return null;
+    }
+
+    function markAvailability(options) {
+      groups.forEach(function (group, index) {
+        $$('input', group).forEach(function (input) {
+          var candidate = options.slice();
+          candidate[index] = input.value;
+          var variant = findVariant(candidate);
+          input.classList.toggle('is-unavailable', !variant || !variant.available);
+        });
+      });
+    }
+
+    function currentQuantity(variant) {
+      if (variant && variant.bulk) {
+        var grams = roundToUnit(bulkInput ? bulkInput.value : BULK.min);
+        return grams / BULK.unit;
+      }
+      return Math.max(1, parseInt(qtyInput ? qtyInput.value : 1, 10) || 1);
+    }
+
+    function renderPrice(variant) {
+      if (!priceEl || !variant) return;
+      var html = '';
+      if (variant.compare_at_price > variant.price) {
+        html += '<s class="price__compare" data-price-compare>' + formatMoney(variant.compare_at_price) + '</s>';
+      }
+      html += '<strong class="price__current" data-price-current>' + formatMoney(variant.price) + '</strong>';
+      if (variant.bulk) html += '<span class="price__unit">/ ' + BULK.unit + ' g</span>';
+      priceEl.innerHTML = html;
+      priceEl.classList.toggle('price--sale', variant.compare_at_price > variant.price);
+    }
+
+    function scrollToMedia(variant) {
+      if (!variant || !variant.media_id) return;
+      var strip = $('[data-gallery-strip]', root);
+      var slide = strip && $('[data-media-id="' + variant.media_id + '"]', strip);
+      if (strip && slide) strip.scrollTo({ left: slide.offsetLeft - strip.offsetLeft, behavior: 'smooth' });
+    }
+
+    function update(fromUser) {
+      var options = selectedOptions();
+      var variant = findVariant(options);
+      if (errorEl) errorEl.hidden = true;
+      markAvailability(options);
+
+      var isBulk = !!(variant && variant.bulk);
+      if (normalWrap) normalWrap.hidden = isBulk;
+      if (bulkWrap) bulkWrap.hidden = !isBulk;
+
+      if (!variant || !variant.available) {
+        if (idInput) { idInput.disabled = true; if (variant) idInput.value = variant.id; }
+        if (addButton) addButton.disabled = true;
+        if (addLabel) addLabel.textContent = variant ? 'Agotado' : 'No disponible';
+        if (addPrice) addPrice.textContent = '';
+        if (variant) renderPrice(variant);
+        return;
+      }
+
+      var quantity = currentQuantity(variant);
+      if (idInput) { idInput.disabled = false; idInput.value = variant.id; }
+      if (qtyField) qtyField.value = quantity;
+      if (addButton) addButton.disabled = false;
+      if (addLabel) addLabel.textContent = defaultLabel;
+      if (addPrice) addPrice.textContent = '· ' + formatMoney(variant.price * quantity);
+      if (bulkKg) bulkKg.textContent = isBulk ? ' · precio por kilo ' + formatMoney(variant.price * (1000 / BULK.unit)) : '';
+      renderPrice(variant);
+
+      if (fromUser) {
+        scrollToMedia(variant);
+        if (!inQuickView && window.history && window.history.replaceState) {
+          var url = new URL(window.location.href);
+          url.searchParams.set('variant', variant.id);
+          window.history.replaceState({}, '', url.toString());
+        }
+      }
+    }
+
+    root.addEventListener('change', function (event) {
+      if (event.target.matches('[data-option-value]')) update(true);
+      else if (event.target === qtyInput) {
+        qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+        update(false);
+      } else if (event.target === bulkInput) {
+        bulkInput.value = roundToUnit(bulkInput.value);
+        update(false);
+      }
+    });
+
+    root.addEventListener('click', function (event) {
+      var btn = event.target.closest('button');
+      if (!btn || !root.contains(btn)) return;
+      if (btn.hasAttribute('data-qty-minus')) {
+        qtyInput.value = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1); update(false);
+      } else if (btn.hasAttribute('data-qty-plus')) {
+        qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1; update(false);
+      } else if (btn.hasAttribute('data-bulk-minus')) {
+        bulkInput.value = roundToUnit((parseInt(bulkInput.value, 10) || BULK.min) - BULK.step); update(false);
+      } else if (btn.hasAttribute('data-bulk-plus')) {
+        bulkInput.value = roundToUnit((parseInt(bulkInput.value, 10) || BULK.min) + BULK.step); update(false);
+      } else if (btn.hasAttribute('data-thumb')) {
+        var strip = $('[data-gallery-strip]', root);
+        var slide = strip && $('[data-media-id="' + btn.getAttribute('data-thumb') + '"]', strip);
+        if (strip && slide) strip.scrollTo({ left: slide.offsetLeft - strip.offsetLeft, behavior: 'smooth' });
+        $$('[data-thumb]', root).forEach(function (t) { t.classList.toggle('is-active', t === btn); });
+      }
+    });
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!addButton || addButton.disabled || !idInput) return;
+      var variant = findVariant(selectedOptions());
+      var quantity = currentQuantity(variant);
+      addButton.disabled = true;
+      addButton.setAttribute('aria-busy', 'true');
+      addToCart(parseInt(idInput.value, 10), quantity)
+        .then(function () {
+          if (inQuickView) closeDrawer($('[data-drawer="quick-view"]'), true);
+          return afterAdd();
+        })
+        .catch(function (error) {
+          if (errorEl) { errorEl.textContent = error.message || 'No se pudo agregar al carrito'; errorEl.hidden = false; }
+        })
+        .then(function () {
+          addButton.disabled = false;
+          addButton.removeAttribute('aria-busy');
+        });
+    });
+
+    update(false);
+  }
+
+  /* ---------- Búsqueda -------------------------------------------------- */
+  var search = { scope: null, items: [], sort: 'default', lastQuery: '' };
+
+  function searchEls() {
+    var panel = $('[data-search-panel]');
+    if (!panel) return null;
+    return {
+      panel: panel,
+      title: $('[data-search-heading]', panel),
+      input: $('[data-search-input]', panel),
+      global: $('[data-search-global]', panel),
+      sort: $('[data-search-sort]', panel),
+      results: $('[data-search-results]', panel)
+    };
+  }
+
+  function toCents(value) {
+    var n = parseFloat(value);
+    return isNaN(n) ? 0 : Math.round(n * 100);
+  }
+
+  function resultHTML(item) {
+    return '<a class="search-result" href="' + esc(item.url) + '" data-quick-view="' + esc(item.url) + '">' +
+      '<span class="search-result__img">' + (item.image ? '<img src="' + esc(item.image) + '" alt="" loading="lazy" width="64" height="56">' : '') + '</span>' +
+      '<span class="search-result__body"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span>' +
+      '</a>';
+  }
+
+  function sizedImage(src, width) {
+    if (!src) return '';
+    return src + (src.indexOf('?') > -1 ? '&' : '?') + 'width=' + width;
+  }
+
+  function renderScopedResults() {
+    var els = searchEls();
+    if (!els) return;
+    var query = (els.input.value || '').trim().toLowerCase();
+    var list = search.items.filter(function (item) { return !query || item.title.toLowerCase().indexOf(query) > -1; });
+    if (search.sort === 'title') list = list.slice().sort(function (a, b) { return a.title.localeCompare(b.title, 'es'); });
+    if (search.sort === 'price') list = list.slice().sort(function (a, b) { return a.price - b.price; });
+    els.results.innerHTML = list.length ? list.map(resultHTML).join('') : '<p class="search-empty">No encontramos productos con ese nombre.</p>';
+  }
+
+  function openSearch(scope) {
+    var els = searchEls();
+    if (!els) { window.location.href = T.routes.search; return; }
+    search.scope = scope || null;
+    search.items = [];
+    search.sort = 'default';
+    els.input.value = '';
+    els.results.innerHTML = '';
+    $$('[data-sort]', els.sort).forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-sort') === 'default'); });
+
+    if (scope) {
+      els.title.textContent = 'Buscar en ' + scope.title;
+      els.input.placeholder = 'Buscar en ' + scope.title + '...';
+      els.global.hidden = true;
+      els.sort.hidden = false;
+      els.results.innerHTML = '<p class="search-empty">Cargando…</p>';
+      var base = ROOT.replace(/\/$/, '');
+      fetch(base + '/collections/' + encodeURIComponent(scope.handle) + '/products.json?limit=250')
+        .then(parseJSON)
+        .then(function (data) {
+          search.items = (data.products || []).map(function (p) {
+            var v = p.variants && p.variants[0];
+            return {
+              title: p.title,
+              url: base + '/products/' + p.handle,
+              image: sizedImage(p.images && p.images[0] && p.images[0].src, 160),
+              price: toCents(v && v.price) ,
+              sub: v ? formatMoney(toCents(v.price)) : ''
+            };
+          });
+          renderScopedResults();
+        })
+        .catch(function () { els.results.innerHTML = '<p class="search-empty">No se pudo cargar la categoría.</p>'; });
+    } else {
+      els.title.textContent = els.title.getAttribute('data-default-title') || els.title.textContent;
+      els.global.hidden = false;
+      els.sort.hidden = true;
+    }
+    openDrawer('search');
+  }
+
+  var runPredictive = debounce(function (query) {
+    var els = searchEls();
+    if (!els) return;
+    if (query.length < 2) { els.results.innerHTML = ''; els.global.hidden = false; return; }
+    els.global.hidden = true;
+    fetch(T.routes.predictiveSearch + '?q=' + encodeURIComponent(query) + '&resources[type]=product&resources[limit]=8')
+      .then(parseJSON)
+      .then(function (data) {
+        if (els.input.value.trim() !== query) return;
+        var products = (data.resources && data.resources.results && data.resources.results.products) || [];
+        var items = products.map(function (p) {
+          var img = p.featured_image && p.featured_image.url || p.image || '';
+          return {
+            title: p.title,
+            url: p.url,
+            image: sizedImage(img, 160),
+            sub: [p.type, p.vendor].filter(Boolean).join(' · ')
+          };
+        });
+        els.results.innerHTML = items.length ? items.map(resultHTML).join('') : '<p class="search-empty">No encontramos resultados.</p>';
+      })
+      .catch(function () { els.results.innerHTML = '<p class="search-empty">No se pudo buscar. Intenta de nuevo.</p>'; });
+  }, 250);
+
+  document.addEventListener('input', function (event) {
+    var els = searchEls();
+    if (!els || event.target !== els.input) return;
+    if (search.scope) renderScopedResults();
+    else runPredictive(els.input.value.trim());
+  });
+
+  document.addEventListener('submit', function (event) {
+    var form = event.target.closest && event.target.closest('[data-search-form]');
+    if (form && search.scope) event.preventDefault();
+  });
+
+  /* ---------- Videos (reels) ------------------------------------------- */
+  var reelObserver = null;
+
+  function reelVideo(reel) { return $('video', reel); }
+
+  function syncReelToggle(reel) {
+    var video = reelVideo(reel);
+    var pauseIcon = $('[data-icon-pause]', reel);
+    var playIcon = $('[data-icon-play]', reel);
+    if (!video || !pauseIcon || !playIcon) return;
+    pauseIcon.hidden = video.paused;
+    playIcon.hidden = !video.paused;
+  }
+
+  function pauseAllReels() {
+    $$('[data-reel] video').forEach(function (v) { v.pause(); });
+  }
+
+  function startReels() {
+    var container = $('[data-reels]');
+    if (!container) return;
+    if (reelObserver) reelObserver.disconnect();
+    if (!('IntersectionObserver' in window)) return;
+    reelObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var video = reelVideo(entry.target);
+        if (!video) return;
+        if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+          var p = video.play();
+          if (p && p.catch) p.catch(function () { /* autoplay bloqueado */ });
+        } else {
+          video.pause();
+        }
+        syncReelToggle(entry.target);
+      });
+    }, { root: container, threshold: [0, 0.6, 1] });
+    $$('[data-reel]', container).forEach(function (reel) { reelObserver.observe(reel); });
+  }
+
+  /* ---------- Eventos globales ----------------------------------------- */
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (!target.closest) return;
+
+    if (handleLineEvent(event)) return;
+
+    var opener = target.closest('[data-open]');
+    if (opener) {
+      var name = opener.getAttribute('data-open');
+      event.preventDefault();
+      if (name === 'search') openSearch(null); else openDrawer(name);
+      return;
+    }
+
+    var cartLink = target.closest('[data-open-cart]');
+    if (cartLink && T.cartDrawer === 'drawer' && $('[data-drawer="cart"]')) {
+      event.preventDefault();
+      openDrawer('cart');
+      return;
+    }
+
+    var closer = target.closest('[data-drawer-close]');
+    if (closer) {
+      closeDrawer(closer.closest('.drawer'));
+      return;
+    }
+
+    var scopeBtn = target.closest('[data-search-collection]');
+    if (scopeBtn) {
+      event.preventDefault();
+      openSearch({ handle: scopeBtn.getAttribute('data-search-collection'), title: scopeBtn.getAttribute('data-search-title') || '' });
+      return;
+    }
+
+    var sortBtn = target.closest('[data-sort]');
+    if (sortBtn && sortBtn.closest('[data-search-sort]')) {
+      search.sort = sortBtn.getAttribute('data-sort');
+      $$('[data-sort]', sortBtn.parentNode).forEach(function (b) { b.classList.toggle('is-active', b === sortBtn); });
+      renderScopedResults();
+      return;
+    }
+
+    var quickAdd = target.closest('[data-quick-add]');
+    if (quickAdd) {
+      event.preventDefault();
+      quickAdd.classList.add('is-loading');
+      addToCart(parseInt(quickAdd.getAttribute('data-quick-add'), 10), 1)
+        .then(afterAdd)
+        .catch(function (error) { showToast(error.message || 'No se pudo agregar al carrito'); })
+        .then(function () { quickAdd.classList.remove('is-loading'); });
+      return;
+    }
+
+    var quick = target.closest('[data-quick-view]');
+    if (quick) {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) return;
+      event.preventDefault();
+      openQuickView(quick.getAttribute('data-quick-view'));
+      return;
+    }
+
+    var like = target.closest('[data-reel-like]');
+    if (like) {
+      like.setAttribute('aria-pressed', like.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      return;
+    }
+
+    var share = target.closest('[data-reel-share]');
+    if (share) {
+      var shareData = { title: share.getAttribute('data-share-title') || document.title, url: share.getAttribute('data-share-url') || window.location.href };
+      if (navigator.share) {
+        navigator.share(shareData).catch(function () { /* cancelado */ });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareData.url).then(function () { showToast('Enlace copiado'); });
+      }
+      return;
+    }
+
+    var toggle = target.closest('[data-reel-toggle]');
+    if (toggle) {
+      var reel = toggle.closest('[data-reel]');
+      var video = reel && reelVideo(reel);
+      if (video) {
+        if (video.paused) { var pr = video.play(); if (pr && pr.catch) pr.catch(function () {}); } else { video.pause(); }
+        syncReelToggle(reel);
+      }
+    }
+  });
+
+  document.addEventListener('change', function (event) {
+    if (handleLineEvent(event)) return;
+    if (event.target.matches && event.target.matches('[data-sort-select]')) {
+      var url = new URL(window.location.href);
+      url.searchParams.set('sort_by', event.target.value);
+      url.searchParams.delete('page');
+      window.location.href = url.toString();
+    }
+  });
+
+  // Cerrar los videos antes de abrir la vista rápida desde un reel.
+  document.addEventListener('click', function (event) {
+    var el = event.target.closest && event.target.closest('[data-close-reels]');
+    if (el) closeDrawer($('[data-drawer="reels"]'), true);
+  }, true);
+
+  /* ---------- Inicio ---------------------------------------------------- */
+  function init() { initProducts(document); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+  // Editor de temas de Shopify: volver a iniciar al recargar una sección.
+  document.addEventListener('shopify:section:load', function (event) { initProducts(event.target); });
+})();

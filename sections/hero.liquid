@@ -1,0 +1,76 @@
+{%- liquid
+  assign hero_height = section.settings.height_desktop
+  assign hero_height_mobile = section.settings.height_mobile
+-%}
+{%- style -%}
+  #shopify-section-{{ section.id }} .hero {
+    --hero-height: {{ hero_height_mobile }}px;
+    --hero-overlay: {{ section.settings.overlay_color }};
+    --hero-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+  }
+  @media (min-width: 750px) {
+    #shopify-section-{{ section.id }} .hero { --hero-height: {{ hero_height }}px; }
+  }
+{%- endstyle -%}
+
+<section class="hero hero--{{ section.settings.text_align }}" aria-label="{{ section.settings.heading | strip_newlines | escape }}">
+  <div class="hero__media">
+    {%- if section.settings.image != blank -%}
+      {{
+        section.settings.image
+        | image_url: width: 2000
+        | image_tag:
+          widths: '750, 1100, 1500, 2000',
+          sizes: '(min-width: 1440px) 1440px, 100vw',
+          loading: 'eager',
+          fetchpriority: 'high',
+          alt: section.settings.image.alt
+      }}
+    {%- else -%}
+      <img src="{{ 'hero-default.jpg' | asset_url }}" alt="" width="1584" height="672" loading="eager" fetchpriority="high">
+    {%- endif -%}
+  </div>
+  <div class="hero__overlay" aria-hidden="true"></div>
+  <div class="hero__copy">
+    {%- if section.settings.heading != blank -%}
+      <h1 class="hero__heading">{{ section.settings.heading | escape | newline_to_br }}</h1>
+    {%- endif -%}
+    {%- if section.settings.text != blank -%}
+      <p class="hero__text">{{ section.settings.text | escape | newline_to_br }}</p>
+    {%- endif -%}
+    {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+      <a href="{{ section.settings.button_link }}" class="button button--light">{{ section.settings.button_label }}</a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Portada (hero)",
+  "tag": "div",
+  "class": "section-hero",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Imagen", "info": "Si la dejas vacía se usa la foto de especias incluida en el tema." },
+    { "type": "textarea", "id": "heading", "label": "Título (admite varias líneas)", "default": "DE NUESTRA\nTRADICIÓN A\nTU MESA" },
+    { "type": "textarea", "id": "text", "label": "Texto", "default": "Especias, ingredientes\ny sabores del mundo\ndesde 1946." },
+    { "type": "text", "id": "button_label", "label": "Texto del botón" },
+    { "type": "url", "id": "button_link", "label": "Enlace del botón" },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Posición del texto",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "left"
+    },
+    { "type": "header", "content": "Apariencia" },
+    { "type": "color", "id": "overlay_color", "label": "Color de la capa", "default": "#1e351d" },
+    { "type": "range", "id": "overlay_opacity", "label": "Intensidad de la capa", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 90 },
+    { "type": "range", "id": "height_desktop", "label": "Altura en computadora", "min": 240, "max": 700, "step": 10, "unit": "px", "default": 420 },
+    { "type": "range", "id": "height_mobile", "label": "Altura en móvil", "min": 180, "max": 600, "step": 10, "unit": "px", "default": 260 }
+  ],
+  "presets": [{ "name": "Portada (hero)" }]
+}
+{% endschema %}

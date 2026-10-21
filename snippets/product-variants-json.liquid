@@ -1,0 +1,28 @@
+{%- comment -%}
+  Datos de variantes para el JS. Parámetro: product
+{%- endcomment -%}
+<script type="application/json" data-product-json>
+  {
+    "id": {{ product.id | json }},
+    "variants": [
+      {%- for variant in product.variants -%}
+        {%- liquid
+          assign variant_is_bulk = false
+          if variant.options contains settings.bulk_variant_name
+            assign variant_is_bulk = true
+          endif
+        -%}
+        {
+          "id": {{ variant.id | json }},
+          "title": {{ variant.title | json }},
+          "options": {{ variant.options | json }},
+          "price": {{ variant.price | json }},
+          "compare_at_price": {{ variant.compare_at_price | default: 0 | json }},
+          "available": {{ variant.available | json }},
+          "bulk": {{ variant_is_bulk | json }},
+          "media_id": {{ variant.featured_media.id | default: 0 | json }}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  }
+</script>

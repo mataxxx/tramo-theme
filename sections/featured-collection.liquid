@@ -1,0 +1,80 @@
+{%- liquid
+  assign coll = section.settings.collection
+  assign heading = section.settings.heading
+  if heading == blank and coll != blank
+    assign heading = coll.title
+  endif
+  if heading == blank
+    assign heading = 'Colección'
+  endif
+-%}
+<section class="category-section" data-category-section>
+  <div class="category-heading">
+    <div class="category-title">
+      <h2>{{ heading }}</h2>
+      {%- if section.settings.show_search and coll != blank -%}
+        <button
+          type="button"
+          class="category-search"
+          data-search-collection="{{ coll.handle }}"
+          data-search-title="{{ heading | escape }}"
+          aria-label="Buscar en {{ heading | escape }}"
+        >
+          {% render 'icon', name: 'search' %}
+        </button>
+      {%- endif -%}
+    </div>
+    {%- if section.settings.show_view_all and coll != blank -%}
+      <a class="view-all" href="{{ coll.url }}">
+        {{ section.settings.view_all_label | default: 'Ver todo' }}
+        {% render 'icon', name: 'chevron-right' %}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="product-rail" tabindex="0" aria-label="{{ heading | escape }}">
+    {%- if coll != blank and coll.products.size > 0 -%}
+      {%- for product in coll.products limit: section.settings.products_to_show -%}
+        <div class="product-rail__item">
+          {% render 'product-card', product: product, show_quick_add: section.settings.show_quick_add %}
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..4) -%}
+        <div class="product-rail__item">
+          <article class="product-card product-card--placeholder">
+            <div class="product-card__media">
+              <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+            </div>
+            <div class="product-card__info">
+              <h3 class="product-card__title">Nombre del producto</h3>
+              <p class="product-card__subtitle">100 g</p>
+              <div class="product-card__row"><div class="price"><strong class="price__current">₡0</strong></div></div>
+            </div>
+          </article>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Productos por categoría",
+  "tag": "div",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Colección" },
+    { "type": "text", "id": "heading", "label": "Título (opcional)", "info": "Si lo dejas vacío se usa el nombre de la colección." },
+    { "type": "range", "id": "products_to_show", "label": "Productos a mostrar", "min": 2, "max": 24, "step": 1, "default": 8 },
+    { "type": "checkbox", "id": "show_quick_add", "label": "Mostrar botón + para agregar rápido", "default": true },
+    { "type": "checkbox", "id": "show_search", "label": "Mostrar lupa para buscar dentro de la categoría", "default": true },
+    { "type": "checkbox", "id": "show_view_all", "label": "Mostrar enlace \"Ver todo\"", "default": true },
+    { "type": "text", "id": "view_all_label", "label": "Texto del enlace", "default": "Ver todo" }
+  ],
+  "presets": [
+    {
+      "name": "Productos por categoría"
+    }
+  ]
+}
+{% endschema %}

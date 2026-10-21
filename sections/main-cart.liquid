@@ -1,0 +1,42 @@
+<section class="cart-page page-width" data-cart-page>
+  <header class="page-header"><h1>Tu carrito</h1></header>
+
+  {%- if cart.item_count == 0 -%}
+    <div class="cart-empty">
+      <p>{{ section.settings.empty_text }}</p>
+      <a href="{{ routes.all_products_collection_url }}" class="button">Ver productos</a>
+    </div>
+  {%- else -%}
+    <form action="{{ routes.cart_url }}" method="post" class="cart-page__form" data-cart-form>
+      <ul class="cart-lines">
+        {%- for item in cart.items -%}
+          {% render 'cart-line', item: item, index: forloop.index %}
+        {%- endfor -%}
+      </ul>
+
+      <div class="cart-page__summary">
+        {%- if section.settings.show_note -%}
+          <label for="CartNote" class="field-label">Nota para tu pedido</label>
+          <textarea id="CartNote" name="note" class="field" rows="3">{{ cart.note }}</textarea>
+        {%- endif -%}
+        <div class="cart-total">
+          <span>Subtotal</span>
+          <strong>{{ cart.total_price | money }}</strong>
+        </div>
+        <p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>
+        <button type="submit" name="checkout" class="button button--full">{{ section.settings.checkout_label }}</button>
+      </div>
+    </form>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Carrito",
+  "settings": [
+    { "type": "text", "id": "empty_text", "label": "Texto con carrito vacío", "default": "Tu carrito está vacío" },
+    { "type": "text", "id": "checkout_label", "label": "Texto del botón de pago", "default": "Finalizar compra" },
+    { "type": "checkbox", "id": "show_note", "label": "Mostrar campo de nota del pedido", "default": false }
+  ]
+}
+{% endschema %}

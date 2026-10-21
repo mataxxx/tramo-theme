@@ -1,0 +1,52 @@
+<div class="drawer drawer--right" id="CartDrawer" data-drawer="cart" role="dialog" aria-modal="true" aria-label="{{ section.settings.title | escape }}" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <aside class="drawer__panel">
+    <header class="drawer__header">
+      <p class="drawer__title">{{ section.settings.title }}</p>
+      <button type="button" class="icon-button" data-drawer-close aria-label="Cerrar carrito">{% render 'icon', name: 'close' %}</button>
+    </header>
+
+    <div class="cart-drawer__content" data-cart-drawer-body>
+      {%- if cart.item_count == 0 -%}
+        <div class="cart-empty">
+          <p>{{ section.settings.empty_text }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="button">Ver productos</a>
+        </div>
+      {%- else -%}
+        <form action="{{ routes.cart_url }}" method="post" class="cart-drawer__form" data-cart-form>
+          <ul class="cart-lines">
+            {%- for item in cart.items -%}
+              {% render 'cart-line', item: item, index: forloop.index %}
+            {%- endfor -%}
+          </ul>
+
+          <div class="cart-drawer__footer">
+            {%- if section.settings.show_note -%}
+              <label for="CartDrawerNote" class="field-label">Nota para tu pedido</label>
+              <textarea id="CartDrawerNote" name="note" class="field" rows="2">{{ cart.note }}</textarea>
+            {%- endif -%}
+            <div class="cart-total">
+              <span>Subtotal</span>
+              <strong data-cart-total>{{ cart.total_price | money }}</strong>
+            </div>
+            <p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>
+            <button type="submit" name="checkout" class="button button--full">{{ section.settings.checkout_label }}</button>
+          </div>
+        </form>
+      {%- endif -%}
+    </div>
+  </aside>
+</div>
+
+{% schema %}
+{
+  "name": "Carrito lateral",
+  "enabled_on": { "groups": ["aside"] },
+  "settings": [
+    { "type": "text", "id": "title", "label": "Título", "default": "Tu carrito" },
+    { "type": "text", "id": "empty_text", "label": "Texto con carrito vacío", "default": "Tu carrito está vacío" },
+    { "type": "text", "id": "checkout_label", "label": "Texto del botón de pago", "default": "Finalizar compra" },
+    { "type": "checkbox", "id": "show_note", "label": "Mostrar campo de nota del pedido", "default": false }
+  ]
+}
+{% endschema %}

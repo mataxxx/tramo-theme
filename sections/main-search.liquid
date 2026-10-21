@@ -1,0 +1,42 @@
+{%- paginate search.results by 24 -%}
+  <section class="search-page page-width">
+    <header class="page-header">
+      <h1>Buscar</h1>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-field search-field--page">
+        {% render 'icon', name: 'search' %}
+        <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ section.settings.placeholder | escape }}" aria-label="Buscar">
+        <input type="hidden" name="type" value="product">
+      </form>
+    </header>
+
+    {%- if search.performed -%}
+      <p class="muted">{{ search.results_count }} resultados para "{{ search.terms | escape }}"</p>
+      {%- if search.results.size > 0 -%}
+        <ul class="product-grid" role="list">
+          {%- for item in search.results -%}
+            <li>
+              {%- if item.object_type == 'product' -%}
+                {% render 'product-card', product: item, show_quick_add: true %}
+              {%- else -%}
+                <a class="search-page__other" href="{{ item.url }}">{{ item.title }}</a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <p class="empty-state">No encontramos resultados. Prueba con otra palabra.</p>
+      {%- endif -%}
+    {%- endif -%}
+
+    {% render 'pagination', paginate: paginate %}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Resultados de búsqueda",
+  "settings": [
+    { "type": "text", "id": "placeholder", "label": "Texto del buscador", "default": "Busca por nombre..." }
+  ]
+}
+{% endschema %}

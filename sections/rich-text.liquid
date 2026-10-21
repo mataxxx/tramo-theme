@@ -1,0 +1,34 @@
+<section class="rich-text rich-text--{{ section.settings.align }}">
+  {%- if section.settings.heading != blank -%}
+    <h2 class="rich-text__heading">{{ section.settings.heading }}</h2>
+  {%- endif -%}
+  {%- if section.settings.text != blank -%}
+    <div class="rte">{{ section.settings.text }}</div>
+  {%- endif -%}
+  {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+    <a href="{{ section.settings.button_link }}" class="button">{{ section.settings.button_label }}</a>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Texto con título",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título", "default": "Nuestra historia" },
+    { "type": "richtext", "id": "text", "label": "Texto", "default": "<p>Cuéntales a tus clientes quién eres y desde cuándo preparas lo que vendes.</p>" },
+    { "type": "text", "id": "button_label", "label": "Texto del botón" },
+    { "type": "url", "id": "button_link", "label": "Enlace del botón" },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Alineación",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "center"
+    }
+  ],
+  "presets": [{ "name": "Texto con título" }]
+}
+{% endschema %}
