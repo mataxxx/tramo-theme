@@ -1,0 +1,4 @@
+{%- comment -%} Ficha dentro de la ventana de categoría, con datos para ordenar y filtrar. Parámetro: product {%- endcomment -%}
+<div class="category-modal__item" data-title="{{ product.title | escape }}" data-price="{{ product.price_min }}" data-tags="{{ product.tags | join: '|' | downcase | escape }}">
+  {% render 'product-card', product: product, show_quick_add: false %}
+</div>

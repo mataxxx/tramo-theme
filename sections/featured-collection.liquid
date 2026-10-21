@@ -15,7 +15,7 @@
     assign heading = 'Colección'
   endif
 -%}
-<section class="category-section" data-category-section data-category-scope>
+<section class="category-section" data-category-section data-category-scope data-category-handle="{{ coll.handle }}" data-category-filters="{{ section.settings.filter_tags | escape }}">
   <div class="category-heading">
     <h2 class="category-title">
       {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
@@ -55,14 +55,12 @@
     <div class="category-more">
       <button type="button" class="category-eye" data-category-open data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">
         {% render 'icon', name: 'eye' %}
-        <span>{{ section.settings.expand_label }}</span>
+        <span>{{ section.settings.expand_label }} {{ heading | downcase }}</span>
       </button>
     </div>
     <template data-category-template>
       {%- for product in coll.products limit: section.settings.expand_limit -%}
-        <div class="category-modal__item">
-          {% render 'product-card', product: product, show_quick_add: section.settings.show_quick_add %}
-        </div>
+        {% render 'category-item', product: product %}
       {%- endfor -%}
     </template>
   {%- endif -%}
@@ -77,6 +75,12 @@
       "type": "collection",
       "id": "collection",
       "label": "Colección"
+    },
+    {
+      "type": "text",
+      "id": "filter_tags",
+      "label": "Filtros de la ventana (etiquetas)",
+      "info": "Separadas por coma. Ej: África, Asia. Se filtran por las etiquetas del producto en Shopify."
     },
     {
       "type": "text",
@@ -129,8 +133,8 @@
       "type": "text",
       "id": "expand_label",
       "label": "Texto del botón",
-      "default": "Ver todo",
-      "info": "Texto junto al ojito, arriba a la derecha del título."
+      "default": "Ver todas las",
+      "info": "Se muestra: texto + nombre de la categoría. Ej: Ver todas las especias"
     },
     {
       "type": "range",

@@ -3,11 +3,25 @@
   <section class="category-modal">
     <header class="category-modal__head">
       <h2 class="category-modal__title" data-category-modal-title></h2>
-      <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+      <div class="category-modal__tools">
+        <button type="button" class="icon-button category-modal__lupa" data-category-search-toggle aria-label="Buscar en la categoría" aria-expanded="false">{% render 'icon', name: 'search' %}</button>
+        <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+      </div>
     </header>
-    <div class="category-modal__search">
-      {% render 'icon', name: 'search' %}
-      <input type="search" data-category-filter autocomplete="off" placeholder="Buscar..." aria-label="Buscar en la categoría">
+    <div class="category-modal__searchwrap" data-category-searchwrap hidden>
+      <div class="search-field category-modal__field">
+        {% render 'icon', name: 'search' %}
+        <input type="search" data-category-filter autocomplete="off" placeholder="Buscar..." aria-label="Buscar en la categoría">
+      </div>
+    </div>
+    <div class="category-modal__filters">
+      <div class="search-sort" data-category-sort>
+        <span>Ordenar por</span>
+        <button type="button" class="is-active" data-csort="default">Destacados</button>
+        <button type="button" data-csort="title">A–Z</button>
+        <button type="button" data-csort="price" data-label-asc="Precio ↑" data-label-desc="Precio ↓">Precio ↑</button>
+      </div>
+      <div class="category-modal__chips" data-category-chips hidden></div>
     </div>
     <div class="category-modal__body">
       <div class="category-modal__grid" data-category-grid></div>

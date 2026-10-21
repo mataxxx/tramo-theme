@@ -1,7 +1,16 @@
 {%- comment -%}
   Métodos de pago informativos (SINPE Móvil, transferencia, tarjeta). Se editan en Configuración del tema → Carrito.
 {%- endcomment -%}
-{%- if settings.show_pay_methods and settings.pay_methods != blank -%}
+{%- if settings.show_pay_methods and settings.pay_methods != blank and mode == 'sentence' -%}
+  {%- assign sm = settings.pay_methods | split: ',' -%}
+  <p class="pay-sentence">{{ settings.pay_prefix | default: 'Paga en' }}
+    {%- for m in sm %}
+      {%- assign nm = m | strip -%}
+      {%- if forloop.first %} {% elsif forloop.last %} ó {% else %}, {% endif -%}
+      <strong>{{ nm }}</strong>
+    {%- endfor -%}
+  </p>
+{%- elsif settings.show_pay_methods and settings.pay_methods != blank -%}
   <div class="pay-methods">
     {%- if settings.pay_methods_title != blank -%}<p class="pay-methods__title">{% render 'icon', name: 'lock' %} <span>{{ settings.pay_methods_title }}</span></p>{%- endif -%}
     <ul class="pay-methods__list" role="list">

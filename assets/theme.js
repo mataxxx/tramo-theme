@@ -1119,7 +1119,7 @@
     var scopeBtn = target.closest('[data-search-collection]');
     if (scopeBtn) {
       event.preventDefault();
-      openSearch({ handle: scopeBtn.getAttribute('data-search-collection'), title: scopeBtn.getAttribute('data-search-title') || '', question: scopeBtn.getAttribute('data-search-question') || '' });
+      openCategoryByHandle(scopeBtn.getAttribute('data-search-collection'), scopeBtn.getAttribute('data-search-title') || '', scopeBtn.getAttribute('data-search-question') || '');
       return;
     }
 
@@ -1224,41 +1224,143 @@
 
   /* ---------- Inicio ---------------------------------------------------- */
   /* ---------- Ventana de categoría (Ver todo) ------------------------------ */
+  var cat = { sort: 'default', desc: false, tag: '' };
   function normText(t) {
     return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  function catEls() {
+    return {
+      grid: $('[data-category-grid]'),
+      title: $('[data-category-modal-title]'),
+      input: $('[data-category-filter]'),
+      empty: $('[data-category-empty]'),
+      chips: $('[data-category-chips]'),
+      wrap: $('[data-category-searchwrap]'),
+      toggle: $('[data-category-search-toggle]'),
+      sort: $('[data-category-sort]'),
+      body: $('.category-modal__body')
+    };
+  }
+  function catSetup(opts) {
+    var e = catEls();
+    cat.sort = 'default'; cat.desc = false; cat.tag = '';
+    e.title.textContent = opts.title || '';
+    e.input.value = '';
+    e.input.placeholder = opts.question || 'Buscar...';
+    e.wrap.hidden = true;
+    e.toggle.setAttribute('aria-expanded', 'false');
+    e.empty.hidden = true;
+    $$('[data-csort]', e.sort).forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-csort') === 'default');
+      if (b.hasAttribute('data-label-asc')) b.textContent = b.getAttribute('data-label-asc');
+    });
+    var tags = (opts.filters || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean);
+    e.chips.innerHTML = '';
+    e.chips.hidden = tags.length === 0;
+    if (tags.length) {
+      ['Todas'].concat(tags).forEach(function (t, i) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'category-chip' + (i === 0 ? ' is-active' : '');
+        b.setAttribute('data-ctag', i === 0 ? '' : t);
+        b.textContent = t;
+        e.chips.appendChild(b);
+      });
+    }
+    if (e.body) e.body.scrollTop = 0;
+  }
+  function catApply() {
+    var e = catEls();
+    var q = normText(e.input.value.trim());
+    var tag = normText(cat.tag);
+    var items = $$('.category-modal__item', e.grid);
+    var shown = 0;
+    items.forEach(function (el) {
+      var okText = !q || normText(el.getAttribute('data-title') || el.textContent).indexOf(q) > -1;
+      var okTag = !tag || (el.getAttribute('data-tags') || '').split('|').some(function (t) { return normText(t).indexOf(tag) > -1; });
+      el.hidden = !(okText && okTag);
+      if (!el.hidden) shown++;
+    });
+    var visible = items.slice();
+    if (cat.sort === 'title') visible.sort(function (a, b) { return (a.getAttribute('data-title') || '').localeCompare(b.getAttribute('data-title') || '', 'es'); });
+    else if (cat.sort === 'price') visible.sort(function (a, b) { return (parseInt(a.getAttribute('data-price'), 10) - parseInt(b.getAttribute('data-price'), 10)) * (cat.desc ? -1 : 1); });
+    if (cat.sort !== 'default') visible.forEach(function (el) { e.grid.appendChild(el); });
+    e.empty.hidden = shown > 0 || items.length === 0;
+  }
+  function catRestoreOrder() {
+    var e = catEls();
+    var items = $$('.category-modal__item', e.grid);
+    items.sort(function (a, b) { return (parseInt(a.style.getPropertyValue('--i'), 10) || 0) - (parseInt(b.style.getPropertyValue('--i'), 10) || 0); });
+    items.forEach(function (el) { e.grid.appendChild(el); });
+  }
+  function catFill(html) {
+    var e = catEls();
+    e.grid.innerHTML = html;
+    $$('.category-modal__item', e.grid).forEach(function (el, i) { el.style.setProperty('--i', i); });
+    syncLikes();
+    catApply();
   }
   function openCategory(opener) {
     var scope = opener.closest('[data-category-scope]');
     var tpl = scope && $('[data-category-template]', scope);
-    var grid = $('[data-category-grid]');
-    if (!tpl || !grid) { var href = opener.getAttribute('href'); if (href) window.location.href = href; return; }
-    grid.innerHTML = '';
-    grid.appendChild(tpl.content.cloneNode(true));
-    $$('.category-modal__item', grid).forEach(function (el, i) { el.style.setProperty('--i', i); });
-    var title = opener.getAttribute('data-category-title') || '';
-    var tEl = $('[data-category-modal-title]');
-    if (tEl) tEl.textContent = title;
-    var input = $('[data-category-filter]');
-    if (input) { input.value = ''; input.placeholder = opener.getAttribute('data-category-question') || 'Buscar...'; }
-    var empty = $('[data-category-empty]');
-    if (empty) empty.hidden = true;
-    var body = $('.category-modal__body');
-    if (body) body.scrollTop = 0;
+    if (!tpl) { var href = opener.getAttribute('href'); if (href) window.location.href = href; return; }
+    catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters') });
+    var tmp = document.createElement('div');
+    tmp.appendChild(tpl.content.cloneNode(true));
+    catFill(tmp.innerHTML);
     openDrawer('category');
-    syncLikes();
+  }
+  function openCategoryByHandle(handle, title, question) {
+    var scope = document.querySelector('[data-category-scope][data-category-handle="' + handle + '"]');
+    var tpl = scope && $('[data-category-template]', scope);
+    var filters = scope ? scope.getAttribute('data-category-filters') : '';
+    catSetup({ title: title, question: question, filters: filters });
+    if (tpl) {
+      var tmp = document.createElement('div');
+      tmp.appendChild(tpl.content.cloneNode(true));
+      catFill(tmp.innerHTML);
+      openDrawer('category');
+      return;
+    }
+    catEls().grid.innerHTML = '<p class="category-modal__empty">Cargando…</p>';
+    openDrawer('category');
+    fetch(ROOT + 'collections/' + encodeURIComponent(handle) + '?view=popup')
+      .then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); })
+      .then(function (html) { catFill(html); })
+      .catch(function () { catEls().grid.innerHTML = '<p class="category-modal__empty">No se pudo cargar la categoría.</p>'; });
   }
   document.addEventListener('input', function (event) {
-    var input = event.target.closest && event.target.closest('[data-category-filter]');
-    if (!input) return;
-    var q = normText(input.value.trim());
-    var shown = 0;
-    $$('.category-modal__item', $('[data-category-grid]')).forEach(function (el) {
-      var ok = !q || normText(el.textContent).indexOf(q) > -1;
-      el.hidden = !ok;
-      if (ok) shown++;
-    });
-    var empty = $('[data-category-empty]');
-    if (empty) empty.hidden = shown > 0;
+    if (event.target.closest && event.target.closest('[data-category-filter]')) catApply();
+  });
+  document.addEventListener('click', function (event) {
+    var t = event.target;
+    if (!t.closest) return;
+    var tog = t.closest('[data-category-search-toggle]');
+    if (tog) {
+      var e = catEls();
+      var open = e.wrap.hidden;
+      e.wrap.hidden = !open;
+      tog.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) e.input.focus();
+      return;
+    }
+    var sb = t.closest('[data-csort]');
+    if (sb) {
+      var kind = sb.getAttribute('data-csort');
+      if (kind === 'price' && cat.sort === 'price') cat.desc = !cat.desc; else cat.desc = false;
+      cat.sort = kind;
+      $$('[data-csort]', sb.parentNode).forEach(function (b) { b.classList.toggle('is-active', b === sb); });
+      if (kind === 'price') sb.textContent = sb.getAttribute(cat.desc ? 'data-label-desc' : 'data-label-asc');
+      else { var pb = $('[data-csort="price"]', sb.parentNode); if (pb) pb.textContent = pb.getAttribute('data-label-asc'); }
+      if (kind === 'default') catRestoreOrder();
+      catApply();
+      return;
+    }
+    var chip = t.closest('[data-ctag]');
+    if (chip) {
+      cat.tag = chip.getAttribute('data-ctag');
+      $$('[data-ctag]', chip.parentNode).forEach(function (b) { b.classList.toggle('is-active', b === chip); });
+      catApply();
+    }
   });
 
   /* ---------- Video del producto: reproducción automática siempre ---------- */

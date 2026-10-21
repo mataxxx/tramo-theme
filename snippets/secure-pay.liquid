@@ -1,14 +1,19 @@
 {%- comment -%}
-  Sello de pago seguro + métodos de pago. Parámetros: text (string)
+  Parámetros: part ('top' = "Paga en SINPE Móvil, Transferencia ó Tarjeta", 'bottom' = candado + pagos seguros), text
 {%- endcomment -%}
-<div class="secure-pay">
-  {% render 'pay-methods' %}
-  <p class="secure-pay__text">{% render 'icon', name: 'lock' %} <span>{{ text | default: 'Pagos seguros en línea' }}</span></p>
-  {%- if shop.enabled_payment_types.size > 0 -%}
-    <ul class="payment-icons payment-icons--small" role="list">
-      {%- for type in shop.enabled_payment_types -%}
-        <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
-      {%- endfor -%}
-    </ul>
+{%- if part == 'top' -%}
+  {%- if settings.show_pay_methods and settings.pay_methods != blank -%}
+    <div class="secure-pay secure-pay--top">{% render 'pay-methods', mode: 'sentence' %}</div>
   {%- endif -%}
-</div>
+{%- else -%}
+  <div class="secure-pay secure-pay--bottom">
+    <p class="secure-pay__text">{% render 'icon', name: 'lock' %} <span>{{ text | default: 'Pagos seguros en línea' }}</span></p>
+    {%- if shop.enabled_payment_types.size > 0 -%}
+      <ul class="payment-icons payment-icons--small" role="list">
+        {%- for type in shop.enabled_payment_types -%}
+          <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+{%- endif -%}

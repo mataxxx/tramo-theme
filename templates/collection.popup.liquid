@@ -1,0 +1,6 @@
+{%- layout none -%}
+{%- paginate collection.products by 60 -%}
+  {%- for product in collection.products -%}
+    {% render 'category-item', product: product %}
+  {%- endfor -%}
+{%- endpaginate -%}

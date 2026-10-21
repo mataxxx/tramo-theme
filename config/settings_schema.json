@@ -370,6 +370,13 @@
       },
       {
         "type": "text",
+        "id": "pay_prefix",
+        "label": "Frase en el carrito",
+        "info": "Sale así: Paga en SINPE Móvil, Transferencia ó Tarjeta",
+        "default": "Paga en"
+      },
+      {
+        "type": "text",
         "id": "pay_methods_title",
         "label": "Título junto a los métodos en los productos (opcional)"
       },

@@ -9,7 +9,7 @@
   {%- else -%}
     <form action="{{ routes.cart_url }}" method="post" class="cart-page__form" data-cart-form>
       {%- if section.settings.show_secure -%}
-        {% render 'secure-pay', text: section.settings.secure_text %}
+        {% render 'secure-pay', part: 'top' %}
       {%- endif -%}
       <ul class="cart-lines">
         {%- for item in cart.items -%}
@@ -29,6 +29,9 @@
         </div>
         <p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>
         <button type="submit" name="checkout" class="button button--full" data-checkout-button{% if settings.show_pay_methods and settings.require_pay_choice and settings.pay_methods != blank and cart.attributes['Método de pago'] == blank %} disabled{% endif %}>{{ section.settings.checkout_label }}</button>
+        {%- if section.settings.show_secure -%}
+          {% render 'secure-pay', part: 'bottom', text: section.settings.secure_text %}
+        {%- endif -%}
       </div>
     </form>
   {%- endif -%}

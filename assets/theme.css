@@ -1109,3 +1109,34 @@ body:has(.drawer--left.is-open) .bottom-nav { transform: translateY(110%); anima
 .secure-pay__text { color: var(--color-primary); font-size: 14px; }
 .pay-methods__item { padding: 6px 12px; font-size: 13px; border-color: #cfe0c9; }
 .cart-page__form > .secure-pay { max-width: 640px; }
+
+/* Ronda 13 */
+/* Más aire entre carruseles */
+.category-section { padding-bottom: 44px; }
+.duo__row { margin-bottom: 40px; }
+.product-rail { padding-bottom: 14px; }
+
+/* Ver todo centrado */
+.category-more, .duo__row .category-more { justify-content: center; padding: 6px 18px 0; }
+@media (min-width: 750px) { .category-more { padding-left: 3.5vw; padding-right: 3.5vw; } .duo__row .category-more { grid-column: 2; padding-left: 0; } }
+
+/* Ventana de categoría: herramientas, buscador cuadrado, filtros */
+.category-modal__tools { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.category-modal__lupa { width: 36px; height: 36px; color: var(--color-primary); }
+.category-modal__lupa .icon { width: 19px; height: 19px; }
+.category-modal__lupa[aria-expanded="true"] { background: color-mix(in srgb, var(--color-primary) 12%, transparent); border-radius: 50%; }
+.category-modal__searchwrap { padding: 0 18px; }
+.category-modal__searchwrap[hidden] { display: none; }
+.category-modal__field { margin: 6px 0 10px; background: var(--color-surface); }
+.category-modal__filters { padding: 4px 18px 10px; display: grid; gap: 8px; }
+.category-modal__chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+.category-modal__chips[hidden] { display: none; }
+.category-modal__chips::-webkit-scrollbar { display: none; }
+.category-chip { flex-shrink: 0; border: 1.5px solid var(--color-primary); border-radius: 999px; background: transparent; color: var(--color-primary); padding: 7px 14px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.category-chip.is-active { background: var(--color-primary); color: var(--color-on-primary); }
+
+/* Carrito: frase arriba, pagos seguros abajo */
+.pay-sentence { font-size: 15px; color: var(--color-primary); text-align: center; line-height: 1.4; }
+.pay-sentence strong { font-weight: 700; }
+.secure-pay--top { padding: 10px 12px; }
+.secure-pay--bottom { margin: 12px 0 0; padding: 0; border: 0; background: transparent; }
