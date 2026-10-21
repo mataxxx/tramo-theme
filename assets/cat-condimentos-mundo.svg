@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
+<defs>
+<filter id="r" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5"/></filter>
+<filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .15  0 0 0 0 .12  0 0 0 0 .08  0 0 0 .09 0"/></filter>
+<radialGradient id="v" cx="50%" cy="45%" r="75%"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#5b4a2a" stop-opacity=".16"/></radialGradient>
+</defs>
+<rect width="400" height="400" fill="#f3ecd9"/>
+<g filter="url(#r)" stroke="#263d25" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+<circle cx="200" cy="200" r="118" fill="#9bbd8a"/>
+<path d="M120 160 Q150 120 190 135 Q205 165 175 185 Q140 195 120 160Z" fill="#fffaf0"/>
+<path d="M215 215 Q260 190 288 225 Q285 275 240 290 Q205 270 215 215Z" fill="#fffaf0"/>
+<path d="M82 200 Q200 250 318 200" stroke-width="3"/><path d="M200 82 Q150 200 200 318" stroke-width="3"/>
+<path d="M330 80 Q372 70 380 112 Q338 122 330 80Z" fill="#c0392b" stroke-width="3"/><path d="M60 330 Q40 300 70 282 Q95 305 60 330Z" fill="#e8bf4a" stroke-width="3"/>
+<path d="M300 330 L350 352" stroke-width="5"/>
+</g>
+<rect width="400" height="400" filter="url(#g)"/><rect width="400" height="400" fill="url(#v)"/>
+</svg>
