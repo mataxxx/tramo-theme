@@ -695,21 +695,30 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
 .about__facts strong { font-size: 20px; }
 .about__facts span { font-size: 11px; }
 
-/* Condimentos: bloque a la izquierda + carrusel */
-.duo__row { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 0; align-items: stretch; margin-bottom: 18px; }
-.duo__label { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-left: 18px; padding: 10px 4px; background: var(--color-primary); color: var(--color-on-primary); border-radius: 14px; }
-.duo__label-text { writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--font-heading); font-size: 17px; letter-spacing: .5px; white-space: nowrap; }
+/* Condimentos: encabezado horizontal en celular, bloque a la izquierda en computadora */
+.duo__row { display: block; margin-bottom: 20px; }
+.duo__label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 18px 10px; color: var(--color-primary); }
+.duo__label-text { font-family: var(--font-heading); font-size: 21px; line-height: 1.1; letter-spacing: -.2px; display: inline-flex; align-items: center; gap: 10px; }
+.duo__label-text::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; }
 .duo__note { display: none; }
-.duo__search { display: grid; place-items: center; border: 0; background: rgba(255,255,255,.16); color: inherit; border-radius: 50%; width: 30px; height: 30px; padding: 0; }
-.duo__search span { display: none; }
-.duo__search .icon { width: 16px; height: 16px; }
-.duo .product-rail { padding-left: 12px; }
+.duo__search { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--color-primary); background: transparent; color: var(--color-primary); border-radius: 999px; padding: 6px 12px; font-size: 13px; flex-shrink: 0; }
+.duo__search .icon { width: 15px; height: 15px; }
 @media (min-width: 750px) {
-  .duo__row { grid-template-columns: 200px minmax(0, 1fr); margin-bottom: 26px; }
-  .duo__label { margin-left: 3.5vw; padding: 18px 16px; align-items: flex-start; justify-content: flex-end; gap: 8px; background: linear-gradient(160deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 70%, #000)); }
-  .duo__label-text { writing-mode: horizontal-tb; transform: none; font-size: 22px; line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
+  .duo__row { display: grid; grid-template-columns: 200px minmax(0, 1fr); align-items: stretch; margin-bottom: 26px; }
+  .duo__label { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 8px; margin-left: 3.5vw; padding: 18px 16px; background: linear-gradient(160deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 70%, #000)); color: var(--color-on-primary); border-radius: 14px; }
+  .duo__label-text { font-size: 22px; overflow-wrap: anywhere; }
+  .duo__label-text::before { display: none; }
   .duo__note { display: block; opacity: .8; font-size: 13px; }
-  .duo__search { width: auto; height: auto; border-radius: 999px; padding: 8px 14px; display: inline-flex; gap: 6px; align-items: center; margin-top: 6px; }
-  .duo__search span { display: inline; font-size: 13px; }
+  .duo__search { border-color: rgba(255,255,255,.7); color: inherit; margin-top: 6px; }
   .duo .product-rail { padding-left: 18px; }
 }
+
+/* Botones del inicio: buscar (mini barra) y ver todas (solo enlace con flecha) */
+.category-search { background: var(--color-surface); color: var(--color-primary); border: 1.5px solid var(--color-primary); box-shadow: none; padding: 8px 16px 8px 12px; min-width: 200px; justify-content: flex-start; font-weight: 500; }
+.category-search span { opacity: .85; }
+.category-more { padding: 6px 18px 0; justify-content: flex-start; }
+@media (min-width: 750px) { .category-more { padding-left: 3.5vw; } }
+.category-more .button { background: transparent; border: 0; box-shadow: none; padding: 6px 2px; color: var(--color-primary); font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: 0; }
+.category-more .button:hover { background: transparent; filter: none; text-decoration: underline; }
+.category-more .icon { width: 18px; height: 18px; transition: transform .2s; }
+.category-more .button:hover .icon { transform: translateY(2px); }
