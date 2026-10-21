@@ -216,8 +216,8 @@
   },
   "order": [
     "hero",
-    "circles",
     "trust",
+    "circles",
     "especias",
     "condimentos_casa",
     "condimentos_mundo",
