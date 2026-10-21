@@ -28,12 +28,13 @@
       <button
         type="button"
         class="category-search"
+        aria-label="{{ section.settings.search_prefix }} {{ heading | escape }}"
         data-search-collection="{{ coll.handle }}"
         data-search-title="{{ heading | escape }}"
         data-search-question="¿Qué {{ section.settings.search_noun | default: 'producto' | escape }} estás buscando?"
       >
         {% render 'icon', name: 'search' %}
-        <span>{{ section.settings.search_prefix }} {{ heading }}</span>
+        <span class="visually-hidden">{{ section.settings.search_prefix }} {{ heading }}</span>
       </button>
     {%- endif -%}
   </div>

@@ -1,0 +1,104 @@
+{%- assign wa = settings.whatsapp_number | replace: '+', '' | replace: ' ', '' | replace: '-', '' -%}
+<div class="drawer drawer--modal drawer--help" id="HelpPanel" data-drawer="help" role="dialog" aria-modal="true" aria-label="{{ section.settings.title | escape }}" hidden>
+  <div class="drawer__backdrop" data-drawer-close></div>
+  <article class="help" data-help>
+    <button type="button" class="close-button help__close" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+
+    <div class="help__home" data-help-home>
+      <div class="help__head">
+        <h2 class="help__title">{{ section.settings.title }}</h2>
+        {%- if section.settings.subtitle != blank -%}<p class="help__subtitle">{{ section.settings.subtitle }}</p>{%- endif -%}
+      </div>
+      <div class="help__grid">
+        {%- for block in section.blocks -%}
+          <button type="button" class="help-card" data-help-open="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+            <span class="help-card__icon">{% render 'icon', name: block.settings.icon %}</span>
+            <strong class="help-card__title">{{ block.settings.title }}</strong>
+            {%- if block.settings.summary != blank -%}<span class="help-card__summary">{{ block.settings.summary }}</span>{%- endif -%}
+          </button>
+        {%- endfor -%}
+      </div>
+      {%- if section.settings.show_whatsapp and wa != blank -%}
+        <a class="button button--full help__wa" href="https://wa.me/{{ wa }}" target="_blank" rel="noopener">{% render 'icon', name: 'chat' %} {{ section.settings.whatsapp_label }}</a>
+      {%- endif -%}
+    </div>
+
+    {%- for block in section.blocks -%}
+      <div class="help__detail" data-help-detail="{{ forloop.index0 }}" hidden>
+        <button type="button" class="help__back" data-help-back>{% render 'icon', name: 'arrow-left' %} <span>{{ section.settings.back_label }}</span></button>
+        <h3 class="help__detail-title"><span class="help-card__icon">{% render 'icon', name: block.settings.icon %}</span> {{ block.settings.title }}</h3>
+        {%- if block.settings.content != blank -%}<div class="rte help__content">{{ block.settings.content }}</div>{%- endif -%}
+        <div class="help__detail-actions">
+          {%- if block.settings.opens_account -%}
+            {%- if customer -%}
+              <button type="button" class="button" data-open="account">{% render 'icon', name: 'package' %} {{ block.settings.cta_label | default: 'Ver mis pedidos' }}</button>
+            {%- else -%}
+              <a class="button" href="{{ routes.storefront_login_url }}">{% render 'icon', name: 'user' %} Iniciar sesión para ver mis pedidos</a>
+            {%- endif -%}
+          {%- elsif block.settings.cta_label != blank and block.settings.cta_url != blank -%}
+            <a class="button" href="{{ block.settings.cta_url }}">{{ block.settings.cta_label }}</a>
+          {%- endif -%}
+          {%- if block.settings.show_whatsapp and wa != blank -%}
+            <a class="button button--outline" href="https://wa.me/{{ wa }}" target="_blank" rel="noopener">{% render 'icon', name: 'chat' %} WhatsApp</a>
+          {%- endif -%}
+          {%- if block.settings.show_email and section.settings.email != blank -%}
+            <a class="button button--outline" href="mailto:{{ section.settings.email }}">{% render 'icon', name: 'mail' %} {{ section.settings.email }}</a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </article>
+</div>
+
+{% schema %}
+{
+  "name": "Ayuda",
+  "enabled_on": { "groups": ["aside"] },
+  "max_blocks": 8,
+  "settings": [
+    { "type": "paragraph", "content": "Se abre con el botón Ayuda de la barra de abajo (celular) y del menú. Cada cajita abre su información." },
+    { "type": "text", "id": "title", "label": "Título", "default": "¿En qué te ayudamos?" },
+    { "type": "text", "id": "subtitle", "label": "Subtítulo", "default": "Aquí estamos para que compres con tranquilidad." },
+    { "type": "text", "id": "back_label", "label": "Texto de volver", "default": "Volver a ayuda" },
+    { "type": "text", "id": "email", "label": "Correo de contacto (opcional)" },
+    { "type": "header", "content": "WhatsApp" },
+    { "type": "paragraph", "content": "El número se configura en Configuración del tema → Redes sociales." },
+    { "type": "checkbox", "id": "show_whatsapp", "label": "Mostrar botón grande de WhatsApp", "default": true },
+    { "type": "text", "id": "whatsapp_label", "label": "Texto del botón", "default": "Escríbenos por WhatsApp" }
+  ],
+  "blocks": [
+    {
+      "type": "topic",
+      "name": "Cajita de ayuda",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icono",
+          "options": [
+            { "value": "help", "label": "Pregunta" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "cart", "label": "Carrito" },
+            { "value": "package", "label": "Paquete" },
+            { "value": "truck", "label": "Camión" },
+            { "value": "shield", "label": "Escudo" },
+            { "value": "mail", "label": "Correo" },
+            { "value": "info", "label": "Info" },
+            { "value": "tag", "label": "Etiqueta" },
+            { "value": "leaf", "label": "Hoja" }
+          ],
+          "default": "help"
+        },
+        { "type": "text", "id": "title", "label": "Título", "default": "Preguntas frecuentes" },
+        { "type": "text", "id": "summary", "label": "Descripción corta", "default": "Respuestas rápidas" },
+        { "type": "richtext", "id": "content", "label": "Contenido" },
+        { "type": "checkbox", "id": "opens_account", "label": "Abre el panel de pedidos del cliente", "info": "Para la cajita de rastrear pedido.", "default": false },
+        { "type": "text", "id": "cta_label", "label": "Texto del botón (opcional)" },
+        { "type": "url", "id": "cta_url", "label": "Enlace del botón (opcional)" },
+        { "type": "checkbox", "id": "show_whatsapp", "label": "Mostrar botón de WhatsApp", "default": false },
+        { "type": "checkbox", "id": "show_email", "label": "Mostrar el correo de contacto", "default": false }
+      ]
+    }
+  ]
+}
+{% endschema %}

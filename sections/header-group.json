@@ -39,6 +39,15 @@
         "bg_color": "#263d25"
       }
     },
+    "trust-bar": {
+      "type": "trust-bar",
+      "blocks": {
+        "t1": { "type": "item", "settings": { "icon": "shield", "text": "Pagos seguros" } },
+        "t2": { "type": "item", "settings": { "icon": "truck", "text": "Entregas confiables" } }
+      },
+      "block_order": ["t1", "t2"],
+      "settings": {}
+    },
     "header": {
       "type": "header",
       "settings": {
@@ -46,12 +55,13 @@
         "brand_subtitle": "— FUNDADORES —",
         "brand_note": "Desde 1946",
         "menu": "main-menu",
-        "sticky": false
+        "sticky": true
       }
     }
   },
   "order": [
     "announcement-bar",
+    "trust-bar",
     "header"
   ]
 }

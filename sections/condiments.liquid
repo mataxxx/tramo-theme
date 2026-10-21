@@ -38,7 +38,7 @@
             data-search-question="¿Qué {{ section.settings[noun_key] | default: 'condimento' | escape }} estás buscando?"
             aria-label="Buscar en {{ label | escape }}"
           >
-            {% render 'icon', name: 'search' %}<span>Buscar</span>
+            {% render 'icon', name: 'search' %}<span class="visually-hidden">Buscar</span>
           </button>
         {%- endif -%}
       </div>
@@ -113,36 +113,17 @@
       "id": "icon_1",
       "label": "Icono",
       "options": [
-        {
-          "value": "house",
-          "label": "Casa"
-        },
-        {
-          "value": "globe",
-          "label": "Mundo"
-        },
-        {
-          "value": "leaf",
-          "label": "Hoja"
-        },
-        {
-          "value": "flame",
-          "label": "Llama"
-        },
-        {
-          "value": "star",
-          "label": "Estrella"
-        },
-        {
-          "value": "heart",
-          "label": "Corazón"
-        },
-        {
-          "value": "none",
-          "label": "Sin icono"
-        }
+        { "value": "house-hand", "label": "Casita" },
+        { "value": "globe-hand", "label": "Mundo" },
+        { "value": "mortar", "label": "Molcajete" },
+        { "value": "chili", "label": "Chile" },
+        { "value": "leaf", "label": "Hoja" },
+        { "value": "flame", "label": "Llama" },
+        { "value": "star", "label": "Estrella" },
+        { "value": "heart", "label": "Corazón" },
+        { "value": "none", "label": "Sin icono" }
       ],
-      "default": "house"
+      "default": "house-hand"
     },
     {
       "type": "text",
@@ -176,36 +157,17 @@
       "id": "icon_2",
       "label": "Icono",
       "options": [
-        {
-          "value": "house",
-          "label": "Casa"
-        },
-        {
-          "value": "globe",
-          "label": "Mundo"
-        },
-        {
-          "value": "leaf",
-          "label": "Hoja"
-        },
-        {
-          "value": "flame",
-          "label": "Llama"
-        },
-        {
-          "value": "star",
-          "label": "Estrella"
-        },
-        {
-          "value": "heart",
-          "label": "Corazón"
-        },
-        {
-          "value": "none",
-          "label": "Sin icono"
-        }
+        { "value": "house-hand", "label": "Casita" },
+        { "value": "globe-hand", "label": "Mundo" },
+        { "value": "mortar", "label": "Molcajete" },
+        { "value": "chili", "label": "Chile" },
+        { "value": "leaf", "label": "Hoja" },
+        { "value": "flame", "label": "Llama" },
+        { "value": "star", "label": "Estrella" },
+        { "value": "heart", "label": "Corazón" },
+        { "value": "none", "label": "Sin icono" }
       ],
-      "default": "globe"
+      "default": "globe-hand"
     },
     {
       "type": "text",

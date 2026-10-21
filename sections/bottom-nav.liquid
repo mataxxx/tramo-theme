@@ -3,9 +3,9 @@
     {% render 'icon', name: 'home' %}
     <span>{{ section.settings.label_home }}</span>
   </a>
-  <button type="button" class="bottom-nav__item" data-open="search">
-    {% render 'icon', name: 'search' %}
-    <span>{{ section.settings.label_search }}</span>
+  <button type="button" class="bottom-nav__item" data-open="help">
+    {% render 'icon', name: 'help' %}
+    <span>{{ section.settings.label_help }}</span>
   </button>
   {%- if section.settings.show_videos -%}
     <button type="button" class="bottom-nav__item" data-open="reels">
@@ -27,7 +27,7 @@
   "settings": [
     { "type": "paragraph", "content": "Solo se muestra en celulares." },
     { "type": "text", "id": "label_home", "label": "Texto: inicio", "default": "Inicio" },
-    { "type": "text", "id": "label_search", "label": "Texto: buscar", "default": "Buscar" },
+    { "type": "text", "id": "label_help", "label": "Texto: ayuda", "default": "Ayuda" },
     { "type": "checkbox", "id": "show_videos", "label": "Mostrar botón de videos", "default": true },
     { "type": "text", "id": "label_videos", "label": "Texto: videos", "default": "Videos" },
     { "type": "text", "id": "label_cart", "label": "Texto: carrito", "default": "Carrito" }

@@ -1,0 +1,63 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} .trust-bar {
+    background: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.size_mobile }}px;
+  }
+  @media (min-width: 750px) {
+    #shopify-section-{{ section.id }} .trust-bar { font-size: {{ section.settings.size }}px; }
+  }
+{%- endstyle -%}
+{%- if section.blocks.size > 0 -%}
+  <div class="trust-bar">
+    <ul class="trust-bar__list" role="list">
+      {%- for block in section.blocks -%}
+        <li class="trust-bar__item" {{ block.shopify_attributes }}>
+          {%- if block.settings.icon != 'none' -%}{% render 'icon', name: block.settings.icon %}{%- endif -%}
+          <span>{{ block.settings.text }}</span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Barra de confianza",
+  "enabled_on": { "groups": ["header"] },
+  "max_blocks": 4,
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Fondo", "default": "#f1ead7" },
+    { "type": "color", "id": "text_color", "label": "Texto", "default": "#263d25" },
+    { "type": "range", "id": "size", "label": "Tamaño del texto en computadora", "min": 11, "max": 18, "step": 1, "unit": "px", "default": 13 },
+    { "type": "range", "id": "size_mobile", "label": "Tamaño del texto en móvil", "min": 10, "max": 16, "step": 1, "unit": "px", "default": 12 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Mensaje",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icono",
+          "options": [
+            { "value": "shield", "label": "Escudo (seguro)" },
+            { "value": "truck", "label": "Camión (entregas)" },
+            { "value": "lock", "label": "Candado" },
+            { "value": "package", "label": "Paquete" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "star", "label": "Estrella" },
+            { "value": "none", "label": "Sin icono" }
+          ],
+          "default": "shield"
+        },
+        { "type": "text", "id": "text", "label": "Texto", "default": "Pagos seguros" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Barra de confianza" }
+  ]
+}
+{% endschema %}

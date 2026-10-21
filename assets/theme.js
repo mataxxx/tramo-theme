@@ -112,6 +112,15 @@
     openDrawers().forEach(function (d) { closeDrawer(d, keepFocus); });
   }
 
+  function showHelpTopic(index) {
+    var root = $('[data-help]');
+    if (!root) return;
+    var home = $('[data-help-home]', root);
+    if (home) home.hidden = index !== null;
+    $$('[data-help-detail]', root).forEach(function (d) { d.hidden = String(index) !== d.getAttribute('data-help-detail'); });
+    root.scrollTop = 0;
+  }
+
   function openDrawer(name, opts) {
     var drawer = $('[data-drawer="' + name + '"]');
     if (!drawer) return null;
@@ -128,9 +137,32 @@
         if (target && typeof target.focus === 'function') target.focus({ preventScroll: true });
       }, 60);
       if (name === 'reels') { setReelsView(opts && opts.view); startReels(); }
+      if (name === 'help') showHelpTopic(null);
     }
     return drawer;
   }
+
+  (function headerScroll() {
+    var header = $('[data-site-header]');
+    if (!header) return;
+    var wrap = header.closest('.shopify-section') || header;
+    function setH() { document.documentElement.style.setProperty('--header-h', wrap.offsetHeight + 'px'); }
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY || 0;
+        if (y > 60) header.classList.add('is-scrolled');
+        else if (y < 10) header.classList.remove('is-scrolled');
+        setH();
+        ticking = false;
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', setH);
+    setH(); onScroll();
+  })();
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Enter' && event.target.matches && event.target.matches('[data-line-qty], [data-line-grams]')) {
@@ -897,6 +929,10 @@
     if (!target.closest) return;
 
     if (handleLineEvent(event)) return;
+
+    var helpOpen = target.closest('[data-help-open]');
+    if (helpOpen) { showHelpTopic(helpOpen.getAttribute('data-help-open')); return; }
+    if (target.closest('[data-help-back]')) { showHelpTopic(null); return; }
 
     var opener = target.closest('[data-open]');
     if (opener) {

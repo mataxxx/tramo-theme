@@ -161,6 +161,63 @@
         "f2"
       ],
       "settings": {}
+    },
+    "help-panel": {
+      "type": "help-panel",
+      "blocks": {
+        "h1": {
+          "type": "topic",
+          "settings": {
+            "icon": "help",
+            "title": "Preguntas frecuentes",
+            "summary": "Respuestas rápidas",
+            "content": "<p><strong>¿Hacen envíos a todo el país?</strong></p><p>Sí. El costo y el tiempo de entrega se calculan al finalizar la compra, según tu dirección.</p><p><strong>¿Cómo puedo pagar?</strong></p><p>Con los métodos que ves al finalizar la compra. El pago es seguro y en línea.</p><p><strong>¿Venden a granel?</strong></p><p>Sí. En los productos con la opción “A granel” eliges cuántos gramos quieres.</p><p><strong>¿Puedo cambiar mi pedido?</strong></p><p>Escríbenos lo antes posible por WhatsApp y lo revisamos juntos.</p>"
+          }
+        },
+        "h2": {
+          "type": "topic",
+          "settings": {
+            "icon": "chat",
+            "title": "Contáctanos",
+            "summary": "Estamos para ayudarte",
+            "content": "<p>¿Dudas sobre un producto, un pedido o cómo usar una especia? Escríbenos y te respondemos con gusto.</p>",
+            "show_whatsapp": true,
+            "show_email": true
+          }
+        },
+        "h3": {
+          "type": "topic",
+          "settings": {
+            "icon": "cart",
+            "title": "Cómo comprar",
+            "summary": "Paso a paso, muy fácil",
+            "content": "<p><strong>1.</strong> Toca el producto que te guste y elige la presentación.</p><p><strong>2.</strong> Agrégalo al carrito con el botón +.</p><p><strong>3.</strong> Abre el carrito, revisa y toca “Finalizar compra”.</p><p><strong>4.</strong> Escribe tu dirección y paga de forma segura. ¡Listo!</p>"
+          }
+        },
+        "h4": {
+          "type": "topic",
+          "settings": {
+            "icon": "package",
+            "title": "Rastrear pedido",
+            "summary": "Mira en qué va tu compra",
+            "content": "<p>Inicia sesión y verás el estado de tus pedidos: preparando, en camino o entregado.</p><p>Si necesitas más información, escríbenos por WhatsApp.</p>",
+            "opens_account": true,
+            "cta_label": "Ver mis pedidos",
+            "show_whatsapp": true
+          }
+        }
+      },
+      "block_order": [
+        "h1",
+        "h2",
+        "h3",
+        "h4"
+      ],
+      "settings": {
+        "title": "¿En qué te ayudamos?",
+        "subtitle": "Aquí estamos para que compres con tranquilidad.",
+        "show_whatsapp": true
+      }
     }
   },
   "order": [
@@ -169,6 +226,7 @@
     "account-panel",
     "about-panel",
     "reels",
-    "bottom-nav"
+    "bottom-nav",
+    "help-panel"
   ]
 }

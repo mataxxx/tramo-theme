@@ -31,6 +31,9 @@
             </div>
             <p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>
             <button type="submit" name="checkout" class="button button--full">{{ section.settings.checkout_label }}</button>
+            {%- if section.settings.show_secure -%}
+              {% render 'secure-pay', text: section.settings.secure_text %}
+            {%- endif -%}
           </div>
         </form>
       {%- endif -%}
@@ -46,6 +49,8 @@
     { "type": "text", "id": "title", "label": "Título", "default": "Tu carrito" },
     { "type": "text", "id": "empty_text", "label": "Texto con carrito vacío", "default": "Tu carrito está vacío" },
     { "type": "text", "id": "checkout_label", "label": "Texto del botón de pago", "default": "Finalizar compra" },
+    { "type": "checkbox", "id": "show_secure", "label": "Mostrar sello de pago seguro y métodos de pago", "default": true },
+    { "type": "text", "id": "secure_text", "label": "Texto del sello", "default": "Pagos seguros en línea" },
     { "type": "checkbox", "id": "show_note", "label": "Mostrar campo de nota del pedido", "default": false }
   ]
 }

@@ -39,11 +39,11 @@
         -%}
         {%- unless skip -%}
           <li>
-            <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title }}</a>
+            <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% elsif link.child_current %} class="is-current"{% endif %}>{{ link.title }}</a>
             {%- if link.links.size > 0 -%}
               <ul class="menu-list__sub">
                 {%- for child in link.links -%}
-                  <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+                  <li><a href="{{ child.url }}"{% if child.current %} aria-current="page"{% endif %}>{{ child.title }}</a></li>
                 {%- endfor -%}
               </ul>
             {%- endif -%}
@@ -60,6 +60,14 @@
   <button type="button" class="menu-about" data-open="about">
     <span class="menu-about__icon">{% render 'icon', name: 'info' %}</span>
     <span class="menu-about__text"><strong>{{ s.about_label | default: 'Quiénes somos' }}</strong></span>
+    {% render 'icon', name: 'chevron-right' %}
+  </button>
+{%- endif -%}
+
+{%- if s.show_help -%}
+  <button type="button" class="menu-about" data-open="help">
+    <span class="menu-about__icon">{% render 'icon', name: 'help' %}</span>
+    <span class="menu-about__text"><strong>{{ s.help_label | default: 'Ayuda' }}</strong></span>
     {% render 'icon', name: 'chevron-right' %}
   </button>
 {%- endif -%}

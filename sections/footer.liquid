@@ -95,6 +95,15 @@
         &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
       {%- endif -%}
     </p>
+    {%- if section.settings.credit != blank -%}
+      <p class="site-footer__credit">
+        {%- if section.settings.credit_url != blank -%}
+          <a href="{{ section.settings.credit_url }}" target="_blank" rel="noopener">{{ section.settings.credit }}</a>
+        {%- else -%}
+          {{ section.settings.credit }}
+        {%- endif -%}
+      </p>
+    {%- endif -%}
     {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
       <ul class="payment-icons" role="list">
         {%- for type in shop.enabled_payment_types -%}
@@ -132,6 +141,17 @@
       "type": "text",
       "id": "copyright",
       "label": "Texto de derechos (opcional)"
+    },
+    {
+      "type": "text",
+      "id": "credit",
+      "label": "Crédito de desarrollo",
+      "default": "Desarrollado por Nomad Studio CR"
+    },
+    {
+      "type": "url",
+      "id": "credit_url",
+      "label": "Enlace del crédito (opcional)"
     },
     {
       "type": "header",

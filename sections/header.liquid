@@ -29,7 +29,7 @@
   {%- endif %}
 {%- endstyle -%}
 
-<header class="site-header{% if s.sticky %} site-header--sticky{% endif %}" data-site-header>
+<header class="site-header{% if s.sticky %} site-header--sticky{% endif %}{% if s.scroll_shadow %} site-header--shadow{% endif %}{% if s.scroll_shrink %} site-header--shrink{% endif %}" data-site-header>
   <button type="button" class="icon-button header__menu" data-open="menu" aria-label="Abrir menú" aria-controls="MenuDrawer">
     {% render 'icon', name: 'menu' %}
   </button>
@@ -53,10 +53,12 @@
   </a>
 
   <div class="header__actions">
-    <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">
-      {% render 'icon', name: 'search' %}
-    </button>
-    {%- if s.show_account -%}
+    {%- if s.show_search -%}
+      <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">
+        {% render 'icon', name: 'search' %}
+      </button>
+    {%- endif -%}
+    {%- if s.show_account_top -%}
       {%- if customer -%}
         <button type="button" class="header__account header__account--in" data-open="account" aria-label="Mi cuenta">
           {% render 'icon', name: 'user' %}
@@ -69,10 +71,12 @@
         </a>
       {%- endif -%}
     {%- endif -%}
-    <a href="{{ routes.cart_url }}" class="icon-button header__cart" data-open-cart aria-label="Ver carrito">
-      {% render 'icon', name: 'cart' %}
-      <span class="count-bubble" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
-    </a>
+    {%- if s.show_cart_top -%}
+      <a href="{{ routes.cart_url }}" class="icon-button header__cart" data-open-cart aria-label="Ver carrito">
+        {% render 'icon', name: 'cart' %}
+        <span class="count-bubble" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+      </a>
+    {%- endif -%}
   </div>
 </header>
 
@@ -284,9 +288,46 @@
       "default": "#263d25"
     },
     {
+      "type": "header",
+      "content": "Encabezado fijo y botones"
+    },
+    {
       "type": "checkbox",
       "id": "sticky",
       "label": "Encabezado fijo al hacer scroll",
+      "info": "El contenido pasa por debajo del encabezado.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_shadow",
+      "label": "Sombra suave al bajar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_shrink",
+      "label": "Encabezado más compacto al bajar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Botón de buscar (a la derecha del logo)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_top",
+      "label": "Botón de carrito arriba (solo computadora)",
+      "info": "En celular el carrito ya está en la barra de abajo.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account_top",
+      "label": "Botón de iniciar sesión arriba (solo computadora)",
+      "info": "La cuenta siempre está disponible dentro del menú.",
       "default": false
     },
     {
@@ -296,7 +337,7 @@
     {
       "type": "checkbox",
       "id": "show_account",
-      "label": "Mostrar botón de cuenta",
+      "label": "Mostrar cuenta dentro del menú",
       "default": true
     },
     {
@@ -333,6 +374,18 @@
       "id": "show_about",
       "label": "Mostrar \"Quiénes somos\" en el menú",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_help",
+      "label": "Mostrar \"Ayuda\" en el menú",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "help_label",
+      "label": "Ayuda: texto",
+      "default": "Ayuda"
     },
     {
       "type": "text",

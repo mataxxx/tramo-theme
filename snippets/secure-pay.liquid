@@ -1,0 +1,13 @@
+{%- comment -%}
+  Sello de pago seguro + métodos de pago. Parámetros: text (string)
+{%- endcomment -%}
+<div class="secure-pay">
+  <p class="secure-pay__text">{% render 'icon', name: 'lock' %} <span>{{ text | default: 'Pagos seguros en línea' }}</span></p>
+  {%- if shop.enabled_payment_types.size > 0 -%}
+    <ul class="payment-icons payment-icons--small" role="list">
+      {%- for type in shop.enabled_payment_types -%}
+        <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</div>
