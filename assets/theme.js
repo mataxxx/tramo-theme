@@ -165,6 +165,24 @@
     setH(); onScroll();
   })();
 
+  /* Categorías: al bajar se hacen pequeñas y se quedan pegadas bajo el header */
+  (function stickyCats() {
+    var sec = $('.cats-section');
+    if (!sec) return;
+    var wrap = sec.closest('.shopify-section') || sec;
+    var ticking = false;
+    function check() {
+      ticking = false;
+      var hh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
+      var stuck = (window.scrollY || 0) > 20 && wrap.getBoundingClientRect().top <= hh + 2;
+      sec.classList.toggle('is-compact', stuck);
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(check); } }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    check();
+  })();
+
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Enter' && event.target.matches && event.target.matches('[data-line-qty], [data-line-grams]')) {
       event.preventDefault();

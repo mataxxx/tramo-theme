@@ -1418,3 +1418,17 @@ a.header__user { text-decoration: none; color: inherit; }
 
 /* Ronda 34 */
 .cats-section { margin-top: 26px; }
+
+/* Ronda 35: categorías compactas pegadas bajo el header */
+.shopify-section:has(> .cats-section) { position: sticky; top: var(--header-h, 0px); z-index: 29; }
+.cats-section { background: var(--color-surface); margin-bottom: 8px; transition: padding .2s ease; }
+.cats-section .category-heading { transition: opacity .15s, max-height .2s, padding .2s; max-height: 80px; overflow: hidden; }
+.cats-section.is-compact { margin-top: 0; margin-bottom: 0; padding-bottom: 2px; box-shadow: 0 6px 14px rgba(38,61,37,.10); }
+.cats-section.is-compact .category-heading { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; }
+.cats-section.is-compact .product-rail { padding-top: 6px; padding-bottom: 6px; gap: 8px; }
+.cats-section.is-compact .product-rail__item { flex-basis: 62px; }
+.cats-section.is-compact .cats-tile { gap: 3px; }
+.cats-section.is-compact .cats-tile__media { border-radius: 12px; box-shadow: none; }
+.cats-section.is-compact .cats-tile__media .icon { width: 22px; height: 22px; }
+.cats-section.is-compact .cats-tile__title { font-size: 10px; font-weight: 600; }
+@media (min-width: 750px) { .cats-section.is-compact .product-rail__item { flex-basis: 74px; } }
