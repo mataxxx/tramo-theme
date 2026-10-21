@@ -699,7 +699,8 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
 .duo__row { display: block; margin-bottom: 20px; }
 .duo__label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 18px 10px; color: var(--color-primary); }
 .duo__label-text { font-family: var(--font-heading); font-size: 21px; line-height: 1.1; letter-spacing: -.2px; display: inline-flex; align-items: center; gap: 10px; }
-.duo__label-text::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; }
+.duo__icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--color-primary); color: var(--color-on-primary); flex-shrink: 0; }
+.duo__icon .icon { width: 18px; height: 18px; }
 .duo__note { display: none; }
 .duo__search { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--color-primary); background: transparent; color: var(--color-primary); border-radius: 999px; padding: 6px 12px; font-size: 13px; flex-shrink: 0; }
 .duo__search .icon { width: 15px; height: 15px; }
@@ -707,7 +708,9 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
   .duo__row { display: grid; grid-template-columns: 200px minmax(0, 1fr); align-items: stretch; margin-bottom: 26px; }
   .duo__label { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 8px; margin-left: 3.5vw; padding: 18px 16px; background: linear-gradient(160deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 70%, #000)); color: var(--color-on-primary); border-radius: 14px; }
   .duo__label-text { font-size: 22px; overflow-wrap: anywhere; }
-  .duo__label-text::before { display: none; }
+  .duo__icon { background: rgba(255,255,255,.18); width: 38px; height: 38px; }
+  .duo__icon .icon { width: 21px; height: 21px; }
+  .duo__label-text { flex-direction: column; align-items: flex-start; }
   .duo__note { display: block; opacity: .8; font-size: 13px; }
   .duo__search { border-color: rgba(255,255,255,.7); color: inherit; margin-top: 6px; }
   .duo .product-rail { padding-left: 18px; }

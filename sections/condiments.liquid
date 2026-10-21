@@ -14,6 +14,8 @@
       assign label_key = 'label_' | append: n
       assign note_key = 'note_' | append: n
       assign noun_key = 'search_noun_' | append: n
+      assign icon_key = 'icon_' | append: n
+      assign icon_name = section.settings[icon_key]
       assign coll = section.settings[coll_key]
       assign label = section.settings[label_key]
       if label == blank and coll != blank
@@ -22,7 +24,10 @@
     -%}
     <div class="duo__row">
       <div class="duo__label">
-        <span class="duo__label-text">{{ label }}</span>
+        <span class="duo__label-text">
+          {%- if icon_name != 'none' and icon_name != blank -%}<span class="duo__icon">{% render 'icon', name: icon_name %}</span>{%- endif -%}
+          <span>{{ label }}</span>
+        </span>
         {%- if section.settings[note_key] != blank -%}<small class="duo__note">{{ section.settings[note_key] }}</small>{%- endif -%}
         {%- if coll != blank -%}
           <button
@@ -104,6 +109,42 @@
       "default": "Condimentos de la casa"
     },
     {
+      "type": "select",
+      "id": "icon_1",
+      "label": "Icono",
+      "options": [
+        {
+          "value": "house",
+          "label": "Casa"
+        },
+        {
+          "value": "globe",
+          "label": "Mundo"
+        },
+        {
+          "value": "leaf",
+          "label": "Hoja"
+        },
+        {
+          "value": "flame",
+          "label": "Llama"
+        },
+        {
+          "value": "star",
+          "label": "Estrella"
+        },
+        {
+          "value": "heart",
+          "label": "Corazón"
+        },
+        {
+          "value": "none",
+          "label": "Sin icono"
+        }
+      ],
+      "default": "house"
+    },
+    {
       "type": "text",
       "id": "note_1",
       "label": "Texto pequeño (opcional)",
@@ -129,6 +170,42 @@
       "id": "label_2",
       "label": "Nombre del bloque",
       "default": "Condimentos del mundo"
+    },
+    {
+      "type": "select",
+      "id": "icon_2",
+      "label": "Icono",
+      "options": [
+        {
+          "value": "house",
+          "label": "Casa"
+        },
+        {
+          "value": "globe",
+          "label": "Mundo"
+        },
+        {
+          "value": "leaf",
+          "label": "Hoja"
+        },
+        {
+          "value": "flame",
+          "label": "Llama"
+        },
+        {
+          "value": "star",
+          "label": "Estrella"
+        },
+        {
+          "value": "heart",
+          "label": "Corazón"
+        },
+        {
+          "value": "none",
+          "label": "Sin icono"
+        }
+      ],
+      "default": "globe"
     },
     {
       "type": "text",
