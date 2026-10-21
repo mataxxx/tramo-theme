@@ -1,4 +1,7 @@
 {%- style -%}
+  #shopify-section-{{ section.id }} { padding-top: {{ section.settings.space_top | default: 0 }}px; padding-bottom: {{ section.settings.space_bottom | default: 0 }}px; }
+{%- endstyle -%}
+{%- style -%}
   #shopify-section-{{ section.id }} .site-footer {
     {%- if section.settings.bg_color != blank %} background: {{ section.settings.bg_color }};{% endif %}
     {%- if section.settings.text_color != blank %} color: {{ section.settings.text_color }};{% endif %}
@@ -243,6 +246,30 @@
       "id": "about_label",
       "label": "Texto del enlace",
       "default": "Quiénes somos"
+    },
+    {
+      "type": "header",
+      "content": "Espacio"
+    },
+    {
+      "type": "range",
+      "id": "space_top",
+      "label": "Espacio arriba",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "space_bottom",
+      "label": "Espacio abajo",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
     }
   ],
   "blocks": [

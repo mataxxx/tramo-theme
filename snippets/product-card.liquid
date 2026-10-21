@@ -1,15 +1,45 @@
 {%- comment -%}
   Tarjeta de producto. Parámetros: product, show_quick_add (bool), lazy (bool)
+  Muestra "Desde" + el precio de la presentación más barata (sin contar "A granel", que se cobra por 10 g).
 {%- endcomment -%}
 {%- liquid
+  assign pick = nil
+  assign min_price = 0
+  assign max_price = 0
+  assign counted = 0
+  for v in product.variants
+    assign v_is_bulk = false
+    if v.options contains settings.bulk_variant_name
+      assign v_is_bulk = true
+    endif
+    if v_is_bulk == false
+      assign counted = counted | plus: 1
+      if counted == 1 or v.price < min_price
+        assign min_price = v.price
+      endif
+      if v.price > max_price
+        assign max_price = v.price
+      endif
+      if v.available
+        if pick == nil or v.price < pick.price
+          assign pick = v
+        endif
+      endif
+    endif
+  endfor
   assign first_variant = product.selected_or_first_available_variant
-  assign first_is_bulk = false
-  if first_variant.options contains settings.bulk_variant_name
-    assign first_is_bulk = true
+  assign shown = pick | default: first_variant
+  assign shown_is_bulk = false
+  if shown.options contains settings.bulk_variant_name
+    assign shown_is_bulk = true
+  endif
+  assign show_from = false
+  if counted > 1 and min_price < max_price
+    assign show_from = true
   endif
   assign subtitle = ''
   unless product.has_only_default_variant
-    assign subtitle = first_variant.title
+    assign subtitle = shown.title
   endunless
 -%}
 <article class="product-card{% unless product.available %} product-card--sold-out{% endunless %}" data-product-card>
@@ -42,13 +72,17 @@
       <p class="product-card__subtitle">{{ subtitle }}</p>
     {%- endif -%}
     <div class="product-card__row">
-      {% render 'price', product: product, variant: first_variant %}
+      <div class="price{% if shown.compare_at_price > shown.price %} price--sale{% endif %}" data-price>
+        {%- if show_from -%}<span class="price__from">Desde</span>{%- endif -%}
+        {%- if shown.compare_at_price > shown.price -%}<s class="price__compare">{{ shown.compare_at_price | money }}</s>{%- endif -%}
+        <strong class="price__current">{{ shown.price | money }}</strong>
+      </div>
       {%- if show_quick_add and product.available -%}
-        {%- if product.has_only_default_variant or first_is_bulk == false -%}
+        {%- if product.has_only_default_variant or shown_is_bulk == false -%}
           <button
             type="button"
             class="quick-add"
-            data-quick-add="{{ first_variant.id }}"
+            data-quick-add="{{ shown.id }}"
             aria-label="Agregar {{ product.title | escape }} al carrito"
           >
             {% render 'icon', name: 'plus' %}

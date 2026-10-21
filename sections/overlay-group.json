@@ -23,28 +23,32 @@
           "type": "category",
           "settings": {
             "collection": "frontpage",
-            "title": "Especias"
+            "title": "Especias",
+            "search_noun": "especia"
           }
         },
         "c2": {
           "type": "category",
           "settings": {
             "collection": "test2",
-            "title": "Semillas & Granos"
+            "title": "Semillas & Granos",
+            "search_noun": "semilla"
           }
         },
         "c3": {
           "type": "category",
           "settings": {
             "collection": "frutas-otros-deshidratados",
-            "title": "Frutas & otros deshidratados"
+            "title": "Frutas & otros deshidratados",
+            "search_noun": "fruta"
           }
         },
         "c4": {
           "type": "category",
           "settings": {
             "collection": "insumos-para-reposteria",
-            "title": "Insumos para Repostería"
+            "title": "Insumos para Repostería",
+            "search_noun": "insumo"
           }
         }
       },

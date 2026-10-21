@@ -54,7 +54,7 @@
             {%- if block.settings.link != blank -%}
               <a href="{{ block.settings.link }}" class="category-tile" {{ block.shopify_attributes }}>{{ tile_inner }}</a>
             {%- elsif coll != blank -%}
-              <button type="button" class="category-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ tile_title | escape }}" {{ block.shopify_attributes }}>{{ tile_inner }}</button>
+              <button type="button" class="category-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ tile_title | escape }}" data-search-question="¿Qué {{ block.settings.search_noun | default: 'producto' | escape }} estás buscando?" {{ block.shopify_attributes }}>{{ tile_inner }}</button>
             {%- else -%}
               <span class="category-tile" {{ block.shopify_attributes }}>{{ tile_inner }}</span>
             {%- endif -%}
@@ -172,6 +172,13 @@
           "id": "link",
           "label": "Enlace (opcional)",
           "info": "Si pones un enlace, la tarjeta lleva a esa página en vez de buscar."
+        },
+        {
+          "type": "text",
+          "id": "search_noun",
+          "label": "Nombre en singular para el buscador",
+          "info": "Dirá: ¿Qué [nombre] estás buscando? Ej: especia",
+          "default": "producto"
         }
       ]
     }

@@ -527,8 +527,8 @@
     $$('[data-sort]', els.sort).forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-sort') === 'default'); });
 
     if (scope) {
-      els.title.textContent = 'Buscar en ' + scope.title;
-      els.input.placeholder = 'Buscar en ' + scope.title + '...';
+      els.title.textContent = scope.question || ('Buscar en ' + scope.title);
+      els.input.placeholder = 'Escribe el nombre...';
       els.global.hidden = true;
       els.sort.hidden = false;
       els.results.innerHTML = '<p class="search-empty">Cargando…</p>';
@@ -537,13 +537,17 @@
         .then(parseJSON)
         .then(function (data) {
           search.items = (data.products || []).map(function (p) {
-            var v = p.variants && p.variants[0];
+            var normal = (p.variants || []).filter(function (v) { return [v.option1, v.option2, v.option3].indexOf(BULK.name) === -1; });
+            var list = normal.length ? normal : (p.variants || []);
+            var prices = list.map(function (v) { return toCents(v.price); });
+            var min = prices.length ? Math.min.apply(null, prices) : 0;
+            var max = prices.length ? Math.max.apply(null, prices) : 0;
             return {
               title: p.title,
               url: base + '/products/' + p.handle,
               image: sizedImage(p.images && p.images[0] && p.images[0].src, 160),
-              price: toCents(v && v.price) ,
-              sub: v ? formatMoney(toCents(v.price)) : ''
+              price: min,
+              sub: prices.length ? (min < max ? 'Desde ' : '') + formatMoney(min) : ''
             };
           });
           renderScopedResults();
@@ -883,7 +887,7 @@
     var scopeBtn = target.closest('[data-search-collection]');
     if (scopeBtn) {
       event.preventDefault();
-      openSearch({ handle: scopeBtn.getAttribute('data-search-collection'), title: scopeBtn.getAttribute('data-search-title') || '' });
+      openSearch({ handle: scopeBtn.getAttribute('data-search-collection'), title: scopeBtn.getAttribute('data-search-title') || '', question: scopeBtn.getAttribute('data-search-question') || '' });
       return;
     }
 

@@ -1,4 +1,7 @@
 {%- style -%}
+  #shopify-section-{{ section.id }} { padding-top: {{ section.settings.space_top | default: 0 }}px; padding-bottom: {{ section.settings.space_bottom | default: 0 }}px; }
+{%- endstyle -%}
+{%- style -%}
   {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .category-title' -%}
   {% render 'text-style', s: section.settings, p: 'heading_style', sel: text_sel %}
 {%- endstyle -%}
@@ -21,6 +24,7 @@
         class="category-search"
         data-search-collection="{{ coll.handle }}"
         data-search-title="{{ heading | escape }}"
+        data-search-question="¿Qué {{ section.settings.search_noun | default: 'producto' | escape }} estás buscando?"
       >
         {% render 'icon', name: 'search' %}
         <span>{{ section.settings.search_prefix }} {{ heading }}</span>
@@ -59,7 +63,7 @@
     {%- endif -%}
   </div>
 
-  {%- if section.settings.show_expand and coll != blank and coll.products.size > section.settings.products_to_show -%}
+  {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
     <div class="category-more" data-collection-more>
       <button type="button" class="button button--outline" data-collection-expand>
         {{ section.settings.expand_label }} {{ heading }}
@@ -120,6 +124,13 @@
       "label": "Texto del botón de búsqueda",
       "info": "Se muestra: texto + nombre de la categoría. Ej: Buscar en Especias",
       "default": "Buscar en"
+    },
+    {
+      "type": "text",
+      "id": "search_noun",
+      "label": "Nombre en singular para el buscador",
+      "info": "Al abrir la búsqueda dirá: ¿Qué [nombre] estás buscando? Ej: especia, semilla, fruta",
+      "default": "producto"
     },
     {
       "type": "checkbox",
@@ -188,6 +199,30 @@
       "type": "color",
       "id": "heading_style_color",
       "label": "Color"
+    },
+    {
+      "type": "header",
+      "content": "Espacio"
+    },
+    {
+      "type": "range",
+      "id": "space_top",
+      "label": "Espacio arriba",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "space_bottom",
+      "label": "Espacio abajo",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
     }
   ],
   "presets": [
