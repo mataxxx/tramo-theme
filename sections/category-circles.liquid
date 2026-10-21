@@ -13,6 +13,8 @@
         <span class="cats-tile__media">
           {%- if img != blank -%}
             {{ img | image_url: width: 400 | image_tag: widths: '200, 400', sizes: '225px', loading: 'lazy', alt: t }}
+          {%- else -%}
+            {% render 'icon', name: block.settings.icon %}
           {%- endif -%}
         </span>
         <span class="cats-tile__title">{{ t }}</span>
@@ -81,7 +83,7 @@
       "settings": [
         { "type": "collection", "id": "collection", "label": "Colección" },
         { "type": "text", "id": "title", "label": "Nombre (opcional)", "info": "Si lo dejas vacío usa el de la colección." },
-        { "type": "image_picker", "id": "image", "label": "Foto (opcional)", "info": "Sube un PNG con fondo transparente (producto recortado). Sin foto solo se ve el nombre." },
+        { "type": "image_picker", "id": "image", "label": "Foto (opcional)", "info": "Sube un PNG con fondo transparente (producto recortado). Sin foto se muestra el ícono." },
         {
           "type": "select",
           "id": "icon",
