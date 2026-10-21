@@ -528,5 +528,45 @@
         "label": "YouTube"
       }
     ]
+  },
+  {
+    "name": "Pop-up de categoría",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Para que tu diseñador personalice el fondo y el espacio bajo el título de las ventanas de categoría."
+      },
+      {
+        "type": "image_picker",
+        "id": "category_bg",
+        "label": "Textura o fondo del pop-up",
+        "info": "Se usa como fondo detrás de los productos."
+      },
+      {
+        "type": "range",
+        "id": "category_bg_opacity",
+        "label": "Intensidad del fondo",
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "image_picker",
+        "id": "category_banner",
+        "label": "Imagen decorativa bajo el título (opcional)"
+      },
+      {
+        "type": "range",
+        "id": "category_art_height",
+        "label": "Espacio bajo el título",
+        "min": 0,
+        "max": 240,
+        "step": 10,
+        "unit": "px",
+        "default": 70
+      }
+    ]
   }
 ]

@@ -1,13 +1,19 @@
 <div class="drawer drawer--category" id="CategoryModal" data-drawer="category" role="dialog" aria-modal="true" aria-label="Categoría" hidden>
   <div class="drawer__backdrop" data-drawer-close></div>
-  <section class="category-modal">
+  <section class="category-modal"{% if settings.category_bg != blank %} style="--cat-bg: url('{{ settings.category_bg | image_url: width: 1400 }}'); --cat-bg-opacity: {{ settings.category_bg_opacity | default: 100 | divided_by: 100.0 }}"{% endif %} data-art="1">
     <header class="category-modal__head">
       <h2 class="category-modal__title" data-category-modal-title></h2>
       <div class="category-modal__tools">
         <button type="button" class="icon-button category-modal__lupa" data-category-search-toggle aria-label="Buscar en la categoría" aria-expanded="false">{% render 'icon', name: 'search' %}</button>
+        <button type="button" class="icon-button category-modal__lupa" data-category-filter-toggle aria-label="Filtros y orden" aria-expanded="false">{% render 'icon', name: 'filter' %}</button>
         <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
       </div>
     </header>
+    <div class="category-modal__art" data-category-art style="height: {{ settings.category_art_height | default: 70 }}px">
+      {%- if settings.category_banner != blank -%}
+        {{ settings.category_banner | image_url: width: 1400 | image_tag: loading: 'lazy', alt: '' }}
+      {%- endif -%}
+    </div>
     <div class="category-modal__searchwrap" data-category-searchwrap hidden>
       <div class="search-field category-modal__field">
         {% render 'icon', name: 'search' %}
@@ -15,7 +21,7 @@
       </div>
     </div>
     <div class="category-modal__filters">
-      <div class="search-sort" data-category-sort>
+      <div class="search-sort" data-category-sort hidden>
         <span>Ordenar por</span>
         <button type="button" class="is-active" data-csort="default">Destacados</button>
         <button type="button" data-csort="title">A–Z</button>

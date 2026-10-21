@@ -14,7 +14,20 @@
       "settings": {
         "heading": "DE NUESTRA\nTRADICIÓN A\nTU MESA",
         "text": "Especias, ingredientes\ny sabores del mundo\ndesde 1946."
-      }
+      },
+      "blocks": {
+        "s1": {
+          "type": "slide",
+          "settings": {
+            "kicker": "Nuestra historia",
+            "heading": "DESDE 1946",
+            "text": "Tres generaciones llevando\nlas mejores especias a tu mesa."
+          }
+        }
+      },
+      "block_order": [
+        "s1"
+      ]
     },
     "especias": {
       "type": "featured-collection",

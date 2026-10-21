@@ -559,6 +559,7 @@
 
   /* ---------- Flechas de carruseles ------------------------------------- */
   var ARROW_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+  var activeRail = null;
   function initRails(scope) {
     $$('.product-rail', scope || document).forEach(function (rail) {
       if (rail.parentNode.classList.contains('rail-wrap')) return;
@@ -576,6 +577,13 @@
         next.classList.toggle('is-visible', max > 6 && rail.scrollLeft < max - 6);
         prev.classList.toggle('is-visible', rail.scrollLeft > 6);
       }
+      function activate() {
+        if (activeRail && activeRail !== rail && activeRail.scrollLeft > 4) activeRail.scrollTo({ left: 0, behavior: 'smooth' });
+        activeRail = rail;
+      }
+      wrap.addEventListener('pointerdown', activate, { passive: true });
+      wrap.addEventListener('touchstart', activate, { passive: true });
+      wrap.addEventListener('mouseenter', activate);
       next.addEventListener('click', function () { rail.scrollBy({ left: rail.clientWidth * 0.8, behavior: 'smooth' }); });
       prev.addEventListener('click', function () { rail.scrollBy({ left: -rail.clientWidth * 0.8, behavior: 'smooth' }); });
       rail.addEventListener('scroll', update, { passive: true });
@@ -1257,6 +1265,8 @@
   function catSetup(opts) {
     var e = catEls();
     cat.sort = 'default'; cat.desc = false; cat.tag = '';
+    e.sort.hidden = true;
+    var ft = $('[data-category-filter-toggle]'); if (ft) ft.setAttribute('aria-expanded', 'false');
     e.title.textContent = opts.title || '';
     e.input.value = '';
     e.input.placeholder = opts.question || 'Buscar...';
@@ -1349,6 +1359,14 @@
   document.addEventListener('click', function (event) {
     var t = event.target;
     if (!t.closest) return;
+    var ftog = t.closest('[data-category-filter-toggle]');
+    if (ftog) {
+      var fe = catEls();
+      var fopen = fe.sort.hidden;
+      fe.sort.hidden = !fopen;
+      ftog.setAttribute('aria-expanded', fopen ? 'true' : 'false');
+      return;
+    }
     var tog = t.closest('[data-category-search-toggle]');
     if (tog) {
       var e = catEls();
@@ -1522,4 +1540,33 @@
 
   // Editor de temas de Shopify: volver a iniciar al recargar una sección.
   document.addEventListener('shopify:section:load', function (event) { initProducts(event.target); });
+
+  /* ---------- Portada con diapositivas --------------------------------- */
+  function initHeroSlider() {
+    $$('[data-hero-slider]').forEach(function (box) {
+      if (box.getAttribute('data-ready')) return;
+      box.setAttribute('data-ready', '1');
+      var track = $('[data-hero-track]', box);
+      var dots = $$('[data-hero-dot]', box);
+      var slides = track.children;
+      if (!dots.length || slides.length < 2) return;
+      var secs = parseInt(box.getAttribute('data-autoplay'), 10);
+      var paused = false, timer = null;
+      function current() { return Math.round(track.scrollLeft / track.clientWidth); }
+      function mark() { var c = current(); dots.forEach(function (d, i) { d.classList.toggle('is-active', i === c); }); }
+      function go(i) { track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' }); }
+      track.addEventListener('scroll', function () { window.requestAnimationFrame(mark); }, { passive: true });
+      dots.forEach(function (d, i) { d.addEventListener('click', function () { go(i); }); });
+      ['touchstart', 'pointerdown', 'mouseenter'].forEach(function (ev) { box.addEventListener(ev, function () { paused = true; }, { passive: true }); });
+      ['mouseleave', 'touchend'].forEach(function (ev) { box.addEventListener(ev, function () { paused = false; }, { passive: true }); });
+      if (secs > 0) {
+        timer = setInterval(function () {
+          if (paused || document.hidden) return;
+          go((current() + 1) % slides.length);
+        }, secs * 1000);
+      }
+    });
+  }
+  initHeroSlider();
+  document.addEventListener('shopify:section:load', initHeroSlider);
 })();
