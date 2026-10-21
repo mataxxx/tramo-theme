@@ -751,7 +751,7 @@
     document.body.classList.add('has-expanded');
     grid.hidden = false;
     $('[data-collection-back]', section).hidden = false;
-    window.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function collapseCollection(section) {
@@ -761,7 +761,7 @@
     document.body.classList.remove('has-expanded');
     $('[data-collection-grid]', section).hidden = true;
     $('[data-collection-back]', section).hidden = true;
-    window.scrollTo({ top: expandedFrom || 0 });
+    window.scrollTo({ top: expandedFrom || 0, behavior: 'instant' });
   }
 
   /* ---------- Cuenta dentro del menú (copia la ficha de cuenta) ---------- */

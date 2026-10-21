@@ -145,19 +145,11 @@
             "value": "+75",
             "label": "Años de tradición"
           }
-        },
-        "f3": {
-          "type": "fact",
-          "settings": {
-            "value": "CR",
-            "label": "Hecho en Costa Rica"
-          }
         }
       },
       "block_order": [
         "f1",
-        "f2",
-        "f3"
+        "f2"
       ],
       "settings": {}
     }

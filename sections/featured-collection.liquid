@@ -16,6 +16,12 @@
   endif
 -%}
 <section class="category-section" data-category-section>
+  <div class="category-back" data-collection-back hidden>
+    <button type="button" class="category-back__btn" data-collection-collapse>
+      {% render 'icon', name: 'arrow-left' %} <span>{{ section.settings.back_label }}</span>
+    </button>
+  </div>
+
   <div class="category-heading">
     <h2 class="category-title">{{ heading }}</h2>
     {%- if section.settings.show_search and coll != blank -%}
@@ -30,12 +36,6 @@
         <span>{{ section.settings.search_prefix }} {{ heading }}</span>
       </button>
     {%- endif -%}
-  </div>
-
-  <div class="category-back" data-collection-back hidden>
-    <button type="button" class="category-back__btn" data-collection-collapse>
-      {% render 'icon', name: 'arrow-left' %} <span>{{ section.settings.back_label }}</span>
-    </button>
   </div>
 
   <div class="product-rail" data-collection-rail tabindex="0" aria-label="{{ heading | escape }}">
@@ -65,8 +65,8 @@
 
   {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
     <div class="category-more" data-collection-more>
-      <button type="button" class="button button--outline" data-collection-expand>
-        {{ section.settings.expand_label }} {{ heading }}
+      <button type="button" class="button button--outline button--small button--pill" data-collection-expand>
+        {{ section.settings.expand_label }} {{ heading | downcase }}
         {% render 'icon', name: 'chevron-down' %}
       </button>
     </div>
@@ -142,7 +142,8 @@
       "type": "text",
       "id": "expand_label",
       "label": "Texto del botón",
-      "default": "Ver toda la colección"
+      "default": "Ver todas las",
+      "info": "Se muestra: texto + nombre de la categoría. Ej: Ver todas las especias"
     },
     {
       "type": "range",

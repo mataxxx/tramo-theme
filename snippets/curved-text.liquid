@@ -1,0 +1,30 @@
+{%- comment -%}
+  Texto con curva tipo arco (estilo retro). Parámetros: text, curve (0 = recto, hasta 10)
+  Cada línea (salto de renglón) se curva por separado.
+{%- endcomment -%}
+{%- liquid
+  assign step = curve | default: 0 | times: 0.6
+  assign safe_text = text | escape | newline_to_br
+-%}
+{%- if step == 0 -%}
+  {{ safe_text }}
+{%- else -%}
+  {%- assign lines = safe_text | split: '<br />' -%}
+  {%- for line in lines -%}
+    {%- assign clean = line | strip -%}
+    {%- if clean != blank -%}
+      {%- assign chars = clean | split: '' -%}
+      {%- assign n = chars.size -%}
+      {%- assign center = n | minus: 1 | divided_by: 2.0 -%}
+      <span class="curve__line" aria-hidden="true">
+        {%- for ch in chars -%}
+          {%- assign off = forloop.index0 | minus: center -%}
+          {%- assign rot = off | times: step -%}
+          {%- assign dy = off | times: off | times: step | times: 0.0025 -%}
+          <span class="curve__ch" style="transform: translateY({{ dy }}em) rotate({{ rot }}deg)">{% if ch == ' ' %}&nbsp;{% else %}{{ ch }}{% endif %}</span>
+        {%- endfor -%}
+      </span>
+    {%- endif -%}
+  {%- endfor -%}
+  <span class="visually-hidden">{{ text | strip_newlines | escape }}</span>
+{%- endif -%}

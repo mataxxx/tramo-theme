@@ -38,11 +38,16 @@
         "heading": "Insumos para Repostería",
         "search_noun": "insumo"
       }
+    },
+    "condimentos": {
+      "type": "condiments",
+      "settings": {}
     }
   },
   "order": [
     "hero",
     "especias",
+    "condimentos",
     "semillas",
     "frutas",
     "reposteria"

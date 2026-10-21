@@ -39,9 +39,9 @@
       {{ s.logo | image_url: width: 800 | image_tag: widths: '200, 300, 400, 600, 800', sizes: '(min-width: 750px) 400px, 200px', class: 'brand-mark__logo', loading: 'eager', alt: shop.name }}
     {%- else -%}
       {%- if s.brand_title != blank -%}
-        <strong class="brand-mark__title">{{ s.brand_title | escape | newline_to_br }}</strong>
+        <strong class="brand-mark__title">{% render 'curved-text', text: s.brand_title, curve: s.brand_curve %}</strong>
       {%- else -%}
-        <strong class="brand-mark__title">{{ shop.name }}</strong>
+        <strong class="brand-mark__title">{% render 'curved-text', text: shop.name, curve: s.brand_curve %}</strong>
       {%- endif -%}
       {%- if s.brand_subtitle != blank -%}
         <span class="brand-mark__subtitle">{{ s.brand_subtitle }}</span>
@@ -55,9 +55,6 @@
   <div class="header__actions">
     <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">
       {% render 'icon', name: 'search' %}
-    </button>
-    <button type="button" class="icon-button header__videos" data-open="reels" data-reels-view="grid" aria-label="Videos">
-      {% render 'icon', name: 'video' %}
     </button>
     {%- if s.show_account -%}
       {%- if customer -%}
@@ -149,6 +146,16 @@
       "id": "brand_note",
       "label": "Nota pequeña",
       "default": "Desde 1946"
+    },
+    {
+      "type": "range",
+      "id": "brand_curve",
+      "label": "Curvatura del texto de marca (estilo retro)",
+      "info": "0 = recto. Sube para que el texto haga un arco.",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 4
     },
     {
       "type": "header",
