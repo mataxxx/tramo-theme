@@ -48,10 +48,6 @@
         "search_noun": "insumo"
       }
     },
-    "condimentos": {
-      "type": "condiments",
-      "settings": {}
-    },
     "trust": {
       "type": "trust-bar",
       "blocks": {
@@ -75,13 +71,35 @@
         "t2"
       ],
       "settings": {}
+    },
+    "condimentos_casa": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "condimentos-de-la-casa",
+        "heading": "Condimentos de la casa",
+        "search_noun": "condimento",
+        "icon": "house-hand",
+        "popup_search": "icon"
+      }
+    },
+    "condimentos_mundo": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "condimentos-del-mundo",
+        "heading": "Condimentos del mundo",
+        "search_noun": "condimento",
+        "icon": "globe-hand",
+        "popup_search": "icon",
+        "filter_tags": "África, Asia, Europa, América, Medio Oriente"
+      }
     }
   },
   "order": [
     "hero",
     "trust",
     "especias",
-    "condimentos",
+    "condimentos_casa",
+    "condimentos_mundo",
     "semillas",
     "frutas",
     "reposteria"

@@ -1247,8 +1247,10 @@
     e.title.textContent = opts.title || '';
     e.input.value = '';
     e.input.placeholder = opts.question || 'Buscar...';
-    e.wrap.hidden = true;
-    e.toggle.setAttribute('aria-expanded', 'false');
+    var bar = opts.search !== 'icon';
+    e.wrap.hidden = !bar;
+    e.toggle.hidden = bar;
+    e.toggle.setAttribute('aria-expanded', bar ? 'true' : 'false');
     e.empty.hidden = true;
     $$('[data-csort]', e.sort).forEach(function (b) {
       b.classList.toggle('is-active', b.getAttribute('data-csort') === 'default');
@@ -1303,7 +1305,7 @@
     var scope = opener.closest('[data-category-scope]');
     var tpl = scope && $('[data-category-template]', scope);
     if (!tpl) { var href = opener.getAttribute('href'); if (href) window.location.href = href; return; }
-    catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters') });
+    catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters'), search: scope.getAttribute('data-category-search') });
     var tmp = document.createElement('div');
     tmp.appendChild(tpl.content.cloneNode(true));
     catFill(tmp.innerHTML);
@@ -1313,7 +1315,7 @@
     var scope = document.querySelector('[data-category-scope][data-category-handle="' + handle + '"]');
     var tpl = scope && $('[data-category-template]', scope);
     var filters = scope ? scope.getAttribute('data-category-filters') : '';
-    catSetup({ title: title, question: question, filters: filters });
+    catSetup({ title: title, question: question, filters: filters, search: scope ? scope.getAttribute('data-category-search') : 'bar' });
     if (tpl) {
       var tmp = document.createElement('div');
       tmp.appendChild(tpl.content.cloneNode(true));

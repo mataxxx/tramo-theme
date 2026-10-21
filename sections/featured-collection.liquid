@@ -15,9 +15,10 @@
     assign heading = 'Colección'
   endif
 -%}
-<section class="category-section" data-category-section data-category-scope data-category-handle="{{ coll.handle }}" data-category-filters="{{ section.settings.filter_tags | escape }}">
+<section class="category-section" data-category-section data-category-scope data-category-handle="{{ coll.handle }}" data-category-filters="{{ section.settings.filter_tags | escape }}" data-category-search="{{ section.settings.popup_search }}">
   <div class="category-heading">
     <h2 class="category-title">
+      {%- if section.settings.icon != 'none' and section.settings.icon != blank -%}<span class="category-title__icon">{% render 'icon', name: section.settings.icon %}</span>{%- endif -%}
       {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
         <a href="{{ coll.url }}" class="category-title__link" data-category-open data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">{{ heading }}</a>
       {%- else -%}
@@ -75,6 +76,32 @@
       "type": "collection",
       "id": "collection",
       "label": "Colección"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "Icono junto al título",
+      "options": [
+        { "value": "none", "label": "Sin icono" },
+        { "value": "house-hand", "label": "Casita" },
+        { "value": "globe-hand", "label": "Mundo" },
+        { "value": "mortar", "label": "Molcajete" },
+        { "value": "chili", "label": "Chile" },
+        { "value": "leaf", "label": "Hoja" },
+        { "value": "flame", "label": "Llama" },
+        { "value": "star", "label": "Estrella" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "popup_search",
+      "label": "Buscador en la ventana de \"Ver todo\"",
+      "options": [
+        { "value": "bar", "label": "Barra visible" },
+        { "value": "icon", "label": "Solo lupa pequeña" }
+      ],
+      "default": "bar"
     },
     {
       "type": "text",

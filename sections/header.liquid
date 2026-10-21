@@ -81,6 +81,9 @@
         </a>
       {%- endif -%}
     {%- endif -%}
+    <button type="button" class="icon-button header__menu header__menu--right" data-open="menu" aria-label="Abrir menú" aria-controls="MenuDrawer">
+      {% render 'icon', name: 'menu' %}
+    </button>
     {%- if s.show_cart_top -%}
       <a href="{{ routes.cart_url }}" class="icon-button header__cart" data-open-cart aria-label="Ver carrito">
         {% render 'icon', name: 'cart' %}

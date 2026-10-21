@@ -3,16 +3,20 @@
     {% render 'icon', name: 'home' %}
     <span>{{ section.settings.label_home }}</span>
   </a>
-  <button type="button" class="bottom-nav__item" data-open="help">
-    {% render 'icon', name: 'help' %}
-    <span>{{ section.settings.label_help }}</span>
-  </button>
   {%- if section.settings.show_videos -%}
     <button type="button" class="bottom-nav__item" data-open="reels">
       {% render 'icon', name: 'video' %}
       <span>{{ section.settings.label_videos }}</span>
     </button>
   {%- endif -%}
+  <button type="button" class="bottom-nav__item bottom-nav__search" data-open="search" aria-label="{{ section.settings.label_search | escape }}">
+    <span class="bottom-nav__bubble">{% render 'icon', name: 'search' %}</span>
+    <span>{{ section.settings.label_search }}</span>
+  </button>
+  <button type="button" class="bottom-nav__item" data-open="help">
+    {% render 'icon', name: 'help' %}
+    <span>{{ section.settings.label_help }}</span>
+  </button>
   <a href="{{ routes.cart_url }}" class="bottom-nav__item bottom-nav__cart" data-open-cart>
     {% render 'icon', name: 'cart' %}
     <span>{{ section.settings.label_cart }}</span>
@@ -34,6 +38,7 @@
   "settings": [
     { "type": "paragraph", "content": "Solo se muestra en celulares." },
     { "type": "text", "id": "label_home", "label": "Texto: inicio", "default": "Inicio" },
+    { "type": "text", "id": "label_search", "label": "Texto: buscar", "default": "Buscar" },
     { "type": "text", "id": "label_help", "label": "Texto: ayuda", "default": "Ayuda" },
     { "type": "checkbox", "id": "show_float_videos", "label": "Botón flotante de videos (solo computadora)", "default": true },
     { "type": "checkbox", "id": "show_videos", "label": "Mostrar botón de videos", "default": true },
