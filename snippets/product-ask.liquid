@@ -25,12 +25,14 @@
   </div>
   <form class="ask__form" data-ask-form>
     <input type="text" name="q" required maxlength="300" placeholder="{{ placeholder | escape }}" aria-label="Tu pregunta">
-    <button type="submit" class="button">{{ button_label }}</button>
+    <div class="ask__actions">
+      <button type="submit" class="button">{% render 'icon', name: 'sparkle' %} {{ button_label }}</button>
+      {%- if wa != blank -%}
+        <a class="button button--outline ask__wa" data-ask-wa href="https://wa.me/{{ wa }}?text={{ 'Hola, quiero preguntar sobre ' | append: product.title | url_encode }}" target="_blank" rel="noopener">
+          {% render 'icon', name: 'chat' %} {{ whatsapp_label }}
+        </a>
+      {%- endif -%}
+    </div>
   </form>
   <div class="ask__answer" data-ask-answer aria-live="polite" hidden></div>
-  {%- if wa != blank -%}
-    <a class="ask__wa" data-ask-wa href="https://wa.me/{{ wa }}?text={{ 'Hola, quiero preguntar sobre: ' | append: product.title | url_encode }}" target="_blank" rel="noopener">
-      {% render 'icon', name: 'chat' %} {{ whatsapp_label }}
-    </a>
-  {%- endif -%}
 </div>

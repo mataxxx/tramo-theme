@@ -1,14 +1,22 @@
-{%- comment -%} Video del producto (sin reproducción automática). Parámetros: product, title {%- endcomment -%}
+{%- comment -%} Video del producto en formato vertical tipo TikTok (sin reproducción automática). Parámetros: product, title {%- endcomment -%}
 {%- assign pvideo = product.metafields.custom.video.value -%}
 {%- if pvideo != blank -%}
-  <div class="pvideo">
+  <div class="pvideo" data-pvideo>
     {%- if title != blank -%}<p class="pvideo__title">{{ title }}</p>{%- endif -%}
-    <div class="product-video__frame">
-      <video controls playsinline preload="metadata" poster="{{ pvideo.preview_image | image_url: width: 900 }}">
+    <div class="pvideo__phone">
+      <video class="pvideo__video" playsinline loop preload="metadata" poster="{{ pvideo.preview_image | image_url: width: 700 }}">
         {%- for source in pvideo.sources -%}
           <source src="{{ source.url }}" type="{{ source.mime_type }}">
         {%- endfor -%}
       </video>
+      <button type="button" class="pvideo__toggle" data-pvideo-toggle aria-label="Reproducir o pausar el video">
+        <span class="pvideo__play">{% render 'icon', name: 'play' %}</span>
+      </button>
+      <button type="button" class="pvideo__mute" data-pvideo-mute aria-label="Sonido" aria-pressed="false">
+        <span data-icon-sound>{% render 'icon', name: 'sound' %}</span>
+        <span data-icon-muted hidden>{% render 'icon', name: 'mute' %}</span>
+      </button>
+      <div class="pvideo__bar"><span data-pvideo-progress></span></div>
     </div>
   </div>
 {%- endif -%}

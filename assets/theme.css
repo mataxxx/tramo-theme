@@ -734,3 +734,23 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
 .prelated__rail .product-rail__item { flex-basis: 150px; }
 .ask, .combo { grid-template-columns: minmax(0, 1fr); }
 .ask__form .button { flex-shrink: 0; }
+
+/* Ask: dos botones */
+.ask__form { display: grid; gap: 10px; }
+.ask__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ask__actions .button { flex: 1 1 140px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 12px; font-size: 14px; text-decoration: none; }
+.ask__actions .icon { width: 17px; height: 17px; }
+.ask__wa { font-weight: 600; justify-self: auto; }
+
+/* Video vertical tipo TikTok */
+.pvideo__phone { position: relative; width: min(100%, 300px); aspect-ratio: 9 / 16; margin: 0 auto; border-radius: 22px; overflow: hidden; background: #000; box-shadow: 0 14px 40px rgba(0,0,0,.22); }
+.pvideo__video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pvideo__toggle { position: absolute; inset: 0; width: 100%; border: 0; background: transparent; display: grid; place-items: center; padding: 0; }
+.pvideo__play { display: grid; place-items: center; width: 68px; height: 68px; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; backdrop-filter: blur(4px); transition: opacity .2s, transform .2s; }
+.pvideo__play .icon { width: 30px; height: 30px; margin-left: 3px; fill: currentColor; }
+.pvideo.is-playing .pvideo__play { opacity: 0; transform: scale(.8); }
+.pvideo__mute { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; padding: 0; }
+.pvideo__mute .icon { width: 19px; height: 19px; }
+.pvideo__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.3); }
+.pvideo__bar span { display: block; height: 100%; width: 0; background: #fff; }
+.pvideo__title { text-align: center; }

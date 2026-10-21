@@ -208,13 +208,13 @@
         "type": "text",
         "id": "quick_ask_title",
         "label": "Preguntas: título",
-        "default": "¿Dudas sobre este producto?"
+        "default": "Pregúntale a nuestra IA"
       },
       {
         "type": "text",
         "id": "quick_ask_text",
         "label": "Preguntas: texto",
-        "default": "Pregúntale a nuestro asistente o escríbenos por WhatsApp."
+        "default": "Resuelve tus dudas al instante, o envía tu pregunta por WhatsApp."
       },
       {
         "type": "text",
@@ -226,7 +226,7 @@
         "type": "text",
         "id": "quick_ask_button",
         "label": "Preguntas: texto del botón",
-        "default": "Preguntar"
+        "default": "Preguntar a la IA"
       },
       {
         "type": "text",
@@ -257,7 +257,7 @@
         "type": "text",
         "id": "quick_ask_whatsapp",
         "label": "Texto del botón de WhatsApp",
-        "default": "Prefiero hablar por WhatsApp"
+        "default": "Enviar por WhatsApp"
       },
       {
         "type": "checkbox",
