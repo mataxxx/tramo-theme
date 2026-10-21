@@ -1432,3 +1432,16 @@ a.header__user { text-decoration: none; color: inherit; }
 .cats-section.is-compact .cats-tile__media .icon { width: 22px; height: 22px; }
 .cats-section.is-compact .cats-tile__title { font-size: 10px; font-weight: 600; }
 @media (min-width: 750px) { .cats-section.is-compact .product-rail__item { flex-basis: 74px; } }
+
+/* Ronda 36: 4–5 visibles y animación suave */
+.cats-section, .cats-section .category-heading, .cats-section .product-rail, .cats-section .product-rail__item, .cats-section .cats-tile, .cats-section .cats-tile__media, .cats-section .cats-tile__title, .cats-section .cats-tile__media .icon { transition-duration: .4s; transition-timing-function: cubic-bezier(.22,.61,.36,1); }
+.cats-section .category-heading { transition-property: max-height, opacity, padding; }
+.cats-section .product-rail { transition-property: padding, gap; }
+.cats-section .product-rail__item { transition-property: flex-basis; }
+.cats-section .cats-tile { transition-property: gap; }
+.cats-section .cats-tile__media { transition-property: border-radius, box-shadow; }
+.cats-section .cats-tile__media .icon { transition-property: width, height; }
+.cats-section .cats-tile__title { transition-property: font-size; }
+.cats-section.is-compact .product-rail__item { flex-basis: calc((100% - 28px) / 4.5); }
+@media (min-width: 750px) { .cats-section.is-compact .product-rail__item { flex-basis: 84px; } }
+@media (prefers-reduced-motion: reduce) { .cats-section * { transition: none !important; } }

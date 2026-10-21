@@ -174,8 +174,10 @@
     function check() {
       ticking = false;
       var hh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
-      var stuck = (window.scrollY || 0) > 20 && wrap.getBoundingClientRect().top <= hh + 2;
-      sec.classList.toggle('is-compact', stuck);
+      var top = wrap.getBoundingClientRect().top;
+      var on = sec.classList.contains('is-compact');
+      var stuck = (window.scrollY || 0) > 20 && (on ? top <= hh + 14 : top <= hh + 2);
+      if (stuck !== on) sec.classList.toggle('is-compact', stuck);
     }
     function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(check); } }
     window.addEventListener('scroll', onScroll, { passive: true });
