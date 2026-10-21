@@ -389,7 +389,12 @@
       bar.className = 'sticky-add'; bar.hidden = true;
       var sb = document.createElement('button');
       sb.type = 'button'; sb.className = 'button button--full';
-      bar.appendChild(sb); host.appendChild(bar);
+      var pay = $('.pay-sentence', root);
+      if (pay) bar.appendChild(pay);
+      bar.appendChild(sb);
+      var trust = $('[data-sticky-trust]', root);
+      if (trust) { trust.hidden = false; bar.appendChild(trust); }
+      host.appendChild(bar);
       function sync() { sb.textContent = (addButton.textContent || '').replace(/\s+/g, ' ').trim(); sb.disabled = addButton.disabled; }
       sync();
       new MutationObserver(sync).observe(addButton, { childList: true, subtree: true, characterData: true, attributes: true });

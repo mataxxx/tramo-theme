@@ -568,5 +568,26 @@
         "default": 70
       }
     ]
+  },
+  {
+    "name": "Barra del botón de compra",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Textos pequeños bajo el botón fijo de Agregar al carrito."
+      },
+      {
+        "type": "text",
+        "id": "sticky_trust_1",
+        "label": "Mensaje 1",
+        "default": "Compra segura"
+      },
+      {
+        "type": "text",
+        "id": "sticky_trust_2",
+        "label": "Mensaje 2",
+        "default": "Entrega rápida"
+      }
+    ]
   }
 ]

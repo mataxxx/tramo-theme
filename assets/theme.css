@@ -1371,3 +1371,11 @@ a.header__user { text-decoration: none; color: inherit; }
 @media (min-width: 750px) { .product-info .sticky-add { left: 0; right: 0; width: auto; } }
 .buy-form [data-add-button] { display: none; }
 .quick-view, .product-info { padding-bottom: 86px; }
+
+/* Ronda 30: contenido de la barra fija */
+.sticky-add .pay-sentence { margin: 0 0 8px; text-align: center; }
+.sticky-add .trust-bar--sticky { background: transparent; color: var(--color-primary); margin: 8px 0 0; padding: 0; border-radius: 0; font-size: 12px; }
+@media (min-width: 750px) { .sticky-add .trust-bar--sticky { font-size: 13px; } }
+.sticky-add .trust-bar--sticky[hidden] { display: none; }
+.sticky-add .trust-bar__list { gap: 2px 22px; }
+.quick-view, .product-info { padding-bottom: 130px; }
