@@ -1351,3 +1351,10 @@ a.header__user { text-decoration: none; color: inherit; }
 .cat-circle__media, .cat-circle__media:is(*) { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden; padding-bottom: 0; box-shadow: 0 5px 12px rgba(38,61,37,.22); }
 .cat-circle__title, .cat-circle__title:is(*) { position: static; padding: 0 2px; background: none; color: var(--color-primary); font-size: 12px; font-weight: 700; line-height: 1.2; text-align: center; }
 @media (min-width: 750px) { .cat-circle__media, .cat-circle__media:is(*) { border-radius: 20px; } .cat-circle__title, .cat-circle__title:is(*) { font-size: 14px; } }
+
+/* Ronda 27: botón flotante al pie en la ficha de producto */
+.sticky-add { position: sticky; bottom: 0; z-index: 20; margin: 0; padding: 10px 22px calc(12px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--color-bg) 94%, transparent); backdrop-filter: blur(8px); border-top: 1px solid var(--color-line); box-shadow: 0 -8px 20px rgba(0,0,0,.08); }
+.sticky-add[hidden] { display: none; }
+.product-info .sticky-add { margin: 18px 0 0; padding-left: 0; padding-right: 0; }
+@media (max-width: 749px) { .product-info .sticky-add { position: fixed; left: 0; right: 0; bottom: 78px; margin: 0; padding: 10px 16px; } }
+.category-see .icon { width: 16px; height: 16px; }

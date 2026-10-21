@@ -12,9 +12,6 @@
         <span class="cat-circle__media">
           {%- if img != blank -%}
             {{ img | image_url: width: 240 | image_tag: widths: '120, 240', sizes: '84px', loading: 'lazy', alt: t }}
-          {%- elsif block.settings.art != 'none' and block.settings.art != blank -%}
-            {%- assign art_file = 'cat-' | append: block.settings.art | append: '.svg' -%}
-            <img src="{{ art_file | asset_url }}" alt="{{ t | escape }}" loading="lazy" width="240" height="240">
           {%- else -%}
             {% render 'icon', name: block.settings.icon %}
           {%- endif -%}
@@ -47,26 +44,7 @@
       "settings": [
         { "type": "collection", "id": "collection", "label": "Colección" },
         { "type": "text", "id": "title", "label": "Nombre (opcional)", "info": "Si lo dejas vacío usa el de la colección." },
-        { "type": "image_picker", "id": "image", "label": "Foto (opcional)", "info": "Si subes una foto, reemplaza la ilustración." },
-        {
-          "type": "select",
-          "id": "art",
-          "label": "Ilustración",
-          "options": [
-            { "value": "none", "label": "Ninguna (usar icono)" },
-            { "value": "especias", "label": "Especias" },
-            { "value": "condimentos-casa", "label": "Condimentos de la casa" },
-            { "value": "condimentos-mundo", "label": "Condimentos del mundo" },
-            { "value": "semillas", "label": "Semillas" },
-            { "value": "frutas", "label": "Frutas" },
-            { "value": "reposteria", "label": "Repostería" },
-            { "value": "dulces", "label": "Dulces" },
-            { "value": "quesos", "label": "Quesos" },
-            { "value": "bebidas", "label": "Bebidas" },
-            { "value": "chocolate", "label": "Chocolate" }
-          ],
-          "default": "none"
-        },
+        { "type": "image_picker", "id": "image", "label": "Foto (opcional)", "info": "Si no subes foto se muestra el icono sobre el color verde." },
         {
           "type": "select",
           "id": "icon",

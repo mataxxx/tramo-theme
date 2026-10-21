@@ -380,6 +380,26 @@
     var addButton = $('[data-add-button]', form);
     var addLabel = $('[data-add-label]', form);
     var addPrice = $('[data-add-price]', form);
+
+    /* Botón de agregar flotante al pie: aparece cuando el original sale de la pantalla */
+    (function () {
+      if (!addButton || !window.IntersectionObserver) return;
+      var host = $('.product-info', root) || root;
+      var bar = document.createElement('div');
+      bar.className = 'sticky-add'; bar.hidden = true;
+      var sb = document.createElement('button');
+      sb.type = 'button'; sb.className = 'button button--full';
+      bar.appendChild(sb); host.appendChild(bar);
+      function sync() { sb.textContent = (addButton.textContent || '').replace(/\s+/g, ' ').trim(); sb.disabled = addButton.disabled; }
+      sync();
+      new MutationObserver(sync).observe(addButton, { childList: true, subtree: true, characterData: true, attributes: true });
+      sb.addEventListener('click', function () { addButton.click(); });
+      var scroller = null;
+      new IntersectionObserver(function (entries) {
+        var e = entries[0];
+        bar.hidden = e.isIntersecting || e.boundingClientRect.top > 0;
+      }, { root: scroller, threshold: 0 }).observe(addButton);
+    })();
     var errorEl = $('[data-form-error]', form);
     var normalWrap = $('[data-qty-normal]', root);
     var bulkWrap = $('[data-qty-bulk]', root);

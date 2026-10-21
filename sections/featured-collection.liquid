@@ -27,7 +27,7 @@
     </h2>
     {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
       <button type="button" class="category-see" data-category-open data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">
-        {% render 'icon', name: 'pin' %}<span>{{ section.settings.expand_label | default: 'Ver' }}</span>
+        <span>{{ section.settings.expand_label | default: 'Ver' }}</span>{% render 'icon', name: 'chevron-right' %}
       </button>
     {%- endif -%}
   </div>

@@ -18,8 +18,7 @@
             "collection": "frontpage",
             "title": "Especias",
             "search_noun": "especia",
-            "icon": "chili",
-            "art": "especias"
+            "icon": "chili"
           }
         },
         "c1": {
@@ -28,8 +27,7 @@
             "collection": "condimentos-de-la-casa",
             "title": "Condimentos de la casa",
             "search_noun": "condimento",
-            "icon": "house-hand",
-            "art": "condimentos-casa"
+            "icon": "house-hand"
           }
         },
         "c2": {
@@ -38,8 +36,7 @@
             "collection": "condimentos-del-mundo",
             "title": "Condimentos del mundo",
             "search_noun": "condimento",
-            "icon": "globe-hand",
-            "art": "condimentos-mundo"
+            "icon": "globe-hand"
           }
         },
         "c3": {
@@ -48,8 +45,7 @@
             "collection": "test2",
             "title": "Semillas",
             "search_noun": "semilla",
-            "icon": "leaf",
-            "art": "semillas"
+            "icon": "leaf"
           }
         },
         "c4": {
@@ -58,8 +54,7 @@
             "collection": "frutas-otros-deshidratados",
             "title": "Frutas",
             "search_noun": "fruta",
-            "icon": "leaf",
-            "art": "frutas"
+            "icon": "leaf"
           }
         },
         "c5": {
@@ -68,8 +63,7 @@
             "collection": "insumos-para-reposteria",
             "title": "Repostería",
             "search_noun": "insumo",
-            "icon": "package",
-            "art": "reposteria"
+            "icon": "package"
           }
         },
         "c6": {
@@ -78,8 +72,7 @@
             "collection": "dulces-conservas",
             "title": "Dulces",
             "search_noun": "dulce",
-            "icon": "tag",
-            "art": "dulces"
+            "icon": "tag"
           }
         },
         "c7": {
@@ -88,8 +81,7 @@
             "collection": "lacteos",
             "title": "Quesos",
             "search_noun": "queso",
-            "icon": "package",
-            "art": "quesos"
+            "icon": "package"
           }
         },
         "c8": {
@@ -98,8 +90,7 @@
             "collection": "bebidas-gelatinas",
             "title": "Bebidas",
             "search_noun": "bebida",
-            "icon": "tag",
-            "art": "bebidas"
+            "icon": "tag"
           }
         },
         "c9": {
@@ -108,8 +99,7 @@
             "collection": "chocolateria",
             "title": "Chocolate",
             "search_noun": "chocolate",
-            "icon": "tag",
-            "art": "chocolate"
+            "icon": "tag"
           }
         }
       },
