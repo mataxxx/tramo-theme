@@ -1428,3 +1428,8 @@ a.header__user { text-decoration: none; color: inherit; }
 .cats-section .cats-tile__media .icon { width: 26px; height: 26px; }
 .cats-section .cats-tile__title { font-size: 11.5px; }
 @media (min-width: 750px) { .cats-section .product-rail { gap: 14px; } .cats-section .product-rail__item { flex: 0 0 120px; } .cats-section .cats-tile__media .icon { width: 32px; height: 32px; } .cats-section .cats-tile__title { font-size: 13px; } }
+
+/* Ronda 40: sin título, menos espacio con el carrusel de abajo */
+.cats-section { margin-bottom: 0; }
+.cats-section .product-rail { padding-bottom: 2px; }
+.cats-section + * , .shopify-section:has(> .cats-section) + .shopify-section .category-section { margin-top: 0; }
