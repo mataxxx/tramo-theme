@@ -2,6 +2,7 @@
   #shopify-section-{{ section.id }} { padding-top: {{ section.settings.space_top }}px; padding-bottom: {{ section.settings.space_bottom }}px; }
 {%- endstyle -%}
 <section class="category-section cats-section">
+  {%- if section.settings.heading != blank -%}<h2 class="cats-heading">{{ section.settings.heading }}</h2>{%- endif -%}
   <div class="product-rail" tabindex="0" aria-label="{{ section.settings.heading | escape }}">
     {%- for block in section.blocks -%}
       {%- assign coll = block.settings.collection -%}
@@ -18,7 +19,7 @@
         </span>
         <span class="cats-tile__title">{{ t }}</span>
       {%- endcapture -%}
-      <div class="product-rail__item">
+      <div class="product-rail__item cats-item cats-item--{{ forloop.index | modulo: 6 }}">
         {%- if coll != blank -%}
           <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?" {{ block.shopify_attributes }}>{{ inner }}</button>
         {%- else -%}
@@ -70,7 +71,7 @@
   "settings": [
     { "type": "paragraph", "content": "Un botón que abre una ventana con todas las categorías. Cada una abre su pop-up." },
     { "type": "text", "id": "button_label", "label": "Texto del botón \"Ver\"", "default": "Ver" },
-    { "type": "text", "id": "heading", "label": "Título", "default": "Categorías" },
+    { "type": "text", "id": "heading", "label": "Título", "default": "Compra por categoría" },
     { "type": "text", "id": "panel_title", "label": "Título de la ventana", "default": "Nuestras categorías" },
     { "type": "range", "id": "space_top", "label": "Espacio arriba", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 },
     { "type": "range", "id": "space_bottom", "label": "Espacio abajo", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 }

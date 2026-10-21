@@ -203,7 +203,12 @@
     ]).then(function (results) {
       var cart = results[0];
       var sections = results[1] || {};
-      updateCount(cart.item_count);
+      var shown = 0;
+      (cart.items || []).forEach(function (it) {
+        var bulk = (it.variant_options || []).indexOf(BULK.name) > -1 || (it.options_with_values || []).some(function (o) { return o.value === BULK.name; });
+        shown += bulk ? 1 : it.quantity;
+      });
+      updateCount(shown);
       if (sections['cart-drawer']) {
         var doc = new DOMParser().parseFromString(sections['cart-drawer'], 'text/html');
         var fresh = $('[data-cart-drawer-body]', doc);
@@ -893,6 +898,11 @@
     if (!box || !box.classList.contains('is-open')) return;
     var v = $('.pvideo__video', box);
     box.classList.remove('is-open', 'is-paused');
+    if (box._pvHome && box._pvHome.parentNode) {
+      box._pvHome.parentNode.insertBefore(box, box._pvHome);
+      box._pvHome.parentNode.removeChild(box._pvHome);
+      box._pvHome = null;
+    }
     if (v) {
       v.muted = true;
       var pr = v.play();
@@ -906,7 +916,12 @@
     var v = $('.pvideo__video', box);
     if (!v) return;
     if (!box.classList.contains('is-open')) {
-      /* miniatura -> grande, con sonido */
+      /* miniatura -> grande, con sonido. Se mueve al <body> para que nada la recorte ni la tape */
+      if (!box._pvHome && box.parentNode) {
+        box._pvHome = document.createComment('pvideo');
+        box.parentNode.insertBefore(box._pvHome, box);
+        document.body.appendChild(box);
+      }
       box.classList.add('is-open');
       v.muted = false;
       v.currentTime = 0;
