@@ -215,8 +215,8 @@
     }
   },
   "order": [
-    "circles",
     "hero",
+    "circles",
     "trust",
     "especias",
     "condimentos_casa",

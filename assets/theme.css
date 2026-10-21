@@ -1276,3 +1276,11 @@ a.header__user { text-decoration: none; color: inherit; }
 .cat-circle:hover .cat-circle__media { transform: translateY(-2px); border-color: var(--color-primary); }
 .cat-circle__title { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
 @media (min-width: 750px) { .cat-circles__row { justify-content: center; padding-left: 3.5vw; padding-right: 3.5vw; gap: 26px; } .cat-circle { width: 96px; } .cat-circle__media { width: 84px; height: 84px; } .cat-circle__media .icon { width: 38px; height: 38px; } .cat-circle__title { font-size: 14px; } }
+
+/* Ronda 19: cuadritos de categoría */
+.cat-circles { padding: 16px 0 4px; }
+.cat-circle { width: 78px; gap: 8px; }
+.cat-circle__media { width: 72px; height: 72px; border-radius: 20px; border: 0; background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface)); box-shadow: 0 1px 0 rgba(255,255,255,.7) inset, 0 6px 14px rgba(38,61,37,.12); }
+.cat-circle__media .icon { width: 32px; height: 32px; }
+.cat-circle:hover .cat-circle__media { box-shadow: 0 10px 20px rgba(38,61,37,.2); }
+@media (min-width: 750px) { .cat-circle { width: 104px; } .cat-circle__media { width: 94px; height: 94px; border-radius: 24px; } }
