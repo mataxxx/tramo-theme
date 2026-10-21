@@ -609,13 +609,38 @@
 
   function reelVideo(reel) { return $('video', reel); }
 
+  var reelsMuted = false;
+
   function syncReelToggle(reel) {
     var video = reelVideo(reel);
-    var pauseIcon = $('[data-icon-pause]', reel);
-    var playIcon = $('[data-icon-play]', reel);
-    if (!video || !pauseIcon || !playIcon) return;
-    pauseIcon.hidden = video.paused;
-    playIcon.hidden = !video.paused;
+    if (!video) return;
+    reel.classList.toggle('is-paused', video.paused);
+  }
+
+  function syncReelSound() {
+    $$('[data-reel-mute]').forEach(function (btn) {
+      btn.setAttribute('aria-pressed', reelsMuted ? 'true' : 'false');
+      var snd = $('[data-icon-sound]', btn);
+      var mut = $('[data-icon-muted]', btn);
+      if (snd) snd.hidden = reelsMuted;
+      if (mut) mut.hidden = !reelsMuted;
+    });
+  }
+
+  function playReel(video) {
+    video.muted = reelsMuted;
+    var p = video.play();
+    if (p && p.catch) {
+      p.catch(function (err) {
+        /* pause() aborta play(): no reanudar. Solo si bloquea el sonido, se reproduce sin sonido */
+        if (!err || err.name !== 'NotAllowedError' || video.hasAttribute('data-user-paused')) return;
+        reelsMuted = true;
+        video.muted = true;
+        syncReelSound();
+        var q = video.play();
+        if (q && q.catch) q.catch(function () { /* sin autoplay */ });
+      });
+    }
   }
 
   function pauseAllReels() {
@@ -655,10 +680,10 @@
         var video = reelVideo(entry.target);
         if (!video) return;
         if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-          var p = video.play();
-          if (p && p.catch) p.catch(function () { /* autoplay bloqueado */ });
+          if (!video.hasAttribute('data-user-paused')) playReel(video);
         } else {
           video.pause();
+          video.removeAttribute('data-user-paused');
         }
         syncReelToggle(entry.target);
       });
@@ -720,6 +745,11 @@
 
   /* ---------- Video del producto (vertical, tipo TikTok) ------------- */
   document.addEventListener('timeupdate', function (event) {
+    var rv = event.target;
+    if (rv && rv.closest && rv.closest('[data-reel]') && rv.duration) {
+      var rbar = $('[data-reel-progress]', rv.closest('[data-reel]'));
+      if (rbar) rbar.style.width = (rv.currentTime / rv.duration * 100) + '%';
+    }
     var v = event.target;
     if (!v || !v.classList || !v.classList.contains('pvideo__video') || !v.duration) return;
     var bar = $('[data-pvideo-progress]', v.closest('[data-pvideo]'));
@@ -739,6 +769,13 @@
       box.classList.remove('is-playing');
     }
   }
+
+  ['play', 'pause'].forEach(function (name) {
+    document.addEventListener(name, function (event) {
+      var r = event.target && event.target.closest && event.target.closest('[data-reel]');
+      if (r) syncReelToggle(r);
+    }, true);
+  });
 
   /* ---------- Combo ---------------------------------------------------- */
   function addCombo(box) {
@@ -985,13 +1022,21 @@
       return;
     }
 
-    var toggle = target.closest('[data-reel-toggle]');
-    if (toggle) {
-      var reel = toggle.closest('[data-reel]');
-      var video = reel && reelVideo(reel);
-      if (video) {
-        if (video.paused) { var pr = video.play(); if (pr && pr.catch) pr.catch(function () {}); } else { video.pause(); }
-        syncReelToggle(reel);
+    var muteBtn = target.closest('[data-reel-mute]');
+    if (muteBtn) {
+      reelsMuted = !reelsMuted;
+      $$('[data-reel] video').forEach(function (v) { v.muted = reelsMuted; });
+      syncReelSound();
+      return;
+    }
+
+    /* Tocar el video lo pausa o lo reanuda */
+    var tappedReel = target.closest('[data-reel]');
+    if (tappedReel && !target.closest('a, button')) {
+      var tvideo = reelVideo(tappedReel);
+      if (tvideo) {
+        if (tvideo.paused) { tvideo.removeAttribute('data-user-paused'); playReel(tvideo); } else { tvideo.setAttribute('data-user-paused', '1'); tvideo.pause(); }
+        syncReelToggle(tappedReel);
       }
     }
   });

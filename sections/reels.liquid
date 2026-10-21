@@ -52,6 +52,8 @@
         {%- endif -%}
 
         <div class="reel__gradient"></div>
+        <span class="reel__paused" aria-hidden="true">{% render 'icon', name: 'play' %}</span>
+        <div class="reel__bar"><span data-reel-progress></span></div>
 
         <div class="reel__copy">
           {%- if block.settings.kicker != blank -%}
@@ -73,9 +75,9 @@
         <div class="reel__actions">
           <button type="button" class="reel__action" data-reel-like aria-pressed="false" aria-label="Me gusta">{% render 'icon', name: 'heart' %}</button>
           <button type="button" class="reel__action" data-reel-share data-share-title="{{ block.settings.heading | escape }}" data-share-url="{{ block.settings.product.url | default: routes.root_url | prepend: request.origin }}" aria-label="Compartir">{% render 'icon', name: 'send' %}</button>
-          <button type="button" class="reel__action" data-reel-toggle aria-label="Pausar o reproducir">
-            <span data-icon-pause>{% render 'icon', name: 'pause' %}</span>
-            <span data-icon-play hidden>{% render 'icon', name: 'play' %}</span>
+          <button type="button" class="reel__action" data-reel-mute aria-label="Sonido" aria-pressed="false">
+            <span data-icon-sound>{% render 'icon', name: 'sound' %}</span>
+            <span data-icon-muted hidden>{% render 'icon', name: 'mute' %}</span>
           </button>
         </div>
       </article>

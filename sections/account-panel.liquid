@@ -22,8 +22,9 @@
         </div>
 
         <ul class="account-links" role="list">
+          {%- assign acc_parts = routes.account_url | split: '?' -%}
           <li>
-            <a href="{{ routes.account_addresses_url }}">
+            <a href="{{ acc_parts | first }}/profile{% if acc_parts.size > 1 %}?{{ acc_parts.last }}{% endif %}">
               {% render 'icon', name: 'map-pin' %}
               <span>{{ section.settings.profile_label }}</span>
               {% render 'icon', name: 'chevron-right' %}
@@ -58,7 +59,7 @@
       {%- else -%}
         <div class="account-signed-out">
           <p>{{ section.settings.signed_out_text }}</p>
-          <a href="{{ routes.account_login_url }}" class="button button--full">{% render 'icon', name: 'user' %} {{ section.settings.login_label }}</a>
+          <a href="{{ routes.storefront_login_url }}" class="button button--full">{% render 'icon', name: 'user' %} {{ section.settings.login_label }}</a>
         </div>
         {%- if request.design_mode -%}
           <h3 class="account-section-title">Vista de ejemplo de un pedido</h3>

@@ -63,7 +63,7 @@
           <span class="header__account-label">{{ customer.first_name | default: 'Mi cuenta' }}</span>
         </button>
       {%- else -%}
-        <a href="{{ routes.account_login_url }}" class="header__account" aria-label="Iniciar sesión">
+        <a href="{{ routes.storefront_login_url }}" class="header__account" aria-label="Iniciar sesión">
           {% render 'icon', name: 'user' %}
           <span class="header__account-label">Iniciar sesión</span>
         </a>

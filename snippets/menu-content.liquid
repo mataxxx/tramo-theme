@@ -69,7 +69,7 @@
     {%- if customer -%}
       <div class="menu-account__slot" data-account-slot></div>
     {%- else -%}
-      <a href="{{ routes.account_login_url }}" class="button button--full">
+      <a href="{{ routes.storefront_login_url }}" class="button button--full">
         {% render 'icon', name: 'user' %} Iniciar sesión
       </a>
     {%- endif -%}
