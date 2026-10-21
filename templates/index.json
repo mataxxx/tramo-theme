@@ -212,6 +212,12 @@
         "popup_search": "icon",
         "filter_tags": "África, Asia, Europa, América, Medio Oriente"
       }
+    },
+    "rack_teaser": {
+      "type": "rack-teaser",
+      "settings": {
+        "button_link": "shopify://pages/especiero"
+      }
     }
   },
   "order": [
@@ -223,6 +229,7 @@
     "condimentos_mundo",
     "semillas",
     "frutas",
-    "reposteria"
+    "reposteria",
+    "rack_teaser"
   ]
 }

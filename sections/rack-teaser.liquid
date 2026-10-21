@@ -1,0 +1,21 @@
+<section class="rack-teaser">
+  <img class="rack-teaser__seal" src="{{ 'handmade-seal.svg' | asset_url }}" alt="Hecho a mano en Costa Rica" width="78" height="78" loading="lazy">
+  <div>
+    <h2>{{ section.settings.heading }}</h2>
+    <p>{{ section.settings.text }}</p>
+  </div>
+  {%- if section.settings.button_link != blank -%}<a class="button" href="{{ section.settings.button_link }}">{{ section.settings.button_label }}</a>{%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Banner del especiero",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título", "default": "Arma tu especiero" },
+    { "type": "textarea", "id": "text", "label": "Texto", "default": "Base de madera hecha a mano en Costa Rica. Tú eliges el modelo y las especias." },
+    { "type": "text", "id": "button_label", "label": "Texto del botón", "default": "Armar el mío" },
+    { "type": "url", "id": "button_link", "label": "Enlace del botón", "default": "/pages/especiero" }
+  ],
+  "presets": [{ "name": "Banner del especiero" }]
+}
+{% endschema %}

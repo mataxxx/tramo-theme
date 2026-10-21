@@ -1,0 +1,19 @@
+{
+  "sections": {
+    "rack": {
+      "type": "spice-rack",
+      "blocks": {
+        "k1": { "type": "kit", "settings": { "name": "Parrillero", "spices": "paprika-dulce, ajo-en-polvo, oregano-seco, comino-molido, pimienta-negra-molida, sazon-para-carne, chimichurri-casero, pimenton-de-la-vera, chile-chipotle-molido, hierbas-provenzales, jengibre-molido, curcuma" } },
+        "k2": { "type": "kit", "settings": { "name": "Tico", "spices": "sazon-de-la-casa, mezcla-para-gallo-pinto, sazon-para-arroz, adobo-para-pollo, condimento-completo, canela-en-grano, curcuma, comino-molido, oregano-seco, mezcla-para-tamales, sazon-para-pescado, mezcla-para-arroz-con-pollo" } },
+        "k3": { "type": "kit", "settings": { "name": "Aventura del mundo", "spices": "curry-madras, garam-masala, harissa, zaatar, ras-el-hanout, chaat-masala, berbere, pimenton-de-la-vera, hierbas-provenzales, clavo-de-olor, nuez-moscada, jengibre-molido" } }
+      },
+      "block_order": ["k1", "k2", "k3"],
+      "settings": {
+        "models_collection": "especieros",
+        "spices_collection": "para-especiero",
+        "engrave_product": "grabado-personalizado"
+      }
+    }
+  },
+  "order": ["rack"]
+}
