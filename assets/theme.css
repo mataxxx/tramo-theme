@@ -862,3 +862,51 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
 .help__content p { margin: 0 0 10px; }
 .help__detail-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .help__detail-actions .button { display: inline-flex; align-items: center; gap: 8px; }
+
+
+/* Ronda 9 */
+.header__searchbar { display: none; }
+@media (min-width: 750px) {
+  .header__search { display: none; }
+  .header__searchbar { display: inline-flex; align-items: center; gap: 10px; width: clamp(180px, 22vw, 300px); padding: 10px 16px; border: 1px solid var(--color-line); border-radius: 999px; background: var(--color-bg); color: var(--color-muted); font-size: 14px; text-align: left; transition: border-color .15s, box-shadow .15s; }
+  .header__searchbar:hover { border-color: var(--color-primary); box-shadow: 0 4px 14px rgba(38,61,37,.1); }
+  .header__searchbar .icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--color-primary); }
+  .header__searchbar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .header__actions { gap: 14px; }
+}
+
+/* Botón flotante de videos (computadora) */
+.float-videos { display: none; }
+@media (min-width: 750px) {
+  .float-videos { position: fixed; right: 24px; bottom: 26px; z-index: 35; display: inline-flex; align-items: center; gap: 8px; padding: 14px 18px; border: 0; border-radius: 999px; background: #151914; color: #fff; box-shadow: 0 10px 26px rgba(0,0,0,.28); font-weight: 600; font-size: 14px; transition: transform .15s, box-shadow .15s; }
+  .float-videos:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,0,0,.32); }
+  .float-videos .icon { width: 24px; height: 24px; }
+  body.is-locked .float-videos { display: none; }
+}
+
+/* Comprar ahora */
+.buy-now { margin-top: 8px; }
+.buy-form [data-add-button]:disabled ~ .buy-now { opacity: .5; pointer-events: none; }
+.added-popup__continue { border: 0; background: transparent; color: var(--color-muted); text-decoration: underline; padding: 6px; font-size: 14px; justify-self: center; }
+
+/* Métodos de pago */
+.pay-methods { display: grid; gap: 8px; margin-top: 14px; justify-items: center; text-align: center; }
+.pay-methods__title { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--color-muted); font-weight: 600; }
+.pay-methods__title .icon { width: 15px; height: 15px; }
+.pay-methods__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.pay-methods__item { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid var(--color-line); border-radius: 999px; background: var(--color-surface); font-size: 12px; font-weight: 600; color: var(--color-text, inherit); }
+.pay-methods__item .icon { width: 15px; height: 15px; color: var(--color-primary); }
+.secure-pay .pay-methods { margin-top: 0; }
+
+/* Carruseles: flechitas */
+.rail-wrap { position: relative; }
+.rail-arrow { position: absolute; top: 32%; z-index: 3; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #fff; color: var(--color-primary); box-shadow: 0 6px 18px rgba(0,0,0,.22); display: none; place-items: center; transition: transform .15s; }
+.rail-arrow.is-visible { display: grid; }
+.rail-arrow:hover { transform: scale(1.08); }
+.rail-arrow--next { right: 8px; animation: rail-nudge 1.8s ease-in-out 3; }
+.rail-arrow--prev { left: 8px; }
+.rail-arrow--prev svg { transform: scaleX(-1); }
+@keyframes rail-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+@media (min-width: 750px) { .rail-arrow { width: 44px; height: 44px; } .rail-arrow--next { right: 2.2vw; } .rail-arrow--prev { left: 2.2vw; } }
+.category-section.is-expanded .rail-arrow { display: none !important; }
+.trust-bar { margin: 0 0 8px; }

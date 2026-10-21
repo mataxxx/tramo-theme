@@ -2,6 +2,7 @@
   Sello de pago seguro + métodos de pago. Parámetros: text (string)
 {%- endcomment -%}
 <div class="secure-pay">
+  {% render 'pay-methods' %}
   <p class="secure-pay__text">{% render 'icon', name: 'lock' %} <span>{{ text | default: 'Pagos seguros en línea' }}</span></p>
   {%- if shop.enabled_payment_types.size > 0 -%}
     <ul class="payment-icons payment-icons--small" role="list">

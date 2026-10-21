@@ -316,6 +316,7 @@
       var panel = body.parentElement;
       if (panel) panel.scrollTop = 0;
       initProducts(body);
+      initRails(body);
     }
 
     if (quickCache[url]) { render(quickCache[url]); return; }
@@ -509,7 +510,50 @@
         });
     });
 
+    var buyNow = $('[data-buy-now]', form);
+    if (buyNow) {
+      buyNow.addEventListener('click', function () {
+        if (!addButton || addButton.disabled || !idInput || buyNow.disabled) return;
+        var variant = findVariant(selectedOptions());
+        var quantity = currentQuantity(variant);
+        buyNow.disabled = true;
+        addToCart(parseInt(idInput.value, 10), quantity)
+          .then(function () { window.location.href = '/checkout'; })
+          .catch(function (error) {
+            buyNow.disabled = false;
+            if (errorEl) { errorEl.textContent = error.message || 'No se pudo agregar al carrito'; errorEl.hidden = false; }
+          });
+      });
+    }
+
     update(false);
+  }
+
+  /* ---------- Flechas de carruseles ------------------------------------- */
+  var ARROW_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+  function initRails(scope) {
+    $$('.product-rail', scope || document).forEach(function (rail) {
+      if (rail.parentNode.classList.contains('rail-wrap')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'rail-wrap';
+      rail.parentNode.insertBefore(wrap, rail);
+      wrap.appendChild(rail);
+      var next = document.createElement('button');
+      next.type = 'button'; next.className = 'rail-arrow rail-arrow--next'; next.setAttribute('aria-label', 'Ver más'); next.innerHTML = ARROW_SVG;
+      var prev = document.createElement('button');
+      prev.type = 'button'; prev.className = 'rail-arrow rail-arrow--prev'; prev.setAttribute('aria-label', 'Anterior'); prev.innerHTML = ARROW_SVG;
+      wrap.appendChild(prev); wrap.appendChild(next);
+      function update() {
+        var max = rail.scrollWidth - rail.clientWidth;
+        next.classList.toggle('is-visible', max > 6 && rail.scrollLeft < max - 6);
+        prev.classList.toggle('is-visible', rail.scrollLeft > 6);
+      }
+      next.addEventListener('click', function () { rail.scrollBy({ left: rail.clientWidth * 0.8, behavior: 'smooth' }); });
+      prev.addEventListener('click', function () { rail.scrollBy({ left: -rail.clientWidth * 0.8, behavior: 'smooth' }); });
+      rail.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      setTimeout(update, 50); setTimeout(update, 600);
+    });
   }
 
   /* ---------- Búsqueda -------------------------------------------------- */
@@ -1094,7 +1138,7 @@
   }, true);
 
   /* ---------- Inicio ---------------------------------------------------- */
-  function init() { initProducts(document); }
+  function init() { initProducts(document); initRails(document); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
   // Editor de temas de Shopify: volver a iniciar al recargar una sección.

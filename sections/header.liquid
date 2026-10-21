@@ -57,6 +57,10 @@
       <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">
         {% render 'icon', name: 'search' %}
       </button>
+      <button type="button" class="header__searchbar" data-open="search" aria-label="Buscar">
+        {% render 'icon', name: 'search' %}
+        <span>{{ s.search_placeholder }}</span>
+      </button>
     {%- endif -%}
     {%- if s.show_account_top -%}
       {%- if customer -%}
@@ -313,8 +317,14 @@
     {
       "type": "checkbox",
       "id": "show_search",
-      "label": "Botón de buscar (a la derecha del logo)",
+      "label": "Buscar (lupa en celular, barra en computadora)",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Texto de la barra de búsqueda (computadora)",
+      "default": "Buscar productos..."
     },
     {
       "type": "checkbox",
@@ -328,7 +338,7 @@
       "id": "show_account_top",
       "label": "Botón de iniciar sesión arriba (solo computadora)",
       "info": "La cuenta siempre está disponible dentro del menú.",
-      "default": false
+      "default": true
     },
     {
       "type": "header",

@@ -20,6 +20,13 @@
   </a>
 </nav>
 
+{%- if section.settings.show_float_videos -%}
+  <button type="button" class="float-videos" data-open="reels" aria-label="{{ section.settings.label_videos | escape }}">
+    {% render 'icon', name: 'video-float' %}
+    <span>{{ section.settings.label_videos }}</span>
+  </button>
+{%- endif -%}
+
 {% schema %}
 {
   "name": "Barra inferior móvil",
@@ -28,6 +35,7 @@
     { "type": "paragraph", "content": "Solo se muestra en celulares." },
     { "type": "text", "id": "label_home", "label": "Texto: inicio", "default": "Inicio" },
     { "type": "text", "id": "label_help", "label": "Texto: ayuda", "default": "Ayuda" },
+    { "type": "checkbox", "id": "show_float_videos", "label": "Botón flotante de videos (solo computadora)", "default": true },
     { "type": "checkbox", "id": "show_videos", "label": "Mostrar botón de videos", "default": true },
     { "type": "text", "id": "label_videos", "label": "Texto: videos", "default": "Videos" },
     { "type": "text", "id": "label_cart", "label": "Texto: carrito", "default": "Carrito" }

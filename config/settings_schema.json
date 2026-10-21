@@ -306,9 +306,51 @@
       },
       {
         "type": "text",
+        "id": "popup_buy_now",
+        "label": "Texto del botón de comprar ahora",
+        "default": "Comprar ahora"
+      },
+      {
+        "type": "text",
         "id": "popup_continue",
         "label": "Texto del botón de seguir",
         "default": "Seguir comprando"
+      },
+      {
+        "type": "header",
+        "content": "Comprar ahora y métodos de pago"
+      },
+      {
+        "type": "checkbox",
+        "id": "buy_now",
+        "label": "Mostrar botón \"Comprar ahora\" en los productos",
+        "info": "Agrega el producto y lleva directo al pago.",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "buy_now_label",
+        "label": "Texto de comprar ahora",
+        "default": "Comprar ahora"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_pay_methods",
+        "label": "Mostrar métodos de pago en productos y carrito",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "pay_methods_title",
+        "label": "Título de métodos de pago",
+        "default": "Puedes pagar con"
+      },
+      {
+        "type": "text",
+        "id": "pay_methods",
+        "label": "Métodos de pago (separados por coma)",
+        "info": "Es solo informativo: activa cada método en Shopify → Configuración → Pagos.",
+        "default": "SINPE Móvil, Transferencia, Tarjeta"
       },
       {
         "type": "header",

@@ -8,8 +8,9 @@
     </p>
     <div class="added-popup__item" data-added-item></div>
     <div class="added-popup__actions">
-      <a href="{{ routes.cart_url }}" class="button button--full" data-added-view-cart>{{ settings.popup_view_cart | default: 'Ver carrito' }}</a>
-      <button type="button" class="button button--outline button--full" data-drawer-close>{{ settings.popup_continue | default: 'Seguir comprando' }}</button>
+      <a href="/checkout" class="button button--full">{{ settings.popup_buy_now | default: 'Comprar ahora' }}</a>
+      <a href="{{ routes.cart_url }}" class="button button--outline button--full" data-added-view-cart>{{ settings.popup_view_cart | default: 'Ver carrito' }}</a>
+      <button type="button" class="added-popup__continue" data-drawer-close>{{ settings.popup_continue | default: 'Seguir comprando' }}</button>
     </div>
   </div>
 </div>

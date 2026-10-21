@@ -51,10 +51,35 @@
     "condimentos": {
       "type": "condiments",
       "settings": {}
+    },
+    "trust": {
+      "type": "trust-bar",
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "text": "Pagos seguros"
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "text": "Entregas confiables"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2"
+      ],
+      "settings": {}
     }
   },
   "order": [
     "hero",
+    "trust",
     "especias",
     "condimentos",
     "semillas",

@@ -20,5 +20,11 @@
     </span>
     <span class="button__price" data-add-price>{% if current_variant.available %}· {{ current_variant.price | money }}{% endif %}</span>
   </button>
+  {%- if settings.buy_now -%}
+    <button type="button" class="button button--outline button--full buy-now" data-buy-now {% unless current_variant.available %}disabled{% endunless %}>
+      {{ settings.buy_now_label | default: 'Comprar ahora' }}
+    </button>
+  {%- endif -%}
   <p class="form-error" data-form-error role="alert" hidden></p>
 {% endform %}
+{% render 'pay-methods' %}
