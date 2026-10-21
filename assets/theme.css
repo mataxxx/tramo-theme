@@ -1358,3 +1358,9 @@ a.header__user { text-decoration: none; color: inherit; }
 .product-info .sticky-add { margin: 18px 0 0; padding-left: 0; padding-right: 0; }
 @media (max-width: 749px) { .product-info .sticky-add { position: fixed; left: 0; right: 0; bottom: 78px; margin: 0; padding: 10px 16px; } }
 .category-see .icon { width: 16px; height: 16px; }
+
+/* Ronda 28: botón agregar al pie, estilo barra verde de abajo */
+.sticky-add, .sticky-add:is(*) { background: #dcebd5; border-top: 1px solid #c5dcbc; box-shadow: 0 -6px 18px rgba(38,61,37,.12); backdrop-filter: none; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+.sticky-add .button { box-shadow: 0 6px 16px rgba(38,61,37,.28); }
+@media (max-width: 749px) { .product-info .sticky-add { bottom: 0; z-index: 45; } }
+@media (min-width: 750px) { .product-info .sticky-add { position: sticky; border-radius: 14px 14px 0 0; } }
