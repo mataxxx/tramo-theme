@@ -1,0 +1,69 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} { padding-top: {{ section.settings.space_top }}px; padding-bottom: {{ section.settings.space_bottom }}px; }
+{%- endstyle -%}
+<nav class="cat-circles" aria-label="Categorías">
+  <div class="cat-circles__row">
+    {%- for block in section.blocks -%}
+      {%- assign coll = block.settings.collection -%}
+      {%- assign t = block.settings.title -%}
+      {%- if t == blank and coll != blank -%}{%- assign t = coll.title -%}{%- endif -%}
+      {%- assign img = block.settings.image -%}
+      {%- capture inner -%}
+        <span class="cat-circle__media">
+          {%- if img != blank -%}
+            {{ img | image_url: width: 240 | image_tag: widths: '120, 240', sizes: '84px', loading: 'lazy', alt: t }}
+          {%- else -%}
+            {% render 'icon', name: block.settings.icon %}
+          {%- endif -%}
+        </span>
+        <span class="cat-circle__title">{{ t }}</span>
+      {%- endcapture -%}
+      {%- if coll != blank -%}
+        <button type="button" class="cat-circle" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?" {{ block.shopify_attributes }}>{{ inner }}</button>
+      {%- else -%}
+        <span class="cat-circle" {{ block.shopify_attributes }}>{{ inner }}</span>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</nav>
+
+{% schema %}
+{
+  "name": "Círculos de categoría",
+  "tag": "div",
+  "max_blocks": 12,
+  "settings": [
+    { "type": "paragraph", "content": "Atajos redondos a cada categoría. Al tocarlos se abre la ventana de la categoría." },
+    { "type": "range", "id": "space_top", "label": "Espacio arriba", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "space_bottom", "label": "Espacio abajo", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Categoría",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Colección" },
+        { "type": "text", "id": "title", "label": "Nombre (opcional)", "info": "Si lo dejas vacío usa el de la colección." },
+        { "type": "image_picker", "id": "image", "label": "Foto (opcional)", "info": "Si no subes foto se muestra el icono." },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icono",
+          "options": [
+            { "value": "mortar", "label": "Mortero" },
+            { "value": "chili", "label": "Chile" },
+            { "value": "leaf", "label": "Hoja" },
+            { "value": "package", "label": "Paquete" },
+            { "value": "tag", "label": "Etiqueta" },
+            { "value": "house-hand", "label": "Casa" },
+            { "value": "globe-hand", "label": "Mundo" }
+          ],
+          "default": "leaf"
+        },
+        { "type": "text", "id": "search_noun", "label": "Palabra para la pregunta", "info": "Ej: especia → ¿Cuál especia buscas?", "default": "producto" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Círculos de categoría" }]
+}
+{% endschema %}

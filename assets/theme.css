@@ -1257,3 +1257,22 @@ a.header__user { text-decoration: none; color: inherit; }
 .hero-dots { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 8px; pointer-events: none; }
 .hero-dot { pointer-events: auto; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,.55); transition: width .25s, background .25s; }
 .hero-dot.is-active { width: 22px; background: #fff; }
+
+
+/* Ronda 18 */
+.like-btn { width: 30px; height: 30px; top: 6px; right: 6px; background: rgba(255,255,255,.55); box-shadow: none; color: #6b6b6b; backdrop-filter: blur(2px); }
+.like-btn .icon { width: 16px; height: 16px; stroke-width: 1.6; }
+.like-btn:hover { transform: none; background: rgba(255,255,255,.85); }
+.like-btn[aria-pressed="true"] { background: rgba(255,255,255,.85); }
+
+/* Círculos de categoría bajo el logo */
+.cat-circles { padding: 14px 0 6px; }
+.cat-circles__row { display: flex; gap: 14px; overflow-x: auto; scrollbar-width: none; padding: 4px 18px 8px; scroll-snap-type: x proximity; }
+.cat-circles__row::-webkit-scrollbar { display: none; }
+.cat-circle { flex: 0 0 auto; width: 74px; display: grid; justify-items: center; gap: 7px; border: 0; background: transparent; padding: 0; color: inherit; text-decoration: none; scroll-snap-align: start; text-align: center; }
+.cat-circle__media { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; overflow: hidden; background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface)); color: var(--color-primary); border: 1.5px solid color-mix(in srgb, var(--color-primary) 30%, transparent); transition: transform .18s, border-color .18s; }
+.cat-circle__media img { width: 100%; height: 100%; object-fit: cover; }
+.cat-circle__media .icon { width: 30px; height: 30px; stroke-width: 1.5; }
+.cat-circle:hover .cat-circle__media { transform: translateY(-2px); border-color: var(--color-primary); }
+.cat-circle__title { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
+@media (min-width: 750px) { .cat-circles__row { justify-content: center; padding-left: 3.5vw; padding-right: 3.5vw; gap: 26px; } .cat-circle { width: 96px; } .cat-circle__media { width: 84px; height: 84px; } .cat-circle__media .icon { width: 38px; height: 38px; } .cat-circle__title { font-size: 14px; } }

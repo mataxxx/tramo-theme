@@ -9,6 +9,113 @@
  */
 {
   "sections": {
+    "circles": {
+      "type": "category-circles",
+      "blocks": {
+        "c0": {
+          "type": "category",
+          "settings": {
+            "collection": "frontpage",
+            "title": "Especias",
+            "search_noun": "especia",
+            "icon": "chili"
+          }
+        },
+        "c1": {
+          "type": "category",
+          "settings": {
+            "collection": "condimentos-de-la-casa",
+            "title": "Condimentos de la casa",
+            "search_noun": "condimento",
+            "icon": "house-hand"
+          }
+        },
+        "c2": {
+          "type": "category",
+          "settings": {
+            "collection": "condimentos-del-mundo",
+            "title": "Condimentos del mundo",
+            "search_noun": "condimento",
+            "icon": "globe-hand"
+          }
+        },
+        "c3": {
+          "type": "category",
+          "settings": {
+            "collection": "test2",
+            "title": "Semillas",
+            "search_noun": "semilla",
+            "icon": "leaf"
+          }
+        },
+        "c4": {
+          "type": "category",
+          "settings": {
+            "collection": "frutas-otros-deshidratados",
+            "title": "Frutas",
+            "search_noun": "fruta",
+            "icon": "leaf"
+          }
+        },
+        "c5": {
+          "type": "category",
+          "settings": {
+            "collection": "insumos-para-reposteria",
+            "title": "Repostería",
+            "search_noun": "insumo",
+            "icon": "package"
+          }
+        },
+        "c6": {
+          "type": "category",
+          "settings": {
+            "collection": "dulces-conservas",
+            "title": "Dulces",
+            "search_noun": "dulce",
+            "icon": "tag"
+          }
+        },
+        "c7": {
+          "type": "category",
+          "settings": {
+            "collection": "lacteos",
+            "title": "Quesos",
+            "search_noun": "queso",
+            "icon": "package"
+          }
+        },
+        "c8": {
+          "type": "category",
+          "settings": {
+            "collection": "bebidas-gelatinas",
+            "title": "Bebidas",
+            "search_noun": "bebida",
+            "icon": "tag"
+          }
+        },
+        "c9": {
+          "type": "category",
+          "settings": {
+            "collection": "chocolateria",
+            "title": "Chocolate",
+            "search_noun": "chocolate",
+            "icon": "tag"
+          }
+        }
+      },
+      "block_order": [
+        "c0",
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c9"
+      ]
+    },
     "hero": {
       "type": "hero",
       "settings": {
@@ -108,6 +215,7 @@
     }
   },
   "order": [
+    "circles",
     "hero",
     "trust",
     "especias",

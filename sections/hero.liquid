@@ -34,14 +34,14 @@
           assign sl_shopify = blk.shopify_attributes
         endif
       -%}
-      <section class="hero hero--{{ section.settings.text_align }}{% if i > 0 %} hero--slide{% endif %}" aria-label="{{ sl.heading | strip_newlines | escape }}" {{ sl_shopify }}>
+      <section class="hero hero--{{ section.settings.text_align }}{% if i > 0 %} hero--slide{% endif %}" aria-label="{{ sl.heading | strip_newlines | escape }}" {% if i > 0 %}style="--hero-overlay: {{ sl.overlay_color | default: '#000000' }}; --hero-overlay-opacity: {{ sl.overlay_opacity | default: 70 | divided_by: 100.0 }}"{% endif %} {{ sl_shopify }}>
         <div class="hero__media">
           {%- if sl.image != blank -%}
             {{ sl.image | image_url: width: 2000 | image_tag: widths: '750, 1100, 1500, 2000', sizes: '(min-width: 1440px) 1440px, 100vw', loading: 'eager', alt: sl.image.alt }}
           {%- elsif i == 0 -%}
             <img src="{{ 'hero-default.jpg' | asset_url }}" alt="" width="1584" height="672" loading="eager" fetchpriority="high">
           {%- else -%}
-            <img src="{{ 'hero-default.jpg' | asset_url }}" alt="" width="1584" height="672" loading="lazy">
+            <img src="{{ 'history-default.svg' | asset_url }}" alt="" width="1584" height="672" loading="lazy">
           {%- endif -%}
         </div>
         <div class="hero__overlay" aria-hidden="true"></div>
@@ -295,6 +295,8 @@
       "name": "Diapositiva",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Imagen" },
+        { "type": "color", "id": "overlay_color", "label": "Color del sombreado", "default": "#000000" },
+        { "type": "range", "id": "overlay_opacity", "label": "Intensidad del sombreado", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 70 },
         { "type": "text", "id": "kicker", "label": "Texto pequeño" },
         { "type": "textarea", "id": "heading", "label": "Título", "default": "DESDE 1946" },
         { "type": "textarea", "id": "text", "label": "Texto", "default": "Tres generaciones\nde tradición en especias." },

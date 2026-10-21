@@ -55,8 +55,8 @@
   {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
     <div class="category-more">
       <button type="button" class="category-eye" data-category-open data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">
-        {% render 'icon', name: 'eye' %}
-        <span>{{ section.settings.expand_label }} {{ heading | downcase }}</span>
+        {% render 'icon', name: 'pin' %}
+        <span>{{ section.settings.expand_label | default: 'Ver categoría' }}</span>
       </button>
     </div>
     <template data-category-template>
@@ -160,8 +160,7 @@
       "type": "text",
       "id": "expand_label",
       "label": "Texto del botón",
-      "default": "Ver todas las",
-      "info": "Se muestra: texto + nombre de la categoría. Ej: Ver todas las especias"
+      "default": "Ver categoría"
     },
     {
       "type": "range",
