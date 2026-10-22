@@ -1,0 +1,19 @@
+{%- comment -%} Mensaje de cash back en el producto {%- endcomment -%}
+{%- if settings.cashback_enabled -%}
+  {%- assign cb_pct = settings.cashback_pct | default: 5 -%}
+  <div class="cb-note">
+    <span class="cb-note__badge" aria-hidden="true">{{ cb_pct }}%</span>
+    <span class="cb-note__text">Obtendrás <b>{{ cb_pct }}% de cash back</b> con esta compra</span>
+    <details class="cb-note__more">
+      <summary aria-label="Más información sobre el cash back"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></summary>
+      <div class="cb-note__pop">
+        <p>{{ settings.cashback_info }}</p>
+        {%- if customer -%}
+          <button type="button" class="cb-note__link" data-open="account" data-acct-tab="puntos">Ver mi cash back →</button>
+        {%- else -%}
+          <a class="cb-note__link" href="{{ routes.storefront_login_url }}" data-login-open>Inicia sesión para empezar a sumar →</a>
+        {%- endif -%}
+      </div>
+    </details>
+  </div>
+{%- endif -%}

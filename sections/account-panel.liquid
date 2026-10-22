@@ -35,7 +35,8 @@
             data-name="{{ customer.first_name | escape }}"
             data-email="{{ customer.email | escape }}"
             data-currency="{{ cart.currency.iso_code }}"
-            data-points-pct="{{ section.settings.points_pct | default: 5 }}">
+            data-points-pct="{{ settings.cashback_pct | default: 5 }}"
+            data-points-min="1000">
             <div class="acct__loading" data-acct-loading>Cargando tu cuenta…</div>
             <div data-acct-root hidden></div>
           </div>
@@ -114,16 +115,6 @@
     {
       "type": "paragraph",
       "content": "El estado de cada pedido se cambia desde el administrador de Shopify: abre el pedido y agrega la etiqueta de la etapa (por ejemplo estado-en-camino)."
-    },
-    {
-      "type": "range",
-      "id": "points_pct",
-      "label": "Puntos: % de cada compra",
-      "min": 1,
-      "max": 20,
-      "step": 1,
-      "unit": "%",
-      "default": 5
     },
     {
       "type": "text",

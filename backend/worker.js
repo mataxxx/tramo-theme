@@ -2,6 +2,9 @@
 // Atiende dos rutas que Shopify reenvía desde la tienda (App Proxy):
 //   GET  /apps/tramo/orders  -> pedidos del cliente que inició sesión (con etiquetas de estado)
 //   POST /apps/tramo/ai      -> respuestas de IA sobre un producto (Claude)
+//   GET  /apps/tramo/cashback         -> saldo de cash back y códigos del cliente
+//   POST /apps/tramo/cashback/redeem  -> convierte saldo en un código (tarjeta de regalo) para el checkout
+// Cash back (opcionales): CASHBACK_PCT (5), CASHBACK_TAX (0.13), CASHBACK_MIN (1000)
 // Variables (secretas) que necesita: SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, SHOPIFY_SHOP, ANTHROPIC_API_KEY
 // IA: por defecto usa Workers AI de Cloudflare (gratis, sin clave). Si no hay AI, usa Claude con ANTHROPIC_API_KEY.
 // Opcionales: AI_MODEL, CLAUDE_MODEL, STORE_INFO
@@ -106,6 +109,104 @@ async function handleOrders(url, env) {
   });
 }
 
+// ---------- Cash back ----------
+// Gana: CASHBACK_PCT % de cada pedido pagado, sobre los productos sin envío y sin impuesto.
+// Gasta: cada canje crea una tarjeta de regalo de Shopify a nombre del cliente (nota "Cash back Tramo").
+// Saldo = ganado − suma de esas tarjetas. Los códigos se guardan en el cliente (metafield) para poder copiarlos otra vez.
+const CB_NOTE = 'Cash back Tramo';
+const CB_NS = 'tramo', CB_KEY = 'cashback_codes';
+const CB_QUERY = `
+query ($id: ID!, $q: String!, $after: String) {
+  customer(id: $id) {
+    metafield(namespace: "tramo", key: "cashback_codes") { value }
+    orders(first: 100, after: $after, query: "financial_status:paid OR financial_status:partially_refunded") {
+      pageInfo { hasNextPage endCursor }
+      nodes { id name processedAt cancelledAt taxesIncluded currentSubtotalPriceSet { shopMoney { amount currencyCode } } }
+    }
+  }
+  giftCards(first: 100, query: $q) { nodes { id note enabled balance { amount } initialValue { amount } lastCharacters createdAt } }
+}`;
+
+function cbCfg(env) {
+  return { pct: Number(env.CASHBACK_PCT || 5) / 100, tax: Number(env.CASHBACK_TAX ?? 0.13), min: Number(env.CASHBACK_MIN || 1000) };
+}
+
+async function cashbackState(env, customerId) {
+  const cfg = cbCfg(env);
+  const gid = `gid://shopify/Customer/${customerId}`;
+  let after = null, orders = [], c = null, cards = [];
+  do {
+    const d = await adminGraphql(env, CB_QUERY, { id: gid, q: `customer_id:${customerId}`, after });
+    c = d.customer;
+    if (!c) return null;
+    if (!after) cards = d.giftCards.nodes.filter((g) => (g.note || '').startsWith(CB_NOTE));
+    orders = orders.concat(c.orders.nodes);
+    after = c.orders.pageInfo.hasNextPage ? c.orders.pageInfo.endCursor : null;
+  } while (after);
+  let currency = 'CRC';
+  const earned = orders.filter((o) => !o.cancelledAt).map((o) => {
+    const sub = parseFloat(o.currentSubtotalPriceSet.shopMoney.amount);
+    currency = o.currentSubtotalPriceSet.shopMoney.currencyCode;
+    const base = o.taxesIncluded ? sub / (1 + cfg.tax) : sub;
+    return { name: o.name, date: o.processedAt, amount: Math.floor(base * cfg.pct) };
+  });
+  const totalEarned = earned.reduce((a, r) => a + r.amount, 0);
+  const redeemed = cards.reduce((a, g) => a + Math.round(parseFloat(g.initialValue.amount)), 0);
+  let saved = [];
+  try { saved = JSON.parse((c.metafield && c.metafield.value) || '[]'); } catch (e) { saved = []; }
+  const codes = cards.map((g) => {
+    const s = saved.find((x) => x.id === g.id);
+    return { id: g.id, code: s ? s.code : null, last: g.lastCharacters, amount: Math.round(parseFloat(g.initialValue.amount)), balance: Math.round(parseFloat(g.balance.amount)), enabled: g.enabled, date: g.createdAt };
+  }).sort((a, b) => (a.date < b.date ? 1 : -1));
+  return { gid, cfg, currency, earned, totalEarned, redeemed, balance: Math.max(0, totalEarned - redeemed), codes, saved };
+}
+
+function cbPublic(st) {
+  return { pct: Math.round(st.cfg.pct * 100), min: st.cfg.min, currency: st.currency, earned: st.earned, totalEarned: st.totalEarned, redeemed: st.redeemed, balance: st.balance, codes: st.codes };
+}
+
+async function handleCashback(url, env) {
+  const customerId = url.searchParams.get('logged_in_customer_id');
+  if (!customerId) return json({ loggedIn: false }, 401);
+  const st = await cashbackState(env, customerId);
+  if (!st) return json({ loggedIn: false }, 401);
+  return json(cbPublic(st));
+}
+
+const redeeming = new Set();
+async function handleRedeem(request, url, env) {
+  const customerId = url.searchParams.get('logged_in_customer_id');
+  if (!customerId) return json({ error: 'Inicia sesión para canjear.' }, 401);
+  if (redeeming.has(customerId)) return json({ error: 'Ya estamos generando tu código, espera un momento.' }, 429);
+  redeeming.add(customerId);
+  try {
+    const body = await request.json().catch(() => ({}));
+    const st = await cashbackState(env, customerId);
+    if (!st) return json({ error: 'No encontramos tu cuenta.' }, 401);
+    const amount = Math.floor(Number(body.amount || st.balance));
+    if (!(amount >= st.cfg.min)) return json({ error: `El mínimo para generar un código es ${st.cfg.min}.` }, 400);
+    if (amount > st.balance) return json({ error: 'El monto es mayor a tu saldo.' }, 400);
+    const code = 'TRAMO' + [...crypto.getRandomValues(new Uint8Array(6))].map((b) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('') + [...crypto.getRandomValues(new Uint8Array(5))].map((b) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('');
+    const made = await adminGraphql(env, `mutation ($i: GiftCardCreateInput!) { giftCardCreate(input: $i) { giftCard { id createdAt } giftCardCode userErrors { message } } }`,
+      { i: { initialValue: String(amount), customerId: st.gid, note: `${CB_NOTE} (${new Date().toISOString().slice(0, 10)})`, code } });
+    const r = made.giftCardCreate;
+    if (r.userErrors.length || !r.giftCard) return json({ error: 'No se pudo generar el código: ' + (r.userErrors[0] && r.userErrors[0].message) }, 400);
+    // Revisión de seguridad: si por un canje simultáneo el saldo quedó negativo, se anula este código.
+    const after = await cashbackState(env, customerId);
+    if (after && after.totalEarned - after.redeemed < 0) {
+      await adminGraphql(env, `mutation ($id: ID!) { giftCardDeactivate(id: $id) { userErrors { message } } }`, { id: r.giftCard.id });
+      return json({ error: 'Tu saldo cambió. Intenta de nuevo.' }, 409);
+    }
+    const saved = (after ? after.saved : st.saved).concat([{ id: r.giftCard.id, code: r.giftCardCode || code }]);
+    await adminGraphql(env, `mutation ($m: [MetafieldsSetInput!]!) { metafieldsSet(metafields: $m) { userErrors { message } } }`,
+      { m: [{ ownerId: st.gid, namespace: CB_NS, key: CB_KEY, type: 'json', value: JSON.stringify(saved) }] });
+    const fresh = await cashbackState(env, customerId);
+    return json({ ok: true, code: r.giftCardCode || code, amount, state: cbPublic(fresh) });
+  } finally {
+    redeeming.delete(customerId);
+  }
+}
+
 // Límite simple por visitante (se reinicia cuando el Worker se reinicia).
 const hits = new Map();
 function limited(ip) {
@@ -186,6 +287,8 @@ export default {
       if (!(await verifyProxy(url, env.SHOPIFY_CLIENT_SECRET))) return json({ error: 'firma inválida' }, 401);
       if (url.pathname.endsWith('/orders') && request.method === 'GET') return await handleOrders(url, env);
       if (url.pathname.endsWith('/ai') && request.method === 'POST') return await handleAI(request, url, env);
+      if (url.pathname.endsWith('/cashback') && request.method === 'GET') return await handleCashback(url, env);
+      if (url.pathname.endsWith('/cashback/redeem') && request.method === 'POST') return await handleRedeem(request, url, env);
       return json({ ok: true, service: 'tramo' });
     } catch (e) {
       return json({ error: 'error interno' }, 500);

@@ -4,6 +4,7 @@ Un servicio pequeño en Cloudflare (gratis) que Shopify conecta a tu tienda con 
 
 - `tu-tienda/apps/tramo/orders` → pedidos del cliente que inició sesión, con su estado.
 - `tu-tienda/apps/tramo/ai` → respuestas de IA sobre el producto.
+- `tu-tienda/apps/tramo/cashback` → saldo de cash back y códigos del cliente; `/cashback/redeem` genera un código.
 
 Shopify firma cada petición. El servicio rechaza todo lo que no venga de tu tienda, y solo devuelve los pedidos del cliente con sesión iniciada.
 
@@ -24,7 +25,8 @@ No necesitas terminal: todo se hace desde las páginas web.
 ## Paso 2. App en Shopify
 
 1. Entra a https://dev.shopify.com → **Apps** → **Create app** → nombre `Tramo Backend`.
-2. En la versión de la app, **Access scopes**: `read_orders`, `read_customers`, `read_products`.
+2. En la versión de la app, **Access scopes**: `read_orders`, `read_customers`, `write_customers`, `read_products`, `read_gift_cards`, `write_gift_cards`.
+   (Si la app ya estaba instalada, agrega los nuevos permisos, publica una versión nueva y acepta la actualización en la tienda.)
 3. **App proxy**: prefijo `apps`, subruta `tramo`, URL = la dirección del Worker del paso 1.
 4. **Release** (publicar la versión) y luego **Install** en tu tienda.
 5. En **Settings** copia el **Client ID** y el **Client secret**, y pégalos en los secretos del paso 1.6.
@@ -48,3 +50,11 @@ En Shopify abre el pedido y agrega la etiqueta de la etapa: `estado-preparando`,
 ## Prueba de la verificación de firma (opcional)
 
 `node backend/test-signature.mjs`
+
+## Cash back
+
+- Cada pedido pagado suma `CASHBACK_PCT` % (5 por defecto) de los productos, sin envío y sin IVA (`CASHBACK_TAX`, 0.13).
+- El cliente convierte su saldo en un código desde **Mi cuenta → Mi cash back**. El código es una tarjeta de regalo de Shopify a su nombre (nota "Cash back Tramo"); se pega en el checkout y se puede usar en partes.
+- Mínimo para generar un código: `CASHBACK_MIN` (1000).
+- No vence. Los códigos se ven en el admin en **Productos → Tarjetas de regalo**.
+- Variables opcionales en Cloudflare: `CASHBACK_PCT`, `CASHBACK_TAX`, `CASHBACK_MIN`. Si cambias el % aquí, cámbialo también en el personalizador (Configuración del tema → Cash back).

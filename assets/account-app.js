@@ -198,24 +198,61 @@
     salir: '<path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M16 17l5-5-5-5M21 12H9"/>'
   };
   function ic(n) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>'; }
-  var DTITLE = { pedidos: 'Mis pedidos', perfil: 'Mis datos', direcciones: 'Mis direcciones', favoritos: 'Mis favoritos', puntos: 'Mis puntos', addr: 'Dirección' };
-  /* Puntos: 5% de cada compra pagada, en colones (1 punto = ₡1) */
+  var DTITLE = { pedidos: 'Mis pedidos', perfil: 'Mis datos', direcciones: 'Mis direcciones', favoritos: 'Mis favoritos', puntos: 'Mi cash back', addr: 'Dirección' };
+  /* Cash back: % de cada compra pagada (productos sin envío ni IVA). El servidor lleva el saldo y crea los códigos. */
   var PUNTOS_PCT = Number(host.dataset.pointsPct || 5) / 100;
+  var CB_MIN = Number(host.dataset.pointsMin || 1000);
   function puntos(c) {
+    if (state.cb && state.cb.balance != null) return { total: state.cb.balance, cur: state.cb.currency, rows: state.cb.earned.map(function (r) { return { name: r.name, date: r.date, p: r.amount }; }), live: true };
     var rows = c.orders.nodes.filter(function (o) { return o.financialStatus === 'PAID'; }).map(function (o) {
-      return { o: o, p: Math.floor(Number(o.totalPrice.amount) * PUNTOS_PCT) };
+      return { name: o.name, date: o.processedAt, p: Math.floor(Number(o.totalPrice.amount) / 1.13 * PUNTOS_PCT) };
     });
-    return { total: rows.reduce(function (a, r) { return a + r.p; }, 0), rows: rows, cur: (c.orders.nodes[0] && c.orders.nodes[0].totalPrice.currencyCode) || 'CRC' };
+    return { total: rows.reduce(function (a, r) { return a + r.p; }, 0), rows: rows, cur: (c.orders.nodes[0] && c.orders.nodes[0].totalPrice.currencyCode) || 'CRC', live: false };
+  }
+  function loadCashback(force) {
+    if (state.cb && !force && (state.cb.balance != null || state.cb.off || state.cb.loading)) return;
+    state.cb = { loading: true };
+    fetch('/apps/tramo/cashback', { credentials: 'same-origin', headers: { Accept: 'application/json' } }).then(function (r) {
+      var ct = r.headers.get('content-type') || '';
+      if (!r.ok || ct.indexOf('json') < 0) throw new Error('off');
+      return r.json();
+    }).then(function (d) { state.cb = d; }).catch(function () { state.cb = { off: true }; }).then(function () { if (state.customer) drawerRender(); });
+  }
+  function copyCode(code, btn) {
+    function done() { if (btn) { var t = btn.textContent; btn.textContent = '¡Copiado!'; btn.classList.add('is-ok'); setTimeout(function () { btn.textContent = t; btn.classList.remove('is-ok'); }, 1600); } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, function () { fallback(); });
+    else fallback();
+    function fallback() { var i = document.createElement('input'); i.value = code; i.setAttribute('readonly', ''); i.style.position = 'fixed'; i.style.opacity = '0'; document.body.appendChild(i); i.select(); try { document.execCommand('copy'); done(); } catch (e) {} i.remove(); }
   }
   function tabPuntos(c) {
-    var P = puntos(c);
-    return '<div class="acd__pts"><small>Tu saldo</small><b>' + esc(money({ amount: P.total, currencyCode: P.cur })) + '</b><span>en puntos para canjear</span></div>' +
-      '<p class="acct__muted acd__pts-how">Cada compra pagada suma el ' + Math.round(PUNTOS_PCT * 100) + '% de su total. Canjeas tus puntos por una tarjeta de regalo para usar en la tienda.</p>' +
-      '<button class="acct__btn acd__pts-btn" type="button" disabled>Canjear por tarjeta de regalo</button>' +
-      '<p class="acct__muted acd__pts-soon">El canje se activa muy pronto. Tus puntos ya se están sumando.</p>' +
-      (P.rows.length ? '<h4 class="acd__sub">Cómo los ganaste</h4><ul class="acd__ptslist">' + P.rows.map(function (r) {
-        return '<li><span>Pedido ' + esc(r.o.name) + '<small>' + esc(fdate(r.o.processedAt)) + '</small></span><b>+' + esc(money({ amount: r.p, currencyCode: P.cur })) + '</b></li>';
-      }).join('') + '</ul>' : '<p class="acct__muted">Haz tu primera compra y empieza a sumar.</p>');
+    loadCashback();
+    var P = puntos(c), cb = state.cb || {}, cur = P.cur;
+    var m = function (n) { return esc(money({ amount: n, currencyCode: cur })); };
+    var h = '<div class="acd__pts"><small>Tu cash back</small><b>' + m(P.total) + '</b><span>' + (P.live ? 'disponible para usar' : (cb.loading ? 'calculando…' : 'estimado')) + '</span></div>';
+    if (state.newCode) {
+      h += '<div class="acd__newcode"><small>Tu código está listo</small><code>' + esc(state.newCode.code) + '</code><button type="button" class="acct__btn" data-a="copy" data-code="' + esc(state.newCode.code) + '">Copiar código</button><p>Pégalo en el checkout, en "Código de descuento o tarjeta de regalo".</p></div>';
+    }
+    if (P.live) {
+      var can = P.total >= CB_MIN;
+      h += '<form class="acd__redeem" data-form="redeem"><label>Monto a convertir en código<div class="acd__amt"><span>₡</span><input name="amount" type="number" inputmode="numeric" min="' + CB_MIN + '" max="' + P.total + '" step="1" value="' + (can ? P.total : '') + '"' + (can ? '' : ' disabled') + '></div></label>' +
+        '<button class="acct__btn" type="submit"' + (can ? '' : ' disabled') + '>Generar código</button>' +
+        (can ? '' : '<p class="acct__muted">Necesitas al menos ' + m(CB_MIN) + ' para generar un código.</p>') + '</form>';
+    } else if (cb.off) {
+      h += '<button class="acct__btn acd__pts-btn" type="button" disabled>Generar código</button><p class="acct__muted acd__pts-soon">Los códigos se activan muy pronto. Tu cash back ya se está sumando.</p>';
+    }
+    var codes = (cb.codes || []);
+    if (codes.length) {
+      h += '<h4 class="acd__sub">Mis códigos</h4><ul class="acd__codes">' + codes.map(function (k) {
+        var used = k.balance <= 0 || !k.enabled;
+        return '<li class="' + (used ? 'is-used' : '') + '"><div><code>' + esc(k.code || ('•••• ' + k.last)) + '</code><small>' + (used ? 'Usado' : 'Disponible ' + m(k.balance) + (k.balance !== k.amount ? ' de ' + m(k.amount) : '')) + '</small></div>' +
+          (k.code && !used ? '<button type="button" class="acct__btn acct__btn--ghost acct__btn--sm" data-a="copy" data-code="' + esc(k.code) + '">Copiar</button>' : '') + '</li>';
+      }).join('') + '</ul>';
+    }
+    h += '<p class="acct__muted acd__pts-how">Cada compra pagada suma el ' + Math.round(PUNTOS_PCT * 100) + '% de los productos (sin envío ni IVA). No vence. Con tu saldo generas un código y lo pegas en el checkout.</p>';
+    h += P.rows.length ? '<h4 class="acd__sub">Cómo lo ganaste</h4><ul class="acd__ptslist">' + P.rows.map(function (r) {
+      return '<li><span>Pedido ' + esc(r.name) + '<small>' + esc(fdate(r.date)) + '</small></span><b>+' + m(r.p) + '</b></li>';
+    }).join('') + '</ul>' : '<p class="acct__muted">Haz tu primera compra y empieza a sumar.</p>';
+    return h;
   }
   /* Favoritos: los mismos corazones de la tienda */
   function likeList() { try { var v = JSON.parse(localStorage.getItem('tramo_likes') || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
@@ -261,7 +298,7 @@
       ['perfil', 'Mis datos', name || 'Agrega tu nombre'],
       ['direcciones', 'Mis direcciones', na ? plural(na, 'dirección guardada', 'direcciones guardadas') : 'Agrega una dirección de entrega'],
       ['favoritos', 'Mis favoritos', likeList().length ? plural(likeList().length, 'producto guardado', 'productos guardados') : 'Guarda lo que te gusta con ♥'],
-      ['puntos', 'Mis puntos', money({ amount: puntos(c).total, currencyCode: puntos(c).cur }) + ' para canjear']
+      ['puntos', 'Mi cash back', money({ amount: puntos(c).total, currencyCode: puntos(c).cur }) + ' acumulado']
     ];
     home.innerHTML = '<div class="acd__me"><span class="acd__avatar">' + esc((c.firstName || email || '?').charAt(0).toUpperCase()) + '</span><div><b>' + (c.firstName ? 'Hola, ' + esc(c.firstName) : 'Hola') + '</b><small>' + esc(email) + '</small></div></div>' +
       (state.tab ? '' : msg) +
@@ -332,7 +369,8 @@
     if (a === 'login') { b.disabled = true; login(); }
     else if (a === 'tab') { state.tab = b.dataset.t; render(); window.scrollTo({ top: host.offsetTop, behavior: 'smooth' }); }
     else if (a === 'go') drawerGo(b.dataset.t);
-    else if (a === 'home') drawerGo('');
+    else if (a === 'home') { state.newCode = null; drawerGo(''); }
+    else if (a === 'copy') copyCode(b.dataset.code, b);
     else if (a === 'unfav') {
       var hs = likeList().filter(function (x) { return x !== b.dataset.h; });
       try { localStorage.setItem('tramo_likes', JSON.stringify(hs)); } catch (er) {}
@@ -354,7 +392,18 @@
   });
   document.addEventListener('submit', function (e) {
     var f = e.target.closest('[data-form]'); if (!f || !(host.contains(f) || f.closest('.acct__modal'))) return; e.preventDefault();
-    var sb = f.querySelector('[type="submit"]'); if (sb) { sb.disabled = true; sb.textContent = 'Guardando…'; }
+    var sb = f.querySelector('[type="submit"]'); if (sb) { sb.disabled = true; sb.textContent = f.dataset.form === 'redeem' ? 'Generando…' : 'Guardando…'; }
+    if (f.dataset.form === 'redeem') {
+      var amt = Math.floor(Number(new FormData(f).get('amount') || 0));
+      fetch('/apps/tramo/cashback/redeem', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ amount: amt }) })
+        .then(function (r) { return r.json().catch(function () { return { error: 'No se pudo generar el código.' }; }); })
+        .then(function (d) {
+          if (d && d.ok) { state.cb = d.state; state.newCode = { code: d.code }; state.msg = null; }
+          else state.msg = { t: (d && d.error) || 'No se pudo generar el código.', err: true };
+        }).catch(function () { state.msg = { t: 'No se pudo conectar. Intenta de nuevo.', err: true }; })
+        .then(function () { drawerRender(); });
+      return;
+    }
     var d = {}; new FormData(f).forEach(function (v, k) { d[k] = v; });
     if (f.dataset.form === 'profile') {
       mut('mutation($i: CustomerUpdateInput!){ customerUpdate(input: $i){ customer{ id } userErrors{ message } } }', { i: { firstName: d.firstName, lastName: d.lastName } }, 'Datos actualizados.');
@@ -375,13 +424,20 @@
         if (host.dataset.signedIn === '1' && !ses('tramo.acct.auto')) { ses('tramo.acct.auto', 1); if (loading) loading.textContent = 'Conectando tu cuenta…'; return login(); }
         return loginView();
       }
-      return load().then(render).catch(function (e) { del(KEY); loginView(e.message === 'auth' ? '' : 'No pudimos cargar tu cuenta. Intenta entrar de nuevo.'); });
+      return load().then(function () { if (DRAWER && typeof pendingTab === 'string' && pendingTab) { state.tab = pendingTab; pendingTab = ''; } render(); }).catch(function (e) { del(KEY); loginView(e.message === 'auth' ? '' : 'No pudimos cargar tu cuenta. Intenta entrar de nuevo.'); });
     }).catch(function () { loginView('No pudimos conectar con tu cuenta. Intenta de nuevo.'); });
   }
   if (!DRAWER) { start(); return; }
   var started = false;
   function startOnce() { if (started) return; started = true; start(); }
-  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-open="account"]')) { startOnce(); if (state.customer) drawerGo(''); } });
+  var pendingTab = '';
+  document.addEventListener('click', function (e) {
+    var op = e.target.closest && e.target.closest('[data-open="account"]');
+    if (!op) return;
+    pendingTab = op.getAttribute('data-acct-tab') || '';
+    startOnce();
+    if (state.customer) { drawerGo(pendingTab); pendingTab = ''; }
+  });
   /* Volvió del inicio de sesión: abrir el panel de nuevo */
   if (location.hash === '#mi-cuenta') {
     history.replaceState({}, '', location.pathname + location.search);
