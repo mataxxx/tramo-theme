@@ -1421,12 +1421,25 @@
         var b = document.createElement('button');
         b.type = 'button'; b.className = 'category-chip' + (i === 0 ? ' is-active' : '');
         b.setAttribute('data-ctag', i === 0 ? '' : t);
-        b.textContent = t;
+        var rk = i === 0 ? 'todas' : normText(t).replace(/\s+/g, '-');
+        b.setAttribute('data-region', rk);
+        b.innerHTML = (REGION_ICONS[rk] || '') + '<span>' + esc(t) + '</span>';
         e.chips.appendChild(b);
       });
     }
     if (e.body) e.body.scrollTop = 0;
   }
+  var REGION_ICONS = (function () {
+    function svg(d) { return '<svg class="ccicon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
+    return {
+      'todas': svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'),
+      'africa': svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>'),
+      'asia': svg('<path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4Z"/>'),
+      'europa': svg('<path d="m3 19 6-11 4 7 3-4 5 8Z"/>'),
+      'america': svg('<path d="M16 4c1 1 1.5 2 1.5 3.5M6 9c3-3 10-3 12 3-3 6-9 8-14 7 0-4 0-7 2-10Z"/>'),
+      'medio-oriente': svg('<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/>')
+    };
+  })();
   function catApply() {
     var e = catEls();
     var q = normText(e.input.value.trim());
@@ -1708,32 +1721,64 @@
       var dots = $$('[data-hero-dot]', box);
       var slides = track.children;
       if (!dots.length || slides.length < 2) return;
+      var n = slides.length; /* slides reales */
       var secs = parseInt(box.getAttribute('data-autoplay'), 10);
-      var paused = false, timer = null;
-      function current() { return Math.round(track.scrollLeft / track.clientWidth); }
-      function mark() { var c = current(); dots.forEach(function (d, i) { d.classList.toggle('is-active', i === c); }); }
-      function go(i) { track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' }); }
+      var paused = false, timer = null, settle = null;
+      /* clon del primero al final: de la última pasa a la primera siguiendo hacia la izquierda, sin devolverse */
+      var clone = slides[0].cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true'); clone.setAttribute('data-clone', '1');
+      $$('a, button', clone).forEach(function (el) { el.setAttribute('tabindex', '-1'); });
+      track.appendChild(clone);
+      function w() { return track.clientWidth || 1; }
+      function current() { return Math.round(track.scrollLeft / w()); }
+      function mark() { var c = current() % n; dots.forEach(function (d, i) { d.classList.toggle('is-active', i === c); }); }
+      function jump(i) { track.style.scrollSnapType = 'none'; track.style.scrollBehavior = 'auto'; track.scrollLeft = i * w(); void track.offsetWidth; track.style.scrollSnapType = ''; track.style.scrollBehavior = ''; }
+      function go(i) { track.scrollTo({ left: i * w(), behavior: 'smooth' }); }
+      function fix() { if (current() >= n) jump(current() - n); mark(); }
+      function next() { go(current() + 1); }
+      function prev() { var c = current(); if (c <= 0) { jump(n); c = n; } go(c - 1); }
       ['prev', 'next'].forEach(function (dir) {
         var b = document.createElement('button');
         b.type = 'button'; b.className = 'hero-arrow hero-arrow--' + dir; b.setAttribute('aria-label', dir === 'prev' ? 'Anterior' : 'Siguiente');
         b.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + (dir === 'prev' ? 'm15 6-6 6 6 6' : 'm9 6 6 6-6 6') + '"/></svg>';
-        b.addEventListener('click', function () { go((current() + (dir === 'prev' ? -1 : 1) + slides.length) % slides.length); });
+        b.addEventListener('click', dir === 'prev' ? prev : next);
         box.appendChild(b);
       });
-      track.addEventListener('scroll', function () { window.requestAnimationFrame(mark); }, { passive: true });
+      track.addEventListener('scroll', function () {
+        window.requestAnimationFrame(mark);
+        clearTimeout(settle); settle = setTimeout(fix, 90);
+      }, { passive: true });
+      if ('onscrollend' in window) track.addEventListener('scrollend', fix);
       dots.forEach(function (d, i) { d.addEventListener('click', function () { go(i); }); });
       ['touchstart', 'pointerdown', 'mouseenter'].forEach(function (ev) { box.addEventListener(ev, function () { paused = true; }, { passive: true }); });
       ['mouseleave', 'touchend'].forEach(function (ev) { box.addEventListener(ev, function () { paused = false; }, { passive: true }); });
       if (secs > 0) {
         timer = setInterval(function () {
           if (paused || document.hidden) return;
-          go((current() + 1) % slides.length);
+          next();
         }, secs * 1000);
       }
     });
   }
   initHeroSlider();
   document.addEventListener('shopify:section:load', initHeroSlider);
+
+  /* Compartir el video del producto */
+  document.addEventListener('click', function (event) {
+    var b = event.target.closest && event.target.closest('[data-pvideo-share]');
+    if (!b) return;
+    event.preventDefault(); event.stopPropagation();
+    var url = b.getAttribute('data-share-url'), title = b.getAttribute('data-share-title') || document.title;
+    if (navigator.share) { navigator.share({ title: title, text: 'Mira este video: ' + title, url: url }).catch(function () {}); return; }
+    var done = function () { showToast('Enlace del video copiado'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copia este enlace', url); });
+    else window.prompt('Copia este enlace', url);
+  }, true);
+  /* Enlace compartido (?video=1): abre el video en grande */
+  (function () {
+    if (!/[?&]video=1/.test(location.search)) return;
+    window.addEventListener('load', function () { setTimeout(function () { var bx = $('[data-pvideo]'); if (bx && !bx.classList.contains('is-open')) toggleProductVideo(bx); }, 500); });
+  })();
 
 
   /* Celular: ventana de categoría — el banner sube con el scroll y queda fija la barra con título + buscador */

@@ -2083,3 +2083,31 @@ shopify-account {
 .brand-mark__subtitle, .brand-mark__note { transition: opacity .35s ease; }
 a, button { touch-action: manipulation; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+/* Ronda 66: portada a todo el ancho en móvil, botones por región, video con like y compartir */
+@media (max-width: 749px) {
+  .hero-wrap { margin: 0 !important; }
+  .hero-wrap .hero-slider, .hero-wrap--tiles .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin: 0 !important; border-radius: 0 !important; width: 100%; }
+  .cats-heading { display: none !important; }
+}
+.category-chip[data-region] { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px 10px 14px; font-weight: 600; border-width: 1.5px; transition: transform .2s ease, background-color .25s ease, color .25s ease, box-shadow .25s ease; }
+.category-chip[data-region] .ccicon { flex: 0 0 auto; }
+.category-chip[data-region]:active { transform: scale(.96); }
+.category-chip[data-region].is-active { box-shadow: 0 6px 16px color-mix(in srgb, var(--rg-fg) 35%, transparent); }
+.category-chip[data-region="todas"]         { --rg-bg: #e9efe4; --rg-fg: #263d25; }
+.category-chip[data-region="africa"]        { --rg-bg: #fbe5d3; --rg-fg: #a24a17; }
+.category-chip[data-region="asia"]          { --rg-bg: #fbefc2; --rg-fg: #8a6500; }
+.category-chip[data-region="europa"]        { --rg-bg: #e0eed9; --rg-fg: #2f6b3a; }
+.category-chip[data-region="america"]       { --rg-bg: #f8d9d3; --rg-fg: #a8321f; }
+.category-chip[data-region="medio-oriente"] { --rg-bg: #e5e0f3; --rg-fg: #51407f; }
+.category-chip[data-region] { background: var(--rg-bg); color: var(--rg-fg); border-color: color-mix(in srgb, var(--rg-fg) 28%, transparent); }
+.category-chip[data-region].is-active { background: var(--rg-fg); color: #fff; border-color: var(--rg-fg); }
+
+.pvideo__side { position: absolute; right: 12px; bottom: 56px; display: none; flex-direction: column; gap: 12px; z-index: 3; }
+.pvideo.is-open .pvideo__side { display: flex; }
+.pvideo--mini .pvideo__side { display: none; }
+.pvideo.is-open .pvideo__side { display: flex !important; }
+.pvideo__side .like-btn, .pvideo__share { position: static; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; padding: 0; box-shadow: none; backdrop-filter: blur(4px); cursor: pointer; }
+.pvideo__side .like-btn .icon, .pvideo__share .icon { width: 22px; height: 22px; stroke-width: 1.8; }
+.pvideo__side .like-btn[aria-pressed="true"] { background: rgba(0,0,0,.45); color: #ff4d6d; }
+.pvideo__side .like-btn[aria-pressed="true"] .icon { fill: currentColor; }
