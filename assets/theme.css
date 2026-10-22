@@ -1830,3 +1830,20 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
   .trust-bar { border-radius: 14px; }
 }
 @media (max-width: 749px) { .hero-slider { border-radius: 14px; } }
+
+
+/* Ronda 51: flechas del slideshow */
+.hero-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 4; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.88); color: #26402a; box-shadow: 0 4px 14px rgba(0,0,0,.25); transition: background .2s, transform .2s; padding: 0; }
+.hero-arrow:hover { background: #fff; transform: translateY(-50%) scale(1.08); }
+.hero-arrow--prev { left: 14px; }
+.hero-arrow--next { right: 14px; }
+@media (max-width: 749px) { .hero-arrow { width: 34px; height: 34px; } .hero-arrow--prev { left: 8px; } .hero-arrow--next { right: 8px; } }
+
+/* Ronda 52: barra fija del producto, alineación */
+.sticky-add .trust-bar--sticky { text-align: center; }
+.sticky-add .trust-bar__list { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 4px 22px; margin: 0; padding: 0; list-style: none; }
+.sticky-add .trust-bar__item { display: inline-flex; align-items: center; gap: 6px; line-height: 1; }
+.sticky-add .trust-bar__item .icon { width: 16px; height: 16px; flex-shrink: 0; }
+.sticky-add .trust-bar--sticky { border-top: 0; margin-top: 8px; padding-top: 0; }
+.sticky-add .spay { margin-bottom: 10px; }
+.sticky-add .spay__title { display: none; }

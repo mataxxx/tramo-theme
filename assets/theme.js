@@ -261,7 +261,7 @@
       '<span class="added-popup__info"><strong>' + esc(item.product_title || item.title) + '</strong>' +
       (detail ? '<small>' + esc(detail) + '</small>' : '') +
       '<span class="added-popup__price">' + formatMoney(item.final_line_price != null ? item.final_line_price : item.line_price) + '</span></span>';
-    openDrawer('added');
+    openDrawer('added', { stack: true });
     return true;
   }
 
@@ -1697,6 +1697,13 @@
       function current() { return Math.round(track.scrollLeft / track.clientWidth); }
       function mark() { var c = current(); dots.forEach(function (d, i) { d.classList.toggle('is-active', i === c); }); }
       function go(i) { track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' }); }
+      ['prev', 'next'].forEach(function (dir) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'hero-arrow hero-arrow--' + dir; b.setAttribute('aria-label', dir === 'prev' ? 'Anterior' : 'Siguiente');
+        b.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + (dir === 'prev' ? 'm15 6-6 6 6 6' : 'm9 6 6 6-6 6') + '"/></svg>';
+        b.addEventListener('click', function () { go((current() + (dir === 'prev' ? -1 : 1) + slides.length) % slides.length); });
+        box.appendChild(b);
+      });
       track.addEventListener('scroll', function () { window.requestAnimationFrame(mark); }, { passive: true });
       dots.forEach(function (d, i) { d.addEventListener('click', function () { go(i); }); });
       ['touchstart', 'pointerdown', 'mouseenter'].forEach(function (ev) { box.addEventListener(ev, function () { paused = true; }, { passive: true }); });
