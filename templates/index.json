@@ -130,7 +130,8 @@
         "tile2_heading": "Productos de temporada",
         "tile2_text": "Lo mejor de esta época.",
         "tile2_button": "Ver más",
-        "tile2_link": "/collections/all"
+        "tile2_link": "/collections/all",
+        "hide_tiles": true
       },
       "blocks": {
         "s1": {
