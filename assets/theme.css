@@ -2178,20 +2178,36 @@ a, button { touch-action: manipulation; }
   .site-header { column-gap: 18px; }
 }
 
-/* Botón flotante "Tramo TV" (computadora) */
-.tv-float { display: none; }
+/* Computadora: video flotante ya abierto + botón de ayuda (mismo verde de la tienda) */
+.float-dock { display: none; }
 @media (min-width: 750px) {
-  .tv-float { all: unset; box-sizing: border-box; position: fixed; right: 22px; bottom: 26px; z-index: 35; display: block; cursor: pointer; width: 96px; aspect-ratio: 9 / 16; border-radius: 16px; padding: 3px; background: linear-gradient(160deg, #e9c46a, #c2412f 55%, #263d25); box-shadow: 0 16px 34px rgba(0,0,0,.3); transition: transform .3s cubic-bezier(.22,.61,.36,1), box-shadow .3s; animation: tv-in .6s cubic-bezier(.22,.61,.36,1) .8s both; }
-  .tv-float:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 22px 40px rgba(0,0,0,.34); }
-  .tv-float:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; }
-  .tv-float__screen { position: relative; display: block; width: 100%; height: 100%; border-radius: 13px; overflow: hidden; background: #1a1d17; }
-  .tv-float__screen video, .tv-float__screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .tv-float__ph { position: absolute; inset: 0; background: radial-gradient(circle at 30% 25%, #6b4a2a, #1a1d17 70%); }
-  .tv-float__play { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.88); color: #1a1d17; box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .25s; }
-  .tv-float__play svg { width: 16px; height: 16px; fill: currentColor; margin-left: 2px; }
-  .tv-float:hover .tv-float__play { transform: scale(1.1); }
-  .tv-float__live { position: absolute; left: 6px; right: 6px; bottom: 6px; padding: 4px 6px; border-radius: 8px; background: rgba(0,0,0,.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); color: #fff; font-size: 11px; font-weight: 700; text-align: center; letter-spacing: .02em; }
-  body.is-locked .tv-float { opacity: 0; pointer-events: none; }
-  @keyframes tv-in { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
+  .float-dock { position: fixed; right: 22px; bottom: 24px; z-index: 35; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; pointer-events: none; }
+  .float-dock > * { pointer-events: auto; }
+  body.is-locked .float-dock { opacity: 0; visibility: hidden; }
+  .tv-pip { position: relative; width: 168px; aspect-ratio: 9 / 16; border-radius: 18px; padding: 3px; background: var(--color-primary); box-shadow: 0 18px 40px rgba(0,0,0,.3); animation: tv-in .6s cubic-bezier(.22,.61,.36,1) .8s both; }
+  .tv-pip[hidden] { display: none; }
+  .tv-pip__screen { all: unset; box-sizing: border-box; position: relative; display: block; width: 100%; height: 100%; border-radius: 15px; overflow: hidden; cursor: pointer; background: #1a1d17; }
+  .tv-pip__screen video, .tv-pip__screen img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.22,.61,.36,1); }
+  .tv-pip__screen:hover video, .tv-pip__screen:hover img { transform: scale(1.04); }
+  .tv-pip__screen:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+  .tv-pip__ph { position: absolute; inset: 0; background: radial-gradient(circle at 30% 25%, #4f6b3e, #1a1d17 70%); }
+  .tv-pip__top { position: absolute; left: 8px; top: 8px; }
+  .tv-pip__tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 999px; background: rgba(0,0,0,.5); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .02em; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .tv-pip__tag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #e2463a; box-shadow: 0 0 0 0 rgba(226,70,58,.6); animation: tv-live 1.8s ease-out infinite; }
+  .tv-pip__bottom { position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 10px 10px; display: grid; gap: 6px; color: #fff; background: linear-gradient(180deg, transparent, rgba(0,0,0,.7)); text-align: left; }
+  .tv-pip__bottom b { font-size: 13px; line-height: 1.2; font-weight: 700; }
+  .tv-pip__hint { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; opacity: .9; }
+  .tv-pip__hint svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+  .tv-pip__min { all: unset; box-sizing: border-box; position: absolute; top: -8px; right: -8px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #1a1d17; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,.25); opacity: 0; transform: scale(.8); transition: opacity .2s, transform .2s; }
+  .tv-pip:hover .tv-pip__min, .tv-pip__min:focus-visible { opacity: 1; transform: none; }
+  .tv-pip__min svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+  .float-btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 56px; min-width: 56px; padding: 0 18px; border-radius: 999px; background: var(--color-primary); color: var(--color-on-primary, #fff); font-weight: 600; font-size: 15px; box-shadow: 0 12px 28px rgba(0,0,0,.25); transition: transform .25s cubic-bezier(.22,.61,.36,1), box-shadow .25s, background-color .2s; }
+  .float-btn[hidden] { display: none; }
+  .float-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .float-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(0,0,0,.3); }
+  .float-btn:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; }
+  .float-btn--video { padding: 0; width: 56px; }
+  @keyframes tv-in { from { opacity: 0; transform: translateY(20px) scale(.92); } to { opacity: 1; transform: none; } }
+  @keyframes tv-live { 0% { box-shadow: 0 0 0 0 rgba(226,70,58,.6); } 100% { box-shadow: 0 0 0 7px rgba(226,70,58,0); } }
 }
-@media (prefers-reduced-motion: reduce) { .tv-float { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .tv-pip, .tv-pip__tag::before { animation: none; } }

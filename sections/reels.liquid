@@ -1,24 +1,59 @@
-{%- comment -%} Botón flotante tipo "reel" en computadora {%- endcomment -%}
-{%- if section.settings.show_float != false -%}
-  {%- assign fb = section.blocks.first -%}
-  <button type="button" class="tv-float" data-open="reels" aria-label="Ver videos de Tramo">
-    <span class="tv-float__screen">
-      {%- if fb.settings.video != blank -%}
-        <video muted loop playsinline autoplay preload="metadata" poster="{% if fb.settings.poster != blank %}{{ fb.settings.poster | image_url: width: 240 }}{% else %}{{ fb.settings.video.preview_image | image_url: width: 240 }}{% endif %}">
-          {%- for source in fb.settings.video.sources -%}{%- if source.mime_type == 'video/mp4' -%}<source src="{{ source.url }}" type="video/mp4">{%- break -%}{%- endif -%}{%- endfor -%}
-        </video>
-      {%- elsif fb.settings.video_url != blank -%}
-        <video muted loop playsinline autoplay preload="metadata" src="{{ fb.settings.video_url }}"{% if fb.settings.poster != blank %} poster="{{ fb.settings.poster | image_url: width: 240 }}"{% endif %}></video>
-      {%- elsif fb.settings.poster != blank -%}
-        {{ fb.settings.poster | image_url: width: 240 | image_tag: alt: '', loading: 'lazy' }}
-      {%- else -%}
-        <span class="tv-float__ph" aria-hidden="true"></span>
-      {%- endif -%}
-      <span class="tv-float__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5Z"/></svg></span>
-      <span class="tv-float__live">{{ section.settings.float_label | default: 'Tramo TV' }}</span>
-    </span>
-  </button>
-{%- endif -%}
+{%- comment -%} Computadora: video flotante ya abierto (sin sonido) + botón de ayuda {%- endcomment -%}
+<div class="float-dock" data-float-dock>
+  {%- if section.settings.show_float != false -%}
+    {%- assign fb = section.blocks.first -%}
+    <div class="tv-pip" data-tv-pip>
+      <button type="button" class="tv-pip__screen" data-open="reels" aria-label="Ver videos de Tramo con sonido">
+        {%- if fb.settings.video != blank -%}
+          <video muted loop playsinline autoplay preload="metadata" poster="{% if fb.settings.poster != blank %}{{ fb.settings.poster | image_url: width: 360 }}{% else %}{{ fb.settings.video.preview_image | image_url: width: 360 }}{% endif %}">
+            {%- for source in fb.settings.video.sources -%}{%- if source.mime_type == 'video/mp4' -%}<source src="{{ source.url }}" type="video/mp4">{%- break -%}{%- endif -%}{%- endfor -%}
+          </video>
+        {%- elsif fb.settings.video_url != blank -%}
+          <video muted loop playsinline autoplay preload="metadata" src="{{ fb.settings.video_url }}"{% if fb.settings.poster != blank %} poster="{{ fb.settings.poster | image_url: width: 360 }}"{% endif %}></video>
+        {%- elsif fb.settings.poster != blank -%}
+          {{ fb.settings.poster | image_url: width: 360 | image_tag: alt: '', loading: 'lazy' }}
+        {%- else -%}
+          <span class="tv-pip__ph" aria-hidden="true"></span>
+        {%- endif -%}
+        <span class="tv-pip__top"><span class="tv-pip__tag">{{ section.settings.float_label | default: 'Tramo TV' }}</span></span>
+        <span class="tv-pip__bottom">
+          {%- if fb.settings.heading != blank -%}<b>{{ fb.settings.heading }}</b>{%- endif -%}
+          <span class="tv-pip__hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 4 6M21 9l-4 6"/></svg>Toca para ver con sonido</span>
+        </span>
+      </button>
+      <button type="button" class="tv-pip__min" data-tv-min aria-label="Minimizar video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button>
+    </div>
+    <button type="button" class="float-btn float-btn--video" data-tv-restore hidden aria-label="Mostrar video de Tramo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="13" height="14" rx="2.5"/><path d="m16 10 5-3v10l-5-3"/></svg></button>
+  {%- endif -%}
+  <button type="button" class="float-btn float-btn--help" data-open="help" aria-label="Ayuda"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.8M12 17h.01"/></svg><span>Ayuda</span></button>
+</div>
+<script>
+  (function () {
+    var dock = document.querySelector('[data-float-dock]'); if (!dock || dock._ok) return; dock._ok = true;
+    var pip = dock.querySelector('[data-tv-pip]'), restore = dock.querySelector('[data-tv-restore]');
+    function setMin(min) {
+      if (!pip) return;
+      pip.hidden = min; if (restore) restore.hidden = !min;
+      var v = pip.querySelector('video'); if (v) { if (min) v.pause(); else { var p = v.play(); if (p && p.catch) p.catch(function () {}); } }
+      try { sessionStorage.setItem('tramo.pip.min', min ? '1' : ''); } catch (e) {}
+    }
+    var start = false; try { start = sessionStorage.getItem('tramo.pip.min') === '1'; } catch (e) {}
+    if (start) setMin(true);
+    dock.addEventListener('click', function (e) {
+      if (e.target.closest('[data-tv-min]')) { e.stopPropagation(); setMin(true); }
+      else if (e.target.closest('[data-tv-restore]')) setMin(false);
+    });
+    /* Mientras hay una ventana abierta (videos grandes, ayuda…) el video flotante se pausa */
+    if (pip && window.MutationObserver) {
+      new MutationObserver(function () {
+        var v = pip.querySelector('video'); if (!v || pip.hidden) return;
+        if (document.body.classList.contains('is-locked')) v.pause(); else if (window.matchMedia('(min-width: 750px)').matches) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
+    /* No gastar datos en celular: el video flotante solo existe en computadora */
+    if (window.matchMedia('(max-width: 749px)').matches && pip) { var v = pip.querySelector('video'); if (v) { v.removeAttribute('autoplay'); v.pause(); v.preload = 'none'; } }
+  })();
+</script>
 <div class="drawer drawer--center drawer--reels" id="ReelsOverlay" data-drawer="reels" role="dialog" aria-modal="true" aria-label="Videos" hidden>
   <div class="drawer__backdrop" data-drawer-close></div>
   <div class="reels-wrap" data-reels-wrap data-default-view="{{ section.settings.default_view }}" data-view="{{ section.settings.default_view }}">

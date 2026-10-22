@@ -293,3 +293,7 @@
   .rbt__price { font-size: 14.5px; }
   .rbt__cta { padding: 14px 18px; font-size: 17px; }
 }
+/* Llegar al banner desde la categoría "Arma tu especiero" */
+.rbt { scroll-margin-top: calc(var(--header-h, 80px) + 8px); }
+.rbt:target .rbt__box { animation: rbt-flash 1.4s var(--rb-ease) .35s both; }
+@keyframes rbt-flash { 0% { box-shadow: 0 0 0 0 rgba(38,61,37,.0), 0 18px 40px rgba(38,61,37,.08); } 35% { box-shadow: 0 0 0 6px rgba(38,61,37,.22), 0 18px 40px rgba(38,61,37,.12); } 100% { box-shadow: 0 0 0 0 rgba(38,61,37,0), 0 18px 40px rgba(38,61,37,.08); } }

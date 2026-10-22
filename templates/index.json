@@ -43,77 +43,26 @@
           "type": "category",
           "settings": {
             "collection": "test2",
-            "title": "Semillas",
+            "title": "Semillas & Granos",
             "search_noun": "semilla",
             "icon": "leaf"
           }
         },
-        "c4": {
+        "rack": {
           "type": "category",
           "settings": {
-            "collection": "frutas-otros-deshidratados",
-            "title": "Frutas",
-            "search_noun": "fruta",
-            "icon": "leaf"
-          }
-        },
-        "c5": {
-          "type": "category",
-          "settings": {
-            "collection": "insumos-para-reposteria",
-            "title": "Repostería",
-            "search_noun": "insumo",
-            "icon": "package"
-          }
-        },
-        "c6": {
-          "type": "category",
-          "settings": {
-            "collection": "dulces-conservas",
-            "title": "Dulces",
-            "search_noun": "dulce",
-            "icon": "tag"
-          }
-        },
-        "c7": {
-          "type": "category",
-          "settings": {
-            "collection": "lacteos",
-            "title": "Quesos",
-            "search_noun": "queso",
-            "icon": "package"
-          }
-        },
-        "c8": {
-          "type": "category",
-          "settings": {
-            "collection": "bebidas-gelatinas",
-            "title": "Bebidas",
-            "search_noun": "bebida",
-            "icon": "tag"
-          }
-        },
-        "c9": {
-          "type": "category",
-          "settings": {
-            "collection": "chocolateria",
-            "title": "Chocolate",
-            "search_noun": "chocolate",
-            "icon": "tag"
+            "link": "#arma-tu-especiero",
+            "title": "Arma tu especiero",
+            "icon": "rack"
           }
         }
       },
       "block_order": [
-        "c0",
         "c1",
         "c2",
-        "c3",
-        "c4",
-        "c5",
-        "c6",
-        "c7",
-        "c8",
-        "c9"
+        "rack",
+        "c0",
+        "c3"
       ]
     },
     "hero": {
