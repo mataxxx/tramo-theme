@@ -789,7 +789,6 @@ body.has-expanded .main > .shopify-section:not(.is-expanded-section) { display: 
 .site-header--sticky { background: color-mix(in srgb, var(--color-surface) 96%, transparent); }
 .brand-mark, .brand-mark__subtitle, .brand-mark__note { transition: transform .25s ease, opacity .2s ease, max-height .25s ease, margin .25s ease; }
 .site-header--shadow.is-scrolled { box-shadow: 0 8px 22px rgba(38, 61, 37, .13); }
-.site-header--shrink.is-scrolled { padding-top: 10px; padding-bottom: 10px; }
 .site-header--shrink.is-scrolled .brand-mark { transform: scale(.82); }
 .site-header--shrink.is-scrolled .brand-mark__subtitle,
 .site-header--shrink.is-scrolled .brand-mark__note { opacity: 0; max-height: 0; margin: 0; overflow: hidden; }
@@ -2048,3 +2047,39 @@ shopify-account {
   .header__account-wc--desk { display: none !important; }
   .header__account-wc--mob:defined ~ .header__user { display: none !important; }
 }
+
+/* Ronda 65: móvil — solo el título queda fijo en la categoría; header estable; sin zoom al enfocar campos; scroll suave */
+.cm-sticky { display: none; }
+@media (max-width: 749px) {
+  .cm-mini-title, .cm-mini-close { display: none !important; }
+  .category-modal__searchwrap { position: static !important; box-shadow: none !important; padding: 8px 16px; }
+  .cm-sticky { display: block; position: sticky; top: 0; height: 0; z-index: 9; overflow: visible; }
+  .cm-sticky__bar { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 8px 8px 18px; background: var(--color-bg, #f7f3e9); box-shadow: 0 6px 16px rgba(38,61,37,.14); transform: translateY(-110%); opacity: 0; pointer-events: none; transition: transform .45s cubic-bezier(.22,.61,.36,1), opacity .35s ease; will-change: transform; }
+  .category-modal.is-compact .cm-sticky__bar { transform: none; opacity: 1; pointer-events: auto; }
+  .cm-sticky__title { font-family: var(--font-heading); font-size: 22px; letter-spacing: -.5px; color: #1f3d22; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .cm-sticky__close { position: static; flex: 0 0 auto; width: 40px; height: 40px; padding: 0; }
+
+  /* Header móvil estable: logo centrado, iconos a los lados */
+  .site-header { grid-template-columns: 1fr auto 1fr; padding: 14px 14px 12px; column-gap: 8px; }
+  .site-header > * { min-width: 0; }
+  .header__account-wc--mob { display: none !important; }
+  .site-header > .header__user { display: grid !important; grid-column: 1; grid-row: 1; justify-self: start; }
+  .site-header .brand-mark { grid-column: 2; grid-row: 1; justify-self: center; }
+  .site-header .header__actions { grid-column: 3; grid-row: 1; justify-self: end; gap: 2px; }
+  .brand-mark__logo { max-height: 64px; max-width: 46vw; height: auto; object-fit: contain; }
+  .site-header .icon-button { width: 44px; height: 44px; padding: 0; }
+  .site-header .icon-button .icon { width: 26px; height: 26px; }
+
+  /* Evita el zoom automático de iOS al tocar un campo */
+  input, select, textarea, .search-field input, .header__searchbar input { font-size: 16px !important; }
+}
+/* Encabezado sin saltos al scrollear: solo transform/sombra, nada que cambie el alto */
+.site-header { transition: box-shadow .4s ease, background-color .4s ease; }
+.site-header--shrink.is-scrolled .brand-mark { transform: scale(.9); }
+.site-header--shrink.is-scrolled .brand-mark__subtitle,
+.site-header--shrink.is-scrolled .brand-mark__note { opacity: 0; max-height: none; margin: 0; }
+.site-header--shrink.is-scrolled .brand-mark__logo { max-height: none; }
+.brand-mark { transition: transform .45s cubic-bezier(.22,.61,.36,1); transform-origin: center; }
+.brand-mark__subtitle, .brand-mark__note { transition: opacity .35s ease; }
+a, button { touch-action: manipulation; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
