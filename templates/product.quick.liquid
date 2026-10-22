@@ -24,7 +24,6 @@
       <button type="button" class="like-btn like-btn--inline" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button>
     </div>
     <div class="quick-view__price">{% render 'price', product: product, variant: product.selected_or_first_available_variant %}</div>
-    {% render 'cashback-note' %}
     {% render 'product-variant-picker', product: product, form_id: form_id, section_id: form_id %}
     {% render 'product-quantity', product: product %}
     {% render 'product-buy-button', product: product, form_id: form_id %}

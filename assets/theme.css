@@ -2289,3 +2289,5 @@ a, button { touch-action: manipulation; }
   .trust-bar--foot + .site-footer { margin-top: 0; }
   .hero-wrap--tv { margin-top: 12px !important; }
 }
+.cb-note--cart { margin: 10px 0 6px; }
+.cb-note--cart .cb-note__pop { top: auto; bottom: calc(100% + 8px); }

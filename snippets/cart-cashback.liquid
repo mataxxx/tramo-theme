@@ -1,0 +1,28 @@
+{%- comment -%} Cash back que gana el cliente con lo que tiene en el carrito {%- endcomment -%}
+{%- unless settings.cashback_enabled == false -%}
+  {%- liquid
+    assign cb_pct = settings.cashback_pct | default: 5
+    assign cb_base = cart.items_subtotal_price
+    if cart.taxes_included
+      assign cb_base = cb_base | times: 100 | divided_by: 113
+    endif
+    assign cb_amount = cb_base | times: cb_pct | divided_by: 100
+  -%}
+  {%- if cb_amount > 0 -%}
+    <div class="cb-note cb-note--cart">
+      <span class="cb-note__badge" aria-hidden="true">{{ cb_pct }}%</span>
+      <span class="cb-note__text">Con esta compra ganas <b>{{ cb_amount | money_without_trailing_zeros }}</b> de cash back</span>
+      <details class="cb-note__more">
+        <summary aria-label="Más información sobre el cash back"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></summary>
+        <div class="cb-note__pop">
+          <p>{{ settings.cashback_info | default: 'Cada compra suma este porcentaje a tu saldo (sobre los productos, sin envío ni IVA). Con tu saldo generas códigos para pagar en el checkout. No vence.' }}</p>
+          {%- if customer -%}
+            <button type="button" class="cb-note__link" data-open="account" data-acct-tab="puntos">Ver mi cash back →</button>
+          {%- else -%}
+            <a class="cb-note__link" href="{{ routes.storefront_login_url }}" data-login-open>Inicia sesión para que se te sume →</a>
+          {%- endif -%}
+        </div>
+      </details>
+    </div>
+  {%- endif -%}
+{%- endunless -%}

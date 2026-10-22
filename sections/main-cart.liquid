@@ -4,7 +4,7 @@
   {%- if cart.item_count == 0 -%}
     <div class="cart-empty">
       <p>{{ section.settings.empty_text }}</p>
-      <a href="{{ routes.all_products_collection_url }}" class="button">Ver productos</a>
+      <button type="button" class="button" data-open="search">Buscar productos</button>
     </div>
   {%- else -%}
     <form action="{{ routes.cart_url }}" method="post" class="cart-page__form" data-cart-form>
@@ -27,7 +27,8 @@
           <span>Subtotal</span>
           <strong>{{ cart.total_price | money }}</strong>
         </div>
-        <p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>
+        {% render 'cart-cashback' %}
+<p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>
         <button type="submit" name="checkout" class="button button--full" data-checkout-button{% if settings.show_pay_methods and settings.require_pay_choice and settings.pay_methods != blank and cart.attributes['Método de pago'] == blank %} disabled{% endif %}>{{ section.settings.checkout_label }}</button>
         {%- if section.settings.show_secure -%}
           {% render 'secure-pay', part: 'bottom', text: section.settings.secure_text %}

@@ -59,7 +59,6 @@
           <div class="product-info__price" {{ block.shopify_attributes }}>
             {% render 'price', product: product, variant: product.selected_or_first_available_variant %}
           </div>
-          {% render 'cashback-note' %}
         {%- when 'variant_picker' -%}
           <div {{ block.shopify_attributes }}>
             {% render 'product-variant-picker', product: product, form_id: form_id, section_id: section.id %}
