@@ -100,6 +100,7 @@
       assign t_b = section.settings[k_b] | default: d_b
       assign t_l = section.settings[k_l] | default: d_l
     -%}
+    {%- if t_h != blank and n == 2 and section.settings.show_tile2 != true -%}{%- continue -%}{%- endif -%}
     {%- if t_h != blank -%}
       <a class="hero-tile" href="{{ t_l }}" style="--tile-bg: {{ section.settings[k_c] | default: '#2f5b2c' }}">
         {%- if section.settings[k_i] != blank -%}<span class="hero-tile__img">{{ section.settings[k_i] | image_url: width: 900 | image_tag: widths: '450, 900', sizes: '420px', loading: 'lazy', alt: '' }}</span>{%- endif -%}
@@ -124,6 +125,7 @@
   "max_blocks": 5,
   "settings": [
     { "type": "paragraph", "content": "Slideshow: la primera diapositiva se edita aquí abajo; las demás con «Agregar diapositiva». Las 2 cajas de la derecha se editan más abajo." },
+    { "type": "checkbox", "id": "show_tile2", "label": "Mostrar también la caja derecha de abajo", "default": false },
     { "type": "checkbox", "id": "hide_tiles", "label": "Ocultar bloques laterales (slideshow a todo el ancho)", "default": false },
     { "type": "header", "content": "Caja derecha de arriba (solo escritorio)" },
     { "type": "text", "id": "tile1_kicker", "label": "Texto pequeño", "default": "Hecho a mano en Costa Rica" },

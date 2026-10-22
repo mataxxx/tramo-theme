@@ -1998,3 +1998,6 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
   .category-modal__searchwrap .category-modal__field .icon { width: 16px; height: 16px; }
   .category-modal.is-compact .cm-mini-title { max-width: 52vw; }
 }
+
+/* Ronda 61: una sola caja lateral */
+@media (min-width: 750px) { .hero-wrap--tiles .hero-side .hero-tile:only-child { border-radius: 14px; } }
