@@ -2400,3 +2400,8 @@ a, button { touch-action: manipulation; }
 .float-btn--blog { gap: 8px; }
 /* Sin botón de "imagen en imagen" ni controles del navegador sobre los videos en bucle */
 .tv-pip video::-internal-media-controls-overlay-cast-button, .reel video::-internal-media-controls-overlay-cast-button { display: none; }
+
+/* Ronda 83: sin contorno negro al tocar una fila (solo se ve navegando con teclado) */
+.product-rail:focus, .cats-tile:focus, [tabindex="0"]:focus { outline: none; }
+.product-rail:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 4px; border-radius: 14px; }
+.cats-tile:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 12px; }

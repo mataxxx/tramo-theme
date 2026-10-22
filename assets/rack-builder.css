@@ -313,3 +313,5 @@
 .rb-opt__jar .rb-jar__glass, .rb-opt__jar .rb-jar__lid { width: 100%; }
 .rb-sum__rack { grid-template-columns: repeat(var(--cols, 3), 7px); }
 .rb-sum__rack i { width: 7px; height: 16px; }
+
+/* sync 1792710874 */
