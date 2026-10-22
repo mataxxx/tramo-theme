@@ -2238,3 +2238,9 @@ a, button { touch-action: manipulation; }
 .category-chip[data-region="queque-navideno"] { --rg-bg: #f6e0d6; --rg-fg: #9b2f22; }
 .category-chip[data-region="tamales"]         { --rg-bg: #e3eed7; --rg-fg: #2f6b3a; }
 .category-chip[data-region="especias"]        { --rg-bg: #f7ebd0; --rg-fg: #8a5a12; }
+
+/* Ronda 73: celular — "Pagos seguros · Entregas confiables" centrado en su franja (mismo espacio arriba y abajo) */
+@media (max-width: 749px) {
+  .shopify-section .trust-bar:not(.trust-bar--sticky) { margin: 13px 0 13px; line-height: 1.2; }
+  .shopify-section .trust-bar:not(.trust-bar--sticky) .trust-bar__list { min-height: 0; }
+}
