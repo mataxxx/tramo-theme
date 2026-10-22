@@ -2410,3 +2410,21 @@ a, button { touch-action: manipulation; }
 .float-btn--blog, .float-btn--help { background: #D9A521; color: #2B1D0E; }
 .float-btn--blog:hover, .float-btn--help:hover { background: #C8941A; }
 .float-btn--blog:focus-visible, .float-btn--help:focus-visible { outline-color: #D9A521; }
+
+/* Ronda 85: ventana de categoría en desktop — encabezado en una sola fila y 6 columnas de fichas */
+@media (min-width: 990px) {
+  .cm-top { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(240px, 340px); align-items: center; column-gap: 22px; padding: 14px 84px 14px 24px; }
+  .cm-top > .cm-hero { position: static; padding: 0; overflow: visible; }
+  .cm-hero__copy { max-width: none; padding: 0; }
+  .cm-hero .category-modal__title { font-size: clamp(26px, 2.3vw, 34px); white-space: nowrap; }
+  .cm-hero__sub { font-size: 13px; margin-top: 2px; white-space: nowrap; }
+  .cm-top .cm-tools { top: 50%; right: 20px; transform: translateY(-50%); }
+  .cm-top .cm-tools .close-button { width: 42px; height: 42px; }
+  .cm-top .cm-filters { padding: 0; min-width: 0; }
+  .cm-top .category-modal__searchwrap { padding: 0; }
+  .cm-top .category-modal__field { margin: 0; min-height: 44px; border-radius: 12px; }
+  .cm-top .category-modal__field input { font-size: 15px; }
+  .cm-bar { padding: 10px 24px 8px; }
+  .category-modal__body { padding-top: 4px; }
+}
+@media (min-width: 1250px) { .category-modal__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; } }
