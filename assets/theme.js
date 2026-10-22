@@ -1400,8 +1400,7 @@
     e.title.textContent = opts.title || '';
     var mt = $('[data-category-mini-title]'); if (mt) mt.textContent = opts.title || '';
     var cm0 = $('.category-modal'); if (cm0) { cm0.classList.remove('is-compact'); cm0.scrollTop = 0; }
-    var art = $('[data-category-art]');
-    if (art) { if (art._def === undefined) art._def = art.innerHTML; art.innerHTML = opts.banner ? '<img src="' + esc(opts.banner) + '" alt="">' : art._def; }
+    $$('[data-category-art]').forEach(function (art) { if (art._def === undefined) art._def = art.innerHTML; art.innerHTML = opts.banner ? '<img src="' + esc(opts.banner) + '" alt="">' : art._def; });
     e.input.value = '';
     e.input.placeholder = opts.question || 'Buscar...';
     var bar = opts.search !== 'icon';

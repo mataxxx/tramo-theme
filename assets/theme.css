@@ -1977,3 +1977,24 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
 .site-footer__credit { padding-left: 16px; margin-left: 4px; border-left: 2px solid rgba(255,255,255,.45); opacity: .85; }
 .site-footer__credit a { border: 0; padding: 0; }
 @media (max-width: 749px) { .site-footer { padding: 44px 22px 24px; } .site-footer__legal a { padding: 0 10px; } }
+
+
+/* Ronda 60: banner hasta la línea bajo el buscador; barra compacta del celular más equilibrada */
+@media (min-width: 750px) {
+  .cm-top { position: relative; border-bottom: 1px solid var(--color-line); overflow: hidden; }
+  .cm-top > *:not(.cm-top__art) { position: relative; z-index: 1; }
+  .cm-top__art { position: absolute; inset: 0 0 0 auto; width: 62%; padding: 0; height: 100% !important; z-index: 0; display: block; }
+  .cm-top__art img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 40%); mask-image: linear-gradient(90deg, transparent, #000 40%); }
+  .cm-hero .cm-hero__art { display: none; }
+  .cm-bar { border-top: 0; }
+  .cm-top .cm-filters, .cm-top .category-modal__searchwrap { background: transparent; }
+}
+@media (max-width: 749px) {
+  .cm-top { display: contents; }
+  .cm-top__art { display: none; }
+  .cm-mini-title { font-size: 26px; }
+  .category-modal__searchwrap .category-modal__field { min-height: 38px; }
+  .category-modal__searchwrap .category-modal__field input { font-size: 14px; }
+  .category-modal__searchwrap .category-modal__field .icon { width: 16px; height: 16px; }
+  .category-modal.is-compact .cm-mini-title { max-width: 52vw; }
+}

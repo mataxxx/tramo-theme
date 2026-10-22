@@ -25,6 +25,12 @@
         <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
       </div>
     </header>
+    <div class="cm-top">
+    <div class="category-modal__art cm-top__art" data-category-art aria-hidden="true">
+      {%- if settings.category_banner != blank -%}
+        {{ settings.category_banner | image_url: width: 1400 | image_tag: loading: 'lazy', alt: '' }}
+      {%- endif -%}
+    </div>
     <div class="category-modal__filters cm-filters" data-category-filters>
       <div class="category-modal__chips" data-category-chips hidden></div>
     </div>
@@ -35,6 +41,7 @@
         <input type="search" data-category-filter autocomplete="off" placeholder="Buscar..." aria-label="Buscar en la categoría">
       </div>
       <button type="button" class="close-button close-button--static cm-mini-close" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+    </div>
     </div>
     <div class="cm-bar">
       <span class="cm-count" data-category-count></span>
