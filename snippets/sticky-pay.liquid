@@ -1,0 +1,20 @@
+{%- comment -%} Franja profesional de métodos de pago bajo/sobre el botón fijo. Logos editables en Configuración del tema → Barra del botón de compra. {%- endcomment -%}
+<div class="spay" data-sticky-pay hidden>
+  <p class="spay__title">{% render 'icon', name: 'lock' %}<span>{{ settings.spay_title | default: 'Pago 100% seguro' }}</span></p>
+  <ul class="spay__list" role="list">
+    {%- assign has_logo = false -%}
+    {%- for n in (1..6) -%}
+      {%- assign key = 'spay_logo_' | append: n -%}
+      {%- assign logo = settings[key] -%}
+      {%- if logo != blank -%}
+        {%- assign has_logo = true -%}
+        <li class="spay__chip spay__chip--logo">{{ logo | image_url: width: 160 | image_tag: height: 22, loading: 'lazy', alt: '' }}</li>
+      {%- endif -%}
+    {%- endfor -%}
+    {%- unless has_logo -%}
+      <li class="spay__chip">{% render 'icon', name: 'phone' %}<span>SINPE Móvil</span></li>
+      <li class="spay__chip">{% render 'icon', name: 'bank' %}<span>Transferencia</span></li>
+      <li class="spay__chip">{% render 'icon', name: 'card' %}<span>Tarjeta</span></li>
+    {%- endunless -%}
+  </ul>
+</div>

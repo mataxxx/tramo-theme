@@ -587,7 +587,15 @@
         "id": "sticky_trust_2",
         "label": "Mensaje 2",
         "default": "Entrega rápida"
-      }
+      },
+      { "type": "text", "id": "spay_title", "label": "Título de métodos de pago", "default": "Pago 100% seguro" },
+      { "type": "paragraph", "content": "Sube los logos oficiales (Visa, Mastercard, SINPE Móvil, etc.) como PNG/SVG con fondo transparente. Si no subes ninguno se muestran etiquetas simples." },
+      { "type": "image_picker", "id": "spay_logo_1", "label": "Logo 1" },
+      { "type": "image_picker", "id": "spay_logo_2", "label": "Logo 2" },
+      { "type": "image_picker", "id": "spay_logo_3", "label": "Logo 3" },
+      { "type": "image_picker", "id": "spay_logo_4", "label": "Logo 4" },
+      { "type": "image_picker", "id": "spay_logo_5", "label": "Logo 5" },
+      { "type": "image_picker", "id": "spay_logo_6", "label": "Logo 6" }
     ]
   }
 ]

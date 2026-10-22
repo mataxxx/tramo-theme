@@ -120,7 +120,17 @@
       "type": "hero",
       "settings": {
         "heading": "DE NUESTRA\nTRADICIÓN A\nTU MESA",
-        "text": "Especias, ingredientes\ny sabores del mundo\ndesde 1946."
+        "text": "Especias, ingredientes\ny sabores del mundo\ndesde 1946.",
+        "tile1_kicker": "Hecho a mano en Costa Rica",
+        "tile1_heading": "Arma tu especiero",
+        "tile1_text": "Elige el modelo y llénalo con tus especias.",
+        "tile1_button": "Armar el mío",
+        "tile1_link": "/pages/especiero",
+        "tile2_kicker": "De temporada",
+        "tile2_heading": "Productos de temporada",
+        "tile2_text": "Lo mejor de esta época.",
+        "tile2_button": "Ver más",
+        "tile2_link": "/collections/all"
       },
       "blocks": {
         "s1": {

@@ -20,6 +20,7 @@
   {% render 'text-style', s: section.settings, p: 'text', sel: text_sel %}
 {%- endstyle -%}
 
+<div class="hero-wrap{% if section.settings.tile1_heading != blank or section.settings.tile2_heading != blank %} hero-wrap--tiles{% endif %}">
 <div class="hero-slider" data-hero-slider data-autoplay="{{ section.settings.autoplay_seconds }}" aria-roledescription="carrusel">
   <div class="hero-track" data-hero-track>
     {%- for i in (0..section.blocks.size) -%}
@@ -69,6 +70,35 @@
   {%- endif -%}
 </div>
 
+{%- if section.settings.tile1_heading != blank or section.settings.tile2_heading != blank -%}
+<div class="hero-side">
+  {%- for n in (1..2) -%}
+    {%- liquid
+      assign k_h = 'tile' | append: n | append: '_heading'
+      assign k_k = 'tile' | append: n | append: '_kicker'
+      assign k_t = 'tile' | append: n | append: '_text'
+      assign k_i = 'tile' | append: n | append: '_image'
+      assign k_l = 'tile' | append: n | append: '_link'
+      assign k_b = 'tile' | append: n | append: '_button'
+      assign k_c = 'tile' | append: n | append: '_color'
+      assign t_h = section.settings[k_h]
+    -%}
+    {%- if t_h != blank -%}
+      <a class="hero-tile" href="{{ section.settings[k_l] | default: '#' }}" style="--tile-bg: {{ section.settings[k_c] | default: '#2f5b2c' }}">
+        {%- if section.settings[k_i] != blank -%}<span class="hero-tile__img">{{ section.settings[k_i] | image_url: width: 900 | image_tag: widths: '450, 900', sizes: '420px', loading: 'lazy', alt: '' }}</span>{%- endif -%}
+        <span class="hero-tile__copy">
+          {%- if section.settings[k_k] != blank -%}<small>{{ section.settings[k_k] }}</small>{%- endif -%}
+          <strong>{{ t_h }}</strong>
+          {%- if section.settings[k_t] != blank -%}<em>{{ section.settings[k_t] }}</em>{%- endif -%}
+          {%- if section.settings[k_b] != blank -%}<span class="hero-tile__btn">{{ section.settings[k_b] }}</span>{%- endif -%}
+        </span>
+      </a>
+    {%- endif -%}
+  {%- endfor -%}
+</div>
+{%- endif -%}
+</div>
+
 {% schema %}
 {
   "name": "Portada (hero)",
@@ -76,6 +106,22 @@
   "class": "section-hero",
   "max_blocks": 5,
   "settings": [
+    { "type": "header", "content": "Bloque lateral 1 (solo escritorio)" },
+    { "type": "text", "id": "tile1_kicker", "label": "Texto pequeño" },
+    { "type": "text", "id": "tile1_heading", "label": "Título", "info": "Si dejas ambos títulos vacíos, el slideshow ocupa todo el ancho." },
+    { "type": "text", "id": "tile1_text", "label": "Texto" },
+    { "type": "text", "id": "tile1_button", "label": "Texto del botón" },
+    { "type": "url", "id": "tile1_link", "label": "Enlace" },
+    { "type": "image_picker", "id": "tile1_image", "label": "Imagen" },
+    { "type": "color", "id": "tile1_color", "label": "Color de fondo", "default": "#2f5b2c" },
+    { "type": "header", "content": "Bloque lateral 2 (solo escritorio)" },
+    { "type": "text", "id": "tile2_kicker", "label": "Texto pequeño" },
+    { "type": "text", "id": "tile2_heading", "label": "Título", "info": "Si dejas ambos títulos vacíos, el slideshow ocupa todo el ancho." },
+    { "type": "text", "id": "tile2_text", "label": "Texto" },
+    { "type": "text", "id": "tile2_button", "label": "Texto del botón" },
+    { "type": "url", "id": "tile2_link", "label": "Enlace" },
+    { "type": "image_picker", "id": "tile2_image", "label": "Imagen" },
+    { "type": "color", "id": "tile2_color", "label": "Color de fondo", "default": "#8a5a2b" },
     {
       "type": "image_picker",
       "id": "image",

@@ -262,10 +262,6 @@
       (detail ? '<small>' + esc(detail) + '</small>' : '') +
       '<span class="added-popup__price">' + formatMoney(item.final_line_price != null ? item.final_line_price : item.line_price) + '</span></span>';
     openDrawer('added');
-    var timer = $('[data-added-timer]');
-    if (timer) { timer.style.animation = 'none'; void timer.offsetWidth; timer.style.animation = ''; }
-    clearTimeout(showAddedPopup._t);
-    showAddedPopup._t = setTimeout(function () { closeDrawer($('[data-drawer="added"]'), true); }, 3000);
     return true;
   }
 
@@ -394,8 +390,9 @@
       bar.className = 'sticky-add'; bar.hidden = true;
       var sb = document.createElement('button');
       sb.type = 'button'; sb.className = 'button button--full';
-      var pay = $('.pay-sentence', root);
-      if (pay) bar.appendChild(pay);
+      var pay = $('[data-sticky-pay]', root);
+      if (pay) { pay.hidden = false; bar.appendChild(pay); }
+      var oldPay = $('.pay-sentence', root); if (oldPay) oldPay.hidden = true;
       bar.appendChild(sb);
       var trust = $('[data-sticky-trust]', root);
       if (trust) { trust.hidden = false; bar.appendChild(trust); }
@@ -552,7 +549,6 @@
       addButton.setAttribute('aria-busy', 'true');
       addToCart(parseInt(idInput.value, 10), quantity, formProps(form))
         .then(function (item) {
-          if (inQuickView) closeDrawer($('[data-drawer="quick-view"]'), true);
           return afterAdd(item);
         })
         .catch(function (error) {
@@ -677,21 +673,22 @@
       });
       html += '</div><button type="button" class="search-drop__all" data-search-drop-all>Buscar un producto por nombre…</button>';
       wrap.innerHTML = html;
-      bar.parentNode.insertBefore(wrap, bar.nextSibling);
+      bar.parentNode.appendChild(wrap);
     }
     var open = !wrap.classList.contains('is-open');
     wrap.classList.toggle('is-open', open);
+    bar.parentNode.classList.toggle('is-open', open);
     bar.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
   function closeSearchDrop() {
-    $$('.search-drop.is-open').forEach(function (d) { d.classList.remove('is-open'); });
+    $$('.search-drop.is-open, .header__searchwrap.is-open').forEach(function (d) { d.classList.remove('is-open'); });
     $$('.header__searchbar').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
   }
   document.addEventListener('click', function (e) {
     var t = e.target; if (!t.closest) return;
     if (t.closest('[data-search-drop-all]')) { closeSearchDrop(); openSearch(null); return; }
     if (t.closest('.search-drop__item')) { closeSearchDrop(); return; }
-    if (!t.closest('.search-drop') && !t.closest('.header__searchbar')) closeSearchDrop();
+    if (!t.closest('.header__searchwrap')) closeSearchDrop();
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSearchDrop(); });
 

@@ -71,10 +71,12 @@
       <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">
         {% render 'icon', name: 'search' %}
       </button>
-      <button type="button" class="header__searchbar" data-open="search" aria-label="Buscar">
-        {% render 'icon', name: 'search' %}
-        <span>{{ s.search_placeholder }}</span>
-      </button>
+      <div class="header__searchwrap">
+        <button type="button" class="header__searchbar" data-open="search" aria-label="Buscar" aria-expanded="false">
+          {% render 'icon', name: 'search' %}
+          <span>{{ s.search_placeholder }}</span>
+        </button>
+      </div>
     {%- endif -%}
     {%- if s.show_likes -%}
       <button type="button" class="icon-button header__likes" data-open="likes" aria-label="Favoritos">

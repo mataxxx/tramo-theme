@@ -31,6 +31,7 @@
   <p class="form-error" data-form-error role="alert" hidden></p>
 {% endform %}
 {% render 'pay-methods', mode: 'sentence' %}
+{% render 'sticky-pay' %}
 <div class="trust-bar trust-bar--sticky" data-sticky-trust hidden>
   <ul class="trust-bar__list" role="list">
     <li class="trust-bar__item">{% render 'icon', name: 'shield' %}<span>{{ settings.sticky_trust_1 | default: 'Compra segura' }}</span></li>

@@ -1645,3 +1645,55 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
   .search-drop__item img { width: 34px; height: 34px; object-fit: contain; }
   .search-drop__all { margin-top: 12px; width: 100%; border: 0; background: transparent; color: var(--color-primary); font: inherit; font-weight: 600; padding: 8px; border-top: 1px solid var(--color-line); }
 }
+
+
+/* Ronda 44 */
+/* modal: arreglo de la imagen que tapaba el contenido */
+@media (min-width: 750px) {
+  .drawer--sheet .quick-view__media { aspect-ratio: auto; height: auto; min-height: 420px; width: 100%; align-self: stretch; position: relative; top: auto; }
+  .drawer--sheet .quick-view__media > img { position: absolute; inset: 0; }
+  .drawer--sheet .quick-view { overflow: hidden; }
+  .drawer--sheet .quick-view .sticky-add { position: sticky !important; width: auto; max-width: none; left: auto; right: auto; }
+}
+.drawer--modal { z-index: 90; }
+
+/* franja de métodos de pago */
+.spay { margin: 0 0 8px; text-align: center; }
+.spay[hidden] { display: none; }
+.spay__title { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: #3b6a36; }
+.spay__title .icon { width: 14px; height: 14px; }
+.spay__list { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; list-style: none; margin: 0; padding: 0; }
+.spay__chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; background: #fff; border: 1px solid #cfe2c7; border-radius: 8px; font-size: 12px; font-weight: 600; color: #26402a; box-shadow: 0 1px 2px rgba(38,61,37,.08); }
+.spay__chip .icon { width: 16px; height: 16px; color: #3b6a36; }
+.spay__chip--logo { padding: 0 10px; }
+.spay__chip--logo img { height: 20px; width: auto; display: block; }
+.sticky-add .trust-bar--sticky { border-top: 1px solid #c5dcbc; padding-top: 6px; margin-top: 8px; }
+
+/* buscador desplegable tipo mega menú */
+@media (min-width: 750px) {
+  .header__searchwrap { grid-column: 2; grid-row: 1; position: relative; width: 100%; max-width: 720px; justify-self: center; }
+  .header__searchwrap .header__searchbar { width: 100%; max-width: none; }
+  .header__searchwrap.is-open .header__searchbar { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: var(--color-primary); }
+  .header__searchwrap .search-drop { display: none; position: absolute; left: 0; right: 0; top: 100%; width: auto; max-width: none; margin: 0; z-index: 80; background: #fff; border: 1px solid var(--color-primary); border-top: 1px solid var(--color-line); border-radius: 0 0 20px 20px; box-shadow: 0 24px 40px rgba(38,61,37,.18); padding: 16px 18px 12px; }
+  .header__searchwrap .search-drop.is-open { display: block; }
+}
+@media (max-width: 749px) { .header__searchwrap { display: none; } }
+
+/* hero con bloques laterales */
+.hero-side { display: none; }
+@media (min-width: 1000px) {
+  .hero-wrap--tiles { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr); gap: 14px; margin: 18px var(--page-pad) 0; }
+  .hero-wrap--tiles .hero-slider { margin: 0; border-radius: 24px 0 0 0; min-width: 0; }
+  .hero-wrap--tiles .hero-side { display: grid; grid-auto-rows: 1fr; gap: 14px; min-width: 0; }
+  .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin: 18px var(--page-pad) 0; }
+  .hero-tile { position: relative; display: flex; align-items: flex-end; overflow: hidden; background: var(--tile-bg); color: #fff; text-decoration: none; min-height: 150px; }
+  .hero-tile:first-child { border-top-right-radius: 24px; }
+  .hero-tile__img { position: absolute; inset: 0; }
+  .hero-tile__img img { width: 100%; height: 100%; object-fit: cover; opacity: .55; transition: transform .5s; }
+  .hero-tile:hover .hero-tile__img img { transform: scale(1.05); }
+  .hero-tile__copy { position: relative; display: grid; gap: 4px; padding: 20px 22px; }
+  .hero-tile__copy small { font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; opacity: .85; font-weight: 700; }
+  .hero-tile__copy strong { font-family: var(--font-heading); font-size: clamp(20px, 1.9vw, 28px); line-height: 1.1; }
+  .hero-tile__copy em { font-style: normal; font-size: 14px; opacity: .92; }
+  .hero-tile__btn { justify-self: start; margin-top: 8px; padding: 8px 16px; border-radius: 999px; background: #fff; color: #26402a; font-size: 13px; font-weight: 700; }
+}
