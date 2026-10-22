@@ -2405,3 +2405,8 @@ a, button { touch-action: manipulation; }
 .product-rail:focus, .cats-tile:focus, [tabindex="0"]:focus { outline: none; }
 .product-rail:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 4px; border-radius: 14px; }
 .cats-tile:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 12px; }
+
+/* Ronda 84: botones flotantes Blog y Ayuda en amarillo mostaza */
+.float-btn--blog, .float-btn--help { background: #D9A521; color: #2B1D0E; }
+.float-btn--blog:hover, .float-btn--help:hover { background: #C8941A; }
+.float-btn--blog:focus-visible, .float-btn--help:focus-visible { outline-color: #D9A521; }
