@@ -15,7 +15,7 @@
     assign heading = 'Colección'
   endif
 -%}
-<section class="category-section" data-category-section data-category-scope data-category-handle="{{ coll.handle }}" data-category-filters="{{ section.settings.filter_tags | escape }}" data-category-search="{{ section.settings.popup_search }}" data-category-banner="{% if section.settings.banner_image != blank %}{{ section.settings.banner_image | image_url: width: 1400 }}{% elsif coll.image != blank %}{{ coll.image | image_url: width: 1400 }}{% endif %}">
+<section class="category-section" data-category-section data-category-scope data-category-handle="{{ coll.handle }}" data-category-filters="{{ section.settings.filter_tags | escape }}" data-category-search="{{ section.settings.popup_search }}" data-category-subtitle="{{ section.settings.popup_subtitle | escape }}" data-category-banner="{% if section.settings.banner_image != blank %}{{ section.settings.banner_image | image_url: width: 1400 }}{% elsif coll.image != blank %}{{ coll.image | image_url: width: 1400 }}{% endif %}">
   <div class="category-heading">
     <h2 class="category-title">
       {%- if section.settings.icon != 'none' and section.settings.icon != blank -%}<span class="category-title__icon">{% render 'icon', name: section.settings.icon %}</span>{%- endif -%}
@@ -148,6 +148,12 @@
       "label": "Nombre en singular para el buscador",
       "info": "Al abrir la búsqueda dirá: ¿Qué [nombre] estás buscando? Ej: especia, semilla, fruta",
       "default": "producto"
+    },
+    {
+      "type": "text",
+      "id": "popup_subtitle",
+      "label": "Frase bajo el título en la ventana de esta categoría",
+      "info": "Si la dejas vacía se usa la frase general del tema."
     },
     {
       "type": "image_picker",

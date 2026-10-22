@@ -2001,3 +2001,11 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
 
 /* Ronda 61: una sola caja lateral */
 @media (min-width: 750px) { .hero-wrap--tiles .hero-side .hero-tile:only-child { border-radius: 14px; } }
+
+
+/* Ronda 62: título de la ventana de categoría más contenido */
+.cm-hero .category-modal__title { font-size: clamp(26px, 2.6vw, 38px); letter-spacing: -.8px; line-height: 1.05; }
+.cm-hero { padding: 20px 22px 4px; min-height: 0; }
+.cm-hero__copy { padding: 14px 0 6px; max-width: 62%; }
+.cm-hero__sub { font-size: clamp(13px, 1.1vw, 15px); margin-top: 4px; }
+@media (max-width: 749px) { .cm-hero .category-modal__title { font-size: 30px; } .cm-hero__copy { padding-top: 56px; max-width: 100%; } }

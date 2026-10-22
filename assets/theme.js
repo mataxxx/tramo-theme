@@ -1398,6 +1398,7 @@
     e.sort.hidden = true;
     var ft = $('[data-category-filter-toggle]'); if (ft) ft.setAttribute('aria-expanded', 'false');
     e.title.textContent = opts.title || '';
+    var sub = $('.cm-hero__sub'); if (sub) { if (sub._def === undefined) sub._def = sub.textContent; sub.textContent = opts.subtitle || sub._def; }
     var mt = $('[data-category-mini-title]'); if (mt) mt.textContent = opts.title || '';
     var cm0 = $('.category-modal'); if (cm0) { cm0.classList.remove('is-compact'); cm0.scrollTop = 0; }
     $$('[data-category-art]').forEach(function (art) { if (art._def === undefined) art._def = art.innerHTML; art.innerHTML = opts.banner ? '<img src="' + esc(opts.banner) + '" alt="">' : art._def; });
@@ -1467,7 +1468,7 @@
     var scope = opener.closest('[data-category-scope]');
     var tpl = scope && $('[data-category-template]', scope);
     if (!tpl) { var href = opener.getAttribute('href'); if (href) window.location.href = href; return; }
-    catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters'), search: scope.getAttribute('data-category-search'), banner: scope.getAttribute('data-category-banner') });
+    catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters'), search: scope.getAttribute('data-category-search'), banner: scope.getAttribute('data-category-banner'), subtitle: scope.getAttribute('data-category-subtitle') });
     var tmp = document.createElement('div');
     tmp.appendChild(tpl.content.cloneNode(true));
     catFill(tmp.innerHTML);
@@ -1477,7 +1478,7 @@
     var scope = document.querySelector('[data-category-scope][data-category-handle="' + handle + '"]');
     var tpl = scope && $('[data-category-template]', scope);
     var filters = scope ? scope.getAttribute('data-category-filters') : '';
-    catSetup({ title: title, question: question, filters: filters, search: scope ? scope.getAttribute('data-category-search') : 'bar', banner: scope ? scope.getAttribute('data-category-banner') : '' });
+    catSetup({ title: title, question: question, filters: filters, search: scope ? scope.getAttribute('data-category-search') : 'bar', banner: scope ? scope.getAttribute('data-category-banner') : '', subtitle: scope ? scope.getAttribute('data-category-subtitle') : '' });
     if (tpl) {
       var tmp = document.createElement('div');
       tmp.appendChild(tpl.content.cloneNode(true));
