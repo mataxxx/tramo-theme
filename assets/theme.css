@@ -2277,3 +2277,15 @@ a, button { touch-action: manipulation; }
   .hero-wrap.hero-wrap--tv .hero-slider,
   .hero-wrap.hero-wrap--tv:not(.hero-wrap--tiles) .hero-slider { border-radius: 24px !important; }
 }
+
+/* Ronda 76: celular — la franja de confianza va arriba del footer, no arriba del slide */
+.trust-bar.trust-bar--foot { display: none; }
+@media (max-width: 749px) {
+  .shopify-section .trust-bar:not(.trust-bar--sticky):not(.trust-bar--foot) { display: none; }
+  .trust-bar.trust-bar--foot { display: block; background: transparent; border: 0; box-shadow: none; margin: 26px 0 14px; padding: 0 16px; }
+  .trust-bar--foot .trust-bar__list { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 6px 26px; margin: 0; padding: 0; list-style: none; }
+  .trust-bar--foot .trust-bar__item { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--color-primary); }
+  .trust-bar--foot .trust-bar__item .icon { width: 16px; height: 16px; }
+  .trust-bar--foot + .site-footer { margin-top: 0; }
+  .hero-wrap--tv { margin-top: 12px !important; }
+}

@@ -1649,6 +1649,16 @@
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var b = $('[data-login-ask]'); if (b) b.hidden = true; } });
   document.addEventListener('tramo:likes-changed', function () { syncLikes(); });
+
+  /* Celular: "Pagos seguros · Entregas confiables" va justo arriba del footer (en computadora sigue arriba) */
+  (function () {
+    var src = $('.shopify-section .trust-bar:not(.trust-bar--sticky)'), foot = $('.site-footer');
+    if (!src || !foot || $('.trust-bar--foot')) return;
+    var c = src.cloneNode(true);
+    c.classList.add('trust-bar--foot');
+    $$('[data-shopify-editor-block]', c).forEach(function (el) { el.removeAttribute('data-shopify-editor-block'); });
+    foot.parentNode.insertBefore(c, foot);
+  })();
   document.addEventListener('tramo:cart-changed', function (e) { refreshCart(); if (e.detail && e.detail.toast) showToast(e.detail.toast); });
   document.addEventListener('tramo:open-cart', function () { refreshCart().then(openCartView, openCartView); });
 
