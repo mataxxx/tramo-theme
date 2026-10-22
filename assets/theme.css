@@ -2356,3 +2356,11 @@ a, button { touch-action: manipulation; }
   .footer-links a, .footer-linkbtn { font-size: 15px; }
   .site-footer__bottom { margin-top: 26px; padding-top: 16px; font-size: 13.5px; }
 }
+
+/* Ronda 81: Favoritos como ventana en el centro (solo computadora) */
+@media (min-width: 750px) {
+  #LikesPanel { justify-content: center; align-items: center; padding: 16px; }
+  #LikesPanel .drawer__panel { width: min(480px, 100%); height: min(680px, calc(100dvh - 48px)); border-radius: 24px; overflow: hidden; box-shadow: 0 28px 80px rgba(0,0,0,.35); transform: translateY(24px) scale(.97); opacity: 0; transition: transform .34s cubic-bezier(.22,.61,.36,1), opacity .24s ease; }
+  #LikesPanel.is-open .drawer__panel { transform: none; opacity: 1; }
+  #LikesPanel .likes-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+}

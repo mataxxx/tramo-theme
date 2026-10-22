@@ -1,4 +1,3 @@
-{{ 'blog.css' | asset_url | stylesheet_tag }}
 {%- liquid
   assign art = article
   assign tipo = art.metafields.custom.tipo.value | default: 'Receta'
@@ -15,7 +14,7 @@
   assign share_url = request.origin | append: art.url
 -%}
 {%- capture poster -%}{% render 'recipe-media', art: art, mode: 'poster' %}{%- endcapture -%}{%- assign poster = poster | strip -%}
-<article class="rcp{% if tipo == 'Vlog' %} rcp--vlog{% endif %}" data-recipe="{{ art.handle }}" data-servings="{{ serv | default: 0 }}">
+<article class="rcp{% if tipo == 'Vlog' %} rcp--vlog{% endif %}" data-recipe="{{ art.handle }}" data-servings="{{ serv | default: 0 }}" data-title="{{ art.title | escape }}" data-currency="{{ cart.currency.iso_code }}">
   <a class="rcp__back" href="{{ blog.url }}?tab={% if tipo == 'Vlog' %}vlog{% else %}recetas{% endif %}">{% render 'icon', name: 'arrow-left' %}<span>{{ blog.title }}</span></a>
 
   <div class="rcp-hero{% unless has_vid %} rcp-hero--photo{% endunless %}">
@@ -146,72 +145,7 @@
   {%- endif -%}
 </article>
 
-<script>
-  (function () {
-    var root = document.querySelector('[data-recipe]'); if (!root) return;
-    var key = 'tramo_steps_' + root.getAttribute('data-recipe');
-    /* Pasos: se recuerdan los marcados */
-    var done = {}; try { done = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
-    root.querySelectorAll('[data-step]').forEach(function (c) {
-      c.checked = !!done[c.getAttribute('data-step')];
-      c.addEventListener('change', function () { done[c.getAttribute('data-step')] = c.checked; try { localStorage.setItem(key, JSON.stringify(done)); } catch (e) {} });
-    });
-    /* Porciones: recalcula cantidades que empiezan con número (200 g, 1/2 cdta, 1 1/2 tazas) */
-    var base = parseInt(root.getAttribute('data-servings'), 10) || 0, cur = base;
-    function parseQ(s) {
-      var m = String(s).trim().match(/^(\d+)\s+(\d+)\/(\d+)|^(\d+)\/(\d+)|^(\d+(?:[.,]\d+)?)/);
-      if (!m) return null;
-      var n = m[1] ? +m[1] + m[2] / m[3] : m[4] ? m[4] / m[5] : parseFloat(m[6].replace(',', '.'));
-      return { n: n, rest: String(s).trim().slice(m[0].length) };
-    }
-    function fmt(n) {
-      var w = Math.floor(n), f = n - w, fr = [[0, ''], [0.25, '1/4'], [1 / 3, '1/3'], [0.5, '1/2'], [2 / 3, '2/3'], [0.75, '3/4'], [1, '']];
-      if (n >= 10) return String(Math.round(n));
-      var best = fr.reduce(function (a, b) { return Math.abs(b[0] - f) < Math.abs(a[0] - f) ? b : a; });
-      if (best[0] === 1) { w += 1; best = [0, '']; }
-      if (Math.abs(best[0] - f) > 0.12) return (Math.round(n * 10) / 10).toString().replace('.', ',');
-      return (w ? w + (best[1] ? ' ' : '') : '') + best[1] || '0';
-    }
-    function scale() {
-      root.querySelectorAll('[data-qty]').forEach(function (el) {
-        var q = parseQ(el.getAttribute('data-qty'));
-        el.textContent = q && base ? fmt(q.n * cur / base) + q.rest : el.getAttribute('data-qty');
-      });
-      var n = root.querySelector('[data-serv-n]'); if (n) n.textContent = cur;
-    }
-    root.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-serv]');
-      if (b && base) { cur = Math.max(1, Math.min(base * 6, cur + Number(b.getAttribute('data-serv')))); scale(); }
-      var sh = e.target.closest('[data-recipe-share]');
-      if (sh) {
-        var data = { title: sh.getAttribute('data-share-title'), url: sh.getAttribute('data-share-url') };
-        if (navigator.share) navigator.share(data).catch(function () {});
-        else if (navigator.clipboard) navigator.clipboard.writeText(data.url).then(function () { var s = sh.querySelector('span'); var t = s.textContent; s.textContent = '¡Enlace copiado!'; setTimeout(function () { s.textContent = t; }, 1600); });
-      }
-    });
-    /* Ingredientes al carrito */
-    var shop = root.querySelector('[data-recipe-shop]');
-    if (shop) {
-      var fmtM = new Intl.NumberFormat('es-CR', { style: 'currency', currency: {{ cart.currency.iso_code | json }}, maximumFractionDigits: 0 });
-      var totalEl = shop.querySelector('[data-shop-total]'), btn = shop.querySelector('[data-shop-add]');
-      function total() {
-        var t = 0, n = 0;
-        shop.querySelectorAll('[data-shop-item]').forEach(function (c) { if (c.checked) { t += +c.getAttribute('data-price'); n++; } });
-        totalEl.textContent = fmtM.format(t / 100); btn.disabled = n === 0;
-      }
-      shop.addEventListener('change', total); total();
-      btn.addEventListener('click', function () {
-        var items = []; shop.querySelectorAll('[data-shop-item]').forEach(function (c) { if (c.checked) items.push({ id: +c.value, quantity: 1, properties: { 'Receta': {{ art.title | json }} } }); });
-        if (!items.length) return;
-        var t = btn.innerHTML; btn.disabled = true; btn.textContent = 'Agregando…';
-        fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ items: items }) })
-          .then(function (r) { if (!r.ok) throw new Error(); document.dispatchEvent(new CustomEvent('tramo:open-cart')); })
-          .catch(function () { alert('No se pudieron agregar. Intenta de nuevo.'); })
-          .then(function () { btn.innerHTML = t; total(); });
-      });
-    }
-  })();
-</script>
+
 
 {% schema %}
 {

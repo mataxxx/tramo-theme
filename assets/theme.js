@@ -101,7 +101,7 @@
     if (drawer.getAttribute('data-drawer') === 'reels') pauseAllReels();
     if (drawer.getAttribute('data-drawer') === 'quick-view') { closeProductVideo($('.pvideo.is-open')); pauseProductVideos(); }
     if (!openDrawers().filter(function (d) { return d !== drawer; }).length) {
-      document.body.classList.remove('is-locked');
+      if (!document.body.classList.contains('is-bmodal')) document.body.classList.remove('is-locked');
     }
     if (!keepFocus && lastFocus && document.contains(lastFocus)) {
       try { lastFocus.focus(); } catch (e) { /* noop */ }
@@ -936,6 +936,7 @@
     document.dispatchEvent(new CustomEvent('tramo:recipes-changed'));
   }
   syncRecipes();
+  document.addEventListener('tramo:recipes-sync', syncRecipes);
 
   function startReels() {
     var container = $('[data-reels]');

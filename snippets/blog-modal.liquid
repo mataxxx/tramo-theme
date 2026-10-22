@@ -1,0 +1,12 @@
+{%- comment -%} Ventana del Blog: recetas y vlog sin salir de la página {%- endcomment -%}
+<div class="bmodal" id="BlogModal" data-bmodal hidden role="dialog" aria-modal="true" aria-label="Recetas y vlog">
+  <div class="bmodal__bg" data-bmodal-close></div>
+  <div class="bmodal__panel">
+    <div class="bmodal__bar">
+      <button type="button" class="bmodal__btn bmodal__back" data-bmodal-back hidden aria-label="Volver">{% render 'icon', name: 'arrow-left' %}<span>Volver</span></button>
+      <p class="bmodal__title" data-bmodal-title>Recetas y vlog</p>
+      <button type="button" class="bmodal__btn bmodal__x" data-bmodal-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+    </div>
+    <div class="bmodal__body" data-bmodal-body></div>
+  </div>
+</div>

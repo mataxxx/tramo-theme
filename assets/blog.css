@@ -188,3 +188,38 @@
 }
 @media (prefers-reduced-motion: reduce) { .blg *, .rcp * { animation: none !important; transition: none !important; } }
 
+
+/* ===== Ventana del Blog ===== */
+.bmodal { position: fixed; inset: 0; z-index: 45; display: flex; align-items: center; justify-content: center; padding: 22px; }
+.bmodal[hidden] { display: none; }
+.bmodal__bg { position: absolute; inset: 0; background: rgba(20,26,18,.55); opacity: 0; transition: opacity .28s ease; }
+.bmodal__panel { position: relative; width: min(1180px, 100%); height: min(900px, calc(100dvh - 44px)); display: flex; flex-direction: column; background: #fffef6; border-radius: 26px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.35); opacity: 0; transform: translateY(26px) scale(.98); transition: opacity .28s ease, transform .38s cubic-bezier(.22,.61,.36,1); }
+.bmodal.is-open .bmodal__bg { opacity: 1; }
+.bmodal.is-open .bmodal__panel { opacity: 1; transform: none; }
+.bmodal__bar { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #e9e3d4; background: rgba(255,254,246,.96); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.bmodal__title { flex: 1; min-width: 0; margin: 0; text-align: center; font-family: var(--font-heading, Georgia, serif); font-size: 19px; color: #1f3d22; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bmodal__btn { all: unset; box-sizing: border-box; cursor: pointer; flex: 0 0 auto; height: 42px; min-width: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 999px; padding: 0 12px; background: #f1ecdc; color: #1f2a1e; font-weight: 600; font-size: 14.5px; transition: background-color .2s; }
+.bmodal__btn:hover { background: #e7e0cc; }
+.bmodal__btn .icon { width: 20px; height: 20px; }
+.bmodal__x { padding: 0; width: 42px; }
+.bmodal__back[hidden] { display: inline-flex; visibility: hidden; }
+.bmodal__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.bmodal__body .blg { padding-top: 6px; }
+.bmodal__body .blg__tabs { top: 8px; }
+.bmodal__body .rcp { padding-top: 14px; }
+.bmodal__body .rcp__back { display: none; }
+.bmodal__body .rcp-ing { top: 12px; }
+.bmodal__body .pagination { display: none; }
+.bmodal__loading { display: flex; justify-content: center; gap: 8px; padding: 90px 0; }
+.bmodal__loading span { width: 10px; height: 10px; border-radius: 50%; background: #263d25; animation: bm-dot 1s ease-in-out infinite; }
+.bmodal__loading span:nth-child(2) { animation-delay: .15s; }
+.bmodal__loading span:nth-child(3) { animation-delay: .3s; }
+@keyframes bm-dot { 0%, 100% { opacity: .25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-6px); } }
+@media (max-width: 749px) {
+  .bmodal { padding: 0; align-items: flex-end; }
+  .bmodal__panel { width: 100%; height: calc(100dvh - 18px); border-radius: 22px 22px 0 0; transform: translateY(100%); }
+  .bmodal__bar { padding: 10px 12px; }
+  .bmodal__btn { height: 38px; min-width: 38px; font-size: 14px; }
+  .bmodal__x { width: 38px; }
+}
+@media (prefers-reduced-motion: reduce) { .bmodal__panel, .bmodal__bg { transition: opacity .15s; transform: none; } }
