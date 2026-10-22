@@ -18,7 +18,7 @@
         <span class="tv-pip__top"><span class="tv-pip__tag">{{ section.settings.float_label | default: 'Tramo TV' }}</span></span>
         <span class="tv-pip__bottom">
           {%- if fb.settings.heading != blank -%}<b>{{ fb.settings.heading }}</b>{%- endif -%}
-          <span class="tv-pip__hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 4 6M21 9l-4 6"/></svg>Toca para ver con sonido</span>
+          <span class="tv-pip__hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 4 6M21 9l-4 6"/></svg><em class="tv-pip__hint-a">Toca para ver con sonido</em><em class="tv-pip__hint-b">Agrandar con sonido</em></span>
         </span>
       </button>
       <button type="button" class="tv-pip__min" data-tv-min aria-label="Minimizar video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button>
@@ -37,8 +37,30 @@
       var v = pip.querySelector('video'); if (v) { if (min) v.pause(); else { var p = v.play(); if (p && p.catch) p.catch(function () {}); } }
       try { sessionStorage.setItem('tramo.pip.min', min ? '1' : ''); } catch (e) {}
     }
+    /* En la portada (computadora) el video vive al lado del slideshow, siempre visible */
+    var slot = document.querySelector('[data-hero-tv]');
+    var desk = window.matchMedia('(min-width: 990px)');
+    function place() {
+      if (!pip) return;
+      if (slot && desk.matches) {
+        if (pip.parentNode !== slot) { slot.appendChild(pip); pip.classList.add('tv-pip--inline'); pip.hidden = false; if (restore) restore.hidden = true; }
+        fit();
+        var v = pip.querySelector('video'); if (v && v.paused && !document.body.classList.contains('is-locked')) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      } else if (pip.parentNode !== dock) {
+        dock.insertBefore(pip, dock.firstChild); pip.classList.remove('tv-pip--inline');
+      }
+    }
+    function fit() {
+      var sl = slot && slot.parentNode.querySelector('.hero-slider');
+      if (sl) slot.style.setProperty('--tv-h', sl.getBoundingClientRect().height + 'px');
+    }
+    if (slot) {
+      if (window.ResizeObserver) { var sl0 = slot.parentNode.querySelector('.hero-slider'); if (sl0) new ResizeObserver(fit).observe(sl0); }
+      if (desk.addEventListener) desk.addEventListener('change', place);
+      place();
+    }
     var start = false; try { start = sessionStorage.getItem('tramo.pip.min') === '1'; } catch (e) {}
-    if (start) setMin(true);
+    if (start && !(slot && desk.matches)) setMin(true);
     dock.addEventListener('click', function (e) {
       if (e.target.closest('[data-tv-min]')) { e.stopPropagation(); setMin(true); }
       else if (e.target.closest('[data-tv-restore]')) setMin(false);

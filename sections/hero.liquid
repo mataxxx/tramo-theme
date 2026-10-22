@@ -20,7 +20,7 @@
   {% render 'text-style', s: section.settings, p: 'text', sel: text_sel %}
 {%- endstyle -%}
 
-<div class="hero-wrap{% unless section.settings.hide_tiles %} hero-wrap--tiles{% endunless %}">
+<div class="hero-wrap{% unless section.settings.hide_tiles %} hero-wrap--tiles{% endunless %}{% if section.settings.show_tv != false %} hero-wrap--tv{% endif %}">
 <div class="hero-slider" data-hero-slider data-autoplay="{{ section.settings.autoplay_seconds }}" aria-roledescription="carrusel">
   <div class="hero-track" data-hero-track>
     {%- for i in (0..section.blocks.size) -%}
@@ -70,6 +70,7 @@
   {%- endif -%}
 </div>
 
+{%- if section.settings.show_tv != false -%}<div class="hero-tv" data-hero-tv></div>{%- endif -%}
 {%- unless section.settings.hide_tiles -%}
 <div class="hero-side">
   {%- for n in (1..2) -%}
@@ -126,6 +127,7 @@
   "settings": [
     { "type": "paragraph", "content": "Slideshow: la primera diapositiva se edita aquí abajo; las demás con «Agregar diapositiva». Las 2 cajas de la derecha se editan más abajo." },
     { "type": "checkbox", "id": "show_tile2", "label": "Mostrar también la caja derecha de abajo", "default": false },
+    { "type": "checkbox", "id": "show_tv", "label": "Video de Tramo TV al lado (computadora)", "default": true, "info": "Usa el primer video de la sección Videos." },
     { "type": "checkbox", "id": "hide_tiles", "label": "Ocultar bloques laterales (slideshow a todo el ancho)", "default": false },
     { "type": "header", "content": "Caja derecha de arriba (solo escritorio)" },
     { "type": "text", "id": "tile1_kicker", "label": "Texto pequeño", "default": "Hecho a mano en Costa Rica" },
