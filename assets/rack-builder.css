@@ -297,3 +297,19 @@
 .rbt { scroll-margin-top: calc(var(--header-h, 80px) + 8px); }
 .rbt:target .rbt__box { animation: rbt-flash 1.4s var(--rb-ease) .35s both; }
 @keyframes rbt-flash { 0% { box-shadow: 0 0 0 0 rgba(38,61,37,.0), 0 18px 40px rgba(38,61,37,.08); } 35% { box-shadow: 0 0 0 6px rgba(38,61,37,.22), 0 18px 40px rgba(38,61,37,.12); } 100% { box-shadow: 0 0 0 0 rgba(38,61,37,0), 0 18px 40px rgba(38,61,37,.08); } }
+
+/* Frascos reales: 12 cm de alto × ~5 cm de diámetro (altos y angostos) */
+.rb-jar__glass { width: 64%; aspect-ratio: 5 / 11; border-radius: 5px 5px 8px 8px; }
+.rb-jar__lid { width: 60%; height: auto; aspect-ratio: 5 / 1.2; min-height: 7px; border-radius: 3px 3px 1px 1px; }
+.rb-jar__art { width: 70%; aspect-ratio: 5 / 12.5; }
+.rb-jar__label { width: 92%; padding: 4px 1px; }
+.rb-rack__shelves .rb-jar__label, .rb[data-size="12"] .rb-rack__shelves .rb-jar__label, .rb[data-size="18"] .rb-rack__shelves .rb-jar__label { font-size: clamp(6px, 8.5cqi, 11px); letter-spacing: 0; }
+.rb-jar__plus { font-size: clamp(14px, 16cqi, 24px); }
+.rb-jar__tag { right: 10%; }
+.rb-rack { max-width: 360px; }
+.rb[data-size="12"] .rb-rack { max-width: 440px; }
+.rb[data-size="18"] .rb-rack { max-width: 600px; }
+.rb-opt__jar { width: 34px; }
+.rb-opt__jar .rb-jar__glass, .rb-opt__jar .rb-jar__lid { width: 100%; }
+.rb-sum__rack { grid-template-columns: repeat(var(--cols, 3), 7px); }
+.rb-sum__rack i { width: 7px; height: 16px; }

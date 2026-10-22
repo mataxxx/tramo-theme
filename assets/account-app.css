@@ -214,3 +214,5 @@
 .acd__unrec:hover{background:#f4efe2;color:#b33b2c}
 .acd__unrec svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .acd__rmore{margin-top:12px}
+.acd__rjar i{width:44%;max-width:22px;aspect-ratio:5/11}
+.acd__rdot{width:10px;height:22px}
