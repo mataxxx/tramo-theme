@@ -1,18 +1,18 @@
 <nav class="bottom-nav" aria-label="Navegación rápida">
+  <button type="button" class="bottom-nav__item" data-open="help">
+    {% render 'icon', name: 'help' %}
+    <span>{{ section.settings.label_help }}</span>
+  </button>
+  <button type="button" class="bottom-nav__item bottom-nav__search" data-open="search" aria-label="{{ section.settings.label_search | escape }}">
+    <span class="bottom-nav__bubble">{% render 'icon', name: 'search' %}</span>
+    <span>{{ section.settings.label_search }}</span>
+  </button>
   {%- if section.settings.show_videos -%}
     <button type="button" class="bottom-nav__item" data-open="reels">
       {% render 'icon', name: 'video' %}
       <span>{{ section.settings.label_videos }}</span>
     </button>
   {%- endif -%}
-  <button type="button" class="bottom-nav__item bottom-nav__search" data-open="search" aria-label="{{ section.settings.label_search | escape }}">
-    <span class="bottom-nav__bubble">{% render 'icon', name: 'search' %}</span>
-    <span>{{ section.settings.label_search }}</span>
-  </button>
-  <button type="button" class="bottom-nav__item" data-open="help">
-    {% render 'icon', name: 'help' %}
-    <span>{{ section.settings.label_help }}</span>
-  </button>
 </nav>
 
 {%- if section.settings.show_float_videos -%}
