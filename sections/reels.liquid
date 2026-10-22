@@ -3,7 +3,7 @@
   {%- if section.settings.show_float != false -%}
     {%- assign fb = section.blocks.first -%}
     <div class="tv-pip" data-tv-pip>
-      <button type="button" class="tv-pip__screen" data-open="reels" aria-label="Ver videos de Tramo con sonido">
+      <button type="button" class="tv-pip__screen" data-open="reels" data-reels-view="feed" aria-label="Ver videos de Tramo con sonido">
         {%- if fb.settings.video != blank -%}
           <video muted loop playsinline autoplay preload="metadata" poster="{% if fb.settings.poster != blank %}{{ fb.settings.poster | image_url: width: 360 }}{% else %}{{ fb.settings.video.preview_image | image_url: width: 360 }}{% endif %}">
             {%- for source in fb.settings.video.sources -%}{%- if source.mime_type == 'video/mp4' -%}<source src="{{ source.url }}" type="video/mp4">{%- break -%}{%- endif -%}{%- endfor -%}
