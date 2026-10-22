@@ -2269,3 +2269,11 @@ a, button { touch-action: manipulation; }
   @keyframes tv-live-m { 0% { box-shadow: 0 0 0 0 rgba(226,70,58,.6); } 100% { box-shadow: 0 0 0 6px rgba(226,70,58,0); } }
 }
 @media (prefers-reduced-motion: reduce) { .tv-pip__tap, .tv-pip__tap::after { animation: none !important; } }
+
+/* Ronda 75: slide redondeado también cuando va a la par del video (le ganaba una regla de "a todo el ancho") */
+.hero-wrap.hero-wrap--tv .hero-slider,
+.hero-wrap.hero-wrap--tv:not(.hero-wrap--tiles) .hero-slider { border-radius: 18px !important; overflow: hidden; isolation: isolate; -webkit-mask-image: -webkit-radial-gradient(white, black); }
+@media (min-width: 990px) {
+  .hero-wrap.hero-wrap--tv .hero-slider,
+  .hero-wrap.hero-wrap--tv:not(.hero-wrap--tiles) .hero-slider { border-radius: 24px !important; }
+}
