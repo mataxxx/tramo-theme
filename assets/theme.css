@@ -2125,3 +2125,30 @@ a, button { touch-action: manipulation; }
 .cb-note__pop p { margin: 0 0 10px; color: var(--color-text); font-size: 14px; line-height: 1.5; }
 .cb-note__link { all: unset; cursor: pointer; color: var(--color-primary); font-weight: 700; font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
 @keyframes cb-pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* Ronda 68: footer — columnas plegables en celular, sin Visítanos */
+.footer-acc > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: default; }
+.footer-acc > summary::-webkit-details-marker { display: none; }
+.footer-acc__chev { display: none; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.22,.61,.36,1); }
+.footer-block--brand .footer-social { margin-top: 22px; }
+@media (min-width: 900px) { .site-footer__grid { grid-template-columns: 1.6fr 1fr 1fr; } }
+@media (max-width: 749px) {
+  .site-footer { padding: 32px 20px 22px; margin-top: 28px; }
+  .site-footer__grid { gap: 0; }
+  .footer-block--brand { padding-bottom: 20px; }
+  .footer-brand { font-size: 26px; }
+  .footer-brand__sub { font-size: 10.5px; margin-top: 8px; }
+  .footer-brand__since { font-size: 14px; }
+  .footer-block--brand .rte { margin-top: 12px; font-size: 15px; }
+  .footer-block--brand .footer-social { margin-top: 16px; padding-top: 0; border-top: 0; }
+  .footer-social a { width: 40px; height: 40px; }
+  .footer-block--menu, .footer-block--info { border-top: 1px solid rgba(243,239,226,.18); }
+  .footer-block--info { border-bottom: 1px solid rgba(243,239,226,.18); }
+  .footer-acc > summary { cursor: pointer; margin: 0; padding: 16px 0; -webkit-tap-highlight-color: transparent; }
+  .footer-acc__chev { display: block; }
+  .footer-acc[open] .footer-acc__chev { transform: rotate(180deg); }
+  .footer-acc .footer-links { padding: 0 0 16px; gap: 12px; }
+  .footer-acc .footer-links a, .footer-acc .footer-linkbtn { font-size: 15.5px; }
+  .site-footer__bottom { margin-top: 22px; padding-top: 16px; font-size: 13px; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .site-footer__legal { font-size: 12.5px; }
+}

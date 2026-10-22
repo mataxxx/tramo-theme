@@ -16,7 +16,7 @@
           "type": "category",
           "settings": {
             "collection": "frontpage",
-            "title": "Especias",
+            "title": "Hierbas & Especias",
             "search_noun": "especia",
             "icon": "chili"
           }
@@ -150,7 +150,7 @@
       "type": "featured-collection",
       "settings": {
         "collection": "frontpage",
-        "heading": "Especias",
+        "heading": "Hierbas & Especias",
         "search_noun": "especia"
       }
     },

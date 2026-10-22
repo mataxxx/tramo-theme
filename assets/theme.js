@@ -1646,6 +1646,19 @@
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var b = $('[data-login-ask]'); if (b) b.hidden = true; } });
   document.addEventListener('tramo:likes-changed', function () { syncLikes(); });
+
+  /* Footer: en celular las columnas se pliegan (Tienda, Información); en computadora siempre abiertas */
+  (function () {
+    var mq = window.matchMedia('(max-width: 749px)');
+    function set() { $$('[data-footer-acc]').forEach(function (d) { d.open = !mq.matches; }); }
+    document.addEventListener('click', function (e) {
+      var sm = e.target.closest && e.target.closest('[data-footer-acc] > summary');
+      if (sm && !mq.matches) e.preventDefault();
+    });
+    if (mq.addEventListener) mq.addEventListener('change', set); else if (mq.addListener) mq.addListener(set);
+    set();
+    document.addEventListener('shopify:section:load', set);
+  })();
   function toggleLike(handle) {
     if (!T.loggedIn) { askLogin('likes'); return; }
     var list = getLikes();
