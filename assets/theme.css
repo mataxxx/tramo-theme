@@ -2406,10 +2406,10 @@ a, button { touch-action: manipulation; }
 .product-rail:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 4px; border-radius: 14px; }
 .cats-tile:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 12px; }
 
-/* Ronda 84: botones flotantes Blog y Ayuda en amarillo mostaza */
-.float-btn--blog, .float-btn--help { background: #D9A521; color: #2B1D0E; }
-.float-btn--blog:hover, .float-btn--help:hover { background: #C8941A; }
-.float-btn--blog:focus-visible, .float-btn--help:focus-visible { outline-color: #D9A521; }
+/* Ronda 84: botones flotantes Blog y Ayuda en verde claro, con borde blanco para que se vean sobre fondos oscuros */
+.float-btn--blog, .float-btn--help { background: #6E9E58; color: #fff; border: 2px solid rgba(255,255,255,.9); }
+.float-btn--blog:hover, .float-btn--help:hover { background: #5F8D4A; }
+.float-btn--blog:focus-visible, .float-btn--help:focus-visible { outline-color: #6E9E58; }
 
 /* Ronda 85: ventana de categoría en desktop — encabezado en una sola fila y 6 columnas de fichas */
 @media (min-width: 990px) {
