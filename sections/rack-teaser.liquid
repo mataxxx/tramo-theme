@@ -3,22 +3,24 @@
 -%}
 <section class="rbt">
   <div class="rbt__box">
-    <button type="button" class="rbt__media" data-rb-open="RackModal-{{ section.id }}" aria-label="{{ section.settings.button_label | escape }}">
-      {%- if img != blank -%}
-        {{ img | image_url: width: 1200 | image_tag: widths: '600, 900, 1200', sizes: '(min-width: 990px) 620px, 100vw', loading: 'lazy', alt: section.settings.heading }}
-      {%- else -%}
-        <img src="{{ 'especieros.jpg' | asset_url }}" alt="{{ section.settings.heading | escape }}" width="1200" height="800" loading="lazy">
-      {%- endif -%}
-    </button>
-    <div class="rbt__copy">
+    <header class="rbt__head">
       <p class="rbt__kicker"><img src="{{ 'handmade-seal.svg' | asset_url }}" alt="" width="28" height="28" loading="lazy">{{ section.settings.kicker }}</p>
       <h2 class="rbt__title">{{ section.settings.heading }}</h2>
+    </header>
+    <div class="rbt__media">
+      <button type="button" class="rbt__photo" data-rb-open="RackModal-{{ section.id }}" aria-label="{{ section.settings.button_label | escape }}">
+        {%- if img != blank -%}
+          {{ img | image_url: width: 1280 | image_tag: widths: '640, 960, 1280', sizes: '(min-width: 990px) 620px, 100vw', loading: 'lazy', alt: section.settings.heading }}
+        {%- else -%}
+          <img src="{{ 'especieros.jpg' | asset_url }}" alt="Especieros de 6, 12 y 18 frascos" width="1280" height="672" loading="lazy">
+        {%- endif -%}
+      </button>
+      <button type="button" class="rbt__pin" style="--x:15.3%" data-rb-open="RackModal-{{ section.id }}" data-rb-slots="6"><b>6</b> frascos</button>
+      <button type="button" class="rbt__pin" style="--x:44%" data-rb-open="RackModal-{{ section.id }}" data-rb-slots="12"><b>12</b> frascos</button>
+      <button type="button" class="rbt__pin" style="--x:79.6%" data-rb-open="RackModal-{{ section.id }}" data-rb-slots="18"><b>18</b> frascos</button>
+    </div>
+    <div class="rbt__copy">
       <p class="rbt__text">{{ section.settings.text }}</p>
-      <ul class="rbt__sizes" role="list">
-        <li><b>6</b><span>frascos</span></li>
-        <li><b>12</b><span>frascos</span></li>
-        <li><b>18</b><span>frascos</span></li>
-      </ul>
       <button type="button" class="button rbt__cta" data-rb-open="RackModal-{{ section.id }}">{{ section.settings.button_label }}</button>
       <p class="rbt__note">Clásicas incluidas · mezclas de la casa y del mundo +₡500</p>
     </div>

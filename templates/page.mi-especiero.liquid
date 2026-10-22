@@ -1,0 +1,73 @@
+{%- comment -%} Página a la que lleva el QR del especiero: muestra el especiero y lo registra en la cuenta {%- endcomment -%}
+<section class="rbreg" data-rbreg data-signed-in="{% if customer %}1{% endif %}">
+  <div class="rbreg__card">
+    <p class="rbreg__kicker"><img src="{{ 'handmade-seal.svg' | asset_url }}" alt="" width="30" height="30">Hecho a mano en Costa Rica</p>
+    <h1 class="rbreg__title" data-rbreg-title>Tu especiero</h1>
+    <p class="rbreg__code" data-rbreg-code hidden></p>
+    <div class="rbreg__wood" data-rbreg-wood></div>
+    <div class="rbreg__how">
+      <div><b>1</b><span>Lo registras en tu cuenta</span></div>
+      <div><b>2</b><span>Ves qué especias tiene cada frasco</span></div>
+      <div><b>3</b><span>Pides sobrecitos o frascos nuevos cuando se acaben</span></div>
+    </div>
+    {%- if customer -%}
+      <button type="button" class="button rbreg__btn" data-rbreg-go>Agregar a mi cuenta</button>
+      <button type="button" data-open="account" data-acct-tab="especieros" data-rbreg-open hidden></button>
+    {%- else -%}
+      <a class="button rbreg__btn" href="{{ routes.storefront_login_url }}" data-login-open data-rbreg-login>Iniciar sesión para registrarlo</a>
+      <p class="rbreg__note">Si aún no tienes cuenta, se crea con tu correo en un momento. Te enviamos un código, sin contraseñas.</p>
+    {%- endif -%}
+    <p class="rbreg__err" data-rbreg-err hidden>Este código no es válido. Revisa que escaneaste la etiqueta del especiero.</p>
+  </div>
+</section>
+<style>
+  .rbreg { padding: 26px 16px 50px; }
+  .rbreg__card { max-width: 560px; margin: 0 auto; background: #f7f3e9; border: 1px solid #e4dfd2; border-radius: 26px; padding: 26px 22px; text-align: center; box-shadow: 0 18px 40px rgba(38,61,37,.08); }
+  .rbreg__kicker { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #6b5a3a; }
+  .rbreg__title { font-family: var(--font-heading, Georgia, serif); font-weight: 400; font-size: clamp(28px, 6vw, 38px); letter-spacing: -.8px; color: #1f3d22; margin: 10px 0 4px; }
+  .rbreg__code { margin: 0 0 16px; font: 700 14px/1 ui-monospace, Menlo, monospace; letter-spacing: .12em; color: #55594f; }
+  .rbreg__wood { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 8px; padding: 14px 12px 16px; margin: 0 auto; max-width: 420px; border-radius: 14px; background: linear-gradient(180deg, #a06a42, #7a4a2a 45%, #5a341c); box-shadow: inset 0 0 0 5px rgba(0,0,0,.1), 0 16px 30px rgba(60,36,18,.22); }
+  .rbreg__wood:empty { display: none; }
+  .rbreg__jar { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .rbreg__jar i { display: block; width: 72%; max-width: 44px; aspect-ratio: 3 / 4; border-radius: 3px 3px 6px 6px; background: var(--fill); box-shadow: inset 0 6px 0 #cfd0cc, inset 3px 0 0 rgba(255,255,255,.25); }
+  .rbreg__jar span { font-size: 10px; line-height: 1.15; color: #fbf3e6; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rbreg__how { display: grid; gap: 10px; text-align: left; margin: 22px 0; }
+  .rbreg__how div { display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: #3d4238; }
+  .rbreg__how b { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #263d25; color: #fff; font-size: 13px; }
+  .rbreg__btn { width: 100%; }
+  .rbreg__note { margin: 10px 0 0; font-size: 13px; color: #6b6f66; }
+  .rbreg__err { margin: 14px 0 0; color: #b33b2c; font-weight: 600; }
+</style>
+<script>
+(function () {
+  var root = document.querySelector('[data-rbreg]'); if (!root) return;
+  var d = new URLSearchParams(location.search).get('d') || '';
+  var p = d.split('~');
+  var ok = p.length >= 3 && /^[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(p[0]);
+  var err = root.querySelector('[data-rbreg-err]');
+  if (!ok) { err.hidden = false; root.querySelectorAll('.rbreg__btn').forEach(function (b) { b.hidden = true; }); return; }
+  var info = { code: p[0], slots: parseInt(p[1], 10) || 0, jars: p[2].split('.').filter(Boolean) };
+  root.querySelector('[data-rbreg-title]').textContent = 'Tu especiero de ' + info.slots + ' frascos';
+  var codeEl = root.querySelector('[data-rbreg-code]'); codeEl.textContent = 'Código ' + info.code; codeEl.hidden = false;
+  var C = [[/paprika|pimenton|chile|chipotle|harissa|berbere|cayena|achiote/, '#b8432a'], [/curry|curcuma|azafran|ras-el|mostaza/, '#d39a26'], [/ajo|cebolla|sal|jengibre|nuez|cardamomo/, '#e6d3ac'], [/pimienta|clavo|comino|anis|cafe|cacao|canela/, '#5a3a24'], [/oregano|albahaca|romero|tomillo|perejil|eneldo|laurel|mejorana|hierbas|chimichurri|zaatar|culantro|cilantro/, '#5e7a3a'], [/masala|garam|chaat|adobo|sazon|mezcla|condimento/, '#8a5a2b']];
+  function col(h) { for (var i = 0; i < C.length; i++) if (C[i][0].test(h)) return C[i][1]; return '#8a6a3a'; }
+  var wood = root.querySelector('[data-rbreg-wood]');
+  wood.style.setProperty('--cols', info.slots <= 6 ? 3 : info.slots <= 12 ? 4 : 6);
+  wood.innerHTML = info.jars.map(function (h) { return '<div class="rbreg__jar" data-h="' + h + '"><i style="--fill:' + col(h) + '"></i><span>' + h.replace(/-/g, ' ') + '</span></div>'; }).join('');
+  info.jars.filter(function (h, i, a) { return a.indexOf(h) === i; }).forEach(function (h) {
+    fetch('/products/' + encodeURIComponent(h) + '.js').then(function (r) { return r.ok ? r.json() : null; }).then(function (pr) {
+      if (!pr) return; wood.querySelectorAll('[data-h="' + h + '"] span').forEach(function (s) { s.textContent = pr.title; });
+    }).catch(function () {});
+  });
+  function savePending() { try { localStorage.setItem('tramo.rack.pending', JSON.stringify(info)); } catch (e) {} }
+  var go = root.querySelector('[data-rbreg-go]'), opener = root.querySelector('[data-rbreg-open]');
+  if (go) go.addEventListener('click', function () { savePending(); opener.click(); });
+  var login = root.querySelector('[data-rbreg-login]');
+  if (login) login.addEventListener('click', savePending, true);
+  // Volvió de iniciar sesión con este especiero pendiente: registrarlo solo
+  if (root.getAttribute('data-signed-in') === '1') {
+    var pend = null; try { pend = JSON.parse(localStorage.getItem('tramo.rack.pending') || 'null'); } catch (e) {}
+    if (pend && pend.code === info.code) setTimeout(function () { opener.click(); }, 400);
+  }
+})();
+</script>

@@ -1646,6 +1646,7 @@
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var b = $('[data-login-ask]'); if (b) b.hidden = true; } });
   document.addEventListener('tramo:likes-changed', function () { syncLikes(); });
+  document.addEventListener('tramo:cart-changed', function (e) { refreshCart(); if (e.detail && e.detail.toast) showToast(e.detail.toast); });
 
   /* Footer: en celular las columnas se pliegan (Tienda, Información); en computadora siempre abiertas */
   (function () {

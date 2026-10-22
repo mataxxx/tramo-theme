@@ -109,7 +109,111 @@
     'lineItems(first: 10) { nodes { title quantity image { url } } } } } } }';
 
   function load() {
-    return gql(Q).then(function (d) { state.customer = d.customer; });
+    return gql(Q).then(function (d) { state.customer = d.customer; return DRAWER ? loadRacks() : null; });
+  }
+
+  /* ---------- Mis especieros (guardados en la cuenta del cliente) ---------- */
+  var PENDING = 'tramo.rack.pending';
+  function loadRacks() {
+    return gql('query { customer { id metafield(namespace: "tramo", key: "especieros") { value } } }').then(function (d) {
+      var v = []; try { v = JSON.parse((d.customer.metafield && d.customer.metafield.value) || '[]'); } catch (e) { v = []; }
+      state.racks = Array.isArray(v) ? v : [];
+      state.custId = d.customer.id;
+      return registerPending();
+    }).catch(function () { state.racks = state.racks || []; });
+  }
+  function saveRacks(list) {
+    return gql('mutation($m: [MetafieldsSetInput!]!) { metafieldsSet(metafields: $m) { userErrors { message } } }',
+      { m: [{ ownerId: state.custId, namespace: 'tramo', key: 'especieros', type: 'json', value: JSON.stringify(list) }] })
+      .then(function (d) { var e = d.metafieldsSet.userErrors; if (e && e.length) throw new Error(e[0].message); state.racks = list; });
+  }
+  function registerPending() {
+    var p = get(PENDING); if (!p || !p.code) return Promise.resolve();
+    del(PENDING);
+    if (state.racks.some(function (r) { return r.code === p.code; })) {
+      state.msg = { t: 'Este especiero ya está en tu cuenta.' }; pendingTab = 'especieros'; return Promise.resolve();
+    }
+    var list = state.racks.concat([{ code: p.code, slots: p.slots, jars: p.jars, date: new Date().toISOString() }]);
+    return saveRacks(list).then(function () { state.msg = { t: '¡Listo! Tu especiero quedó registrado.' }; pendingTab = 'especieros'; })
+      .catch(function () { set(PENDING, p); state.msg = { t: 'No pudimos registrar el especiero. Intenta de nuevo.', err: true }; });
+  }
+
+  /* Catálogo para repuestos: especias por grupo + precios del repuesto */
+  var CAT = null;
+  function loadCatalog() {
+    if (CAT) return CAT.ready;
+    CAT = { by: {}, list: [], refill: {}, extra: null };
+    function coll(h, g) {
+      return fetch('/collections/' + h + '/products.json?limit=250').then(function (r) { return r.ok ? r.json() : { products: [] }; }).then(function (j) {
+        (j.products || []).forEach(function (p) { if (CAT.by[p.handle]) return; var x = { handle: p.handle, title: p.title, group: g }; CAT.by[p.handle] = x; CAT.list.push(x); });
+      }).catch(function () {});
+    }
+    function prod(h) { return fetch('/products/' + h + '.js').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }
+    CAT.ready = Promise.all([
+      coll('frontpage', 'classic'), coll('condimentos-de-la-casa', 'house'), coll('condimentos-del-mundo', 'world'),
+      prod('repuesto-especiero').then(function (p) { (p && p.variants || []).forEach(function (v) { CAT.refill[/frasco/i.test(v.title) ? 'jar' : 'bag'] = { id: v.id, price: v.price }; }); }).catch(function () {}),
+      prod('frasco-especial').then(function (p) { var v = p && p.variants && p.variants[0]; if (v) CAT.extra = { id: v.id, price: v.price }; }).catch(function () {})
+    ]).catch(function () {}).then(function () { CAT.loaded = true; if (state.customer && (state.tab === 'especieros' || state.tab === 'repuestos')) drawerRender(); });
+    return CAT.ready;
+  }
+  var JARC = [[/paprika|pimenton|chile|chipotle|harissa|berbere|cayena|achiote/, '#b8432a'], [/curry|curcuma|azafran|ras el|mostaza/, '#d39a26'], [/ajo|cebolla|sal|jengibre|nuez|cardamomo/, '#e6d3ac'], [/pimienta|clavo|comino|anis|cafe|cacao|canela/, '#5a3a24'], [/oregano|albahaca|romero|tomillo|perejil|eneldo|laurel|mejorana|hierbas|chimichurri|zaatar|culantro|cilantro/, '#5e7a3a'], [/masala|garam|chaat|adobo|sazon|mezcla|condimento/, '#8a5a2b']];
+  function jarC(t) { t = String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); for (var i = 0; i < JARC.length; i++) if (JARC[i][0].test(t)) return JARC[i][1]; return '#8a6a3a'; }
+  function spTitle(h) { return (CAT && CAT.by[h] && CAT.by[h].title) || String(h).replace(/-/g, ' ').replace(/^./, function (x) { return x.toUpperCase(); }); }
+  function spGroup(h) { return (CAT && CAT.by[h] && CAT.by[h].group) || 'classic'; }
+  function cents(n) { return money({ amount: n / 100, currencyCode: host.dataset.currency || 'CRC' }); }
+
+  function tabEspecieros() {
+    loadCatalog();
+    var rs = state.racks || [];
+    if (!rs.length) return '<div class="acd__empty-rack"><span class="acd__ico">' + ic('especieros') + '</span><b>Aún no tienes especieros registrados</b><p class="acct__muted">Cuando recibas tu especiero, escanea el código QR que viene pegado. Se agrega aquí y desde aquí pides repuestos de cada frasco.</p></div>';
+    return rs.map(function (r, ri) {
+      var cols = r.slots <= 6 ? 3 : r.slots <= 12 ? 4 : 6;
+      return '<div class="acd__rack"><div class="acd__rackhead"><div><b>Especiero ' + r.slots + ' frascos</b><small>Código ' + esc(r.code) + (r.date ? ' · desde ' + esc(fdate(r.date)) : '') + '</small></div></div>' +
+        '<div class="acd__rackwood" style="--cols:' + cols + '">' + r.jars.map(function (h, i) {
+          return '<button type="button" class="acd__rjar" data-a="refill-one" data-r="' + ri + '" data-h="' + esc(h) + '" aria-label="Pedir repuesto de ' + esc(spTitle(h)) + '"><i style="--fill:' + jarC(spTitle(h)) + '"></i><span>' + esc(spTitle(h)) + '</span></button>';
+        }).join('') + '</div>' +
+        '<button type="button" class="acct__btn acd__rackbtn" data-a="go" data-t="repuestos" data-r="' + ri + '">Pedir repuestos</button></div>';
+    }).join('') + '<p class="acct__muted acd__rackhint">Toca un frasco para pedir su repuesto, o usa «Pedir repuestos» para elegir varios.</p>';
+  }
+
+  function refillRow(h, mine) {
+    var sp = CAT.by[h] || { handle: h, title: spTitle(h), group: spGroup(h) };
+    var kind = state.refillKind || 'bag', base = CAT.refill[kind], extra = sp.group !== 'classic' && CAT.extra ? CAT.extra.price : 0;
+    var added = state.added && state.added[kind + ':' + h];
+    return '<li><i class="acd__rdot" style="--fill:' + jarC(sp.title) + '"></i><span><b>' + esc(sp.title) + '</b><small>' + (base ? cents(base.price + extra) : '') + (extra ? ' · especial' : '') + '</small></span>' +
+      '<button type="button" class="acd__add' + (added ? ' is-ok' : '') + '" data-a="refill-add" data-h="' + esc(h) + '" aria-label="Agregar ' + esc(sp.title) + '">' + (added ? '✓' : '+') + '</button></li>';
+  }
+  function tabRepuestos() {
+    loadCatalog();
+    if (!CAT.loaded) return '<p class="acct__muted">Cargando especias…</p>';
+    var r = (state.racks || [])[state.rackIdx || 0];
+    var kind = state.refillKind || 'bag';
+    if (!CAT.refill.bag && !CAT.refill.jar) return '<p class="acct__muted">Los repuestos no están disponibles en este momento.</p>';
+    var mine = r ? r.jars.filter(function (h, i, a) { return a.indexOf(h) === i; }) : [];
+    var g = state.refillTab || 'classic', q = (state.refillQ || '').toLowerCase();
+    var others = CAT.list.filter(function (x) { return mine.indexOf(x.handle) < 0 && (q ? x.title.toLowerCase().indexOf(q) > -1 : x.group === g); });
+    return '<div class="acd__kind" role="tablist">' +
+      ['bag', 'jar'].map(function (k) { var v = CAT.refill[k]; if (!v) return ''; return '<button type="button" data-a="kind" data-k="' + k + '" class="' + (k === kind ? 'is-on' : '') + '"><b>' + (k === 'bag' ? 'Sobrecito' : 'Frasco nuevo') + '</b><small>' + cents(v.price) + '</small></button>'; }).join('') + '</div>' +
+      '<p class="acct__muted acd__kindhint">' + (kind === 'bag' ? 'Para rellenar tu frasco.' : 'Un frasco lleno con tapa, listo para poner en tu especiero.') + ' Mezclas de la casa y del mundo +' + cents(CAT.extra ? CAT.extra.price : 50000) + '.</p>' +
+      (mine.length ? '<h4 class="acd__sub">En tu especiero</h4><ul class="acd__refills">' + mine.map(function (h) { return refillRow(h, true); }).join('') + '</ul>' : '') +
+      '<h4 class="acd__sub">Otras especias</h4>' +
+      '<div class="acd__rtabs">' + [['classic', 'Clásicas'], ['house', 'De la casa'], ['world', 'Del mundo']].map(function (x) { return '<button type="button" data-a="rtab" data-g="' + x[0] + '" class="' + (x[0] === g && !q ? 'is-on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>' +
+      '<label class="acd__rsearch"><input type="search" data-refill-q placeholder="Buscar especia…" value="' + esc(state.refillQ || '') + '"></label>' +
+      '<ul class="acd__refills">' + (others.length ? others.map(function (x) { return refillRow(x.handle); }).join('') : '<li class="acct__muted">No hay especias aquí.</li>') + '</ul>';
+  }
+  function addRefill(h, btn) {
+    var kind = state.refillKind || 'bag', base = CAT.refill[kind]; if (!base) return;
+    var r = (state.racks || [])[state.rackIdx || 0];
+    var sp = CAT.by[h] || { title: spTitle(h), group: spGroup(h) };
+    var props = { 'Especia': sp.title, 'Especiero': r ? r.code : '' };
+    var items = [{ id: base.id, quantity: 1, properties: props }];
+    if (sp.group !== 'classic' && CAT.extra) items.push({ id: CAT.extra.id, quantity: 1, properties: { 'Repuesto especial': sp.title } });
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+    fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ items: items }) })
+      .then(function (res) { if (!res.ok) throw new Error('add'); state.added = state.added || {}; state.added[kind + ':' + h] = 1;
+        document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { toast: (kind === 'bag' ? 'Sobrecito' : 'Frasco') + ' de ' + sp.title + ' agregado' } })); })
+      .catch(function () { state.msg = { t: 'No se pudo agregar. Intenta de nuevo.', err: true }; })
+      .then(function () { drawerRender(); });
   }
 
   /* ---------- Vistas ---------- */
@@ -189,6 +293,7 @@
 
   /* ---------- Panel lateral (cuenta dentro del slide) ---------- */
   var IC = {
+    especieros: '<path d="M4 20V8l4-4h8l4 4v12M4 20h16M7 11h10M7 15h10M9 8v3M12 8v3M15 8v3M9 15v-4M12 15v-4M15 15v-4"/>',
     pedidos: '<path d="m21 8-9-5-9 5v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
     perfil: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
     direcciones: '<path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/>',
@@ -198,7 +303,7 @@
     salir: '<path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M16 17l5-5-5-5M21 12H9"/>'
   };
   function ic(n) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>'; }
-  var DTITLE = { pedidos: 'Mis pedidos', perfil: 'Mis datos', direcciones: 'Mis direcciones', favoritos: 'Mis favoritos', puntos: 'Mi cash back', addr: 'Dirección' };
+  var DTITLE = { pedidos: 'Mis pedidos', perfil: 'Mis datos', direcciones: 'Mis direcciones', favoritos: 'Mis favoritos', puntos: 'Mi cash back', especieros: 'Mis especieros', repuestos: 'Pedir repuestos', addr: 'Dirección' };
   /* Cash back: % de cada compra pagada (productos sin envío ni IVA). El servidor lleva el saldo y crea los códigos. */
   var PUNTOS_PCT = Number(host.dataset.pointsPct || 5) / 100;
   var CB_MIN = Number(host.dataset.pointsMin || 1000);
@@ -299,6 +404,7 @@
     var msg = state.msg ? '<div class="acct__msg' + (state.msg.err ? ' acct__msg--err' : '') + '">' + esc(state.msg.t) + '</div>' : '';
     var rows = [
       ['pedidos', 'Mis pedidos', n ? plural(n, 'pedido', 'pedidos') : 'Aún no tienes pedidos'],
+      ['especieros', 'Mis especieros', (state.racks || []).length ? plural(state.racks.length, 'especiero registrado', 'especieros registrados') + ' · pedir repuestos' : 'Registra el tuyo con el código QR'],
       ['perfil', 'Mis datos', name || 'Agrega tu nombre'],
       ['direcciones', 'Mis direcciones', na ? plural(na, 'dirección guardada', 'direcciones guardadas') : 'Agrega una dirección de entrega'],
       ['favoritos', 'Mis favoritos', likeList().length ? plural(likeList().length, 'producto guardado', 'productos guardados') : 'Guarda lo que te gusta con ♥'],
@@ -316,8 +422,11 @@
       if (t === 'addr') body = addrFormHtml(state.addr);
       else if (t === 'favoritos') body = tabFavoritos();
       else if (t === 'puntos') body = tabPuntos(c);
+      else if (t === 'especieros') body = tabEspecieros();
+      else if (t === 'repuestos') body = tabRepuestos();
       else { var v = TABS.filter(function (x) { return x[0] === t; })[0]; body = v ? v[2](c) : ''; }
-      sub.innerHTML = '<button type="button" class="acd__back" data-a="' + (t === 'addr' ? 'go' : 'home') + '" data-t="direcciones">' + ic('back') + (t === 'addr' ? 'Mis direcciones' : 'Mi cuenta') + '</button>' +
+      var bk = t === 'addr' ? ['direcciones', 'Mis direcciones'] : t === 'repuestos' ? ['especieros', 'Mis especieros'] : null;
+      sub.innerHTML = '<button type="button" class="acd__back" data-a="' + (bk ? 'go' : 'home') + '" data-t="' + (bk ? bk[0] : '') + '">' + ic('back') + (bk ? bk[1] : 'Mi cuenta') + '</button>' +
         '<h3 class="acd__title">' + (t === 'addr' ? (state.addr && state.addr.id ? 'Editar dirección' : 'Nueva dirección') : DTITLE[t]) + '</h3>' + msg + '<div class="acd__body">' + body + '</div>';
     }
     home.classList.toggle('is-on', !t);
@@ -372,9 +481,13 @@
     var a = b.dataset.a;
     if (a === 'login') { b.disabled = true; login(); }
     else if (a === 'tab') { state.tab = b.dataset.t; render(); window.scrollTo({ top: host.offsetTop, behavior: 'smooth' }); }
-    else if (a === 'go') drawerGo(b.dataset.t);
+    else if (a === 'go') { if (b.dataset.r != null) state.rackIdx = Number(b.dataset.r) || 0; if (b.dataset.t === 'repuestos') state.refillQ = ''; drawerGo(b.dataset.t); }
     else if (a === 'home') { state.newCode = null; drawerGo(''); }
     else if (a === 'copy') copyCode(b.dataset.code, b);
+    else if (a === 'refill-one') { state.rackIdx = Number(b.dataset.r) || 0; state.refillQ = ''; drawerGo('repuestos'); }
+    else if (a === 'refill-add') addRefill(b.dataset.h, b);
+    else if (a === 'kind') { state.refillKind = b.dataset.k; drawerRender(); }
+    else if (a === 'rtab') { state.refillTab = b.dataset.g; state.refillQ = ''; drawerRender(); }
     else if (a === 'unfav') {
       var hs = likeList().filter(function (x) { return x !== b.dataset.h; });
       try { localStorage.setItem('tramo_likes', JSON.stringify(hs)); } catch (er) {}
@@ -419,6 +532,15 @@
     }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+  var rqT;
+  document.addEventListener('input', function (e) {
+    if (!e.target.matches || !e.target.matches('[data-refill-q]') || !host.contains(e.target)) return;
+    state.refillQ = e.target.value;
+    clearTimeout(rqT); rqT = setTimeout(function () {
+      var pos = e.target.selectionStart; drawerRender();
+      var i = root.querySelector('[data-refill-q]'); if (i) { i.focus(); try { i.setSelectionRange(pos, pos); } catch (er) {} }
+    }, 220);
+  });
 
   /* ---------- Arranque ---------- */
   function start() {
@@ -440,7 +562,10 @@
     if (!op) return;
     pendingTab = op.getAttribute('data-acct-tab') || '';
     startOnce();
-    if (state.customer) { drawerGo(pendingTab); pendingTab = ''; }
+    if (state.customer) {
+      if (get(PENDING)) { registerPending().then(function () { drawerGo('especieros'); pendingTab = ''; }); return; }
+      drawerGo(pendingTab); pendingTab = '';
+    }
   });
   /* Volvió del inicio de sesión: abrir el panel de nuevo */
   if (location.hash === '#mi-cuenta') {
