@@ -20,7 +20,7 @@
   {% render 'text-style', s: section.settings, p: 'text', sel: text_sel %}
 {%- endstyle -%}
 
-<div class="hero-wrap{% if section.settings.tile1_heading != blank or section.settings.tile2_heading != blank %} hero-wrap--tiles{% endif %}">
+<div class="hero-wrap{% unless section.settings.hide_tiles %} hero-wrap--tiles{% endunless %}">
 <div class="hero-slider" data-hero-slider data-autoplay="{{ section.settings.autoplay_seconds }}" aria-roledescription="carrusel">
   <div class="hero-track" data-hero-track>
     {%- for i in (0..section.blocks.size) -%}
@@ -70,7 +70,7 @@
   {%- endif -%}
 </div>
 
-{%- if section.settings.tile1_heading != blank or section.settings.tile2_heading != blank -%}
+{%- unless section.settings.hide_tiles -%}
 <div class="hero-side">
   {%- for n in (1..2) -%}
     {%- liquid
@@ -81,22 +81,39 @@
       assign k_l = 'tile' | append: n | append: '_link'
       assign k_b = 'tile' | append: n | append: '_button'
       assign k_c = 'tile' | append: n | append: '_color'
-      assign t_h = section.settings[k_h]
+      if n == 1
+        assign d_h = 'Arma tu especiero'
+        assign d_k = 'Hecho a mano en Costa Rica'
+        assign d_t = 'Elige el modelo y llénalo con tus especias.'
+        assign d_b = 'Armar el mío'
+        assign d_l = '/pages/especiero'
+      else
+        assign d_h = 'Productos de temporada'
+        assign d_k = 'De temporada'
+        assign d_t = 'Lo mejor de esta época.'
+        assign d_b = 'Ver más'
+        assign d_l = '/collections/all'
+      endif
+      assign t_h = section.settings[k_h] | default: d_h
+      assign t_k = section.settings[k_k] | default: d_k
+      assign t_t = section.settings[k_t] | default: d_t
+      assign t_b = section.settings[k_b] | default: d_b
+      assign t_l = section.settings[k_l] | default: d_l
     -%}
     {%- if t_h != blank -%}
-      <a class="hero-tile" href="{{ section.settings[k_l] | default: '#' }}" style="--tile-bg: {{ section.settings[k_c] | default: '#2f5b2c' }}">
+      <a class="hero-tile" href="{{ t_l }}" style="--tile-bg: {{ section.settings[k_c] | default: '#2f5b2c' }}">
         {%- if section.settings[k_i] != blank -%}<span class="hero-tile__img">{{ section.settings[k_i] | image_url: width: 900 | image_tag: widths: '450, 900', sizes: '420px', loading: 'lazy', alt: '' }}</span>{%- endif -%}
         <span class="hero-tile__copy">
-          {%- if section.settings[k_k] != blank -%}<small>{{ section.settings[k_k] }}</small>{%- endif -%}
+          {%- if t_k != blank -%}<small>{{ t_k }}</small>{%- endif -%}
           <strong>{{ t_h }}</strong>
-          {%- if section.settings[k_t] != blank -%}<em>{{ section.settings[k_t] }}</em>{%- endif -%}
-          {%- if section.settings[k_b] != blank -%}<span class="hero-tile__btn">{{ section.settings[k_b] }}</span>{%- endif -%}
+          {%- if t_t != blank -%}<em>{{ t_t }}</em>{%- endif -%}
+          {%- if t_b != blank -%}<span class="hero-tile__btn">{{ t_b }}</span>{%- endif -%}
         </span>
       </a>
     {%- endif -%}
   {%- endfor -%}
 </div>
-{%- endif -%}
+{%- endunless -%}
 </div>
 
 {% schema %}
@@ -106,6 +123,7 @@
   "class": "section-hero",
   "max_blocks": 5,
   "settings": [
+    { "type": "checkbox", "id": "hide_tiles", "label": "Ocultar bloques laterales (slideshow a todo el ancho)", "default": false },
     { "type": "header", "content": "Bloque lateral 1 (solo escritorio)" },
     { "type": "text", "id": "tile1_kicker", "label": "Texto pequeño", "default": "Hecho a mano en Costa Rica" },
     { "type": "text", "id": "tile1_heading", "label": "Título", "info": "Si dejas ambos títulos vacíos, el slideshow ocupa todo el ancho.", "default": "Arma tu especiero" },

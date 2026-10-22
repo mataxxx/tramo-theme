@@ -1732,3 +1732,7 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
   .search-drop__empty { margin: 6px 4px; color: var(--color-muted); }
   .search-drop__results .search-drop__all { display: block; text-align: center; margin-top: 6px; }
 }
+
+@media (min-width: 750px) {
+  #CartDrawer .drawer__panel { width: min(900px, 94vw); height: 90vh; height: 90dvh; max-height: none; }
+}
