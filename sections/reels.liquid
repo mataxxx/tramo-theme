@@ -15,6 +15,7 @@
         {%- else -%}
           <span class="tv-pip__ph" aria-hidden="true"></span>
         {%- endif -%}
+        <span class="tv-pip__tap" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-1.5a1.5 1.5 0 0 1 3 0V11m0-1a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1-6 6h-.6a5.5 5.5 0 0 1-4.3-2.1L5 15.4a1.5 1.5 0 0 1 2.3-2L9 15"/></svg></span>
         <span class="tv-pip__top"><span class="tv-pip__tag">{{ section.settings.float_label | default: 'Tramo TV' }}</span></span>
         <span class="tv-pip__bottom">
           {%- if fb.settings.heading != blank -%}<b>{{ fb.settings.heading }}</b>{%- endif -%}
@@ -39,7 +40,7 @@
     }
     /* En la portada (computadora) el video vive al lado del slideshow, siempre visible */
     var slot = document.querySelector('[data-hero-tv]');
-    var desk = window.matchMedia('(min-width: 990px)');
+    var desk = { matches: true };
     function place() {
       if (!pip) return;
       if (slot && desk.matches) {
@@ -56,7 +57,6 @@
     }
     if (slot) {
       if (window.ResizeObserver) { var sl0 = slot.parentNode.querySelector('.hero-slider'); if (sl0) new ResizeObserver(fit).observe(sl0); }
-      if (desk.addEventListener) desk.addEventListener('change', place);
       place();
     }
     var start = false; try { start = sessionStorage.getItem('tramo.pip.min') === '1'; } catch (e) {}
@@ -69,11 +69,11 @@
     if (pip && window.MutationObserver) {
       new MutationObserver(function () {
         var v = pip.querySelector('video'); if (!v || pip.hidden) return;
-        if (document.body.classList.contains('is-locked')) v.pause(); else if (window.matchMedia('(min-width: 750px)').matches) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+        if (document.body.classList.contains('is-locked')) v.pause(); else if (slot || window.matchMedia('(min-width: 750px)').matches) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
       }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     }
-    /* No gastar datos en celular: el video flotante solo existe en computadora */
-    if (window.matchMedia('(max-width: 749px)').matches && pip) { var v = pip.querySelector('video'); if (v) { v.removeAttribute('autoplay'); v.pause(); v.preload = 'none'; } }
+    /* En celular sin portada (otras páginas) no hay video flotante: no gastar datos */
+    if (!slot && window.matchMedia('(max-width: 749px)').matches && pip) { var v = pip.querySelector('video'); if (v) { v.removeAttribute('autoplay'); v.pause(); v.preload = 'none'; } }
   })();
 </script>
 <div class="drawer drawer--center drawer--reels" id="ReelsOverlay" data-drawer="reels" role="dialog" aria-modal="true" aria-label="Videos" hidden>
