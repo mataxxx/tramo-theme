@@ -153,3 +153,5 @@
 .acd__codes li.is-used{opacity:.55}
 .acd__codes li.is-used small{color:#6b6f66}
 .acct__btn.is-ok{background:#2f6b3a;color:#fff;border-color:#2f6b3a}
+.acct--drawer .acd__title{margin:2px 0 20px;line-height:1.15}
+.acct--drawer .acd__back{margin-bottom:12px}

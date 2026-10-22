@@ -1,5 +1,5 @@
 {%- comment -%} Mensaje de cash back en el producto {%- endcomment -%}
-{%- if settings.cashback_enabled -%}
+{%- unless settings.cashback_enabled == false -%}
   {%- assign cb_pct = settings.cashback_pct | default: 5 -%}
   <div class="cb-note">
     <span class="cb-note__badge" aria-hidden="true">{{ cb_pct }}%</span>
@@ -7,7 +7,7 @@
     <details class="cb-note__more">
       <summary aria-label="Más información sobre el cash back"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></summary>
       <div class="cb-note__pop">
-        <p>{{ settings.cashback_info }}</p>
+        <p>{{ settings.cashback_info | default: 'Cada compra suma este porcentaje a tu saldo (sobre los productos, sin envío ni IVA). Con tu saldo generas códigos para pagar en el checkout. No vence.' }}</p>
         {%- if customer -%}
           <button type="button" class="cb-note__link" data-open="account" data-acct-tab="puntos">Ver mi cash back →</button>
         {%- else -%}
@@ -16,4 +16,4 @@
       </div>
     </details>
   </div>
-{%- endif -%}
+{%- endunless -%}
