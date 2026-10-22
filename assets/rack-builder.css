@@ -280,3 +280,16 @@
   .rbt__cta { width: 100%; padding: 17px 20px; border-radius: 8px; font-size: 18px; }
 }
 @media (min-width: 990px) { .rbt__title { max-width: 6.4em; } .rbt__panel { width: min(580px, 47%); } }
+/* Banner del especiero más bajo en computadora */
+@media (min-width: 990px) {
+  .rbt__box { min-height: 400px; }
+  .rbt__panel { min-height: 400px; padding: 30px 0 30px 52px; gap: 16px; }
+  .rbt__intro { gap: 10px; }
+  .rbt__title { font-size: clamp(46px, 4.4vw, 64px); }
+  .rbt__text { font-size: 17px; }
+  .rbt__size { padding: 10px 8px 10px; gap: 2px; }
+  .rbt__size img { width: 70px; height: 48px; margin-bottom: 4px; }
+  .rbt__size span, .rbt__size b { font-size: 15.5px; }
+  .rbt__price { font-size: 14.5px; }
+  .rbt__cta { padding: 14px 18px; font-size: 17px; }
+}

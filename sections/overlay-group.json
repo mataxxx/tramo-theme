@@ -82,7 +82,10 @@
       "block_order": [
         "reel-1"
       ],
-      "settings": {}
+      "settings": {
+        "show_float": true,
+        "float_label": "Tramo TV"
+      }
     },
     "bottom-nav": {
       "type": "bottom-nav",
@@ -91,7 +94,8 @@
         "label_search": "Buscar",
         "label_videos": "Videos",
         "label_cart": "Carrito",
-        "show_videos": true
+        "show_videos": true,
+        "show_float_videos": false
       }
     },
     "account-panel": {

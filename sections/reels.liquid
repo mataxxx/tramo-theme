@@ -1,3 +1,24 @@
+{%- comment -%} Botón flotante tipo "reel" en computadora {%- endcomment -%}
+{%- if section.settings.show_float != false -%}
+  {%- assign fb = section.blocks.first -%}
+  <button type="button" class="tv-float" data-open="reels" aria-label="Ver videos de Tramo">
+    <span class="tv-float__screen">
+      {%- if fb.settings.video != blank -%}
+        <video muted loop playsinline autoplay preload="metadata" poster="{% if fb.settings.poster != blank %}{{ fb.settings.poster | image_url: width: 240 }}{% else %}{{ fb.settings.video.preview_image | image_url: width: 240 }}{% endif %}">
+          {%- for source in fb.settings.video.sources -%}{%- if source.mime_type == 'video/mp4' -%}<source src="{{ source.url }}" type="video/mp4">{%- break -%}{%- endif -%}{%- endfor -%}
+        </video>
+      {%- elsif fb.settings.video_url != blank -%}
+        <video muted loop playsinline autoplay preload="metadata" src="{{ fb.settings.video_url }}"{% if fb.settings.poster != blank %} poster="{{ fb.settings.poster | image_url: width: 240 }}"{% endif %}></video>
+      {%- elsif fb.settings.poster != blank -%}
+        {{ fb.settings.poster | image_url: width: 240 | image_tag: alt: '', loading: 'lazy' }}
+      {%- else -%}
+        <span class="tv-float__ph" aria-hidden="true"></span>
+      {%- endif -%}
+      <span class="tv-float__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5Z"/></svg></span>
+      <span class="tv-float__live">{{ section.settings.float_label | default: 'Tramo TV' }}</span>
+    </span>
+  </button>
+{%- endif -%}
 <div class="drawer drawer--center drawer--reels" id="ReelsOverlay" data-drawer="reels" role="dialog" aria-modal="true" aria-label="Videos" hidden>
   <div class="drawer__backdrop" data-drawer-close></div>
   <div class="reels-wrap" data-reels-wrap data-default-view="{{ section.settings.default_view }}" data-view="{{ section.settings.default_view }}">
@@ -126,7 +147,9 @@
     },
     { "type": "range", "id": "grid_columns", "label": "Columnas de la cuadrícula", "min": 2, "max": 4, "step": 1, "default": 3 },
     { "type": "text", "id": "all_label", "label": "Texto del botón \"ver todos\"", "default": "Ver todos los videos" },
-    { "type": "text", "id": "grid_title", "label": "Título de la cuadrícula", "default": "Todos los videos" }
+    { "type": "text", "id": "grid_title", "label": "Título de la cuadrícula", "default": "Todos los videos" },
+    { "type": "checkbox", "id": "show_float", "label": "Botón flotante de videos (computadora)", "default": true },
+    { "type": "text", "id": "float_label", "label": "Texto del botón flotante", "default": "Tramo TV" }
   ],
   "blocks": [
     {

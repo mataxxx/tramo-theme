@@ -2166,3 +2166,32 @@ a, button { touch-action: manipulation; }
 }
 @media (prefers-reduced-motion: reduce) { #AccountPanel .drawer__panel.account-panel { transition: opacity .15s; transform: none; } }
 @media (min-width: 750px) { #AccountPanel .drawer__panel.account-panel { height: min(740px, calc(100dvh - 48px)); } }
+
+/* Ronda 70: header en computadora — "Iniciar sesión" sin sesión; icono del mismo tamaño que el carrito con sesión */
+@media (min-width: 750px) {
+  .site-header .header__account-desk--out { padding: 11px 20px; border-radius: 999px; border: 1.5px solid var(--color-primary); color: var(--color-primary); font-size: 15px; font-weight: 600; transition: background-color .2s, color .2s; }
+  .site-header .header__account-desk--out:hover { background: var(--color-primary); color: var(--color-on-primary, #fff); }
+  .site-header .header__account-desk--in { border: 0; padding: 0; margin-right: 0; width: 48px; height: 48px; display: inline-grid; place-items: center; border-radius: 50%; background: transparent; }
+  .site-header .header__account-desk--in:hover { background: rgba(38,61,37,.07); }
+  .site-header .header__account-desk--in .icon, .site-header .header__cart .icon { width: 30px; height: 30px; }
+  .site-header .header__cart { width: 48px; height: 48px; place-items: center; }
+  .site-header { column-gap: 18px; }
+}
+
+/* Botón flotante "Tramo TV" (computadora) */
+.tv-float { display: none; }
+@media (min-width: 750px) {
+  .tv-float { all: unset; box-sizing: border-box; position: fixed; right: 22px; bottom: 26px; z-index: 35; display: block; cursor: pointer; width: 96px; aspect-ratio: 9 / 16; border-radius: 16px; padding: 3px; background: linear-gradient(160deg, #e9c46a, #c2412f 55%, #263d25); box-shadow: 0 16px 34px rgba(0,0,0,.3); transition: transform .3s cubic-bezier(.22,.61,.36,1), box-shadow .3s; animation: tv-in .6s cubic-bezier(.22,.61,.36,1) .8s both; }
+  .tv-float:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 22px 40px rgba(0,0,0,.34); }
+  .tv-float:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; }
+  .tv-float__screen { position: relative; display: block; width: 100%; height: 100%; border-radius: 13px; overflow: hidden; background: #1a1d17; }
+  .tv-float__screen video, .tv-float__screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tv-float__ph { position: absolute; inset: 0; background: radial-gradient(circle at 30% 25%, #6b4a2a, #1a1d17 70%); }
+  .tv-float__play { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.88); color: #1a1d17; box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .25s; }
+  .tv-float__play svg { width: 16px; height: 16px; fill: currentColor; margin-left: 2px; }
+  .tv-float:hover .tv-float__play { transform: scale(1.1); }
+  .tv-float__live { position: absolute; left: 6px; right: 6px; bottom: 6px; padding: 4px 6px; border-radius: 8px; background: rgba(0,0,0,.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); color: #fff; font-size: 11px; font-weight: 700; text-align: center; letter-spacing: .02em; }
+  body.is-locked .tv-float { opacity: 0; pointer-events: none; }
+  @keyframes tv-in { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
+}
+@media (prefers-reduced-motion: reduce) { .tv-float { animation: none; } }

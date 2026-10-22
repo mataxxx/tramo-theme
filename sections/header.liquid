@@ -85,11 +85,10 @@
         <span class="count-bubble" data-likes-count hidden>0</span>
       </button>
     {%- endif -%}
-    {%- if shop.customer_accounts_enabled -%}<shopify-account class="header__account-wc header__account-wc--desk" menu="customer-account-main-menu"></shopify-account>{%- endif -%}
     {%- if customer -%}
-      <button type="button" class="header__account-desk" data-open="account"><span>{% render 'icon', name: 'user' %}</span>{{ customer.first_name | default: 'Mi cuenta' }}</button>
+      <button type="button" class="icon-button header__account-desk header__account-desk--in" data-open="account" aria-label="Mi cuenta">{% render 'icon', name: 'user' %}</button>
     {%- else -%}
-      <a href="{{ routes.storefront_login_url }}" data-login-open class="header__account-desk"><span>{% render 'icon', name: 'user' %}</span>Iniciar sesión</a>
+      <a href="{{ routes.storefront_login_url }}" data-login-open class="header__account-desk header__account-desk--out">Iniciar sesión</a>
     {%- endif -%}
     {%- if s.show_cart_top -%}
       <a href="{{ routes.cart_url }}" class="icon-button header__cart" data-open-cart aria-label="Ver carrito">
