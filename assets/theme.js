@@ -932,6 +932,7 @@
     else { list.unshift({ handle: h, title: btn.getAttribute('data-recipe-title') || '', url: btn.getAttribute('data-recipe-url') || '', img: (btn.getAttribute('data-recipe-img') || '').trim() }); showToast('Receta guardada ♥'); }
     try { localStorage.setItem(RECIPES_KEY, JSON.stringify(list.slice(0, 200))); } catch (e) {}
     syncRecipes();
+    if (typeof syncLikes === 'function') syncLikes();
     document.dispatchEvent(new CustomEvent('tramo:recipes-changed'));
   }
   syncRecipes();
@@ -1667,7 +1668,8 @@
       var on = list.indexOf(b.getAttribute('data-like')) > -1;
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
-    $$('[data-likes-count]').forEach(function (c) { c.textContent = list.length; c.hidden = list.length === 0; });
+    var tot = list.length + (typeof getRecipes === 'function' ? getRecipes().length : 0);
+    $$('[data-likes-count]').forEach(function (c) { c.textContent = tot; c.hidden = tot === 0; });
   }
   function askLogin(reason) {
     var box = $('[data-login-ask]');
@@ -1731,7 +1733,28 @@
     if ($('[data-drawer="likes"].is-open')) renderLikes();
     else if (i === -1) showToast('Guardado en favoritos ♥');
   }
+  function renderRecipesLikes() {
+    var ul = $('[data-recipes-list]'), em = $('[data-recipes-empty]');
+    if (!ul) return;
+    var rs = getRecipes();
+    em.hidden = rs.length > 0;
+    ul.innerHTML = rs.map(function (r) {
+      return '<li class="like-row"><a class="like-row__main" href="' + esc(r.url) + '"><span class="like-row__img">' + (r.img ? '<img src="' + esc(r.img) + '" alt="" width="64" height="64">' : '') + '</span><span class="like-row__info"><strong>' + esc(r.title) + '</strong><span>Ver receta</span></span></a>' +
+        '<button type="button" class="like-btn like-btn--row" data-save-recipe="' + esc(r.handle) + '" data-recipe-title="' + esc(r.title) + '" data-recipe-url="' + esc(r.url) + '" aria-pressed="true" aria-label="Quitar receta"><svg class="icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></button></li>';
+    }).join('');
+    var np = $('[data-likes-n-products]'), nr = $('[data-likes-n-recipes]');
+    if (np) np.textContent = getLikes().length || '';
+    if (nr) nr.textContent = rs.length || '';
+  }
+  document.addEventListener('tramo:recipes-changed', function () { if ($('[data-drawer="likes"].is-open')) renderRecipesLikes(); });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-likes-tab]'); if (!t) return;
+    var k = t.getAttribute('data-likes-tab');
+    $$('[data-likes-tab]').forEach(function (b) { var on = b === t; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    $$('[data-likes-pane]').forEach(function (p) { p.hidden = p.getAttribute('data-likes-pane') !== k; });
+  });
   function renderLikes() {
+    renderRecipesLikes();
     var listEl = $('[data-likes-list]');
     var empty = $('[data-likes-empty]');
     if (!listEl) return;

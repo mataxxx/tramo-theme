@@ -6,11 +6,25 @@
       <button type="button" class="icon-button" data-drawer-close aria-label="Cerrar favoritos">{% render 'icon', name: 'close' %}</button>
     </header>
     <div class="likes-body">
+      <div class="likes-tabs" role="tablist">
+        <button type="button" class="likes-tab is-on" data-likes-tab="products" role="tab" aria-selected="true">Productos <small data-likes-n-products></small></button>
+        <button type="button" class="likes-tab" data-likes-tab="recipes" role="tab" aria-selected="false">Recetas <small data-likes-n-recipes></small></button>
+      </div>
+      <div data-likes-pane="recipes" hidden>
+        <ul class="likes-list likes-list--recipes" data-recipes-list role="list"></ul>
+        <div class="likes-empty" data-recipes-empty>
+          {% render 'icon', name: 'heart' %}
+          <p>Guarda recetas del Blog con ♥ y aparecen aquí.</p>
+          <a class="button button--outline" href="/blogs/recetas">Ir al Blog</a>
+        </div>
+      </div>
+      <div data-likes-pane="products">
       <p class="muted small likes-note">{{ section.settings.note }}</p>
       <ul class="likes-list" data-likes-list role="list"></ul>
       <div class="likes-empty" data-likes-empty>
         {% render 'icon', name: 'heart' %}
         <p>{{ section.settings.empty_text }}</p>
+      </div>
       </div>
     </div>
   </aside>

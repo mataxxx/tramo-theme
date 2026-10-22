@@ -46,7 +46,8 @@
         "brand_subtitle": "— FUNDADORES —",
         "brand_note": "Desde 1946",
         "menu": "main-menu",
-        "sticky": true
+        "sticky": true,
+        "show_likes": true
       }
     }
   },
