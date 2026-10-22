@@ -5,15 +5,7 @@
     {%- if settings.quick_show_video and settings.quick_video_position == 'on_image' -%}
       {% render 'product-video', product: product, title: '' %}
     {%- endif -%}
-    {%- if product.featured_media -%}
-      {{
-        product.featured_media
-        | image_url: width: 900
-        | image_tag: widths: '450, 600, 900', sizes: '(min-width: 750px) 560px, 100vw', alt: product.featured_media.alt
-      }}
-    {%- else -%}
-      <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
-    {%- endif -%}
+    {% render 'product-gallery', product: product, sizes: '(min-width: 750px) 560px, 100vw', lazy: 'eager' %}
   </div>
   <div class="quick-view__content">
     {%- if product.type != blank -%}

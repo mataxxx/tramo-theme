@@ -8,40 +8,7 @@
 {%- endstyle -%}
 {%- assign form_id = 'product-form-' | append: section.id -%}
 <section class="product-page page-width" data-product-root data-section-id="{{ section.id }}">
-  <div class="product-gallery" data-gallery>
-    <div class="product-gallery__strip" data-gallery-strip>
-      {%- for media in product.media -%}
-        {%- assign loading_mode = 'lazy' -%}
-        {%- if forloop.first -%}{%- assign loading_mode = 'eager' -%}{%- endif -%}
-        <div class="product-gallery__slide" data-media-id="{{ media.id }}">
-          {{
-            media.preview_image
-            | image_url: width: 1100
-            | image_tag:
-              widths: '450, 600, 800, 1100',
-              sizes: '(min-width: 750px) 50vw, 100vw',
-              loading: loading_mode,
-              alt: media.alt
-          }}
-        </div>
-      {%- else -%}
-        <div class="product-gallery__slide">
-          <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
-        </div>
-      {%- endfor -%}
-    </div>
-    {%- if product.media.size > 1 -%}
-      <ul class="product-gallery__thumbs" role="list">
-        {%- for media in product.media -%}
-          <li>
-            <button type="button" class="thumb" data-thumb="{{ media.id }}" aria-label="Ver imagen {{ forloop.index }}">
-              {{ media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}
-            </button>
-          </li>
-        {%- endfor -%}
-      </ul>
-    {%- endif -%}
-  </div>
+  {% render 'product-gallery', product: product, lazy: 'eager' %}
 
   <div class="product-info">
     {%- for block in section.blocks -%}

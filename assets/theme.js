@@ -468,8 +468,9 @@
     function scrollToMedia(variant) {
       if (!variant || !variant.media_id) return;
       var strip = $('[data-gallery-strip]', root);
-      var slide = strip && $('[data-media-id="' + variant.media_id + '"]', strip);
-      if (strip && slide) strip.scrollTo({ left: slide.offsetLeft - strip.offsetLeft, behavior: 'smooth' });
+      var vsl = strip ? Array.prototype.slice.call(strip.children) : [];
+      var vi = vsl.findIndex(function (sl) { return sl.getAttribute('data-media-id') === String(variant.media_id); });
+      if (strip && vi > -1) strip.scrollTo({ left: vi * strip.clientWidth, behavior: 'smooth' });
     }
 
     function update(fromUser) {
@@ -534,8 +535,9 @@
         bulkInput.value = roundToUnit((parseInt(bulkInput.value, 10) || BULK.min) + BULK.step); update(false);
       } else if (btn.hasAttribute('data-thumb')) {
         var strip = $('[data-gallery-strip]', root);
-        var slide = strip && $('[data-media-id="' + btn.getAttribute('data-thumb') + '"]', strip);
-        if (strip && slide) strip.scrollTo({ left: slide.offsetLeft - strip.offsetLeft, behavior: 'smooth' });
+        var slides = strip ? Array.prototype.slice.call(strip.children) : [];
+        var si = slides.findIndex(function (sl) { return sl.getAttribute('data-media-id') === btn.getAttribute('data-thumb'); });
+        if (strip && si > -1) strip.scrollTo({ left: si * strip.clientWidth, behavior: 'smooth' });
         $$('[data-thumb]', root).forEach(function (t) { t.classList.toggle('is-active', t === btn); });
       }
     });
@@ -1459,6 +1461,7 @@
     var bar = opts.search !== 'icon';
     e.wrap.hidden = false;
     var gz = $('[data-cat-granel]'), fv = $('[data-cat-favs]'); if (gz) gz.checked = false; if (fv) fv.checked = false;
+    if (fv && fv.closest('label')) fv.closest('label').hidden = getLikes().length === 0;
     var fl = $('[data-category-filters]'); if (fl) fl.hidden = false;
     e.empty.hidden = true;
     $$('[data-csort]', e.sort).forEach(function (b) {
@@ -1699,6 +1702,35 @@
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var b = $('[data-login-ask]'); if (b) b.hidden = true; } });
   document.addEventListener('tramo:likes-changed', function () { syncLikes(); });
+
+  /* Galería del producto: flechas, contador y miniatura activa al deslizar */
+  function galleryGo(g, idx) {
+    var strip = $('[data-gallery-strip]', g); if (!strip) return;
+    var n = strip.children.length; idx = Math.max(0, Math.min(n - 1, idx));
+    strip.scrollTo({ left: idx * strip.clientWidth, behavior: 'smooth' });
+  }
+  function galleryIdx(g) { var strip = $('[data-gallery-strip]', g); return strip ? Math.round(strip.scrollLeft / Math.max(1, strip.clientWidth)) : 0; }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-gallery-prev], [data-gallery-next]');
+    if (!b) return;
+    e.preventDefault();
+    var g = b.closest('[data-gallery]');
+    galleryGo(g, galleryIdx(g) + (b.hasAttribute('data-gallery-next') ? 1 : -1));
+  });
+  document.addEventListener('scroll', function (e) {
+    var strip = e.target; if (!strip.matches || !strip.matches('[data-gallery-strip]')) return;
+    var g = strip.closest('[data-gallery]'); if (!g) return;
+    if (g._gt) return; g._gt = true;
+    requestAnimationFrame(function () {
+      g._gt = false;
+      var i = galleryIdx(g), slides = strip.children, n = slides.length;
+      var c = $('[data-gallery-count]', g); if (c) c.textContent = (i + 1) + ' / ' + n;
+      var id = slides[i] && slides[i].getAttribute('data-media-id');
+      $$('[data-thumb]', g).forEach(function (t) { t.classList.toggle('is-active', t.getAttribute('data-thumb') === id); });
+      var p = $('[data-gallery-prev]', g), nx = $('[data-gallery-next]', g);
+      if (p) p.disabled = i === 0; if (nx) nx.disabled = i >= n - 1;
+    });
+  }, true);
 
   /* Celular: "Pagos seguros · Entregas confiables" va justo arriba del footer (en computadora sigue arriba) */
   (function () {

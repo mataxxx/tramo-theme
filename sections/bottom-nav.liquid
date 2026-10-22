@@ -8,10 +8,17 @@
     <span>{{ section.settings.label_search }}</span>
   </button>
   {%- if section.settings.show_videos -%}
-    <button type="button" class="bottom-nav__item" data-open="reels">
-      {% render 'icon', name: 'video' %}
-      <span>{{ section.settings.label_videos }}</span>
-    </button>
+    {%- if blogs['recetas'] != blank -%}
+      <a class="bottom-nav__item" href="{{ blogs['recetas'].url }}?tab=videos">
+        {% render 'icon', name: 'video' %}
+        <span>{{ section.settings.label_videos }}</span>
+      </a>
+    {%- else -%}
+      <button type="button" class="bottom-nav__item" data-open="reels">
+        {% render 'icon', name: 'video' %}
+        <span>{{ section.settings.label_videos }}</span>
+      </button>
+    {%- endif -%}
   {%- endif -%}
 </nav>
 

@@ -82,7 +82,7 @@
       "settings": {
         "label_home": "Inicio",
         "label_search": "Buscar",
-        "label_videos": "Videos",
+        "label_videos": "Vlog",
         "label_cart": "Carrito",
         "show_videos": true,
         "show_float_videos": false
