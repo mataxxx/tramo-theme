@@ -669,7 +669,11 @@
       var tiles = $$('[data-search-global] [data-search-collection]');
       var chips = tiles.map(function (t) {
         var title = t.getAttribute('data-search-title') || t.textContent.trim();
-        return '<button type="button" class="hsd__chip" data-search-collection="' + esc(t.getAttribute('data-search-collection')) + '" data-search-title="' + esc(title) + '" data-search-question="' + esc(t.getAttribute('data-search-question') || '') + '">' + esc(title) + '</button>';
+        var h = t.getAttribute('data-search-collection');
+        var im = t.querySelector('img') || document.querySelector('.cats-tile[data-search-collection="' + h + '"] img');
+        var src = im ? (im.currentSrc || im.src) : '';
+        return '<button type="button" class="hsd__chip" data-search-collection="' + esc(h) + '" data-search-title="' + esc(title) + '" data-search-question="' + esc(t.getAttribute('data-search-question') || '') + '">' +
+          '<span class="hsd__cimg">' + (src ? '<img src="' + esc(src) + '" alt="" loading="lazy">' : '<b>' + esc(title.charAt(0)) + '</b>') + '</span><span class="hsd__cname">' + esc(title) + '</span></button>';
       }).join('');
       drop.innerHTML = '<div class="search-drop__inner">' +
         '<div class="hsd__sugg" hidden><p class="hsd__title">Sugerencias</p><div class="hsd__list" data-hsd-list></div></div>' +

@@ -1805,3 +1805,16 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
   .hsd__foot strong { color: var(--color-primary); }
   .search-drop__list { transform: none; opacity: 1; }
 }
+
+
+/* Ronda 49: categorías del buscador como rectángulos redondeados con imagen */
+@media (min-width: 750px) {
+  .hsd__chips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding-bottom: 14px; }
+  .hsd__chip { display: grid; gap: 6px; padding: 0; background: transparent; border-radius: 16px; text-align: center; }
+  .hsd__chip:hover { background: transparent; color: var(--color-text); }
+  .hsd__cimg { display: grid; place-items: center; aspect-ratio: 4 / 3; border-radius: 16px; background: #f1f1e8; overflow: hidden; transition: transform .25s, box-shadow .25s; }
+  .hsd__cimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hsd__cimg b { font-family: var(--font-heading); font-size: 28px; color: var(--color-primary); font-weight: 400; }
+  .hsd__chip:hover .hsd__cimg { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(38,61,37,.18); }
+  .hsd__cname { font-size: 13px; font-weight: 600; line-height: 1.2; }
+}
