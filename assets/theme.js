@@ -1401,9 +1401,9 @@
     e.input.value = '';
     e.input.placeholder = opts.question || 'Buscar...';
     var bar = opts.search !== 'icon';
-    e.wrap.hidden = !bar;
-    e.toggle.hidden = bar;
-    e.toggle.setAttribute('aria-expanded', bar ? 'true' : 'false');
+    e.wrap.hidden = false;
+    var gz = $('[data-cat-granel]'), fv = $('[data-cat-favs]'); if (gz) gz.checked = false; if (fv) fv.checked = false;
+    var fl = $('[data-category-filters]'); if (fl) fl.hidden = false;
     e.empty.hidden = true;
     $$('[data-csort]', e.sort).forEach(function (b) {
       b.classList.toggle('is-active', b.getAttribute('data-csort') === 'default');
@@ -1431,8 +1431,10 @@
     var shown = 0;
     items.forEach(function (el) {
       var okText = !q || normText(el.getAttribute('data-title') || el.textContent).indexOf(q) > -1;
+      var gOn = $('[data-cat-granel]') && $('[data-cat-granel]').checked, fOn = $('[data-cat-favs]') && $('[data-cat-favs]').checked;
+      var okExtra = (!gOn || el.getAttribute('data-bulk') === '1') && (!fOn || getLikes().indexOf(el.getAttribute('data-handle')) > -1);
       var okTag = !tag || (el.getAttribute('data-tags') || '').split('|').some(function (t) { return normText(t).indexOf(tag) > -1; });
-      el.hidden = !(okText && okTag);
+      el.hidden = !(okText && okTag && okExtra);
       if (!el.hidden) shown++;
     });
     var visible = items.slice();
@@ -1440,7 +1442,11 @@
     else if (cat.sort === 'price') visible.sort(function (a, b) { return (parseInt(a.getAttribute('data-price'), 10) - parseInt(b.getAttribute('data-price'), 10)) * (cat.desc ? -1 : 1); });
     if (cat.sort !== 'default') visible.forEach(function (el) { e.grid.appendChild(el); });
     e.empty.hidden = shown > 0 || items.length === 0;
+    var cnt = $('[data-category-count]'); if (cnt) cnt.textContent = shown + (shown === 1 ? ' producto' : ' productos');
   }
+  document.addEventListener('change', function (ev) {
+    if (ev.target.closest && ev.target.closest('[data-cat-granel], [data-cat-favs]')) catApply();
+  });
   function catRestoreOrder() {
     var e = catEls();
     var items = $$('.category-modal__item', e.grid);
@@ -1497,6 +1503,8 @@
       ftog.setAttribute('aria-expanded', fopen ? 'true' : 'false');
       return;
     }
+    var fgt = t.closest('[data-category-filters-toggle]');
+    if (fgt) { var fl2 = $('[data-category-filters]'); fl2.hidden = !fl2.hidden; fgt.setAttribute('aria-expanded', fl2.hidden ? 'false' : 'true'); return; }
     var tog = t.closest('[data-category-search-toggle]');
     if (tog) {
       var e = catEls();

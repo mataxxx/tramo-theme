@@ -1,4 +1,5 @@
 {%- comment -%} Ficha dentro de la ventana de categoría, con datos para ordenar y filtrar. Parámetro: product {%- endcomment -%}
-<div class="category-modal__item" data-title="{{ product.title | escape }}" data-price="{{ product.price_min }}" data-tags="{{ product.tags | join: '|' | downcase | escape }}">
+{%- assign has_bulk = 0 -%}{%- for v in product.variants -%}{%- assign vt = v.title | downcase -%}{%- if vt contains 'granel' -%}{%- assign has_bulk = 1 -%}{%- endif -%}{%- endfor -%}
+<div class="category-modal__item" data-handle="{{ product.handle }}" data-bulk="{{ has_bulk }}" data-title="{{ product.title | escape }}" data-price="{{ product.price_min }}" data-tags="{{ product.tags | join: '|' | downcase | escape }}">
   {% render 'product-card', product: product, show_quick_add: false %}
 </div>

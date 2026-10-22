@@ -558,6 +558,12 @@
         "label": "Imagen decorativa bajo el título (opcional)"
       },
       {
+        "type": "text",
+        "id": "category_subtitle",
+        "label": "Frase bajo el título de la categoría",
+        "default": "Explora sabores, aromas y mezclas para tu cocina."
+      },
+      {
         "type": "range",
         "id": "category_art_height",
         "label": "Espacio bajo el título",
