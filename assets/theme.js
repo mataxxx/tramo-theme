@@ -1728,4 +1728,34 @@
   }
   initHeroSlider();
   document.addEventListener('shopify:section:load', initHeroSlider);
+
+  /* ---------- Celular: el slideshow se encoge al bajar para dar prioridad a los productos ---------- */
+  (function () {
+    var mq = window.matchMedia('(max-width: 749px)');
+    var wrap = null, full = 0, ticking = false;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function measure() {
+      wrap = $('.hero-wrap');
+      if (!wrap) return;
+      wrap.style.height = ''; wrap.style.opacity = ''; wrap.style.transform = '';
+      full = wrap.offsetHeight;
+      update();
+    }
+    function update() {
+      ticking = false;
+      if (!wrap) return;
+      if (!mq.matches || reduce) { wrap.classList.remove('is-collapsing'); wrap.style.height = ''; wrap.style.opacity = ''; wrap.style.transform = ''; return; }
+      var y = window.pageYOffset || 0;
+      var p = Math.min(1, Math.max(0, y / Math.max(full * 0.85, 1)));
+      wrap.classList.add('is-collapsing');
+      wrap.style.height = (full * (1 - p)) + 'px';
+      wrap.style.opacity = String(1 - p * 0.85);
+      wrap.style.transform = 'scale(' + (1 - 0.05 * p) + ')';
+    }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; window.requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+    document.addEventListener('shopify:section:load', measure);
+    measure();
+  })();
 })();

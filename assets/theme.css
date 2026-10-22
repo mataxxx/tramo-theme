@@ -1920,3 +1920,12 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
 .category-modal__field { max-width: 560px; }
 .cm-switch .cm-ico, .cm-switch > .icon { width: 20px; height: 20px; color: var(--color-primary); flex-shrink: 0; }
 @media (min-width: 750px) { .hero-wrap--tiles, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin-top: 14px; } }
+
+
+/* Ronda 57: celular — slideshow redondeado y que se encoge al bajar */
+@media (max-width: 749px) {
+  .hero-wrap { margin: 12px 14px 0; overflow-anchor: none; }
+  .hero-wrap .hero-slider { margin: 0; border-radius: 22px; overflow: hidden; }
+  .hero-wrap.is-collapsing { overflow: hidden; transform-origin: top center; will-change: height, opacity, transform; border-radius: 22px; }
+  .hero-wrap .hero { margin-bottom: 0; }
+}
