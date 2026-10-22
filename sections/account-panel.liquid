@@ -22,16 +22,15 @@
         </div>
 
         <ul class="account-links" role="list">
-          {%- assign acc_parts = routes.account_url | split: '?' -%}
           <li>
-            <a href="{{ acc_parts | first }}/profile{% if acc_parts.size > 1 %}?{{ acc_parts.last }}{% endif %}">
+            <a href="/pages/mi-cuenta?tab=perfil">
               {% render 'icon', name: 'map-pin' %}
               <span>{{ section.settings.profile_label }}</span>
               {% render 'icon', name: 'chevron-right' %}
             </a>
           </li>
           <li>
-            <a href="{{ routes.account_url }}">
+            <a href="/pages/mi-cuenta?tab=pedidos">
               {% render 'icon', name: 'package' %}
               <span>{{ section.settings.orders_link_label }}</span>
               {% render 'icon', name: 'chevron-right' %}

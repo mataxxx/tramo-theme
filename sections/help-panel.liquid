@@ -33,7 +33,7 @@
             {%- if customer -%}
               <button type="button" class="button" data-open="account">{% render 'icon', name: 'package' %} {{ block.settings.cta_label | default: 'Ver mis pedidos' }}</button>
             {%- else -%}
-              <a class="button" href="{{ routes.storefront_login_url }}">{% render 'icon', name: 'user' %} Iniciar sesión para ver mis pedidos</a>
+              <a class="button" data-login-go href="{{ routes.storefront_login_url }}">{% render 'icon', name: 'user' %} Iniciar sesión para ver mis pedidos</a>
             {%- endif -%}
           {%- elsif block.settings.cta_label != blank and block.settings.cta_url != blank -%}
             <a class="button" href="{{ block.settings.cta_url }}">{{ block.settings.cta_label }}</a>

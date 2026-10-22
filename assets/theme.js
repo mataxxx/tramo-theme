@@ -1628,6 +1628,15 @@
     var t = e.target; if (!t.closest) return;
     var op = t.closest('[data-login-open]');
     if (op && $('[data-login-ask]')) { e.preventDefault(); askLogin(); return; }
+    var go = t.closest('[data-login-go]');
+    if (go) {
+      try {
+        var u = new URL(go.getAttribute('href'), location.origin);
+        var back = location.pathname.indexOf('/account') === 0 ? '/' : location.pathname + location.search;
+        u.searchParams.set('return_to', back);
+        go.setAttribute('href', u.pathname + u.search);
+      } catch (er) {}
+    }
     if (t.closest('[data-login-ask-close]')) { var b = $('[data-login-ask]'); if (b) b.hidden = true; }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var b = $('[data-login-ask]'); if (b) b.hidden = true; } });

@@ -7,7 +7,8 @@
   data-login-text="{{ section.settings.login_text | escape }}"
   data-login-button="{{ section.settings.login_button | escape }}"
   data-home="{{ routes.root_url }}"
-  data-shop-url="{{ routes.all_products_collection_url }}">
+  data-shop-url="{{ routes.all_products_collection_url }}"
+  data-signed-in="{% if customer %}1{% endif %}">
   <div class="acct__shell">
     {%- if section.settings.client_id == blank -%}
       <div class="acct__card acct__setup">

@@ -11,6 +11,7 @@
   var API_VERSION = '2025-10';
   var cfg = null; // endpoints
   var state = { tab: 'resumen', customer: null, msg: null };
+  try { var qt = new URLSearchParams(location.search).get('tab'); if (qt) state.tab = qt; } catch (e) {}
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
@@ -240,7 +241,11 @@
 
   /* ---------- Arranque ---------- */
   handleCallback().catch(function () { return false; }).then(function () { return accessToken(); }).then(function (tok) {
-    if (!tok) return loginView();
+    if (!tok) {
+      /* Ya inició sesión en la tienda: entra directo (Shopify reconoce la sesión y vuelve sin pedir código) */
+      if (host.dataset.signedIn === '1' && !ses('tramo.acct.auto')) { ses('tramo.acct.auto', 1); return login(); }
+      return loginView();
+    }
     return load().then(render).catch(function (e) { del(KEY); loginView(e.message === 'auth' ? '' : 'No pudimos cargar tu cuenta. Intenta entrar de nuevo.'); });
   }).catch(function () { loginView('No pudimos conectar con tu cuenta. Intenta de nuevo.'); });
 })();

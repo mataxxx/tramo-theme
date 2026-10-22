@@ -11,7 +11,7 @@
       <li>{% render 'icon', name: 'package' %}<span>{{ settings.login_perk_2 | default: 'Revisa tus pedidos' }}</span></li>
       <li>{% render 'icon', name: 'check' %}<span>{{ settings.login_perk_3 | default: 'Compra más rápido' }}</span></li>
     </ul>
-    <a class="button button--full" href="{{ routes.storefront_login_url }}">{{ settings.login_button | default: 'Continuar con mi correo' }}</a>
+    <a class="button button--full" data-login-go href="{{ routes.storefront_login_url }}">{{ settings.login_button | default: 'Continuar con mi correo' }}</a>
     <button type="button" class="login-ask__later" data-login-ask-close>Ahora no</button>
   </div>
 </div>
