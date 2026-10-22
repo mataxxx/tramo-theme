@@ -1,0 +1,44 @@
+{{ 'account-app.css' | asset_url | stylesheet_tag }}
+<section class="acct" id="tramo-account"
+  data-client-id="{{ section.settings.client_id | strip }}"
+  data-origin="{{ shop.url }}"
+  data-shop-origin="{{ request.origin }}"
+  data-login-title="{{ section.settings.login_title | escape }}"
+  data-login-text="{{ section.settings.login_text | escape }}"
+  data-login-button="{{ section.settings.login_button | escape }}"
+  data-home="{{ routes.root_url }}"
+  data-shop-url="{{ routes.all_products_collection_url }}">
+  <div class="acct__shell">
+    {%- if section.settings.client_id == blank -%}
+      <div class="acct__card acct__setup">
+        <h2>Falta conectar la cuenta</h2>
+        {%- if request.design_mode -%}
+          <p>Pega el <strong>ID de cliente</strong> de la API de cuentas de clientes (Canal Headless en el admin de Shopify) en los ajustes de esta sección.</p>
+        {%- else -%}
+          <p>Estamos preparando tu cuenta. Vuelve en un momento.</p>
+        {%- endif -%}
+      </div>
+    {%- else -%}
+      <div class="acct__loading" data-acct-loading>Cargando tu cuenta…</div>
+      <div data-acct-root hidden></div>
+      <noscript><p>Necesitas activar JavaScript para ver tu cuenta.</p></noscript>
+    {%- endif -%}
+  </div>
+</section>
+{%- if section.settings.client_id != blank -%}
+  <script src="{{ 'account-app.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Mi cuenta (propia)",
+  "settings": [
+    { "type": "paragraph", "content": "Cuenta de clientes con el diseño de Tramo. Datos desde la API de cuentas de clientes de Shopify." },
+    { "type": "text", "id": "client_id", "label": "ID de cliente (Customer Account API)", "info": "Admin > Canales de venta > Headless > tu tienda > Customer Account API. Es público, no es el secreto." },
+    { "type": "text", "id": "login_title", "label": "Título al entrar", "default": "Tu cuenta Tramo" },
+    { "type": "textarea", "id": "login_text", "label": "Texto al entrar", "default": "Revisa tus pedidos, guarda tus direcciones y vuelve a pedir tus especias favoritas." },
+    { "type": "text", "id": "login_button", "label": "Botón de entrar", "default": "Entrar a mi cuenta" }
+  ],
+  "presets": [{ "name": "Mi cuenta (propia)" }]
+}
+{% endschema %}

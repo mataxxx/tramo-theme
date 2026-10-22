@@ -1,0 +1,6 @@
+{
+  "sections": {
+    "account": { "type": "account-app", "settings": {} }
+  },
+  "order": ["account"]
+}
