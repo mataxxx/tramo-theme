@@ -47,8 +47,11 @@
                 {%- endfor -%}
               {%- endif -%}
               {%- if shown == 0 -%}
-                {%- if linklists['main-menu'].links.size > 0 -%}
-                  {%- for link in linklists['main-menu'].links limit: 7 -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endfor -%}
+                {%- assign shop_menu = section.settings.shop_menu -%}
+                {%- if shop_menu == blank -%}{%- assign shop_menu = linklists['main-tramo'] -%}{%- endif -%}
+                {%- if shop_menu == blank or shop_menu.links.size == 0 -%}{%- assign shop_menu = linklists['main-menu'] -%}{%- endif -%}
+                {%- if shop_menu.links.size > 0 -%}
+                  {%- for link in shop_menu.links limit: 8 -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endfor -%}
                 {%- else -%}
                   {%- for c in collections limit: 7 -%}{%- if c.handle != 'all' and c.products_count > 0 -%}<li><a href="{{ c.url }}">{{ c.title }}</a></li>{%- endif -%}{%- endfor -%}
                 {%- endif -%}
@@ -182,6 +185,7 @@
       "type": "header",
       "content": "Colores"
     },
+    { "type": "link_list", "id": "shop_menu", "label": "Menú para la columna Tienda", "info": "Se usa si el menú del bloque Tienda está vacío. Si no eliges ninguno se usa el menú «MAIN TRAMO»." },
     { "type": "header", "content": "Columna Información" },
     { "type": "text", "id": "info_heading", "label": "Título", "default": "Información" },
     { "type": "link_list", "id": "info_menu", "label": "Menú de Información", "info": "Si lo dejas vacío se muestran enlaces básicos." },
