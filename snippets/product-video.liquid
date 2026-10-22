@@ -23,7 +23,7 @@
         <span data-icon-muted>{% render 'icon', name: 'mute' %}</span>
       </button>
       <div class="pvideo__side">
-        <button type="button" class="like-btn pvideo__like" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button>
+        <button type="button" class="like-btn pvideo__like" data-pvideo-like="{{ product.handle }}" aria-pressed="false" aria-label="Me gusta este video">{% render 'icon', name: 'heart' %}</button>
         <button type="button" class="pvideo__share" data-pvideo-share data-share-title="{{ product.title | escape }}" data-share-url="{{ request.origin }}{{ product.url | split: '?' | first }}?video=1" aria-label="Compartir video">{% render 'icon', name: 'share' %}</button>
       </div>
       <div class="pvideo__bar"><span data-pvideo-progress></span></div>

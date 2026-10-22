@@ -1763,6 +1763,24 @@
   initHeroSlider();
   document.addEventListener('shopify:section:load', initHeroSlider);
 
+  /* Me gusta del video (separado de favoritos; se guarda en este navegador) */
+  (function () {
+    var KEY = 'tramo.videoLikes';
+    function list() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } }
+    function save(a) { try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {} }
+    function paint() { var l = list(); $$('[data-pvideo-like]').forEach(function (b) { b.setAttribute('aria-pressed', l.indexOf(b.getAttribute('data-pvideo-like')) > -1 ? 'true' : 'false'); }); }
+    document.addEventListener('click', function (event) {
+      var b = event.target.closest && event.target.closest('[data-pvideo-like]');
+      if (!b) return;
+      event.preventDefault(); event.stopPropagation();
+      var h = b.getAttribute('data-pvideo-like'), l = list(), i = l.indexOf(h);
+      if (i > -1) l.splice(i, 1); else l.push(h);
+      save(l); paint();
+    }, true);
+    paint();
+    document.addEventListener('shopify:section:load', paint);
+  })();
+
   /* Compartir el video del producto */
   document.addEventListener('click', function (event) {
     var b = event.target.closest && event.target.closest('[data-pvideo-share]');
