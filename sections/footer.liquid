@@ -5,7 +5,7 @@
   #shopify-section-{{ section.id }} .site-footer {
     {%- if section.settings.bg_color != blank %} background-color: {{ section.settings.bg_color }};{% endif %}
     {%- if section.settings.bg_image != blank %} background-image: linear-gradient(rgba(0,0,0,{{ section.settings.bg_image_dim | default: 40 | divided_by: 100.0 }}), rgba(0,0,0,{{ section.settings.bg_image_dim | default: 40 | divided_by: 100.0 }})), url('{{ section.settings.bg_image | image_url: width: 2000 }}'); background-size: cover; background-position: center;{% endif %}
-    {%- if section.settings.text_color != blank %} color: {{ section.settings.text_color }};{% endif %}
+    {%- if section.settings.fg_color != blank %} color: {{ section.settings.fg_color }};{% endif %}
   }
   {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .footer-heading' -%}
   {% render 'text-style', s: section.settings, p: 'heading', sel: text_sel %}
@@ -168,8 +168,8 @@
     },
     {
       "type": "color",
-      "id": "text_color",
-      "label": "Color del texto",
+      "id": "fg_color",
+      "label": "Color del texto general",
       "default": "#ffffff"
     },
     {
