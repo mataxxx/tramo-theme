@@ -2152,3 +2152,17 @@ a, button { touch-action: manipulation; }
   .site-footer__bottom { margin-top: 22px; padding-top: 16px; font-size: 13px; flex-direction: column; align-items: flex-start; gap: 10px; }
   .site-footer__legal { font-size: 12.5px; }
 }
+
+/* Ronda 69: Mi cuenta como ventana en el centro de la pantalla (no panel lateral) */
+#AccountPanel { justify-content: center; align-items: center; padding: 16px; }
+#AccountPanel .drawer__panel.account-panel { width: min(460px, 100%); height: min(680px, calc(100dvh - 32px)); max-height: calc(100dvh - 32px); border-radius: 24px; overflow: hidden; box-shadow: 0 28px 80px rgba(0,0,0,.35); transform: translateY(24px) scale(.97); opacity: 0; transition: transform .34s cubic-bezier(.22,.61,.36,1), opacity .24s ease; }
+#AccountPanel.is-open .drawer__panel.account-panel { transform: none; opacity: 1; }
+#AccountPanel .drawer__header { padding: 16px 18px 14px 22px; }
+#AccountPanel .drawer__title { font-size: 24px; }
+#AccountPanel .account-panel__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+@media (max-width: 749px) {
+  #AccountPanel { padding: 12px; }
+  #AccountPanel .drawer__panel.account-panel { height: min(640px, calc(100dvh - 24px)); max-height: calc(100dvh - 24px); border-radius: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { #AccountPanel .drawer__panel.account-panel { transition: opacity .15s; transform: none; } }
+@media (min-width: 750px) { #AccountPanel .drawer__panel.account-panel { height: min(740px, calc(100dvh - 48px)); } }
