@@ -2233,3 +2233,8 @@ a, button { touch-action: manipulation; }
   .tv-pip--inline .tv-pip__hint-b { display: inline; }
   .tv-pip--inline .tv-pip__screen:hover .tv-pip__hint { background: rgba(255,255,255,.3); }
 }
+
+/* Ronda 72: subcategorías navideñas */
+.category-chip[data-region="queque-navideno"] { --rg-bg: #f6e0d6; --rg-fg: #9b2f22; }
+.category-chip[data-region="tamales"]         { --rg-bg: #e3eed7; --rg-fg: #2f6b3a; }
+.category-chip[data-region="especias"]        { --rg-bg: #f7ebd0; --rg-fg: #8a5a12; }

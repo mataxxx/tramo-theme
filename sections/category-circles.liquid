@@ -23,7 +23,7 @@
         {%- if block.settings.link != blank -%}
           <a class="cats-tile cats-tile--link" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>{{ inner }}</a>
         {%- elsif coll != blank -%}
-          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?" {{ block.shopify_attributes }}>{{ inner }}</button>
+          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?"{% if block.settings.filters != blank %} data-category-filters="{{ block.settings.filters | escape }}"{% endif %} {{ block.shopify_attributes }}>{{ inner }}</button>
         {%- else -%}
           <span class="cats-tile" {{ block.shopify_attributes }}>{{ inner }}</span>
         {%- endif -%}
@@ -58,7 +58,7 @@
         {%- if block.settings.link != blank -%}
           <a class="cats-tile cats-tile--link" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>{{ inner }}</a>
         {%- elsif coll != blank -%}
-          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?" {{ block.shopify_attributes }}>{{ inner }}</button>
+          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?"{% if block.settings.filters != blank %} data-category-filters="{{ block.settings.filters | escape }}"{% endif %} {{ block.shopify_attributes }}>{{ inner }}</button>
         {%- else -%}
           <span class="cats-tile" {{ block.shopify_attributes }}>{{ inner }}</span>
         {%- endif -%}
@@ -101,10 +101,12 @@
             { "value": "tag", "label": "Etiqueta" },
             { "value": "house-hand", "label": "Casa" },
             { "value": "globe-hand", "label": "Mundo" },
-            { "value": "rack", "label": "Especiero" }
+            { "value": "rack", "label": "Especiero" },
+            { "value": "tree", "label": "Navidad" }
           ],
           "default": "leaf"
         },
+        { "type": "text", "id": "filters", "label": "Subcategorías (opcional)", "info": "Etiquetas de producto separadas por coma; salen como botones arriba en la ventana. Ej: Queque navideño, Tamales, Especias" },
         { "type": "text", "id": "search_noun", "label": "Palabra para la pregunta", "info": "Ej: especia → ¿Cuál especia buscas?", "default": "producto" }
       ]
     }

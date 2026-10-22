@@ -55,9 +55,20 @@
             "title": "Arma tu especiero",
             "icon": "rack"
           }
+        },
+        "navidad": {
+          "type": "category",
+          "settings": {
+            "collection": "temporada-navidena",
+            "title": "Temporada navideña",
+            "icon": "tree",
+            "search_noun": "producto",
+            "filters": "Queque navideño, Tamales, Especias"
+          }
         }
       },
       "block_order": [
+        "navidad",
         "c1",
         "c2",
         "rack",

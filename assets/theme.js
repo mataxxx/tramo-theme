@@ -1273,7 +1273,7 @@
     var scopeBtn = target.closest('[data-search-collection]');
     if (scopeBtn) {
       event.preventDefault();
-      openCategoryByHandle(scopeBtn.getAttribute('data-search-collection'), scopeBtn.getAttribute('data-search-title') || '', scopeBtn.getAttribute('data-search-question') || '');
+      openCategoryByHandle(scopeBtn.getAttribute('data-search-collection'), scopeBtn.getAttribute('data-search-title') || '', scopeBtn.getAttribute('data-search-question') || '', scopeBtn.getAttribute('data-category-filters') || '');
       return;
     }
 
@@ -1440,7 +1440,10 @@
       'asia': svg('<path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4Z"/>'),
       'europa': svg('<path d="m3 19 6-11 4 7 3-4 5 8Z"/>'),
       'america': svg('<path d="M16 4c1 1 1.5 2 1.5 3.5M6 9c3-3 10-3 12 3-3 6-9 8-14 7 0-4 0-7 2-10Z"/>'),
-      'medio-oriente': svg('<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/>')
+      'medio-oriente': svg('<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/>'),
+      'queque-navideno': svg('<path d="M4 13h16v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/><path d="M4 13c1.3-1.5 2.7-1.5 4 0s2.7 1.5 4 0 2.7-1.5 4 0 2.7 1.5 4 0"/><path d="M6 13c0-3 2.7-5 6-5s6 2 6 5M12 8V5M10.5 4.5 12 3l1.5 1.5"/>'),
+      'tamales': svg('<path d="M5 8c3-3 11-3 14 0l-2 10H7Z"/><path d="M5 8l7 4 7-4M12 12v6"/>'),
+      'especias': svg('<path d="M7 8h10l-1 12H8Z"/><path d="M8 4h8v4H8ZM10 12h4M10 15.5h4"/>')
     };
   })();
   function catApply() {
@@ -1490,10 +1493,10 @@
     catFill(tmp.innerHTML);
     openDrawer('category');
   }
-  function openCategoryByHandle(handle, title, question) {
+  function openCategoryByHandle(handle, title, question, extraFilters) {
     var scope = document.querySelector('[data-category-scope][data-category-handle="' + handle + '"]');
     var tpl = scope && $('[data-category-template]', scope);
-    var filters = scope ? scope.getAttribute('data-category-filters') : '';
+    var filters = (scope && scope.getAttribute('data-category-filters')) || extraFilters || '';
     catSetup({ title: title, question: question, filters: filters, search: scope ? scope.getAttribute('data-category-search') : 'bar', banner: scope ? scope.getAttribute('data-category-banner') : '', subtitle: scope ? scope.getAttribute('data-category-subtitle') : '' });
     if (tpl) {
       var tmp = document.createElement('div');
