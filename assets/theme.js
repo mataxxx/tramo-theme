@@ -657,7 +657,7 @@
     els.results.innerHTML = list.length ? list.map(resultHTML).join('') : '<p class="search-empty">No encontramos productos con ese nombre.</p>';
   }
 
-  // Buscador del header (escritorio): se escribe ahí mismo y se despliega un mega menú
+  // Buscador del header (escritorio): se escribe ahí mismo y se despliega un panel unido a la barra
   (function () {
     var timer = null, token = 0;
     function wrapOf(el) { return el.closest('.header__searchwrap'); }
@@ -667,15 +667,15 @@
       drop = document.createElement('div');
       drop.className = 'search-drop';
       var tiles = $$('[data-search-global] [data-search-collection]');
-      var html = '<div class="search-drop__inner"><div class="search-drop__cats"><p class="search-drop__title">Buscar por categoría</p><div class="search-drop__list">';
-      tiles.forEach(function (t) {
-        var img = t.querySelector('img');
+      var chips = tiles.map(function (t) {
         var title = t.getAttribute('data-search-title') || t.textContent.trim();
-        html += '<button type="button" class="search-drop__item" data-search-collection="' + esc(t.getAttribute('data-search-collection')) + '" data-search-title="' + esc(title) + '" data-search-question="' + esc(t.getAttribute('data-search-question') || '') + '">' +
-          (img ? '<img src="' + esc(img.currentSrc || img.src) + '" alt="" loading="lazy">' : '') + '<span>' + esc(title) + '</span></button>';
-      });
-      html += '</div></div><div class="search-drop__results" hidden></div></div>';
-      drop.innerHTML = html;
+        return '<button type="button" class="hsd__chip" data-search-collection="' + esc(t.getAttribute('data-search-collection')) + '" data-search-title="' + esc(title) + '" data-search-question="' + esc(t.getAttribute('data-search-question') || '') + '">' + esc(title) + '</button>';
+      }).join('');
+      drop.innerHTML = '<div class="search-drop__inner">' +
+        '<div class="hsd__sugg" hidden><p class="hsd__title">Sugerencias</p><div class="hsd__list" data-hsd-list></div></div>' +
+        '<div class="hsd__cats"><p class="hsd__title">Categorías</p><div class="hsd__chips">' + chips + '</div></div>' +
+        '<a class="hsd__foot" href="#" data-hsd-foot hidden><span></span>' + '<svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
+        '</div>';
       wrap.appendChild(drop);
       return drop;
     }
@@ -686,46 +686,61 @@
       wrap.classList.toggle('is-open', open);
     }
     function closeAll() { $$('.header__searchwrap.is-open').forEach(function (w) { setOpen(w, false); }); }
-    function show(wrap, showResults) {
+    function mode(wrap, q) {
       var drop = ensureDrop(wrap);
-      drop.querySelector('.search-drop__cats').hidden = showResults;
-      drop.querySelector('.search-drop__results').hidden = !showResults;
+      drop.querySelector('.hsd__sugg').hidden = !q;
+      drop.querySelector('[data-hsd-foot]').hidden = !q;
+      if (q) {
+        var base = ROOT.replace(/\/$/, '');
+        var f = drop.querySelector('[data-hsd-foot]');
+        f.href = base + '/search?q=' + encodeURIComponent(q);
+        f.querySelector('span').innerHTML = 'Ver resultados para “<strong>' + esc(q) + '</strong>”';
+      }
     }
     function run(wrap, q) {
       var mine = ++token;
-      var box = ensureDrop(wrap).querySelector('.search-drop__results');
-      show(wrap, true);
-      box.innerHTML = '<p class="search-drop__empty">Buscando…</p>';
+      var box = ensureDrop(wrap).querySelector('[data-hsd-list]');
+      mode(wrap, q);
+      if (!box.children.length) box.innerHTML = '<p class="hsd__empty">Buscando…</p>';
       var base = ROOT.replace(/\/$/, '');
-      fetch(base + '/search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=8')
+      fetch(base + '/search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=5')
         .then(parseJSON)
         .then(function (data) {
           if (mine !== token) return;
           var list = (data.resources && data.resources.results && data.resources.results.products) || [];
-          if (!list.length) { box.innerHTML = '<p class="search-drop__empty">No encontramos “' + esc(q) + '”. Prueba con otra palabra.</p>'; return; }
+          if (!list.length) { box.innerHTML = '<p class="hsd__empty">No encontramos “' + esc(q) + '”. Prueba con otra palabra o elige una categoría.</p>'; return; }
           box.innerHTML = list.map(function (p) {
-            return resultHTML({ url: p.url, image: p.image, title: p.title, sub: p.price ? formatMoney(toCents(p.price)) : '' });
-          }).join('') + '<a class="search-drop__all" href="' + base + '/search?q=' + encodeURIComponent(q) + '">Ver todos los resultados</a>';
+            var lo = parseFloat(p.price_min || p.price), hi = parseFloat(p.price_max || p.price);
+            var price = isNaN(lo) ? '' : ((hi > lo ? 'Desde ' : '') + formatMoney(toCents(lo)));
+            var sub = [p.type, price].filter(Boolean).map(esc).join('<i>•</i>');
+            return '<a class="hsd__item" href="' + esc(p.url) + '" data-quick-view="' + esc(p.url) + '">' +
+              '<span class="hsd__img">' + (p.image ? '<img src="' + esc(p.image) + '" alt="" loading="lazy">' : '') + '</span>' +
+              '<span class="hsd__body"><strong>' + esc(p.title) + '</strong><small>' + sub + '</small></span>' +
+              '<svg class="icon hsd__go" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>';
+          }).join('');
         })
-        .catch(function () { if (mine === token) box.innerHTML = '<p class="search-drop__empty">No pude buscar ahora.</p>'; });
+        .catch(function () { if (mine === token) box.innerHTML = '<p class="hsd__empty">No pude buscar ahora.</p>'; });
     }
     document.addEventListener('focusin', function (e) {
       var inp = e.target.closest && e.target.closest('[data-header-search]');
       if (!inp) return;
       var w = wrapOf(inp); setOpen(w, true);
-      show(w, inp.value.trim().length >= 2);
+      var q = inp.value.trim(); if (q.length >= 2) run(w, q); else mode(w, '');
     });
     document.addEventListener('input', function (e) {
       var inp = e.target.closest && e.target.closest('[data-header-search]');
       if (!inp) return;
       var w = wrapOf(inp), q = inp.value.trim();
+      var clr = $('[data-search-clear]', w); if (clr) clr.hidden = !inp.value;
       clearTimeout(timer);
-      if (q.length < 2) { token++; show(w, false); return; }
-      timer = setTimeout(function () { run(w, q); }, 220);
+      if (q.length < 2) { token++; mode(w, ''); return; }
+      timer = setTimeout(function () { run(w, q); }, 200);
     });
     document.addEventListener('click', function (e) {
       var t = e.target; if (!t.closest) return;
-      if (t.closest('.search-drop__item') || t.closest('.search-drop__results a')) { closeAll(); return; }
+      var clr = t.closest('[data-search-clear]');
+      if (clr) { var w0 = wrapOf(clr), i0 = $('[data-header-search]', w0); i0.value = ''; clr.hidden = true; token++; mode(w0, ''); i0.focus(); return; }
+      if (t.closest('.hsd__chip') || t.closest('.hsd__item') || t.closest('[data-hsd-foot]')) { closeAll(); return; }
       if (!t.closest('.header__searchwrap')) closeAll();
     });
     document.addEventListener('keydown', function (e) {

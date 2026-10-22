@@ -75,6 +75,7 @@
         <form class="header__searchbar" action="{{ routes.search_url }}" method="get" role="search" autocomplete="off">
           {% render 'icon', name: 'search' %}
           <input type="search" name="q" placeholder="{{ s.search_placeholder | escape }}" aria-label="Buscar" data-header-search>
+          <button type="button" class="header__searchclear" data-search-clear hidden aria-label="Borrar">{% render 'icon', name: 'close' %}</button>
         </form>
       </div>
     {%- endif -%}
