@@ -2110,3 +2110,4 @@ a, button { touch-action: manipulation; }
 .pvideo__side .like-btn .icon, .pvideo__share .icon { width: 22px; height: 22px; stroke-width: 1.8; }
 .pvideo__side .like-btn[aria-pressed="true"] { background: rgba(0,0,0,.45); color: #ff4d6d; }
 .pvideo__side .like-btn[aria-pressed="true"] .icon { fill: currentColor; }
+.login-ask__perks[hidden] { display: none; }

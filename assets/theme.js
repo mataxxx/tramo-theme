@@ -1623,15 +1623,17 @@
     var box = $('[data-login-ask]');
     if (!box) { window.location.href = T.loginUrl || '/account/login'; return; }
     var t = $('[data-login-title]', box), x = $('[data-login-text]', box);
-    if (t) { if (t._def === undefined) t._def = t.textContent; t.textContent = reason === 'likes' ? 'Guarda tus favoritos' : t._def; }
-    if (x) { if (x._def === undefined) x._def = x.textContent; x.textContent = reason === 'likes' ? 'Para guardar productos en favoritos, inicia sesión o crea tu cuenta. Es rápido: te enviamos un código a tu correo.' : x._def; }
+    var R = {
+      likes: ['Guarda tus favoritos', 'Para guardar en favoritos debes iniciar sesión.']
+    }[reason] || null;
+    if (t) { if (t._def === undefined) t._def = t.textContent; t.textContent = R ? R[0] : t._def; }
+    if (x) { if (x._def === undefined) x._def = x.textContent; x.textContent = R ? R[1] : x._def; }
+    var perks = $('.login-ask__perks', box); if (perks) perks.hidden = !!R;
     box.hidden = false;
   }
   document.addEventListener('click', function (e) {
     var t = e.target; if (!t.closest) return;
-    var op = t.closest('[data-login-open]');
-    if (op && $('[data-login-ask]')) { e.preventDefault(); askLogin(); return; }
-    var go = t.closest('[data-login-go]');
+    var go = t.closest('[data-login-go], [data-login-open]');
     if (go) {
       try {
         var u = new URL(go.getAttribute('href'), location.origin);
@@ -1643,6 +1645,7 @@
     if (t.closest('[data-login-ask-close]')) { var b = $('[data-login-ask]'); if (b) b.hidden = true; }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var b = $('[data-login-ask]'); if (b) b.hidden = true; } });
+  document.addEventListener('tramo:likes-changed', function () { syncLikes(); });
   function toggleLike(handle) {
     if (!T.loggedIn) { askLogin('likes'); return; }
     var list = getLikes();

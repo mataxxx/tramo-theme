@@ -4,7 +4,7 @@
   <div class="login-ask__card">
     <button type="button" class="close-button close-button--static login-ask__x" data-login-ask-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
     <p class="login-ask__brand">{{ shop.name }}</p>
-    <h2 class="login-ask__title" id="LoginAskTitle" data-login-title>{{ settings.login_title | default: 'Inicia sesión' }}</h2>
+    <h2 class="login-ask__title" id="LoginAskTitle" data-login-title>{{ settings.login_title | default: 'Inicia sesión para continuar' }}</h2>
     <p class="login-ask__text" data-login-text>{{ settings.login_text | default: 'Entra o crea tu cuenta en un momento. Te enviamos un código a tu correo, sin contraseñas.' }}</p>
     <ul class="login-ask__perks" role="list">
       <li>{% render 'icon', name: 'heart' %}<span>{{ settings.login_perk_1 | default: 'Guarda tus favoritos' }}</span></li>

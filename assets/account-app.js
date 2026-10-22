@@ -192,12 +192,57 @@
     pedidos: '<path d="m21 8-9-5-9 5v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
     perfil: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
     direcciones: '<path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/>',
-    especias: '<path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/><path d="M5 19 13 11"/>',
+    favoritos: '<path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9Z"/>',
+    puntos: '<circle cx="12" cy="12" r="8.5"/><path d="m12 7.5 1.4 2.9 3.1.4-2.3 2.2.6 3.1-2.8-1.5-2.8 1.5.6-3.1-2.3-2.2 3.1-.4Z"/>',
     chev: '<path d="m9 6 6 6-6 6"/>', back: '<path d="m15 6-6 6 6 6"/>',
     salir: '<path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M16 17l5-5-5-5M21 12H9"/>'
   };
   function ic(n) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>'; }
-  var DTITLE = { pedidos: 'Mis pedidos', perfil: 'Mis datos', direcciones: 'Mis direcciones', especias: 'Mis especias', addr: 'Dirección' };
+  var DTITLE = { pedidos: 'Mis pedidos', perfil: 'Mis datos', direcciones: 'Mis direcciones', favoritos: 'Mis favoritos', puntos: 'Mis puntos', addr: 'Dirección' };
+  /* Puntos: 5% de cada compra pagada, en colones (1 punto = ₡1) */
+  var PUNTOS_PCT = Number(host.dataset.pointsPct || 5) / 100;
+  function puntos(c) {
+    var rows = c.orders.nodes.filter(function (o) { return o.financialStatus === 'PAID'; }).map(function (o) {
+      return { o: o, p: Math.floor(Number(o.totalPrice.amount) * PUNTOS_PCT) };
+    });
+    return { total: rows.reduce(function (a, r) { return a + r.p; }, 0), rows: rows, cur: (c.orders.nodes[0] && c.orders.nodes[0].totalPrice.currencyCode) || 'CRC' };
+  }
+  function tabPuntos(c) {
+    var P = puntos(c);
+    return '<div class="acd__pts"><small>Tu saldo</small><b>' + esc(money({ amount: P.total, currencyCode: P.cur })) + '</b><span>en puntos para canjear</span></div>' +
+      '<p class="acct__muted acd__pts-how">Cada compra pagada suma el ' + Math.round(PUNTOS_PCT * 100) + '% de su total. Canjeas tus puntos por una tarjeta de regalo para usar en la tienda.</p>' +
+      '<button class="acct__btn acd__pts-btn" type="button" disabled>Canjear por tarjeta de regalo</button>' +
+      '<p class="acct__muted acd__pts-soon">El canje se activa muy pronto. Tus puntos ya se están sumando.</p>' +
+      (P.rows.length ? '<h4 class="acd__sub">Cómo los ganaste</h4><ul class="acd__ptslist">' + P.rows.map(function (r) {
+        return '<li><span>Pedido ' + esc(r.o.name) + '<small>' + esc(fdate(r.o.processedAt)) + '</small></span><b>+' + esc(money({ amount: r.p, currencyCode: P.cur })) + '</b></li>';
+      }).join('') + '</ul>' : '<p class="acct__muted">Haz tu primera compra y empieza a sumar.</p>');
+  }
+  /* Favoritos: los mismos corazones de la tienda */
+  function likeList() { try { var v = JSON.parse(localStorage.getItem('tramo_likes') || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+  var favCache = {};
+  function tabFavoritos() {
+    var hs = likeList();
+    if (!hs.length) return '<p class="acct__muted">Toca el ♥ en cualquier producto y aparece aquí.</p><a class="acct__btn acct__btn--sm" href="' + esc(host.dataset.shopUrl || '/collections/all') + '">Ver productos</a>';
+    setTimeout(loadFavs, 0);
+    return '<div class="acd__favs" data-favs>' + hs.map(function (h) { return favCard(h, favCache[h]); }).join('') + '</div>';
+  }
+  function favCard(h, p) {
+    if (!p) return '<div class="acd__fav is-loading" data-fav="' + esc(h) + '"><i></i><span></span></div>';
+    var img = p.featured_image ? p.featured_image + (p.featured_image.indexOf('?') > -1 ? '&' : '?') + 'width=300' : '';
+    return '<div class="acd__fav" data-fav="' + esc(h) + '"><a href="/products/' + encodeURIComponent(h) + '">' + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy">' : '<i></i>') +
+      '<b>' + esc(p.title) + '</b><small>' + (p.price_varies ? 'Desde ' : '') + esc(money({ amount: p.price / 100, currencyCode: host.dataset.currency || 'CRC' })) + '</small></a>' +
+      '<button type="button" class="acd__unfav" data-a="unfav" data-h="' + esc(h) + '" aria-label="Quitar de favoritos"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9Z"/></svg></button></div>';
+  }
+  function loadFavs() {
+    likeList().forEach(function (h) {
+      if (favCache[h]) return;
+      fetch('/products/' + encodeURIComponent(h) + '.js').then(function (r) { return r.ok ? r.json() : null; }).then(function (p) {
+        var el = root.querySelector('[data-fav="' + (window.CSS && CSS.escape ? CSS.escape(h) : h) + '"]');
+        if (!p) { if (el) el.remove(); return; }
+        favCache[h] = p; if (el) el.outerHTML = favCard(h, p);
+      }).catch(function () {});
+    });
+  }
   function plural(n, a, b) { return n + ' ' + (n === 1 ? a : b); }
   function drawerShell() {
     if (root.querySelector('.acd')) return;
@@ -215,7 +260,8 @@
       ['pedidos', 'Mis pedidos', n ? plural(n, 'pedido', 'pedidos') : 'Aún no tienes pedidos'],
       ['perfil', 'Mis datos', name || 'Agrega tu nombre'],
       ['direcciones', 'Mis direcciones', na ? plural(na, 'dirección guardada', 'direcciones guardadas') : 'Agrega una dirección de entrega'],
-      ['especias', 'Mis especias', 'Vuelve a pedir lo de siempre']
+      ['favoritos', 'Mis favoritos', likeList().length ? plural(likeList().length, 'producto guardado', 'productos guardados') : 'Guarda lo que te gusta con ♥'],
+      ['puntos', 'Mis puntos', money({ amount: puntos(c).total, currencyCode: puntos(c).cur }) + ' para canjear']
     ];
     home.innerHTML = '<div class="acd__me"><span class="acd__avatar">' + esc((c.firstName || email || '?').charAt(0).toUpperCase()) + '</span><div><b>' + (c.firstName ? 'Hola, ' + esc(c.firstName) : 'Hola') + '</b><small>' + esc(email) + '</small></div></div>' +
       (state.tab ? '' : msg) +
@@ -227,6 +273,8 @@
     if (t) {
       var body = '';
       if (t === 'addr') body = addrFormHtml(state.addr);
+      else if (t === 'favoritos') body = tabFavoritos();
+      else if (t === 'puntos') body = tabPuntos(c);
       else { var v = TABS.filter(function (x) { return x[0] === t; })[0]; body = v ? v[2](c) : ''; }
       sub.innerHTML = '<button type="button" class="acd__back" data-a="' + (t === 'addr' ? 'go' : 'home') + '" data-t="direcciones">' + ic('back') + (t === 'addr' ? 'Mis direcciones' : 'Mi cuenta') + '</button>' +
         '<h3 class="acd__title">' + (t === 'addr' ? (state.addr && state.addr.id ? 'Editar dirección' : 'Nueva dirección') : DTITLE[t]) + '</h3>' + msg + '<div class="acd__body">' + body + '</div>';
@@ -285,6 +333,12 @@
     else if (a === 'tab') { state.tab = b.dataset.t; render(); window.scrollTo({ top: host.offsetTop, behavior: 'smooth' }); }
     else if (a === 'go') drawerGo(b.dataset.t);
     else if (a === 'home') drawerGo('');
+    else if (a === 'unfav') {
+      var hs = likeList().filter(function (x) { return x !== b.dataset.h; });
+      try { localStorage.setItem('tramo_likes', JSON.stringify(hs)); } catch (er) {}
+      var card = b.closest('.acd__fav'); if (card) { card.classList.add('is-gone'); setTimeout(function () { drawerRender(); }, 260); }
+      document.dispatchEvent(new CustomEvent('tramo:likes-changed'));
+    }
     else if (a === 'logout' && DRAWER) { del(KEY); location.href = host.dataset.logoutUrl || '/account/logout'; }
     else if (a === 'logout') {
       var t = get(KEY); del(KEY);
@@ -327,7 +381,7 @@
   if (!DRAWER) { start(); return; }
   var started = false;
   function startOnce() { if (started) return; started = true; start(); }
-  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-open="account"]')) { startOnce(); if (state.customer && state.tab) drawerGo(''); } });
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-open="account"]')) { startOnce(); if (state.customer) drawerGo(''); } });
   /* Volvió del inicio de sesión: abrir el panel de nuevo */
   if (location.hash === '#mi-cuenta') {
     history.replaceState({}, '', location.pathname + location.search);

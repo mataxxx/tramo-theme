@@ -107,3 +107,28 @@
 .acd__body .acct__form input,.acd__body .acct__form select{font-size:16px}
 @media (prefers-reduced-motion:reduce){.acd__pane,.acd__pane:not(.is-on){transition:none}}
 .acct__addr>.acct__tag{align-self:flex-start}
+/* Favoritos y puntos en el panel */
+.acd__favs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.acd__fav{position:relative;border:1px solid #e4dfd2;border-radius:16px;background:#fffdf8;overflow:hidden;transition:opacity .25s,transform .25s}
+.acd__fav.is-gone{opacity:0;transform:scale(.94)}
+.acd__fav a{display:flex;flex-direction:column;gap:4px;padding:0 0 12px;text-decoration:none;color:inherit}
+.acd__fav img,.acd__fav i{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#efe9d8;margin-bottom:6px}
+.acd__fav b{font-size:14px;font-weight:600;padding:0 12px;line-height:1.25}
+.acd__fav small{font-size:13px;color:#6b6f66;padding:0 12px}
+.acd__fav.is-loading span{display:block;height:12px;margin:6px 12px 14px;border-radius:6px;background:#efe9d8}
+.acd__unfav{position:absolute;top:8px;right:8px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;cursor:pointer;color:#c2412f;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.acd__unfav svg{width:18px;height:18px;fill:currentColor;stroke:currentColor;stroke-width:1.5}
+.acd__pts{border-radius:20px;padding:22px 20px;background:linear-gradient(135deg,#263d25,#3f6b3a);color:#fff;display:flex;flex-direction:column;gap:2px}
+.acd__pts small{opacity:.8;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.acd__pts b{font:400 38px/1.1 Georgia,serif;letter-spacing:-.5px}
+.acd__pts span{opacity:.85;font-size:14px}
+.acd__pts-how{margin:14px 0 12px;line-height:1.5}
+.acd__pts-btn{width:100%}
+.acd__pts-btn:disabled{opacity:.5;cursor:not-allowed}
+.acd__pts-soon{margin:8px 0 0;font-size:13px;text-align:center}
+.acd__sub{font-size:15px;margin:22px 0 8px}
+.acd__ptslist{list-style:none;margin:0;padding:0;border:1px solid #e4dfd2;border-radius:16px;background:#fffdf8}
+.acd__ptslist li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px}
+.acd__ptslist li+li{border-top:1px solid #eee8da}
+.acd__ptslist small{display:block;color:#6b6f66;font-size:12.5px}
+.acd__ptslist b{color:#2f6b3a}
