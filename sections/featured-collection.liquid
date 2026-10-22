@@ -15,7 +15,7 @@
     assign heading = 'Colección'
   endif
 -%}
-<section class="category-section" data-category-section data-category-scope data-category-handle="{{ coll.handle }}" data-category-filters="{{ section.settings.filter_tags | escape }}" data-category-search="{{ section.settings.popup_search }}">
+<section class="category-section" data-category-section data-category-scope data-category-handle="{{ coll.handle }}" data-category-filters="{{ section.settings.filter_tags | escape }}" data-category-search="{{ section.settings.popup_search }}" data-category-banner="{% if section.settings.banner_image != blank %}{{ section.settings.banner_image | image_url: width: 1400 }}{% elsif coll.image != blank %}{{ coll.image | image_url: width: 1400 }}{% endif %}">
   <div class="category-heading">
     <h2 class="category-title">
       {%- if section.settings.icon != 'none' and section.settings.icon != blank -%}<span class="category-title__icon">{% render 'icon', name: section.settings.icon %}</span>{%- endif -%}
@@ -148,6 +148,12 @@
       "label": "Nombre en singular para el buscador",
       "info": "Al abrir la búsqueda dirá: ¿Qué [nombre] estás buscando? Ej: especia, semilla, fruta",
       "default": "producto"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Imagen del banner de la ventana de esta categoría",
+      "info": "Se muestra a la derecha del título al abrir la categoría. Si la dejas vacía se usa la imagen de la colección o la general del tema."
     },
     {
       "type": "checkbox",

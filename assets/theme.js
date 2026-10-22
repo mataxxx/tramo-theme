@@ -1398,6 +1398,8 @@
     e.sort.hidden = true;
     var ft = $('[data-category-filter-toggle]'); if (ft) ft.setAttribute('aria-expanded', 'false');
     e.title.textContent = opts.title || '';
+    var art = $('[data-category-art]');
+    if (art) { if (art._def === undefined) art._def = art.innerHTML; art.innerHTML = opts.banner ? '<img src="' + esc(opts.banner) + '" alt="">' : art._def; }
     e.input.value = '';
     e.input.placeholder = opts.question || 'Buscar...';
     var bar = opts.search !== 'icon';
@@ -1464,7 +1466,7 @@
     var scope = opener.closest('[data-category-scope]');
     var tpl = scope && $('[data-category-template]', scope);
     if (!tpl) { var href = opener.getAttribute('href'); if (href) window.location.href = href; return; }
-    catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters'), search: scope.getAttribute('data-category-search') });
+    catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters'), search: scope.getAttribute('data-category-search'), banner: scope.getAttribute('data-category-banner') });
     var tmp = document.createElement('div');
     tmp.appendChild(tpl.content.cloneNode(true));
     catFill(tmp.innerHTML);
@@ -1474,7 +1476,7 @@
     var scope = document.querySelector('[data-category-scope][data-category-handle="' + handle + '"]');
     var tpl = scope && $('[data-category-template]', scope);
     var filters = scope ? scope.getAttribute('data-category-filters') : '';
-    catSetup({ title: title, question: question, filters: filters, search: scope ? scope.getAttribute('data-category-search') : 'bar' });
+    catSetup({ title: title, question: question, filters: filters, search: scope ? scope.getAttribute('data-category-search') : 'bar', banner: scope ? scope.getAttribute('data-category-banner') : '' });
     if (tpl) {
       var tmp = document.createElement('div');
       tmp.appendChild(tpl.content.cloneNode(true));

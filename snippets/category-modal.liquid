@@ -13,9 +13,9 @@
       </div>
       <div class="category-modal__tools cm-tools">
         <button type="button" class="icon-button category-modal__lupa" data-category-search-toggle aria-label="Buscar en la categoría" aria-expanded="true" hidden>{% render 'icon', name: 'search' %}</button>
-        <button type="button" class="cm-btn" data-category-filters-toggle aria-expanded="true">{% render 'icon', name: 'filter' %}<span>Filtrar</span>{% render 'icon', name: 'chevron-down' %}</button>
-        <div class="cm-sortwrap">
-          <button type="button" class="cm-btn" data-category-filter-toggle aria-expanded="false">{% render 'icon', name: 'grid' %}<span>Ordenar</span>{% render 'icon', name: 'chevron-down' %}</button>
+        <div class="cm-sortwrap" hidden>
+          <button type="button" data-category-filters-toggle hidden></button>
+          <button type="button" data-category-filter-toggle hidden></button>
           <div class="search-sort cm-sortmenu" data-category-sort hidden>
             <button type="button" class="is-active" data-csort="default">Destacados</button>
             <button type="button" data-csort="title">A–Z</button>
@@ -36,8 +36,8 @@
     </div>
     <div class="cm-bar">
       <span class="cm-count" data-category-count></span>
-      <label class="cm-switch"><span>Disponible a granel</span><input type="checkbox" data-cat-granel><i></i></label>
-      <label class="cm-switch"><span>Solo favoritos</span><input type="checkbox" data-cat-favs><i></i></label>
+      <label class="cm-switch"><svg class="icon cm-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v17M8 20h8M5 6h14M5 6l-3 7a3.2 3.2 0 0 0 6 0L5 6ZM19 6l-3 7a3.2 3.2 0 0 0 6 0L19 6Z"/></svg><span>Disponible a granel</span><input type="checkbox" data-cat-granel><i></i></label>
+      <label class="cm-switch">{% render 'icon', name: 'heart' %}<span>Solo favoritos</span><input type="checkbox" data-cat-favs><i></i></label>
     </div>
     <div class="category-modal__body">
       <div class="category-modal__grid" data-category-grid></div>

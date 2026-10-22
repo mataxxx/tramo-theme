@@ -1907,3 +1907,16 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
   .cm-bar { flex-wrap: wrap; gap: 8px 16px; padding: 10px 16px; }
   .category-modal__searchwrap, .cm-filters { padding-left: 16px; padding-right: 16px; }
 }
+
+
+/* Ronda 56 */
+.shopify-section .trust-bar:not(.trust-bar--sticky) { background: transparent !important; border: 0; border-radius: 0; box-shadow: none; width: 100%; max-width: none; margin: 16px 0 0; padding: 0 var(--page-pad); }
+.shopify-section .trust-bar:not(.trust-bar--sticky) .trust-bar__list { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 6px 34px; margin: 0; padding: 0; list-style: none; }
+.shopify-section .trust-bar:not(.trust-bar--sticky) .trust-bar__item { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--color-primary); }
+.shopify-section .trust-bar:not(.trust-bar--sticky) .trust-bar__item .icon { width: 16px; height: 16px; }
+.shopify-section .trust-bar:not(.trust-bar--sticky) .trust-bar__item + .trust-bar__item { position: relative; }
+.shopify-section .trust-bar:not(.trust-bar--sticky) .trust-bar__item + .trust-bar__item::before { content: ''; position: absolute; left: -18px; top: 50%; width: 4px; height: 4px; margin-top: -2px; border-radius: 50%; background: currentColor; opacity: .45; }
+.cm-btn, .cm-sortwrap { display: none !important; }
+.category-modal__field { max-width: 560px; }
+.cm-switch .cm-ico, .cm-switch > .icon { width: 20px; height: 20px; color: var(--color-primary); flex-shrink: 0; }
+@media (min-width: 750px) { .hero-wrap--tiles, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin-top: 14px; } }
