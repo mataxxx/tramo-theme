@@ -1922,10 +1922,25 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
 @media (min-width: 750px) { .hero-wrap--tiles, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin-top: 14px; } }
 
 
-/* Ronda 57: celular — slideshow redondeado y que se encoge al bajar */
+/* Ronda 57: celular — slideshow redondeado */
 @media (max-width: 749px) {
-  .hero-wrap { margin: 12px 14px 0; overflow-anchor: none; }
+  .hero-wrap { margin: 12px 14px 0; }
   .hero-wrap .hero-slider { margin: 0; border-radius: 22px; overflow: hidden; }
-  .hero-wrap.is-collapsing { overflow: hidden; transform-origin: top center; will-change: height, opacity, transform; border-radius: 22px; }
   .hero-wrap .hero { margin-bottom: 0; }
+}
+
+/* Ronda 58: ventana de categoría en celular — banner sube, barra fija con título + buscador */
+.cm-mini-title, .cm-mini-close { display: none; }
+@media (max-width: 749px) {
+  .category-modal { display: block; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+  .category-modal__body { overflow: visible; flex: none; }
+  .category-modal__searchwrap { position: sticky; top: 0; z-index: 8; display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: var(--color-bg); transition: box-shadow .3s ease; }
+  .category-modal__searchwrap .category-modal__field { flex: 1; min-width: 0; max-width: none; margin: 0; min-height: 46px; }
+  .cm-mini-title, .cm-mini-close { display: block; overflow: hidden; white-space: nowrap; opacity: 0; max-width: 0; flex: 0 0 auto; transition: max-width .4s cubic-bezier(.22,.61,.36,1), opacity .3s ease; }
+  .cm-mini-title { font-family: var(--font-heading); font-size: 22px; letter-spacing: -.5px; color: #1f3d22; }
+  .cm-mini-close { width: 40px; height: 40px; padding: 0; position: static; }
+  .category-modal.is-compact .cm-mini-title { max-width: 42vw; opacity: 1; text-overflow: ellipsis; }
+  .category-modal.is-compact .cm-mini-close { max-width: 40px; opacity: 1; }
+  .category-modal.is-compact .category-modal__searchwrap { box-shadow: 0 6px 16px rgba(38,61,37,.14); }
+  .cm-bar { position: static; }
 }

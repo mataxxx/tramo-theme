@@ -29,10 +29,12 @@
       <div class="category-modal__chips" data-category-chips hidden></div>
     </div>
     <div class="category-modal__searchwrap" data-category-searchwrap>
+      <span class="cm-mini-title" data-category-mini-title></span>
       <div class="search-field category-modal__field">
         {% render 'icon', name: 'search' %}
         <input type="search" data-category-filter autocomplete="off" placeholder="Buscar..." aria-label="Buscar en la categoría">
       </div>
+      <button type="button" class="close-button close-button--static cm-mini-close" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
     </div>
     <div class="cm-bar">
       <span class="cm-count" data-category-count></span>

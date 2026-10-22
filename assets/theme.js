@@ -1398,6 +1398,8 @@
     e.sort.hidden = true;
     var ft = $('[data-category-filter-toggle]'); if (ft) ft.setAttribute('aria-expanded', 'false');
     e.title.textContent = opts.title || '';
+    var mt = $('[data-category-mini-title]'); if (mt) mt.textContent = opts.title || '';
+    var cm0 = $('.category-modal'); if (cm0) { cm0.classList.remove('is-compact'); cm0.scrollTop = 0; }
     var art = $('[data-category-art]');
     if (art) { if (art._def === undefined) art._def = art.innerHTML; art.innerHTML = opts.banner ? '<img src="' + esc(opts.banner) + '" alt="">' : art._def; }
     e.input.value = '';
@@ -1729,33 +1731,15 @@
   initHeroSlider();
   document.addEventListener('shopify:section:load', initHeroSlider);
 
-  /* ---------- Celular: el slideshow se encoge al bajar para dar prioridad a los productos ---------- */
+
+  /* Celular: ventana de categoría — el banner sube con el scroll y queda fija la barra con título + buscador */
   (function () {
-    var mq = window.matchMedia('(max-width: 749px)');
-    var wrap = null, full = 0, ticking = false;
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    function measure() {
-      wrap = $('.hero-wrap');
-      if (!wrap) return;
-      wrap.style.height = ''; wrap.style.opacity = ''; wrap.style.transform = '';
-      full = wrap.offsetHeight;
-      update();
-    }
-    function update() {
-      ticking = false;
-      if (!wrap) return;
-      if (!mq.matches || reduce) { wrap.classList.remove('is-collapsing'); wrap.style.height = ''; wrap.style.opacity = ''; wrap.style.transform = ''; return; }
-      var y = window.pageYOffset || 0;
-      var p = Math.min(1, Math.max(0, y / Math.max(full * 0.85, 1)));
-      wrap.classList.add('is-collapsing');
-      wrap.style.height = (full * (1 - p)) + 'px';
-      wrap.style.opacity = String(1 - p * 0.85);
-      wrap.style.transform = 'scale(' + (1 - 0.05 * p) + ')';
-    }
-    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; window.requestAnimationFrame(update); } }, { passive: true });
-    window.addEventListener('resize', measure);
-    window.addEventListener('load', measure);
-    document.addEventListener('shopify:section:load', measure);
-    measure();
+    var cm = null;
+    document.addEventListener('scroll', function (e) {
+      var t = e.target;
+      if (!t || !t.classList || !t.classList.contains('category-modal')) return;
+      var compact = t.scrollTop > 90;
+      if (compact !== t.classList.contains('is-compact')) t.classList.toggle('is-compact', compact);
+    }, true);
   })();
 })();
