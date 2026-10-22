@@ -2009,3 +2009,18 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
 .cm-hero__copy { padding: 14px 0 6px; max-width: 62%; }
 .cm-hero__sub { font-size: clamp(13px, 1.1vw, 15px); margin-top: 4px; }
 @media (max-width: 749px) { .cm-hero .category-modal__title { font-size: 30px; } .cm-hero__copy { padding-top: 56px; max-width: 100%; } }
+
+
+/* Ronda 63: ventana de inicio de sesión */
+.login-ask__card { width: min(420px, 100%); padding: 34px 30px 22px; border-radius: 24px; gap: 14px; }
+.login-ask__x { position: absolute; top: 14px; right: 14px; }
+.login-ask__brand { font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; color: var(--color-primary) !important; opacity: .8; }
+.login-ask__title { font-size: 30px; letter-spacing: -.5px; }
+.login-ask__text { font-size: 15px; line-height: 1.5; }
+.login-ask__perks { list-style: none; margin: 4px 0 6px; padding: 14px 0; border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); display: grid; gap: 10px; text-align: left; }
+.login-ask__perks li { display: flex; align-items: center; gap: 12px; font-size: 15px; }
+.login-ask__perks .icon { width: 20px; height: 20px; color: var(--color-primary); flex-shrink: 0; }
+.login-ask__later { border: 0; background: transparent; color: var(--color-muted); font: inherit; font-size: 14px; padding: 6px; }
+.login-ask__later:hover { color: var(--color-text); }
+.login-ask__card { animation: login-in .3s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes login-in { from { opacity: 0; transform: translateY(16px) scale(.97); } to { opacity: 1; transform: none; } }

@@ -1,0 +1,18 @@
+{%- unless customer -%}
+<div class="login-ask" data-login-ask hidden role="dialog" aria-modal="true" aria-labelledby="LoginAskTitle">
+  <div class="login-ask__bg" data-login-ask-close></div>
+  <div class="login-ask__card">
+    <button type="button" class="close-button close-button--static login-ask__x" data-login-ask-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
+    <p class="login-ask__brand">{{ shop.name }}</p>
+    <h2 class="login-ask__title" id="LoginAskTitle" data-login-title>{{ settings.login_title | default: 'Inicia sesión' }}</h2>
+    <p class="login-ask__text" data-login-text>{{ settings.login_text | default: 'Entra o crea tu cuenta en un momento. Te enviamos un código a tu correo, sin contraseñas.' }}</p>
+    <ul class="login-ask__perks" role="list">
+      <li>{% render 'icon', name: 'heart' %}<span>{{ settings.login_perk_1 | default: 'Guarda tus favoritos' }}</span></li>
+      <li>{% render 'icon', name: 'package' %}<span>{{ settings.login_perk_2 | default: 'Revisa tus pedidos' }}</span></li>
+      <li>{% render 'icon', name: 'check' %}<span>{{ settings.login_perk_3 | default: 'Compra más rápido' }}</span></li>
+    </ul>
+    <a class="button button--full" href="{{ routes.storefront_login_url }}">{{ settings.login_button | default: 'Continuar con mi correo' }}</a>
+    <button type="button" class="login-ask__later" data-login-ask-close>Ahora no</button>
+  </div>
+</div>
+{%- endunless -%}

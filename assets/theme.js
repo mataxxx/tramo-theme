@@ -1603,19 +1603,23 @@
     });
     $$('[data-likes-count]').forEach(function (c) { c.textContent = list.length; c.hidden = list.length === 0; });
   }
-  function askLogin() {
+  function askLogin(reason) {
     var box = $('[data-login-ask]');
-    if (!box) {
-      box = document.createElement('div');
-      box.className = 'login-ask'; box.setAttribute('data-login-ask', '');
-      box.innerHTML = '<div class="login-ask__bg" data-login-ask-close></div><div class="login-ask__card" role="dialog" aria-modal="true"><p class="login-ask__title">Guarda tus favoritos</p><p>Para agregar productos a favoritos, inicia sesión o crea tu cuenta. Así los tendrás en cualquier dispositivo.</p><a class="button button--full" href="' + esc(T.loginUrl || '/account/login') + '">Iniciar sesión</a><button type="button" class="added-popup__continue" data-login-ask-close>Ahora no</button></div>';
-      document.body.appendChild(box);
-      box.addEventListener('click', function (e) { if (e.target.closest('[data-login-ask-close]')) box.hidden = true; });
-    }
+    if (!box) { window.location.href = T.loginUrl || '/account/login'; return; }
+    var t = $('[data-login-title]', box), x = $('[data-login-text]', box);
+    if (t) { if (t._def === undefined) t._def = t.textContent; t.textContent = reason === 'likes' ? 'Guarda tus favoritos' : t._def; }
+    if (x) { if (x._def === undefined) x._def = x.textContent; x.textContent = reason === 'likes' ? 'Para guardar productos en favoritos, inicia sesión o crea tu cuenta. Es rápido: te enviamos un código a tu correo.' : x._def; }
     box.hidden = false;
   }
+  document.addEventListener('click', function (e) {
+    var t = e.target; if (!t.closest) return;
+    var op = t.closest('[data-login-open]');
+    if (op && $('[data-login-ask]')) { e.preventDefault(); askLogin(); return; }
+    if (t.closest('[data-login-ask-close]')) { var b = $('[data-login-ask]'); if (b) b.hidden = true; }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var b = $('[data-login-ask]'); if (b) b.hidden = true; } });
   function toggleLike(handle) {
-    if (!T.loggedIn) { askLogin(); return; }
+    if (!T.loggedIn) { askLogin('likes'); return; }
     var list = getLikes();
     var i = list.indexOf(handle);
     if (i > -1) list.splice(i, 1); else list.unshift(handle);

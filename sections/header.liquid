@@ -43,7 +43,7 @@
       {% render 'icon', name: 'user' %}
     </button>
   {%- else -%}
-    <a href="{{ routes.storefront_login_url }}" class="icon-button header__menu header__user" aria-label="Iniciar sesión">
+    <a href="{{ routes.storefront_login_url }}" data-login-open class="icon-button header__menu header__user" aria-label="Iniciar sesión">
       {% render 'icon', name: 'user' %}
     </a>
   {%- endif -%}
@@ -88,7 +88,7 @@
     {%- if customer -%}
       <button type="button" class="header__account-desk" data-open="account"><span>{% render 'icon', name: 'user' %}</span>{{ customer.first_name | default: 'Mi cuenta' }}</button>
     {%- else -%}
-      <a href="{{ routes.storefront_login_url }}" class="header__account-desk"><span>{% render 'icon', name: 'user' %}</span>Iniciar sesión</a>
+      <a href="{{ routes.storefront_login_url }}" data-login-open class="header__account-desk"><span>{% render 'icon', name: 'user' %}</span>Iniciar sesión</a>
     {%- endif -%}
     {%- if s.show_cart_top -%}
       <a href="{{ routes.cart_url }}" class="icon-button header__cart" data-open-cart aria-label="Ver carrito">

@@ -576,6 +576,17 @@
     ]
   },
   {
+    "name": "Ventana de inicio de sesión",
+    "settings": [
+      { "type": "text", "id": "login_title", "label": "Título", "default": "Inicia sesión" },
+      { "type": "textarea", "id": "login_text", "label": "Texto", "default": "Entra o crea tu cuenta en un momento. Te enviamos un código a tu correo, sin contraseñas." },
+      { "type": "text", "id": "login_perk_1", "label": "Beneficio 1", "default": "Guarda tus favoritos" },
+      { "type": "text", "id": "login_perk_2", "label": "Beneficio 2", "default": "Revisa tus pedidos" },
+      { "type": "text", "id": "login_perk_3", "label": "Beneficio 3", "default": "Compra más rápido" },
+      { "type": "text", "id": "login_button", "label": "Texto del botón", "default": "Continuar con mi correo" }
+    ]
+  },
+  {
     "name": "Barra del botón de compra",
     "settings": [
       {
