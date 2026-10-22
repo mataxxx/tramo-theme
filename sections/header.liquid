@@ -72,10 +72,10 @@
         {% render 'icon', name: 'search' %}
       </button>
       <div class="header__searchwrap">
-        <button type="button" class="header__searchbar" data-open="search" aria-label="Buscar" aria-expanded="false">
+        <form class="header__searchbar" action="{{ routes.search_url }}" method="get" role="search" autocomplete="off">
           {% render 'icon', name: 'search' %}
-          <span>{{ s.search_placeholder }}</span>
-        </button>
+          <input type="search" name="q" placeholder="{{ s.search_placeholder | escape }}" aria-label="Buscar" data-header-search>
+        </form>
       </div>
     {%- endif -%}
     {%- if s.show_likes -%}

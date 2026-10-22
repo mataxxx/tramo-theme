@@ -657,40 +657,81 @@
     els.results.innerHTML = list.length ? list.map(resultHTML).join('') : '<p class="search-empty">No encontramos productos con ese nombre.</p>';
   }
 
-  // Desplegable de categorías del buscador (escritorio)
-  function toggleSearchDrop(bar) {
-    var wrap = bar.parentNode.querySelector('.search-drop');
-    if (!wrap) {
-      wrap = document.createElement('div');
-      wrap.className = 'search-drop';
+  // Buscador del header (escritorio): se escribe ahí mismo y se despliega un mega menú
+  (function () {
+    var timer = null, token = 0;
+    function wrapOf(el) { return el.closest('.header__searchwrap'); }
+    function ensureDrop(wrap) {
+      var drop = wrap.querySelector('.search-drop');
+      if (drop) return drop;
+      drop = document.createElement('div');
+      drop.className = 'search-drop';
       var tiles = $$('[data-search-global] [data-search-collection]');
-      var html = '<p class="search-drop__title">Buscar por categoría</p><div class="search-drop__list">';
+      var html = '<div class="search-drop__cats"><p class="search-drop__title">Buscar por categoría</p><div class="search-drop__list">';
       tiles.forEach(function (t) {
         var img = t.querySelector('img');
         var title = t.getAttribute('data-search-title') || t.textContent.trim();
-        html += '<button type="button" class="search-drop__item" data-search-collection="' + t.getAttribute('data-search-collection') + '" data-search-title="' + title.replace(/"/g, '&quot;') + '" data-search-question="' + (t.getAttribute('data-search-question') || '').replace(/"/g, '&quot;') + '">' +
-          (img ? '<img src="' + img.currentSrc + '" alt="" loading="lazy">' : '') + '<span>' + title + '</span></button>';
+        html += '<button type="button" class="search-drop__item" data-search-collection="' + esc(t.getAttribute('data-search-collection')) + '" data-search-title="' + esc(title) + '" data-search-question="' + esc(t.getAttribute('data-search-question') || '') + '">' +
+          (img ? '<img src="' + esc(img.currentSrc || img.src) + '" alt="" loading="lazy">' : '') + '<span>' + esc(title) + '</span></button>';
       });
-      html += '</div><button type="button" class="search-drop__all" data-search-drop-all>Buscar un producto por nombre…</button>';
-      wrap.innerHTML = html;
-      bar.parentNode.appendChild(wrap);
+      html += '</div></div><div class="search-drop__results" hidden></div>';
+      drop.innerHTML = html;
+      wrap.appendChild(drop);
+      return drop;
     }
-    var open = !wrap.classList.contains('is-open');
-    wrap.classList.toggle('is-open', open);
-    bar.parentNode.classList.toggle('is-open', open);
-    bar.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  function closeSearchDrop() {
-    $$('.search-drop.is-open, .header__searchwrap.is-open').forEach(function (d) { d.classList.remove('is-open'); });
-    $$('.header__searchbar').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
-  }
-  document.addEventListener('click', function (e) {
-    var t = e.target; if (!t.closest) return;
-    if (t.closest('[data-search-drop-all]')) { closeSearchDrop(); openSearch(null); return; }
-    if (t.closest('.search-drop__item')) { closeSearchDrop(); return; }
-    if (!t.closest('.header__searchwrap')) closeSearchDrop();
-  });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSearchDrop(); });
+    function setOpen(wrap, open) {
+      if (!wrap) return;
+      var drop = ensureDrop(wrap);
+      drop.classList.toggle('is-open', open);
+      wrap.classList.toggle('is-open', open);
+    }
+    function closeAll() { $$('.header__searchwrap.is-open').forEach(function (w) { setOpen(w, false); }); }
+    function show(wrap, showResults) {
+      var drop = ensureDrop(wrap);
+      drop.querySelector('.search-drop__cats').hidden = showResults;
+      drop.querySelector('.search-drop__results').hidden = !showResults;
+    }
+    function run(wrap, q) {
+      var mine = ++token;
+      var box = ensureDrop(wrap).querySelector('.search-drop__results');
+      show(wrap, true);
+      box.innerHTML = '<p class="search-drop__empty">Buscando…</p>';
+      var base = ROOT.replace(/\/$/, '');
+      fetch(base + '/search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=8')
+        .then(parseJSON)
+        .then(function (data) {
+          if (mine !== token) return;
+          var list = (data.resources && data.resources.results && data.resources.results.products) || [];
+          if (!list.length) { box.innerHTML = '<p class="search-drop__empty">No encontramos “' + esc(q) + '”. Prueba con otra palabra.</p>'; return; }
+          box.innerHTML = list.map(function (p) {
+            return resultHTML({ url: p.url, image: p.image, title: p.title, sub: p.price ? formatMoney(toCents(p.price)) : '' });
+          }).join('') + '<a class="search-drop__all" href="' + base + '/search?q=' + encodeURIComponent(q) + '">Ver todos los resultados</a>';
+        })
+        .catch(function () { if (mine === token) box.innerHTML = '<p class="search-drop__empty">No pude buscar ahora.</p>'; });
+    }
+    document.addEventListener('focusin', function (e) {
+      var inp = e.target.closest && e.target.closest('[data-header-search]');
+      if (!inp) return;
+      var w = wrapOf(inp); setOpen(w, true);
+      show(w, inp.value.trim().length >= 2);
+    });
+    document.addEventListener('input', function (e) {
+      var inp = e.target.closest && e.target.closest('[data-header-search]');
+      if (!inp) return;
+      var w = wrapOf(inp), q = inp.value.trim();
+      clearTimeout(timer);
+      if (q.length < 2) { token++; show(w, false); return; }
+      timer = setTimeout(function () { run(w, q); }, 220);
+    });
+    document.addEventListener('click', function (e) {
+      var t = e.target; if (!t.closest) return;
+      if (t.closest('.search-drop__item') || t.closest('.search-drop__results a')) { closeAll(); return; }
+      if (!t.closest('.header__searchwrap')) closeAll();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeAll(); var i = $('[data-header-search]'); if (i) i.blur(); }
+    });
+  })();
 
   function openSearch(scope) {
     var els = searchEls();
