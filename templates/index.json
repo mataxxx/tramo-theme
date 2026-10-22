@@ -225,7 +225,7 @@
     "rack_teaser": {
       "type": "rack-teaser",
       "settings": {
-        "text": "Elige el tamaño, llénalo con tus especias favoritas y recíbelo listo para estrenar o regalar.",
+        "text": "Elige 6, 12 o 18 frascos y llénalo con tus especias favoritas.",
         "button_label": "Armar mi especiero"
       }
     }

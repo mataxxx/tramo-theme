@@ -1,27 +1,64 @@
 {%- liquid
   assign img = section.settings.image
 -%}
+{%- liquid
+  assign p6 = '' 
+  assign p12 = ''
+  assign p18 = ''
+  assign min_price = 0
+  for p in collections['especieros'].products
+    if min_price == 0 or p.price < min_price
+      assign min_price = p.price
+    endif
+    if p.tags contains 'slots-6'
+      assign p6 = p.price | money_without_trailing_zeros
+    elsif p.tags contains 'slots-12'
+      assign p12 = p.price | money_without_trailing_zeros
+    elsif p.tags contains 'slots-18'
+      assign p18 = p.price | money_without_trailing_zeros
+    endif
+  endfor
+  assign desde = section.settings.from_price
+  if desde == blank and min_price > 0
+    assign desde = min_price | money_without_trailing_zeros
+  endif
+-%}
 <section class="rbt">
   <div class="rbt__box">
+    <div class="rbt__bg" aria-hidden="true">
+      {%- if section.settings.banner != blank -%}
+        {{ section.settings.banner | image_url: width: 1400 | image_tag: loading: 'lazy', alt: '' }}
+      {%- else -%}
+        <img src="{{ 'especiero-banner.jpg' | asset_url }}" alt="" width="846" height="622" loading="lazy">
+      {%- endif -%}
+    </div>
     <button type="button" class="rbt__photo" data-rb-open="RackModal-{{ section.id }}" data-rb-sel aria-label="{{ section.settings.button_label | escape }}">
       {%- if img != blank -%}
-        {{ img | image_url: width: 1200 | image_tag: widths: '600, 900, 1200', sizes: '(min-width: 990px) 640px, 100vw', loading: 'lazy', alt: section.settings.heading }}
+        {{ img | image_url: width: 1200 | image_tag: widths: '600, 900, 1200', sizes: '100vw', loading: 'lazy', alt: section.settings.heading }}
       {%- else -%}
         <img src="{{ 'especiero-hero.jpg' | asset_url }}" alt="{{ section.settings.heading | escape }}: elige 6, 12 o 18 frascos y llénalo con tus especias favoritas" width="1200" height="1049" loading="lazy">
       {%- endif -%}
     </button>
     <div class="rbt__panel">
-      <h2 class="rbt__title{% unless section.settings.show_title %} visually-hidden{% endunless %}">{{ section.settings.heading }}</h2>
+      <div class="rbt__intro">
+        {%- if section.settings.kicker != blank -%}<p class="rbt__kicker">{{ section.settings.kicker }}</p>{%- endif -%}
+        <h2 class="rbt__title">{{ section.settings.heading }}</h2>
+        <p class="rbt__text">{{ section.settings.text }}</p>
+        <span class="rbt__rule" aria-hidden="true"></span>
+      </div>
       <div class="rbt__sizes" role="radiogroup" aria-label="Tamaño del especiero">
         {%- for n in (1..3) -%}
           {%- liquid
             case n
               when 1
                 assign k = 6
+                assign kp = p6
               when 2
                 assign k = 12
+                assign kp = p12
               else
                 assign k = 18
+                assign kp = p18
             endcase
             capture mini
               echo 'especiero-' | append: k | append: '-mini.jpg'
@@ -30,23 +67,11 @@
           <button type="button" class="rbt__size{% if k == 12 %} is-on{% endif %}" role="radio" aria-checked="{% if k == 12 %}true{% else %}false{% endif %}" data-rbt-size="{{ k }}">
             <img src="{{ mini | asset_url }}" alt="" width="60" height="60" loading="lazy">
             <span><b>{{ k }}</b> frascos</span>
+            {%- if kp != blank -%}<em class="rbt__price">{{ kp }}</em>{%- endif -%}
+            <i class="rbt__check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12 4 4 8-8"/></svg></i>
           </button>
         {%- endfor -%}
       </div>
-      {%- liquid
-        assign desde = section.settings.from_price
-        if desde == blank
-          assign min_price = 0
-          for p in collections['especieros'].products
-            if min_price == 0 or p.price < min_price
-              assign min_price = p.price
-            endif
-          endfor
-          if min_price > 0
-            assign desde = min_price | money_without_trailing_zeros
-          endif
-        endif
-      -%}
       <div class="rbt__buy">
         {%- if desde != blank -%}<p class="rbt__from"><span>Desde</span> <b>{{ desde }}</b></p>{%- endif -%}
         <button type="button" class="rbt__cta" data-rb-open="RackModal-{{ section.id }}" data-rb-sel>{{ section.settings.button_label }} <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -68,10 +93,11 @@
 {
   "name": "Banner del especiero",
   "settings": [
+    { "type": "text", "id": "kicker", "label": "Texto pequeño (computadora)", "default": "Especias · Mezclas · A tu medida" },
     { "type": "text", "id": "heading", "label": "Título", "default": "Arma tu especiero" },
-    { "type": "textarea", "id": "text", "label": "Texto", "default": "Elige el tamaño, llénalo con tus especias favoritas y recíbelo listo para estrenar o regalar." },
-    { "type": "image_picker", "id": "image", "label": "Foto del especiero", "info": "Si la dejas vacía se usa la foto con el título incluido." },
-    { "type": "checkbox", "id": "show_title", "label": "Mostrar el título en texto", "default": false, "info": "Apágalo si la foto ya trae el título escrito." },
+    { "type": "textarea", "id": "text", "label": "Texto", "default": "Elige 6, 12 o 18 frascos y llénalo con tus especias favoritas." },
+    { "type": "image_picker", "id": "image", "label": "Foto para celular", "info": "Si la dejas vacía se usa la foto con el título incluido." },
+    { "type": "image_picker", "id": "banner", "label": "Foto para computadora", "info": "Va a la derecha; el lado izquierdo se funde con el fondo. Si la dejas vacía se usa la foto del especiero con plantas." },
     { "type": "text", "id": "button_label", "label": "Texto del botón", "default": "Armar mi especiero" },
     { "type": "text", "id": "from_price", "label": "Precio \"Desde\" (opcional)", "info": "Si lo dejas vacío se usa el precio del especiero más barato." }
   ],

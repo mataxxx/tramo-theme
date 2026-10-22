@@ -246,3 +246,37 @@
   .rbt__cta svg { width: 19px; height: 19px; }
 }
 @media (max-width: 360px) { .rbt__size img { display: none; } .rbt__cta { font-size: 15px; } }
+
+/* Caja del especiero en computadora: banner con foto a la derecha y opciones a la izquierda */
+.rbt__bg, .rbt__price, .rbt__check { display: none; }
+@media (max-width: 989px) {
+  .rbt__intro { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+@media (min-width: 990px) {
+  .rbt { padding-top: 40px; }
+  .rbt__box { display: block; position: relative; max-width: 1240px; min-height: 500px; border-radius: 22px; background: radial-gradient(120% 90% at 0% 0%, #f3ebdd 0%, #ece2d1 45%, #e3d6c1 100%); }
+  .rbt__photo { display: none; }
+  .rbt__bg { display: block; position: absolute; inset: 0 0 0 auto; width: 60%; }
+  .rbt__bg img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%; -webkit-mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,.55) 12%, #000 26%); mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,.55) 12%, #000 26%); }
+  .rbt__panel { position: relative; z-index: 1; width: min(600px, 50%); min-height: 500px; padding: 46px 0 46px 60px; gap: 22px; justify-content: center; }
+  .rbt__intro { display: grid; gap: 14px; }
+  .rbt__kicker { margin: 0; font-size: 12.5px; letter-spacing: .22em; text-transform: uppercase; color: #7a5636; font-weight: 500; }
+  .rbt__title { font-size: clamp(56px, 5.6vw, 82px); line-height: .92; letter-spacing: -2px; }
+  .rbt__text { margin: 2px 0 0; font-size: 20px; line-height: 1.4; color: #4a463c; max-width: 440px; }
+  .rbt__rule { display: block; width: 52px; height: 2px; background: #9a5a32; border-radius: 2px; margin-top: 4px; }
+  .rbt__sizes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .rbt__size { position: relative; flex-direction: column; justify-content: center; gap: 4px; padding: 16px 10px 14px; border-radius: 8px; background: rgba(255,252,246,.82); text-align: center; box-shadow: 0 6px 16px rgba(60,40,20,.06); }
+  .rbt__size img { width: 92px; height: 66px; object-fit: contain; border-radius: 4px; margin-bottom: 6px; }
+  .rbt__size span { font-size: 17px; }
+  .rbt__size b { font-size: 17px; margin-right: 0; }
+  .rbt__price { display: block; font-style: normal; font-family: var(--font-heading, Georgia, serif); font-size: 16px; color: #8a4a26; }
+  .rbt__size:hover { background: #fffdf8; transform: translateY(-2px); }
+  .rbt__size.is-on { background: #eef2e6; border-color: #2c3f2b; }
+  .rbt__check { display: grid; place-items: center; position: absolute; top: -9px; right: -9px; width: 24px; height: 24px; border-radius: 50%; background: #2c4a2b; color: #fff; opacity: 0; transform: scale(.6); transition: opacity .2s, transform .25s var(--rb-ease); box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+  .rbt__check svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .rbt__size.is-on .rbt__check { opacity: 1; transform: none; }
+  .rbt__buy { display: block; }
+  .rbt__from { display: none; }
+  .rbt__cta { width: 100%; padding: 17px 20px; border-radius: 8px; font-size: 18px; }
+}
+@media (min-width: 990px) { .rbt__title { max-width: 6.4em; } .rbt__panel { width: min(580px, 47%); } }
