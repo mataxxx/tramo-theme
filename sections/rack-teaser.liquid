@@ -4,8 +4,22 @@
 <section class="rbt">
   <div class="rbt__box">
     <header class="rbt__head">
-      <p class="rbt__kicker"><img src="{{ 'handmade-seal.svg' | asset_url }}" alt="" width="28" height="28" loading="lazy">{{ section.settings.kicker }}</p>
       <h2 class="rbt__title">{{ section.settings.heading }}</h2>
+      {%- liquid
+        assign desde = section.settings.from_price
+        if desde == blank
+          assign min_price = 0
+          for p in collections['especieros'].products
+            if min_price == 0 or p.price < min_price
+              assign min_price = p.price
+            endif
+          endfor
+          if min_price > 0
+            assign desde = min_price | money_without_trailing_zeros
+          endif
+        endif
+      -%}
+      {%- if desde != blank -%}<p class="rbt__from">Desde <b>{{ desde }}</b></p>{%- endif -%}
     </header>
     <div class="rbt__media">
       <button type="button" class="rbt__photo" data-rb-open="RackModal-{{ section.id }}" aria-label="{{ section.settings.button_label | escape }}">
@@ -40,11 +54,11 @@
 {
   "name": "Banner del especiero",
   "settings": [
-    { "type": "text", "id": "kicker", "label": "Texto pequeño", "default": "Hecho a mano en Costa Rica" },
     { "type": "text", "id": "heading", "label": "Título", "default": "Arma tu especiero" },
     { "type": "textarea", "id": "text", "label": "Texto", "default": "Elige el tamaño, llénalo con tus especias favoritas y recíbelo listo para estrenar o regalar." },
     { "type": "image_picker", "id": "image", "label": "Foto de los especieros", "info": "Si la dejas vacía se usa la foto de los tres modelos." },
-    { "type": "text", "id": "button_label", "label": "Texto del botón", "default": "Armar el mío" }
+    { "type": "text", "id": "button_label", "label": "Texto del botón", "default": "Armar el mío" },
+    { "type": "text", "id": "from_price", "label": "Precio \"Desde\" (opcional)", "info": "Si lo dejas vacío se usa el precio del especiero más barato." }
   ],
   "presets": [{ "name": "Banner del especiero" }]
 }

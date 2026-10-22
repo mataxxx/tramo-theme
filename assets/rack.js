@@ -212,7 +212,12 @@
       next.disabled = true; next.textContent = 'Agregando…';
       fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ items: items }) })
         .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.description || j.message || 'No se pudo agregar'); return j; }); })
-        .then(function () { window.location.href = root.getAttribute('data-cart-url') || '/cart'; })
+        .then(function () {
+          var m = root.closest('.rb-modal');
+          if (m) closeModal(m);
+          document.dispatchEvent(new CustomEvent('tramo:open-cart'));
+          setTimeout(function () { resetBuilder(); }, 400);
+        })
         .catch(function (e) { alert(e.message || 'No se pudo agregar al carrito'); updateFooter(); });
     }
 
@@ -234,6 +239,12 @@
     if (engText) engText.addEventListener('input', function () { renderSummary(); updateFooter(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !picker.hidden) closePicker(); });
 
+    function resetBuilder() {
+      st.model = null; st.slots = []; st.active = 0;
+      if (eng) { eng.checked = false; engText.value = ''; engText.hidden = true; }
+      $$('[data-rb-model]', root).forEach(function (b) { b.classList.remove('is-on'); });
+      go(1);
+    }
     root._rbPickSlots = function (n) { var m = data.models.filter(function (x) { return x.slots === Number(n); })[0]; if (m) pickModel(m.id); };
     var q = new URLSearchParams(location.search).get('modelo');
     if (q) pickModel(q);

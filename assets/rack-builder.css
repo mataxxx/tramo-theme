@@ -218,3 +218,9 @@
 .rb-rack__shelves .rb-jar { container-type: inline-size; }
 .rb-rack__shelves .rb-jar__label, .rb[data-size="12"] .rb-rack__shelves .rb-jar__label, .rb[data-size="18"] .rb-rack__shelves .rb-jar__label { font-size: clamp(6.5px, 13cqi, 12px); }
 .rb-jar.is-full .rb-jar__glass::before { content: ''; position: absolute; inset: 0 0 auto; height: 12%; background: rgba(255,255,255,.28); }
+
+/* Desde y aire bajo la caja */
+.rbt { padding-bottom: 46px; }
+.rbt__from { margin: 8px 0 0; font-size: 14px; color: #6b6f66; letter-spacing: .02em; }
+.rbt__from b { font-size: 17px; color: var(--rb-wood); }
+@media (max-width: 749px) { .rbt { padding-bottom: 36px; } .rbt__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; } .rbt__from { margin: 0; } }
