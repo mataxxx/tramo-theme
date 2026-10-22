@@ -155,3 +155,10 @@
 .acct__btn.is-ok{background:#2f6b3a;color:#fff;border-color:#2f6b3a}
 .acct--drawer .acd__title{margin:2px 0 20px;line-height:1.15}
 .acct--drawer .acd__back{margin-bottom:12px}
+.acd__pts{margin-bottom:16px}
+.acd__pts span{margin-top:4px;line-height:1.35}
+.acd__prog{margin-top:14px;height:8px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden}
+.acd__prog i{display:block;height:100%;border-radius:inherit;background:#e9d9a8;transition:width .6s cubic-bezier(.22,.61,.36,1)}
+.acd__note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#f4efe2;color:#55594f;font-size:13.5px;line-height:1.45}
+.acd__note svg{flex:0 0 auto;width:18px;height:18px;margin-top:1px;fill:none;stroke:#3f6b3a;stroke-width:1.8;stroke-linecap:round}
+.acd__redeem{margin-top:0}

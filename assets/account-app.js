@@ -228,17 +228,21 @@
     loadCashback();
     var P = puntos(c), cb = state.cb || {}, cur = P.cur;
     var m = function (n) { return esc(money({ amount: n, currencyCode: cur })); };
-    var h = '<div class="acd__pts"><small>Tu cash back</small><b>' + m(P.total) + '</b><span>' + (P.live ? 'disponible para usar' : (cb.loading ? 'calculando…' : 'estimado')) + '</span></div>';
+    var pct = Math.min(100, Math.round(P.total / CB_MIN * 100));
+    var falta = Math.max(0, CB_MIN - P.total);
+    var h = '<div class="acd__pts"><small>Tu cash back</small><b>' + m(P.total) + '</b>' +
+      '<span>' + (cb.loading ? 'Calculando…' : (falta > 0 ? 'Te faltan ' + m(falta) + ' para generar tu primer código' : (P.live ? 'Listo para convertir en código' : 'Ya alcanzas para un código'))) + '</span>' +
+      (falta > 0 ? '<div class="acd__prog" role="progressbar" aria-valuemin="0" aria-valuemax="' + CB_MIN + '" aria-valuenow="' + P.total + '"><i style="width:' + Math.max(pct, 3) + '%"></i></div>' : '') + '</div>';
     if (state.newCode) {
       h += '<div class="acd__newcode"><small>Tu código está listo</small><code>' + esc(state.newCode.code) + '</code><button type="button" class="acct__btn" data-a="copy" data-code="' + esc(state.newCode.code) + '">Copiar código</button><p>Pégalo en el checkout, en "Código de descuento o tarjeta de regalo".</p></div>';
     }
     if (P.live) {
       var can = P.total >= CB_MIN;
-      h += '<form class="acd__redeem" data-form="redeem"><label>Monto a convertir en código<div class="acd__amt"><span>₡</span><input name="amount" type="number" inputmode="numeric" min="' + CB_MIN + '" max="' + P.total + '" step="1" value="' + (can ? P.total : '') + '"' + (can ? '' : ' disabled') + '></div></label>' +
+      if (can) h += '<form class="acd__redeem" data-form="redeem"><label>Monto a convertir en código<div class="acd__amt"><span>₡</span><input name="amount" type="number" inputmode="numeric" min="' + CB_MIN + '" max="' + P.total + '" step="1" value="' + (can ? P.total : '') + '"' + (can ? '' : ' disabled') + '></div></label>' +
         '<button class="acct__btn" type="submit"' + (can ? '' : ' disabled') + '>Generar código</button>' +
-        (can ? '' : '<p class="acct__muted">Necesitas al menos ' + m(CB_MIN) + ' para generar un código.</p>') + '</form>';
+        '</form>';
     } else if (cb.off) {
-      h += '<button class="acct__btn acd__pts-btn" type="button" disabled>Generar código</button><p class="acct__muted acd__pts-soon">Los códigos se activan muy pronto. Tu cash back ya se está sumando.</p>';
+      h += '<div class="acd__note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Muy pronto podrás convertir tu saldo en códigos para el checkout. Tu cash back ya se está sumando.</span></div>';
     }
     var codes = (cb.codes || []);
     if (codes.length) {
