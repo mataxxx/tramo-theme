@@ -136,7 +136,9 @@
         "s3",
         "s4"
       ],
-      "settings": {}
+      "settings": {
+        "client_id": "80f6ff85-93ed-4c05-a4da-03d76563b647"
+      }
     },
     "about-panel": {
       "type": "about-panel",

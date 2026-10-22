@@ -1103,9 +1103,12 @@
 
   /* ---------- Cuenta dentro del menú (copia la ficha de cuenta) ---------- */
   function fillAccountSlots() {
+    var mini = $('#AccountPanel [data-account-mini]');
     var source = $('#AccountPanel .account-panel__body');
     $$('[data-account-slot]').forEach(function (slot) {
-      if (source && !slot.firstChild) slot.innerHTML = '<div class="account-panel__body">' + source.innerHTML + '</div>';
+      if (slot.firstChild) return;
+      if (mini) slot.innerHTML = '<div class="account-panel__body">' + mini.innerHTML + '</div>';
+      else if (source) slot.innerHTML = '<div class="account-panel__body">' + source.innerHTML + '</div>';
     });
   }
   /* Pedidos reales desde el servicio propio (App Proxy). Si falla, se queda lo que dibujó Liquid. */

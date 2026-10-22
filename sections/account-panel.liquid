@@ -13,48 +13,75 @@
 
     <div class="account-panel__body">
       {%- if customer -%}
-        <div class="account-card">
-          <span class="account-card__avatar" aria-hidden="true">{{ customer.first_name | default: customer.email | slice: 0 | upcase }}</span>
-          <div class="account-card__text">
-            <strong>{{ section.settings.greeting }} {{ customer.first_name | default: customer.email }}</strong>
-            <small>{{ customer.email }}</small>
+        {%- assign who = customer.first_name | default: customer.email -%}
+        <template data-account-mini>
+          <div class="account-card">
+            <span class="account-card__avatar" aria-hidden="true">{{ who | slice: 0 | upcase }}</span>
+            <div class="account-card__text">
+              <strong>{{ section.settings.greeting }} {{ customer.first_name | default: '' }}</strong>
+              <small>{{ customer.email }}</small>
+            </div>
           </div>
-        </div>
-
-        <ul class="account-links" role="list">
-          <li>
-            <a href="/pages/mi-cuenta?tab=perfil">
-              {% render 'icon', name: 'map-pin' %}
-              <span>{{ section.settings.profile_label }}</span>
-              {% render 'icon', name: 'chevron-right' %}
-            </a>
-          </li>
-          <li>
-            <a href="/pages/mi-cuenta?tab=pedidos">
-              {% render 'icon', name: 'package' %}
-              <span>{{ section.settings.orders_link_label }}</span>
-              {% render 'icon', name: 'chevron-right' %}
-            </a>
-          </li>
-        </ul>
-
-        <div data-orders-region data-orders-endpoint="{{ section.settings.orders_endpoint }}" data-orders-limit="{{ section.settings.orders_to_show }}" data-empty-text="{{ section.settings.empty_text | escape }}">
-        <script type="application/json" data-order-steps>[{% for b in section.blocks %}{"label":{{ b.settings.label | json }},"tag":{{ b.settings.tag | strip | downcase | json }},"description":{{ b.settings.description | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}]</script>
-        <h3 class="account-section-title">{{ section.settings.orders_title }}</h3>
-        {%- if customer.orders.size > 0 -%}
-          <div class="order-list">
-            {%- for order in customer.orders limit: section.settings.orders_to_show -%}
-              {% render 'order-card', order: order, steps: section.blocks %}
-            {%- endfor -%}
+          <button type="button" class="button button--outline button--full" data-open="account">{% render 'icon', name: 'user' %} Ver mi cuenta</button>
+        </template>
+        {%- if section.settings.client_id != blank and template.suffix != 'mi-cuenta' -%}
+          {{ 'account-app.css' | asset_url | stylesheet_tag }}
+          <div class="acct acct--drawer" id="tramo-account-drawer" data-mode="drawer"
+            data-client-id="{{ section.settings.client_id | strip }}"
+            data-callback="/pages/mi-cuenta"
+            data-logout-url="{{ routes.account_logout_url }}"
+            data-shop-url="{{ routes.all_products_collection_url }}"
+            data-signed-in="1"
+            data-name="{{ customer.first_name | escape }}"
+            data-email="{{ customer.email | escape }}">
+            <div class="acct__loading" data-acct-loading>Cargando tu cuenta…</div>
+            <div data-acct-root hidden></div>
           </div>
+          <script src="{{ 'account-app.js' | asset_url }}" defer></script>
         {%- else -%}
-          <p class="muted account-empty">{{ section.settings.empty_text }}</p>
+        <div class="account-card">
+            <span class="account-card__avatar" aria-hidden="true">{{ customer.first_name | default: customer.email | slice: 0 | upcase }}</span>
+            <div class="account-card__text">
+              <strong>{{ section.settings.greeting }} {{ customer.first_name | default: customer.email }}</strong>
+              <small>{{ customer.email }}</small>
+            </div>
+          </div>
+  
+          <ul class="account-links" role="list">
+            <li>
+              <a href="/pages/mi-cuenta?tab=perfil">
+                {% render 'icon', name: 'map-pin' %}
+                <span>{{ section.settings.profile_label }}</span>
+                {% render 'icon', name: 'chevron-right' %}
+              </a>
+            </li>
+            <li>
+              <a href="/pages/mi-cuenta?tab=pedidos">
+                {% render 'icon', name: 'package' %}
+                <span>{{ section.settings.orders_link_label }}</span>
+                {% render 'icon', name: 'chevron-right' %}
+              </a>
+            </li>
+          </ul>
+  
+          <div data-orders-region data-orders-endpoint="{{ section.settings.orders_endpoint }}" data-orders-limit="{{ section.settings.orders_to_show }}" data-empty-text="{{ section.settings.empty_text | escape }}">
+          <script type="application/json" data-order-steps>[{% for b in section.blocks %}{"label":{{ b.settings.label | json }},"tag":{{ b.settings.tag | strip | downcase | json }},"description":{{ b.settings.description | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}]</script>
+          <h3 class="account-section-title">{{ section.settings.orders_title }}</h3>
+          {%- if customer.orders.size > 0 -%}
+            <div class="order-list">
+              {%- for order in customer.orders limit: section.settings.orders_to_show -%}
+                {% render 'order-card', order: order, steps: section.blocks %}
+              {%- endfor -%}
+            </div>
+          {%- else -%}
+            <p class="muted account-empty">{{ section.settings.empty_text }}</p>
+          {%- endif -%}
+          </div>
+  
+          <a href="{{ routes.account_logout_url }}" class="button button--outline button--full account-logout">
+            {% render 'icon', name: 'logout' %} {{ section.settings.logout_label }}
+          </a>
         {%- endif -%}
-        </div>
-
-        <a href="{{ routes.account_logout_url }}" class="button button--outline button--full account-logout">
-          {% render 'icon', name: 'logout' %} {{ section.settings.logout_label }}
-        </a>
       {%- else -%}
         <div class="account-signed-out">
           <p>{{ section.settings.signed_out_text }}</p>
@@ -85,6 +112,12 @@
     {
       "type": "paragraph",
       "content": "El estado de cada pedido se cambia desde el administrador de Shopify: abre el pedido y agrega la etiqueta de la etapa (por ejemplo estado-en-camino)."
+    },
+    {
+      "type": "text",
+      "id": "client_id",
+      "label": "ID de cliente (API de cuentas de clientes)",
+      "info": "El mismo de la página Mi cuenta. Con esto el cliente ve y edita su cuenta aquí mismo."
     },
     {
       "type": "text",
