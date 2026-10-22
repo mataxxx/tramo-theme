@@ -1818,3 +1818,15 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
   .hsd__chip:hover .hsd__cimg { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(38,61,37,.18); }
   .hsd__cname { font-size: 13px; font-weight: 600; line-height: 1.2; }
 }
+
+
+/* Ronda 50: menos redondo y slideshow sin corte */
+@media (min-width: 750px) {
+  .hero-wrap--tiles { align-items: stretch; }
+  .hero-wrap--tiles .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .hero-wrap--tiles .hero-track { flex: 1; align-items: stretch; }
+  .hero-wrap--tiles .hero-track > .hero { height: auto; min-height: var(--hero-height); }
+  .hero-tile, .hero-tile:first-child { border-radius: 14px; }
+  .trust-bar { border-radius: 14px; }
+}
+@media (max-width: 749px) { .hero-slider { border-radius: 14px; } }
