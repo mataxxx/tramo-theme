@@ -667,14 +667,14 @@
       drop = document.createElement('div');
       drop.className = 'search-drop';
       var tiles = $$('[data-search-global] [data-search-collection]');
-      var html = '<div class="search-drop__cats"><p class="search-drop__title">Buscar por categoría</p><div class="search-drop__list">';
+      var html = '<div class="search-drop__inner"><div class="search-drop__cats"><p class="search-drop__title">Buscar por categoría</p><div class="search-drop__list">';
       tiles.forEach(function (t) {
         var img = t.querySelector('img');
         var title = t.getAttribute('data-search-title') || t.textContent.trim();
         html += '<button type="button" class="search-drop__item" data-search-collection="' + esc(t.getAttribute('data-search-collection')) + '" data-search-title="' + esc(title) + '" data-search-question="' + esc(t.getAttribute('data-search-question') || '') + '">' +
           (img ? '<img src="' + esc(img.currentSrc || img.src) + '" alt="" loading="lazy">' : '') + '<span>' + esc(title) + '</span></button>';
       });
-      html += '</div></div><div class="search-drop__results" hidden></div>';
+      html += '</div></div><div class="search-drop__results" hidden></div></div>';
       drop.innerHTML = html;
       wrap.appendChild(drop);
       return drop;

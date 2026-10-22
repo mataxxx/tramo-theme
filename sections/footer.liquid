@@ -41,7 +41,7 @@
             {%- if block.settings.menu != blank -%}
               <ul class="footer-links">
                 {%- for link in block.settings.menu.links -%}
-                  {%- unless link.url contains '/search' -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endunless -%}
+                  {%- assign l_low = link.title | downcase -%}{%- unless link.url contains '/search' or l_low == 'buscar' or l_low == 'búsqueda' -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endunless -%}
                 {%- endfor -%}
               </ul>
             {%- endif -%}
