@@ -270,7 +270,16 @@
   }
   document.addEventListener('click', function (e) {
     var op = e.target.closest && e.target.closest('[data-rb-open]');
-    if (op && openModal(op.getAttribute('data-rb-open'), op.getAttribute('data-rb-slots'))) { e.preventDefault(); return; }
+    var sz = e.target.closest && e.target.closest('[data-rbt-size]');
+    if (sz) {
+      $$('[data-rbt-size]', sz.parentNode).forEach(function (b) { var on = b === sz; b.classList.toggle('is-on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
+      return;
+    }
+    if (op) {
+      var slots = op.getAttribute('data-rb-slots');
+      if (op.hasAttribute('data-rb-sel')) { var box = op.closest('.rbt'); var on = box && $('[data-rbt-size].is-on', box); if (on) slots = on.getAttribute('data-rbt-size'); }
+      if (openModal(op.getAttribute('data-rb-open'), slots)) { e.preventDefault(); return; }
+    }
     var cl = e.target.closest && e.target.closest('[data-rb-close], .rb-modal__bg');
     if (cl) { var m = cl.closest('.rb-modal'); if (m) closeModal(m); }
   });
