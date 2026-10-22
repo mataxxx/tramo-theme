@@ -1,6 +1,6 @@
 {
   "sections": {
-    "account": { "type": "account-app", "settings": {} }
+    "account": { "type": "account-app", "settings": { "client_id": "80f6ff85-93ed-4c05-a4da-03d76563b647" } }
   },
   "order": ["account"]
 }
