@@ -1,240 +1,266 @@
-/* Arma tu especiero */
+/* Arma tu especiero — constructor por pasos (modelo → frascos → listo) */
 (function () {
   'use strict';
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+
+  /* Colores de frasco por especia (hasta que haya una imagen SVG propia) */
+  var PALETTE = [
+    [/paprika|pimenton|chile|chipotle|harissa|berbere|cayena|aji|achiote/, '#b8432a'],
+    [/curry|curcuma|azafran|ras el|mostaza/, '#d39a26'],
+    [/ajo|cebolla|sal|jengibre|nuez|cardamomo/, '#e6d3ac'],
+    [/pimienta|clavo|comino|anis|cafe|cacao|canela/, '#5a3a24'],
+    [/oregano|albahaca|romero|tomillo|perejil|eneldo|laurel|mejorana|hierbas|chimichurri|zaatar|culantro|cilantro/, '#5e7a3a'],
+    [/masala|garam|chaat|adobo|sazon|mezcla|condimento/, '#8a5a2b']
+  ];
+  function jarColor(sp) {
+    var t = norm(sp.title);
+    for (var i = 0; i < PALETTE.length; i++) if (PALETTE[i][0].test(t)) return PALETTE[i][1];
+    var h = 0; for (var k = 0; k < t.length; k++) h = (h * 31 + t.charCodeAt(k)) % 360;
+    return 'hsl(' + h + ' 40% 42%)';
+  }
+  function jarHTML(sp, small) {
+    if (sp.art) return '<img class="rb-jar__art" src="' + esc(sp.art) + '" alt="' + esc(sp.title) + '">';
+    return '<span class="rb-jar__lid"></span><span class="rb-jar__glass" style="--fill:' + jarColor(sp) + '"><span class="rb-jar__label">' + esc(sp.title) + '</span></span>';
+  }
 
   function init(root) {
-    if (!root || root._rack) return;
-    root._rack = true;
-    var dataEl = $('[data-rack-data]', root);
-    if (!dataEl) return;
+    if (!root || root._rb) return;
+    root._rb = true;
     var data;
-    try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+    try { data = JSON.parse($('[data-rb-data]', root).textContent); } catch (e) { return; }
     var fmt = new Intl.NumberFormat('es-CR', { style: 'currency', currency: root.getAttribute('data-currency') || 'CRC', maximumFractionDigits: 0 });
-    function money(cents) { return fmt.format(cents / 100); }
-    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function money(c) { return fmt.format(c / 100); }
 
-    var state = { model: null, slots: [], active: 0, step: 1, filter: '', query: '' };
-    var spiceById = {}, spiceByHandle = {};
-    data.spices.forEach(function (s) { spiceById[s.id] = s; spiceByHandle[s.handle] = s; });
+    var byId = {};
+    data.spices.forEach(function (s) { byId[s.id] = s; });
+    var st = { step: 1, model: null, slots: [], active: 0, tab: 'classic', q: '' };
 
-    var bar = $('[data-rack-bar]', root);
-    var barTotal = $('[data-rack-total]', root);
-    var barProg = $('[data-rack-progress]', root);
-    var nextBtn = $('[data-rack-next]', root);
-    var slotsEl = $('[data-rack-slots]', root);
-    var picker = $('[data-rack-picker]', root);
-    var engToggle = $('[data-engrave-toggle]', root);
-    var engText = $('[data-engrave-text]', root);
+    var bar = $('[data-rb-bar]', root), label = $('[data-rb-steplabel]', root), footer = $('[data-rb-footer]', root);
+    var totalEl = $('[data-rb-total]', root), countEl = $('[data-rb-count]', root), next = $('[data-rb-next]', root);
+    var slotsEl = $('[data-rb-slots]', root), picker = $('[data-rb-picker]', root), body = $('[data-rb-body]', root);
+    var eng = $('[data-rb-eng]', root), engText = $('[data-rb-eng-text]', root);
 
-    function hue(str) { var h = 0; for (var i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360; return h; }
-    function filled() { return state.slots.filter(Boolean).length; }
-    function engraving() { return !!(engToggle && engToggle.checked && engText && engText.value.trim() && data.engrave); }
+    function filled() { return st.slots.filter(Boolean).length; }
+    function extras() { return st.slots.filter(function (id) { return id && byId[id].group !== 'classic'; }).length; }
+    function engraving() { return !!(eng && eng.checked && engText.value.trim() && data.engrave); }
     function total() {
-      if (!state.model) return 0;
-      var t = state.model.price;
-      state.slots.forEach(function (id) { if (id && spiceById[id]) t += spiceById[id].price; });
-      if (engraving()) t += data.engrave.price;
-      return t;
+      if (!st.model) return 0;
+      return st.model.price + extras() * data.extra.price + (engraving() ? data.engrave.price : 0);
     }
 
-    function setStep(n) {
-      state.step = n;
-      $$('[data-step]', root).forEach(function (el) { el.hidden = Number(el.getAttribute('data-step')) !== n; });
-      $$('[data-step-dot]', root).forEach(function (el) {
-        var k = Number(el.getAttribute('data-step-dot'));
-        el.classList.toggle('is-active', k === n);
-        el.classList.toggle('is-done', k < n);
+    function progress() {
+      var p = st.step === 1 ? 8 : st.step === 2 ? 34 + (st.model ? filled() / st.model.slots : 0) * 50 : 100;
+      bar.style.width = p + '%';
+      label.textContent = 'Paso ' + st.step + ' de 3 · ' + ['Elige tu modelo', 'Llena tus frascos', 'Revisa y agrega'][st.step - 1];
+      $$('[data-rb-dot]', root).forEach(function (d) {
+        var k = Number(d.getAttribute('data-rb-dot'));
+        d.classList.toggle('is-on', k === st.step);
+        d.classList.toggle('is-done', k < st.step);
       });
-      updateBar();
-      var top = root.getBoundingClientRect().top + window.scrollY - 70;
-      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     }
-
-    function updateBar() {
-      if (!state.model || state.step === 1) { bar.hidden = true; return; }
-      bar.hidden = false;
-      barTotal.textContent = money(total());
-      var n = state.model.slots, f = filled();
-      barProg.textContent = f + ' de ' + n + ' frascos';
-      if (state.step === 2) {
-        nextBtn.textContent = f === n ? 'Continuar' : 'Faltan ' + (n - f);
-        nextBtn.disabled = f !== n;
-      } else {
-        nextBtn.textContent = 'Agregar al carrito';
-        nextBtn.disabled = f !== n || (engToggle && engToggle.checked && !engText.value.trim());
+    function updateFooter() {
+      progress();
+      if (st.step === 1 || !st.model) { footer.hidden = true; return; }
+      footer.hidden = false;
+      totalEl.textContent = money(total());
+      var n = st.model.slots, f = filled(), x = extras();
+      countEl.textContent = f + ' de ' + n + ' frascos' + (x ? ' · ' + x + ' especial' + (x > 1 ? 'es' : '') : '');
+      if (st.step === 2) { next.disabled = f !== n; next.textContent = f === n ? 'Continuar' : 'Faltan ' + (n - f); }
+      else { next.disabled = !!(eng && eng.checked && !engText.value.trim()); next.textContent = 'Agregar al carrito'; }
+    }
+    function go(n) {
+      st.step = n;
+      $$('[data-rb-step]', root).forEach(function (s) {
+        var on = Number(s.getAttribute('data-rb-step')) === n;
+        s.hidden = !on;
+        if (on) { s.classList.remove('is-on'); void s.offsetWidth; s.classList.add('is-on'); }
+      });
+      if (n === 3) renderSummary();
+      updateFooter();
+      if (body && body.scrollTo) body.scrollTo({ top: 0, behavior: 'smooth' });
+      if (!root.classList.contains('rb--modal')) {
+        var top = root.getBoundingClientRect().top + window.scrollY - 80;
+        if (window.scrollY > top) window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       }
     }
 
+    function cols(n) { return n <= 6 ? 3 : n <= 12 ? 4 : 6; }
     function renderSlots() {
-      var n = state.model.slots;
-      var cols = n <= 6 ? 3 : (n <= 9 ? 3 : 4);
-      slotsEl.style.setProperty('--cols', cols);
-      slotsEl.innerHTML = '';
-      for (var i = 0; i < n; i++) {
-        var sp = state.slots[i] ? spiceById[state.slots[i]] : null;
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'rack-jar' + (sp ? ' is-filled' : '') + (i === state.active && !sp ? ' is-next' : '');
-        b.setAttribute('data-slot', i);
-        if (sp) {
-          b.style.setProperty('--h', hue(sp.handle));
-          b.innerHTML = '<span class="rack-jar__lid"></span><span class="rack-jar__glass"><span class="rack-jar__label">' + esc(sp.title) + '</span></span>' +
-            (sp.premium ? '<em class="rack-jar__star" title="Especial">★</em>' : '') +
-            '<span class="rack-jar__x" data-slot-clear="' + i + '" aria-label="Quitar">×</span>';
-        } else {
-          b.innerHTML = '<span class="rack-jar__lid"></span><span class="rack-jar__glass rack-jar__glass--empty"><span class="rack-jar__plus">+</span></span>';
+      var n = st.model.slots, c = cols(n), rows = Math.ceil(n / c), html = '';
+      slotsEl.style.setProperty('--cols', c);
+      root.setAttribute('data-size', n);
+      for (var r = 0; r < rows; r++) {
+        html += '<div class="rb-rack__row">';
+        for (var i = r * c; i < Math.min(n, (r + 1) * c); i++) {
+          var sp = st.slots[i] ? byId[st.slots[i]] : null;
+          if (sp) {
+            html += '<button type="button" class="rb-jar is-full' + (sp.group !== 'classic' ? ' is-extra' : '') + '" data-rb-slot="' + i + '" aria-label="Frasco ' + (i + 1) + ': ' + esc(sp.title) + '">' + jarHTML(sp) +
+              (sp.group !== 'classic' ? '<em class="rb-jar__tag">+</em>' : '') + '</button>';
+          } else {
+            html += '<button type="button" class="rb-jar is-empty' + (i === st.active ? ' is-next' : '') + '" data-rb-slot="' + i + '" aria-label="Frasco ' + (i + 1) + ' vacío"><span class="rb-jar__lid"></span><span class="rb-jar__glass"><span class="rb-jar__plus">+</span></span></button>';
+          }
         }
-        slotsEl.appendChild(b);
+        html += '</div>';
       }
-      updateBar();
+      slotsEl.innerHTML = html;
+      updateFooter();
     }
 
     function renderSummary() {
-      var box = $('[data-rack-summary]', root);
-      var counts = {};
-      state.slots.forEach(function (id) { if (id) counts[id] = (counts[id] || 0) + 1; });
-      var html = '<div class="rack-summary__row rack-summary__row--model"><span>' + esc(state.model.title) + '</span><b>' + money(state.model.price) + '</b></div>';
-      Object.keys(counts).forEach(function (id) {
-        var s = spiceById[id];
-        html += '<div class="rack-summary__row"><span>' + esc(s.title) + (counts[id] > 1 ? ' × ' + counts[id] : '') + (s.premium ? ' <em>★ especial</em>' : '') + '</span><b>' + money(s.price * counts[id]) + '</b></div>';
-      });
-      if (engraving()) html += '<div class="rack-summary__row"><span>Grabado: “' + esc(engText.value.trim()) + '”</span><b>' + money(data.engrave.price) + '</b></div>';
-      html += '<div class="rack-summary__row rack-summary__row--total"><span>Total</span><b>' + money(total()) + '</b></div>';
-      box.innerHTML = html;
+      var counts = {}, order = [];
+      st.slots.forEach(function (id) { if (!id) return; if (!counts[id]) { counts[id] = 0; order.push(id); } counts[id]++; });
+      var x = extras();
+      var h = '<div class="rb-sum__model"><span class="rb-sum__rack" style="--cols:' + cols(st.model.slots) + '">' +
+        st.slots.map(function (id) { var sp = byId[id]; return '<i style="--fill:' + (sp ? jarColor(sp) : '#ddd') + '"></i>'; }).join('') + '</span>' +
+        '<div><b>' + esc(st.model.title) + '</b><small>' + st.model.slots + ' frascos incluidos</small></div><strong>' + money(st.model.price) + '</strong></div>';
+      h += '<ul class="rb-sum__list">' + order.map(function (id) {
+        var sp = byId[id];
+        return '<li><span class="rb-sum__dot" style="--fill:' + jarColor(sp) + '"></span><span>' + esc(sp.title) + (counts[id] > 1 ? ' <small>×' + counts[id] + '</small>' : '') + '</span>' +
+          (sp.group !== 'classic' ? '<em>+' + money(data.extra.price * counts[id]) + '</em>' : '<em class="is-inc">Incluida</em>') + '</li>';
+      }).join('') + '</ul>';
+      if (x) h += '<div class="rb-sum__row"><span>Frascos especiales (' + x + ' × ' + money(data.extra.price) + ')</span><b>' + money(x * data.extra.price) + '</b></div>';
+      if (engraving()) h += '<div class="rb-sum__row"><span>Grabado: “' + esc(engText.value.trim()) + '”</span><b>' + money(data.engrave.price) + '</b></div>';
+      h += '<div class="rb-sum__row rb-sum__row--total"><span>Total</span><b>' + money(total()) + '</b></div>';
+      $('[data-rb-summary]', root).innerHTML = h;
     }
 
-    function selectModel(id) {
-      var m = data.models.filter(function (x) { return String(x.id) === String(id) || x.handle === id; })[0];
+    function pickModel(id) {
+      var m = data.models.filter(function (x) { return String(x.id) === String(id); })[0];
       if (!m) return;
-      var prev = state.slots.slice(0, m.slots);
-      state.model = m;
-      state.slots = [];
-      for (var i = 0; i < m.slots; i++) state.slots.push(prev[i] || null);
-      state.active = state.slots.indexOf(null);
-      if (state.active < 0) state.active = 0;
+      var prev = st.slots.slice(0, m.slots);
+      st.model = m; st.slots = [];
+      for (var i = 0; i < m.slots; i++) st.slots.push(prev[i] || null);
+      st.active = Math.max(0, st.slots.indexOf(null));
+      $$('[data-rb-model]', root).forEach(function (b) { b.classList.toggle('is-on', String(b.getAttribute('data-rb-model')) === String(id)); });
       renderSlots();
-      setStep(2);
+      setTimeout(function () { go(2); }, 180);
     }
 
-    /* ----- selector de especias ----- */
-    function chipsList() {
-      var chips = [{ k: '', t: 'Todas' }, { k: '__hot', t: 'Picantes' }, { k: '__premium', t: 'Especiales' }];
-      var seen = {};
-      ['África', 'Asia', 'Europa', 'América', 'Medio Oriente'].forEach(function (r) {
-        var has = data.spices.some(function (s) { return s.tags.indexOf(r) > -1; });
-        if (has && !seen[r]) { seen[r] = 1; chips.push({ k: r, t: r }); }
-      });
-      return chips;
-    }
-    function renderChips() {
-      var el = $('[data-picker-chips]', root);
-      el.innerHTML = chipsList().map(function (c) {
-        return '<button type="button" class="category-chip' + (state.filter === c.k ? ' is-active' : '') + '" data-chip="' + esc(c.k) + '">' + esc(c.t) + '</button>';
-      }).join('');
-    }
+    /* ----- selector ----- */
     function renderGrid() {
-      var q = state.query.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-      var list = data.spices.filter(function (s) {
-        var t = s.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-        if (q && t.indexOf(q) === -1) return false;
-        if (state.filter === '__hot') return s.hot;
-        if (state.filter === '__premium') return s.premium;
-        if (state.filter) return s.tags.indexOf(state.filter) > -1;
-        return true;
-      });
-      var grid = $('[data-picker-grid]', root);
-      if (!list.length) { grid.innerHTML = '<p class="rack-empty">No encontramos esa especia.</p>'; return; }
+      var q = norm(st.q);
+      var list = data.spices.filter(function (s) { return q ? norm(s.title).indexOf(q) > -1 : s.group === st.tab; });
+      var grid = $('[data-rb-grid]', root);
+      if (!list.length) { grid.innerHTML = '<p class="rb__empty">' + (q ? 'No encontramos esa especia.' : 'Pronto agregamos opciones aquí.') + '</p>'; return; }
       grid.innerHTML = list.map(function (s) {
-        var thumb = s.image ? '<img src="' + esc(s.image) + '" alt="" loading="lazy">' : '<span style="--h:' + hue(s.handle) + '">' + esc(s.title.charAt(0)) + '</span>';
-        return '<button type="button" class="rack-spice" data-pick="' + s.id + '"><i class="rack-spice__thumb">' + thumb + '</i><b>' + esc(s.title) + '</b><small>' + money(s.price) + (s.premium ? ' · ★ especial' : '') + (s.hot ? ' · 🌶' : '') + '</small></button>';
+        var cur = st.slots[st.active] === s.id;
+        return '<button type="button" class="rb-opt' + (cur ? ' is-on' : '') + '" data-rb-pick="' + s.id + '"><span class="rb-opt__jar rb-jar is-full">' + jarHTML(s) + '</span><b>' + esc(s.title) + '</b>' +
+          '<small>' + (s.group === 'classic' ? 'Incluida' : '+' + money(data.extra.price)) + (s.hot ? ' · 🌶' : '') + '</small></button>';
       }).join('');
     }
-    function openPicker(slot) {
-      state.active = slot;
-      state.filter = ''; state.query = '';
-      $('[data-picker-search]', root).value = '';
-      $('[data-picker-title]', root).textContent = 'Frasco ' + (slot + 1) + ' de ' + state.model.slots;
-      renderChips(); renderGrid();
-      picker.hidden = false;
-      document.body.classList.add('is-locked');
+    function setTab(t) {
+      st.tab = t;
+      $$('[data-rb-tab]', root).forEach(function (b) { var on = b.getAttribute('data-rb-tab') === t; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+      renderGrid();
     }
-    function closePicker() { picker.hidden = true; document.body.classList.remove('is-locked'); }
-
-    function pick(id) {
-      state.slots[state.active] = Number(id);
-      var nx = state.slots.indexOf(null);
-      state.active = nx > -1 ? nx : state.active;
+    function openPicker(i) {
+      st.active = i; st.q = '';
+      $('[data-rb-search]', root).value = '';
+      $('[data-rb-pick-title]', root).textContent = 'Frasco ' + (i + 1) + ' de ' + st.model.slots;
+      var cur = st.slots[i] && byId[st.slots[i]];
+      var rm = $('[data-rb-remove]', root); if (rm) rm.hidden = !cur;
+      setTab(cur ? cur.group : st.tab);
+      picker.hidden = false;
+      requestAnimationFrame(function () { picker.classList.add('is-open'); });
+    }
+    function closePicker() {
+      picker.classList.remove('is-open');
+      setTimeout(function () { picker.hidden = true; }, 220);
+    }
+    function choose(id) {
+      st.slots[st.active] = Number(id);
+      var nx = st.slots.indexOf(null);
+      st.active = nx > -1 ? nx : st.active;
       closePicker();
       renderSlots();
+      var el = $('[data-rb-slot="' + st.slots.lastIndexOf(Number(id)) + '"]', root);
+      if (el) { el.classList.add('is-pop'); }
     }
 
     function surprise() {
-      var pool = data.spices.slice();
-      for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
-      for (var k = 0; k < state.slots.length; k++) if (!state.slots[k]) state.slots[k] = (pool.shift() || data.spices[0]).id;
-      renderSlots();
-    }
-    function applyKit(list) {
-      var handles = list.split(',').map(function (h) { return h.trim(); }).filter(Boolean);
-      var found = handles.map(function (h) { return spiceByHandle[h]; }).filter(Boolean);
-      if (!found.length) return;
-      for (var i = 0; i < state.slots.length; i++) state.slots[i] = found[i % found.length].id;
+      var pool = data.spices.filter(function (s) { return s.group === 'classic'; });
+      if (!pool.length) pool = data.spices.slice();
+      pool = pool.sort(function () { return Math.random() - 0.5; });
+      for (var k = 0, j = 0; k < st.slots.length; k++) if (!st.slots[k]) st.slots[k] = pool[j++ % pool.length].id;
       renderSlots();
     }
 
     function addToCart() {
       var bundle = 'esp-' + Date.now().toString(36);
-      var counts = {};
-      state.slots.forEach(function (id) { if (id) counts[id] = (counts[id] || 0) + 1; });
-      var names = Object.keys(counts).map(function (id) { return spiceById[id].title + (counts[id] > 1 ? ' ×' + counts[id] : ''); }).join(', ');
-      var modelProps = { '_bundle': bundle, 'Frascos': names };
-      var items = [{ id: state.model.variant, quantity: 1, properties: modelProps }];
-      if (engraving()) {
-        modelProps['Grabado'] = engText.value.trim();
-        items.push({ id: data.engrave.variant, quantity: 1, properties: { '_bundle': bundle, 'Grabado para': state.model.title } });
+      var names = st.slots.map(function (id, i) { return (i + 1) + '. ' + byId[id].title; }).join(' · ');
+      var props = { 'Frascos': names, '_bundle': bundle };
+      var items = [{ id: st.model.variant, quantity: 1, properties: props }];
+      var x = extras();
+      if (x && data.extra.variant) {
+        items.push({ id: data.extra.variant, quantity: x, properties: { 'Especiero': st.model.title, '_bundle': bundle,
+          'Frascos especiales': st.slots.filter(function (id) { return byId[id].group !== 'classic'; }).map(function (id) { return byId[id].title; }).join(', ') } });
       }
-      Object.keys(counts).forEach(function (id) {
-        items.push({ id: spiceById[id].variant, quantity: counts[id], properties: { '_bundle': bundle, 'En': state.model.title } });
-      });
-      nextBtn.disabled = true; nextBtn.textContent = 'Agregando…';
+      if (engraving()) {
+        props['Grabado'] = engText.value.trim();
+        items.push({ id: data.engrave.variant, quantity: 1, properties: { 'Grabado para': st.model.title, '_bundle': bundle } });
+      }
+      next.disabled = true; next.textContent = 'Agregando…';
       fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ items: items }) })
         .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.description || j.message || 'No se pudo agregar'); return j; }); })
         .then(function () { window.location.href = root.getAttribute('data-cart-url') || '/cart'; })
-        .catch(function (e) { alert(e.message || 'No se pudo agregar al carrito'); updateBar(); });
+        .catch(function (e) { alert(e.message || 'No se pudo agregar al carrito'); updateFooter(); });
     }
 
-    root._rackSelect = selectModel;
     root.addEventListener('click', function (e) {
       var t = e.target;
-      var m = t.closest('[data-model]'); if (m) { selectModel(m.getAttribute('data-model')); return; }
-      var go = t.closest('[data-go]'); if (go) { setStep(Number(go.getAttribute('data-go'))); return; }
-      var clr = t.closest('[data-slot-clear]');
-      if (clr) { e.stopPropagation(); var ci = Number(clr.getAttribute('data-slot-clear')); state.slots[ci] = null; state.active = ci; renderSlots(); return; }
-      var slot = t.closest('[data-slot]'); if (slot) { openPicker(Number(slot.getAttribute('data-slot'))); return; }
-      if (t.closest('[data-picker-close]')) { closePicker(); return; }
-      var chip = t.closest('[data-chip]'); if (chip) { state.filter = chip.getAttribute('data-chip'); renderChips(); renderGrid(); return; }
-      var pk = t.closest('[data-pick]'); if (pk) { pick(pk.getAttribute('data-pick')); return; }
-      if (t.closest('[data-surprise]')) { surprise(); return; }
-      var kit = t.closest('[data-kit]'); if (kit) { applyKit(kit.getAttribute('data-kit')); return; }
-      if (t.closest('[data-rack-next]')) {
-        if (state.step === 2) { renderSummary(); setStep(3); }
-        else if (state.step === 3) addToCart();
-      }
+      var m = t.closest('[data-rb-model]'); if (m) { pickModel(m.getAttribute('data-rb-model')); return; }
+      var g = t.closest('[data-rb-go]'); if (g) { go(Number(g.getAttribute('data-rb-go'))); return; }
+      var sl = t.closest('[data-rb-slot]'); if (sl) { openPicker(Number(sl.getAttribute('data-rb-slot'))); return; }
+      if (t.closest('[data-rb-pick-close]')) { closePicker(); return; }
+      var tb = t.closest('[data-rb-tab]'); if (tb) { st.q = ''; $('[data-rb-search]', root).value = ''; setTab(tb.getAttribute('data-rb-tab')); return; }
+      var pk = t.closest('[data-rb-pick]'); if (pk) { choose(pk.getAttribute('data-rb-pick')); return; }
+      if (t.closest('[data-rb-remove]')) { st.slots[st.active] = null; closePicker(); renderSlots(); return; }
+      if (t.closest('[data-rb-surprise]')) { surprise(); return; }
+      if (t.closest('[data-rb-clear]')) { st.slots = st.slots.map(function () { return null; }); st.active = 0; renderSlots(); return; }
+      if (t.closest('[data-rb-next]')) { if (st.step === 2) go(3); else if (st.step === 3) addToCart(); }
     });
-    $('[data-picker-search]', root).addEventListener('input', function (e) { state.query = e.target.value; renderGrid(); });
-    if (engToggle) engToggle.addEventListener('change', function () { engText.hidden = !engToggle.checked; renderSummary(); updateBar(); });
-    if (engText) engText.addEventListener('input', function () { renderSummary(); updateBar(); });
+    $('[data-rb-search]', root).addEventListener('input', function (e) { st.q = e.target.value; renderGrid(); });
+    if (eng) eng.addEventListener('change', function () { engText.hidden = !eng.checked; if (eng.checked) engText.focus(); renderSummary(); updateFooter(); });
+    if (engText) engText.addEventListener('input', function () { renderSummary(); updateFooter(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !picker.hidden) closePicker(); });
+
+    root._rbReset = function () { if (st.step !== 1 && !st.model) go(1); };
+    var q = new URLSearchParams(location.search).get('modelo');
+    if (q) pickModel(q);
+    progress();
   }
 
-  function preselect(root) {
-    var q = new URLSearchParams(window.location.search).get('modelo');
-    if (!q || !root._rackSelect) return;
-    root._rackSelect(q);
+  /* Ventana de la portada */
+  function openModal(id) {
+    var m = document.getElementById(id || 'RackModal');
+    if (!m) return false;
+    m.hidden = false;
+    document.body.classList.add('is-locked');
+    requestAnimationFrame(function () { m.classList.add('is-open'); });
+    init($('[data-rb]', m));
+    return true;
   }
-  function boot() { $$('[data-rack]').forEach(function (r) { init(r); preselect(r); }); }
+  function closeModal(m) {
+    m.classList.remove('is-open');
+    document.body.classList.remove('is-locked');
+    setTimeout(function () { m.hidden = true; }, 300);
+  }
+  document.addEventListener('click', function (e) {
+    var op = e.target.closest && e.target.closest('[data-rb-open]');
+    if (op && openModal(op.getAttribute('data-rb-open'))) { e.preventDefault(); return; }
+    var cl = e.target.closest && e.target.closest('[data-rb-close], .rb-modal__bg');
+    if (cl) { var m = cl.closest('.rb-modal'); if (m) closeModal(m); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var m = $('.rb-modal.is-open');
+    if (m && !$('[data-rb-picker].is-open', m)) closeModal(m);
+  });
+
+  function boot() { $$('[data-rb]').forEach(function (r) { if (!r.closest('.rb-modal')) init(r); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   document.addEventListener('shopify:section:load', boot);
 })();

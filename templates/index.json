@@ -226,7 +226,8 @@
     "rack_teaser": {
       "type": "rack-teaser",
       "settings": {
-        "button_link": "shopify://pages/especiero"
+        "text": "Elige el tamaño, llénalo con tus especias favoritas y recíbelo listo para estrenar o regalar.",
+        "button_label": "Armar el mío"
       }
     }
   },
@@ -235,9 +236,9 @@
     "hero",
     "circles",
     "especias",
-    "rack_teaser",
     "condimentos_casa",
     "condimentos_mundo",
+    "rack_teaser",
     "semillas",
     "frutas",
     "reposteria"
