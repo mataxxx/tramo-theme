@@ -2045,7 +2045,6 @@ shopify-account {
 }
 @media (max-width: 749px) {
   .header__account-wc--desk { display: none !important; }
-  .header__account-wc--mob:defined ~ .header__user { display: none !important; }
 }
 
 /* Ronda 65: móvil — solo el título queda fijo en la categoría; header estable; sin zoom al enfocar campos; scroll suave */
