@@ -1847,3 +1847,9 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
 .sticky-add .trust-bar--sticky { border-top: 0; margin-top: 8px; padding-top: 0; }
 .sticky-add .spay { margin-bottom: 10px; }
 .sticky-add .spay__title { display: none; }
+
+/* Ronda 53 */
+.sticky-add .trust-bar.trust-bar--sticky { width: auto; max-width: none; margin: 8px 0 0; padding: 0; border-radius: 0; background: transparent; display: block; }
+.sticky-add .trust-bar__item { white-space: nowrap; }
+.hero-arrow { border-radius: 10px; width: 40px; height: 52px; }
+@media (max-width: 749px) { .hero-arrow { width: 30px; height: 42px; } }
