@@ -297,13 +297,14 @@
     pedidos: '<path d="m21 8-9-5-9 5v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
     perfil: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
     direcciones: '<path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/>',
+    recetas: '<path d="M6 4h10a2 2 0 0 1 2 2v14l-4-2-4 2-4-2V6a2 2 0 0 1 2-2Z"/><path d="M9 9h6M9 13h4"/>',
     favoritos: '<path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9Z"/>',
     puntos: '<circle cx="12" cy="12" r="8.5"/><path d="m12 7.5 1.4 2.9 3.1.4-2.3 2.2.6 3.1-2.8-1.5-2.8 1.5.6-3.1-2.3-2.2 3.1-.4Z"/>',
     chev: '<path d="m9 6 6 6-6 6"/>', back: '<path d="m15 6-6 6 6 6"/>',
     salir: '<path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M16 17l5-5-5-5M21 12H9"/>'
   };
   function ic(n) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>'; }
-  var DTITLE = { pedidos: 'Mis pedidos', perfil: 'Mis datos', direcciones: 'Mis direcciones', favoritos: 'Mis favoritos', puntos: 'Mi cash back', especieros: 'Mis especieros', repuestos: 'Pedir repuestos', addr: 'Dirección' };
+  var DTITLE = { pedidos: 'Mis pedidos', perfil: 'Mis datos', direcciones: 'Mis direcciones', favoritos: 'Mis favoritos', puntos: 'Mi cash back', especieros: 'Mis especieros', recetas: 'Mis recetas', repuestos: 'Pedir repuestos', addr: 'Dirección' };
   /* Cash back: % de cada compra pagada (productos sin envío ni IVA). El servidor lleva el saldo y crea los códigos. */
   var PUNTOS_PCT = Number(host.dataset.pointsPct || 5) / 100;
   var CB_MIN = Number(host.dataset.pointsMin || 1000);
@@ -363,6 +364,17 @@
     }).join('') + '</ul>' : '<p class="acct__muted">Haz tu primera compra y empieza a sumar.</p>';
     return h;
   }
+  /* Mis recetas: las guardadas con ♥ en el Blog */
+  function recipeList() { try { var v = JSON.parse(localStorage.getItem('tramo_recipes') || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+  function tabRecetas() {
+    var rs = recipeList();
+    if (!rs.length) return '<div class="acd__empty-rack"><span class="acd__ico">' + ic('recetas') + '</span><b>Aún no guardas recetas</b><p class="acct__muted">En el Blog toca el ♥ de una receta o video y aparece aquí para cocinarla cuando quieras.</p><a class="acct__btn acct__btn--sm" href="/blogs/recetas">Ir al Blog</a></div>';
+    return '<ul class="acd__recipes" role="list">' + rs.map(function (r) {
+      return '<li><a href="' + esc(r.url) + '"><span class="acd__rimg">' + (r.img ? '<img src="' + esc(r.img) + '" alt="" loading="lazy">' : ic('recetas')) + '</span><b>' + esc(r.title) + '</b></a>' +
+        '<button type="button" class="acd__unrec" data-a="unrec" data-h="' + esc(r.handle) + '" aria-label="Quitar ' + esc(r.title) + '">' + ic('chev').replace('m9 6 6 6-6 6', 'M6 6l12 12M18 6 6 18') + '</button></li>';
+    }).join('') + '</ul><a class="acct__btn acct__btn--ghost acct__btn--sm acd__rmore" href="/blogs/recetas">Ver más recetas</a>';
+  }
+
   /* Favoritos: los mismos corazones de la tienda */
   function likeList() { try { var v = JSON.parse(localStorage.getItem('tramo_likes') || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
   var favCache = {};
@@ -407,6 +419,7 @@
       ['especieros', 'Mis especieros', (state.racks || []).length ? plural(state.racks.length, 'especiero registrado', 'especieros registrados') + ' · pedir repuestos' : 'Registra el tuyo con el código QR'],
       ['perfil', 'Mis datos', name || 'Agrega tu nombre'],
       ['direcciones', 'Mis direcciones', na ? plural(na, 'dirección guardada', 'direcciones guardadas') : 'Agrega una dirección de entrega'],
+      ['recetas', 'Mis recetas', recipeList().length ? plural(recipeList().length, 'receta guardada', 'recetas guardadas') : 'Guarda recetas del Blog con ♥'],
       ['favoritos', 'Mis favoritos', likeList().length ? plural(likeList().length, 'producto guardado', 'productos guardados') : 'Guarda lo que te gusta con ♥'],
       ['puntos', 'Mi cash back', money({ amount: puntos(c).total, currencyCode: puntos(c).cur }) + ' acumulado']
     ];
@@ -421,6 +434,7 @@
       var body = '';
       if (t === 'addr') body = addrFormHtml(state.addr);
       else if (t === 'favoritos') body = tabFavoritos();
+      else if (t === 'recetas') body = tabRecetas();
       else if (t === 'puntos') body = tabPuntos(c);
       else if (t === 'especieros') body = tabEspecieros();
       else if (t === 'repuestos') body = tabRepuestos();
@@ -488,6 +502,11 @@
     else if (a === 'refill-add') addRefill(b.dataset.h, b);
     else if (a === 'kind') { state.refillKind = b.dataset.k; drawerRender(); }
     else if (a === 'rtab') { state.refillTab = b.dataset.g; state.refillQ = ''; drawerRender(); }
+    else if (a === 'unrec') {
+      var rl = recipeList().filter(function (x) { return x.handle !== b.dataset.h; });
+      try { localStorage.setItem('tramo_recipes', JSON.stringify(rl)); } catch (er) {}
+      drawerRender();
+    }
     else if (a === 'unfav') {
       var hs = likeList().filter(function (x) { return x !== b.dataset.h; });
       try { localStorage.setItem('tramo_likes', JSON.stringify(hs)); } catch (er) {}

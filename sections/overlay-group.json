@@ -70,22 +70,11 @@
     },
     "reels": {
       "type": "reels",
-      "blocks": {
-        "reel-1": {
-          "type": "reel",
-          "settings": {
-            "kicker": "Receta rápida",
-            "heading": "Pasta con chile seco",
-            "video_url": "tramo-tv.mp4"
-          }
-        }
-      },
-      "block_order": [
-        "reel-1"
-      ],
+      "blocks": {},
+      "block_order": [],
       "settings": {
         "show_float": true,
-        "float_label": "Tramo TV"
+        "float_label": "Blog"
       }
     },
     "bottom-nav": {

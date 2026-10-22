@@ -1,10 +1,29 @@
+{%- liquid
+  assign rblog = blogs['recetas']
+  assign rvids = ''
+  for a in rblog.articles limit: 40
+    if a.metafields.custom.video.value != blank or a.metafields.custom.video_url.value != blank
+      assign rvids = rvids | append: a.handle | append: ','
+    endif
+  endfor
+  assign rfirst = nil
+  for a in rblog.articles limit: 40
+    if a.metafields.custom.video.value != blank or a.metafields.custom.video_url.value != blank
+      assign rfirst = a
+      break
+    endif
+  endfor
+-%}
 {%- comment -%} Computadora: video flotante ya abierto (sin sonido) + botón de ayuda {%- endcomment -%}
 <div class="float-dock" data-float-dock>
   {%- if section.settings.show_float != false -%}
     {%- assign fb = section.blocks.first -%}
     <div class="tv-pip" data-tv-pip>
-      <button type="button" class="tv-pip__screen" data-open="reels" data-reels-view="feed" aria-label="Ver videos de Tramo con sonido">
-        {%- if fb.settings.video != blank -%}
+      <button type="button" class="tv-pip__screen" data-open="reels" data-reels-view="feed" aria-label="Ver los videos del blog con sonido">
+        {%- if rfirst -%}
+          {%- capture pv -%}{% render 'recipe-media', art: rfirst, mode: 'reel' %}{%- endcapture -%}
+          {{ pv | replace: 'class="reel__video"', 'class="tv-pip__media" autoplay' | replace: 'preload="none"', 'preload="metadata"' }}
+        {%- elsif fb.settings.video != blank -%}
           <video muted loop playsinline autoplay preload="metadata" poster="{% if fb.settings.poster != blank %}{{ fb.settings.poster | image_url: width: 360 }}{% else %}{{ fb.settings.video.preview_image | image_url: width: 360 }}{% endif %}">
             {%- for source in fb.settings.video.sources -%}{%- if source.mime_type == 'video/mp4' -%}<source src="{{ source.url }}" type="video/mp4">{%- break -%}{%- endif -%}{%- endfor -%}
           </video>
@@ -17,9 +36,9 @@
           <span class="tv-pip__ph" aria-hidden="true"></span>
         {%- endif -%}
         <span class="tv-pip__tap" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-1.5a1.5 1.5 0 0 1 3 0V11m0-1a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1-6 6h-.6a5.5 5.5 0 0 1-4.3-2.1L5 15.4a1.5 1.5 0 0 1 2.3-2L9 15"/></svg></span>
-        <span class="tv-pip__top"><span class="tv-pip__tag">{{ section.settings.float_label | default: 'Tramo TV' }}</span></span>
+        <span class="tv-pip__top"><span class="tv-pip__tag">{{ section.settings.float_label | default: 'Blog' }}</span></span>
         <span class="tv-pip__bottom">
-          {%- if fb.settings.heading != blank -%}<b>{{ fb.settings.heading }}</b>{%- endif -%}
+          {%- if rfirst -%}<b>{{ rfirst.title }}</b>{%- elsif fb.settings.heading != blank -%}<b>{{ fb.settings.heading }}</b>{%- endif -%}
           <span class="tv-pip__hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 4 6M21 9l-4 6"/></svg><em class="tv-pip__hint-a">Toca para ver con sonido</em><em class="tv-pip__hint-b">Agrandar con sonido</em></span>
         </span>
       </button>
@@ -81,17 +100,31 @@
   <div class="drawer__backdrop" data-drawer-close></div>
   <div class="reels-wrap" data-reels-wrap data-default-view="{{ section.settings.default_view }}" data-view="{{ section.settings.default_view }}">
     <div class="reels-bar">
-      <button type="button" class="reels-bar__btn" data-reels-show-grid>
-        {% render 'icon', name: 'grid' %}
-        <span>{{ section.settings.all_label | default: 'Ver todos los videos' }}</span>
-      </button>
+      {%- if rblog != blank and rblog.articles_count > 0 -%}
+        <a class="reels-bar__btn" href="{{ rblog.url }}?tab=videos" data-close-reels>
+          {% render 'icon', name: 'grid' %}
+          <span>{{ section.settings.all_label | default: 'Ver todo en el Blog' }}</span>
+        </a>
+      {%- else -%}
+        <button type="button" class="reels-bar__btn" data-reels-show-grid>
+          {% render 'icon', name: 'grid' %}
+          <span>{{ section.settings.all_label | default: 'Ver todos los videos' }}</span>
+        </button>
+      {%- endif -%}
       <p class="reels-bar__title" data-reels-grid-title>{{ section.settings.grid_title | default: 'Todos los videos' }}</p>
       <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar videos">{% render 'icon', name: 'close' %}</button>
     </div>
 
+    <div class="reels-nav" aria-label="Cambiar de video">
+      <button type="button" class="reels-nav__btn" data-reels-prev aria-label="Video anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
+      <button type="button" class="reels-nav__btn" data-reels-next aria-label="Video siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+    </div>
     <section class="reels" data-reels>
 
-    {%- if section.blocks.size == 0 -%}
+    {%- for a in rblog.articles limit: 40 -%}
+      {%- if rvids contains a.handle -%}{% render 'reel-recipe', art: a %}{%- endif -%}
+    {%- endfor -%}
+    {%- if section.blocks.size == 0 and rvids == '' -%}
       <div class="reel reel--empty">
         <p>Agrega videos desde el personalizador (sección "Videos").</p>
       </div>
@@ -165,9 +198,20 @@
     </section>
 
     <section class="reels-grid" data-reels-grid style="--reel-cols: {{ section.settings.grid_columns }};" hidden>
+      {%- assign ri = 0 -%}
+      {%- for a in rblog.articles limit: 40 -%}
+        {%- if rvids contains a.handle -%}
+          <button type="button" class="reel-tile" data-reel-tile="{{ ri }}" aria-label="{{ a.title | escape }}">
+            {% render 'recipe-media', art: a, mode: 'tile' %}
+            <span class="reel-tile__play">{% render 'icon', name: 'play' %}</span>
+            <span class="reel-tile__title">{{ a.title }}</span>
+          </button>
+          {%- assign ri = ri | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
       {%- for block in section.blocks -%}
         {%- assign tile_video = block.settings.video -%}
-        <button type="button" class="reel-tile" data-reel-tile="{{ forloop.index0 }}" aria-label="{{ block.settings.heading | escape }}">
+        <button type="button" class="reel-tile" data-reel-tile="{{ forloop.index0 | plus: ri }}" aria-label="{{ block.settings.heading | escape }}">
           {%- if block.settings.poster != blank -%}
             {{ block.settings.poster | image_url: width: 400 | image_tag: widths: '200, 300, 400', sizes: '(min-width: 750px) 230px, 33vw', loading: 'lazy', class: 'reel-tile__media', alt: '' }}
           {%- elsif tile_video != blank and tile_video.preview_image != blank -%}
@@ -206,10 +250,10 @@
       "default": "feed"
     },
     { "type": "range", "id": "grid_columns", "label": "Columnas de la cuadrícula", "min": 2, "max": 4, "step": 1, "default": 3 },
-    { "type": "text", "id": "all_label", "label": "Texto del botón \"ver todos\"", "default": "Ver todos los videos" },
+    { "type": "text", "id": "all_label", "label": "Texto del botón \"ver todos\"", "default": "Ver todo en el Blog" },
     { "type": "text", "id": "grid_title", "label": "Título de la cuadrícula", "default": "Todos los videos" },
     { "type": "checkbox", "id": "show_float", "label": "Botón flotante de videos (computadora)", "default": true },
-    { "type": "text", "id": "float_label", "label": "Texto del botón flotante", "default": "Tramo TV" }
+    { "type": "text", "id": "float_label", "label": "Texto del botón flotante", "default": "Blog" }
   ],
   "blocks": [
     {

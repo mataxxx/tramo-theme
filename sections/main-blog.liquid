@@ -1,27 +1,166 @@
-{%- paginate blog.articles by 12 -%}
-  <section class="page-width">
-    <header class="page-header"><h1>{{ blog.title }}</h1></header>
-    <ul class="article-grid" role="list">
-      {%- for article in blog.articles -%}
-        <li class="article-card">
-          <a href="{{ article.url }}">
-            {%- if article.image -%}
-              {{ article.image | image_url: width: 700 | image_tag: widths: '350, 500, 700', sizes: '(min-width: 750px) 33vw, 100vw', loading: 'lazy', alt: article.image.alt }}
+{{ 'blog.css' | asset_url | stylesheet_tag }}
+{%- paginate blog.articles by 48 -%}
+  {%- liquid
+    assign n_videos = 0
+    assign n_recipes = 0
+    assign n_vlog = 0
+    assign rtags = ''
+    for a in blog.articles
+      assign tipo = a.metafields.custom.tipo.value | default: 'Receta'
+      if a.metafields.custom.video.value != blank or a.metafields.custom.video_url.value != blank
+        assign n_videos = n_videos | plus: 1
+      endif
+      if tipo == 'Vlog'
+        assign n_vlog = n_vlog | plus: 1
+      else
+        assign n_recipes = n_recipes | plus: 1
+        for t in a.tags
+          unless rtags contains t
+            assign rtags = rtags | append: t | append: '|'
+          endunless
+        endfor
+      endif
+    endfor
+    assign rtag_list = rtags | split: '|'
+  -%}
+  <section class="blg" data-blog>
+    <header class="blg__head">
+      <p class="blg__kicker">{{ section.settings.kicker }}</p>
+      <h1 class="blg__title">{{ section.settings.heading | default: blog.title }}</h1>
+      <p class="blg__sub">{{ section.settings.subheading }}</p>
+    </header>
+
+    <div class="blg__tabs" role="tablist" aria-label="Secciones del blog">
+      <button type="button" class="blg__tab is-on" role="tab" aria-selected="true" data-blog-tab="videos">{% render 'icon', name: 'video' %}<span>Videos</span><small>{{ n_videos }}</small></button>
+      <button type="button" class="blg__tab" role="tab" aria-selected="false" data-blog-tab="recetas">{% render 'icon', name: 'mortar' %}<span>Recetas</span><small>{{ n_recipes }}</small></button>
+      <button type="button" class="blg__tab" role="tab" aria-selected="false" data-blog-tab="vlog">{% render 'icon', name: 'house' %}<span>Vlog</span><small>{{ n_vlog }}</small></button>
+    </div>
+
+    {%- comment -%} Videos {%- endcomment -%}
+    <div class="blg__panel is-on" data-blog-panel="videos" role="tabpanel">
+      {%- if n_videos == 0 -%}
+        <p class="blg__empty">Pronto subimos recetas en video. Mientras tanto, mira las recetas escritas.</p>
+      {%- else -%}
+        <div class="blg-vids">
+          {%- for a in blog.articles -%}
+            {%- if a.metafields.custom.video.value != blank or a.metafields.custom.video_url.value != blank -%}
+              {%- assign mins = a.metafields.custom.tiempo.value -%}
+              <div class="blg-vid">
+                <button type="button" class="blg-vid__play" data-open="reels" data-reel-handle="{{ a.handle }}" aria-label="Ver video: {{ a.title | escape }}">
+                  {% render 'recipe-media', art: a, mode: 'tile' %}
+                  <span class="blg-vid__icon" aria-hidden="true">{% render 'icon', name: 'play' %}</span>
+                  <span class="blg-vid__shade" aria-hidden="true"></span>
+                  <span class="blg-vid__copy">
+                    <small>{% if a.metafields.custom.tipo.value == 'Vlog' %}Vlog{% else %}Receta{% endif %}{% if mins %} · {{ mins }} min{% endif %}</small>
+                    <b>{{ a.title }}</b>
+                  </span>
+                </button>
+                <button type="button" class="blg-save" data-save-recipe="{{ a.handle }}" data-recipe-title="{{ a.title | escape }}" data-recipe-url="{{ a.url }}" data-recipe-img="{% render 'recipe-media', art: a, mode: 'poster' %}" aria-pressed="false" aria-label="Guardar">{% render 'icon', name: 'heart' %}</button>
+              </div>
             {%- endif -%}
-            <h2>{{ article.title }}</h2>
-          </a>
-          <p class="muted small">{{ article.published_at | time_tag: '%d/%m/%Y' }}</p>
-          <p>{{ article.excerpt_or_content | strip_html | truncate: 140 }}</p>
-        </li>
-      {%- endfor -%}
-    </ul>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Recetas escritas {%- endcomment -%}
+    <div class="blg__panel" data-blog-panel="recetas" role="tabpanel" hidden>
+      {%- if rtag_list.size > 0 -%}
+        <div class="blg__chips" role="group" aria-label="Filtrar recetas">
+          <button type="button" class="blg__chip is-on" data-blog-tag="">Todas</button>
+          {%- for t in rtag_list -%}{%- if t != blank -%}<button type="button" class="blg__chip" data-blog-tag="{{ t | escape }}">{{ t }}</button>{%- endif -%}{%- endfor -%}
+        </div>
+      {%- endif -%}
+      <div class="blg-cards">
+        {%- for a in blog.articles -%}
+          {%- unless a.metafields.custom.tipo.value == 'Vlog' -%}
+            {%- assign poster = '' -%}
+            {%- capture poster -%}{% render 'recipe-media', art: a, mode: 'poster' %}{%- endcapture -%}
+            {%- assign poster = poster | strip -%}
+            {%- assign has_vid = false -%}{%- if a.metafields.custom.video.value != blank or a.metafields.custom.video_url.value != blank -%}{%- assign has_vid = true -%}{%- endif -%}
+            <article class="blg-card" data-blog-item data-tags="{{ a.tags | join: '|' | escape }}">
+              <a class="blg-card__link" href="{{ a.url }}">
+                <span class="blg-card__img{% if poster == '' %} is-empty{% endif %}">
+                  {%- if poster != '' -%}<img src="{{ poster }}" alt="" loading="lazy">{%- else -%}{% render 'icon', name: 'mortar' %}{%- endif -%}
+                  {%- if has_vid -%}<em class="blg-card__badge">{% render 'icon', name: 'play' %} Video</em>{%- endif -%}
+                </span>
+                <span class="blg-card__body">
+                  {%- if a.tags.size > 0 -%}<small class="blg-card__tags">{{ a.tags | join: ' · ' }}</small>{%- endif -%}
+                  <b class="blg-card__title">{{ a.title }}</b>
+                  <span class="blg-card__meta">
+                    {%- if a.metafields.custom.tiempo.value -%}<span>⏱ {{ a.metafields.custom.tiempo.value }} min</span>{%- endif -%}
+                    {%- if a.metafields.custom.porciones.value -%}<span>🍽 {{ a.metafields.custom.porciones.value }} porciones</span>{%- endif -%}
+                    {%- if a.metafields.custom.dificultad.value -%}<span>{{ a.metafields.custom.dificultad.value }}</span>{%- endif -%}
+                  </span>
+                </span>
+              </a>
+              <button type="button" class="blg-save" data-save-recipe="{{ a.handle }}" data-recipe-title="{{ a.title | escape }}" data-recipe-url="{{ a.url }}" data-recipe-img="{{ poster }}" aria-pressed="false" aria-label="Guardar receta">{% render 'icon', name: 'heart' %}</button>
+            </article>
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+      <p class="blg__empty" data-blog-none hidden>No hay recetas con ese filtro todavía.</p>
+    </div>
+
+    {%- comment -%} Vlog {%- endcomment -%}
+    <div class="blg__panel" data-blog-panel="vlog" role="tabpanel" hidden>
+      {%- if n_vlog == 0 -%}
+        <p class="blg__empty">Muy pronto: historias del Mercado Central y de la familia Tramo.</p>
+      {%- else -%}
+        <div class="blg-vlog">
+          {%- for a in blog.articles -%}
+            {%- if a.metafields.custom.tipo.value == 'Vlog' -%}
+              {%- capture poster -%}{% render 'recipe-media', art: a, mode: 'poster' %}{%- endcapture -%}{%- assign poster = poster | strip -%}
+              <a class="blg-post" href="{{ a.url }}">
+                <span class="blg-post__img{% if poster == '' %} is-empty{% endif %}">{%- if poster != '' -%}<img src="{{ poster }}" alt="" loading="lazy">{%- else -%}<span>1946</span>{%- endif -%}</span>
+                <span class="blg-post__body">
+                  <small>{{ a.published_at | date: '%d/%m/%Y' }}{% if a.author != blank %} · {{ a.author }}{% endif %}</small>
+                  <b>{{ a.title }}</b>
+                  <span>{{ a.excerpt_or_content | strip_html | truncate: 160 }}</span>
+                  <em>Leer historia →</em>
+                </span>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
     {% render 'pagination', paginate: paginate %}
   </section>
 {%- endpaginate -%}
 
+<script>
+  (function () {
+    var root = document.querySelector('[data-blog]'); if (!root) return;
+    function tab(name) {
+      root.querySelectorAll('[data-blog-tab]').forEach(function (b) { var on = b.getAttribute('data-blog-tab') === name; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+      root.querySelectorAll('[data-blog-panel]').forEach(function (p) { var on = p.getAttribute('data-blog-panel') === name; p.hidden = !on; if (on) { p.classList.remove('is-on'); void p.offsetWidth; p.classList.add('is-on'); } });
+      try { var u = new URL(location.href); u.searchParams.set('tab', name); history.replaceState({}, '', u); } catch (e) {}
+    }
+    root.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-blog-tab]'); if (t) { tab(t.getAttribute('data-blog-tab')); return; }
+      var c = e.target.closest('[data-blog-tag]');
+      if (c) {
+        var tag = c.getAttribute('data-blog-tag'), shown = 0;
+        root.querySelectorAll('[data-blog-tag]').forEach(function (b) { b.classList.toggle('is-on', b === c); });
+        root.querySelectorAll('[data-blog-item]').forEach(function (it) { var ok = !tag || (it.getAttribute('data-tags') || '').split('|').indexOf(tag) > -1; it.hidden = !ok; if (ok) shown++; });
+        root.querySelector('[data-blog-none]').hidden = shown > 0;
+      }
+    });
+    var q = new URLSearchParams(location.search).get('tab');
+    var hasVideos = root.querySelector('.blg-vids');
+    tab(q && root.querySelector('[data-blog-panel="' + q + '"]') ? q : (hasVideos ? 'videos' : 'recetas'));
+  })();
+</script>
+
 {% schema %}
 {
-  "name": "Blog",
-  "settings": []
+  "name": "Blog de recetas",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Texto pequeño", "default": "Cocina Tramo" },
+    { "type": "text", "id": "heading", "label": "Título", "default": "Recetas y vlog" },
+    { "type": "textarea", "id": "subheading", "label": "Texto", "default": "Ideas para cocinar con nuestras especias. Guarda tus favoritas y compártelas." }
+  ]
 }
 {% endschema %}

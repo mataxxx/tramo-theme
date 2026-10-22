@@ -2297,3 +2297,18 @@ a, button { touch-action: manipulation; }
 .hero-wrap--tv .hero-tv > .tv-pip.tv-pip--inline { position: absolute; inset: 0; width: auto; height: auto; }
 .hero-wrap--tv .hero-tv .tv-pip__screen video, .hero-wrap--tv .hero-tv .tv-pip__screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 @media (min-width: 990px) { .hero-wrap--tv .hero-tv { min-width: 0; max-width: none; width: clamp(220px, calc(var(--tv-h, 420px) * 9 / 16), 34vw); } }
+
+
+/* Ronda 78: reproductor — flechas en computadora (al lado del video) y guardar receta */
+.reels-nav { display: none; }
+@media (min-width: 750px) {
+  .drawer--reels .reels-nav { display: flex; flex-direction: column; gap: 12px; position: fixed; top: 50%; left: calc(50% + min(215px, 100dvh * 9 / 32) + 22px); transform: translateY(-50%); z-index: 8; }
+  .reels-wrap[data-view="grid"] .reels-nav { display: none; }
+  .reels-nav__btn { all: unset; box-sizing: border-box; cursor: pointer; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.14); color: #fff; border: 1px solid rgba(255,255,255,.28); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); transition: background-color .2s, transform .2s; }
+  .reels-nav__btn:hover { background: rgba(255,255,255,.3); transform: scale(1.06); }
+  .reels-nav__btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .reels-nav__btn svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+}
+.reel__action[data-save-recipe][aria-pressed="true"] { color: #ff5a6e; }
+.reel__action[data-save-recipe][aria-pressed="true"] .icon { fill: currentColor; }
+.tv-pip__media { width: 100%; height: 100%; object-fit: cover; display: block; }

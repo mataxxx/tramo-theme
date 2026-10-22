@@ -1,17 +1,221 @@
-<article class="page-width page-width--narrow">
-  <header class="page-header">
-    <h1>{{ article.title }}</h1>
-    <p class="muted small">{{ article.published_at | time_tag: '%d/%m/%Y' }}</p>
-  </header>
-  {%- if article.image -%}
-    {{ article.image | image_url: width: 1100 | image_tag: widths: '550, 800, 1100', sizes: '(min-width: 750px) 800px, 100vw', alt: article.image.alt }}
+{{ 'blog.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign art = article
+  assign tipo = art.metafields.custom.tipo.value | default: 'Receta'
+  assign mins = art.metafields.custom.tiempo.value
+  assign serv = art.metafields.custom.porciones.value
+  assign diff = art.metafields.custom.dificultad.value
+  assign ing = art.metafields.custom.ingredientes.value | newline_to_br | split: '<br />'
+  assign steps = art.metafields.custom.pasos.value | newline_to_br | split: '<br />'
+  assign prods = art.metafields.custom.productos.value
+  assign has_vid = false
+  if art.metafields.custom.video.value != blank or art.metafields.custom.video_url.value != blank
+    assign has_vid = true
+  endif
+  assign share_url = request.origin | append: art.url
+-%}
+{%- capture poster -%}{% render 'recipe-media', art: art, mode: 'poster' %}{%- endcapture -%}{%- assign poster = poster | strip -%}
+<article class="rcp{% if tipo == 'Vlog' %} rcp--vlog{% endif %}" data-recipe="{{ art.handle }}" data-servings="{{ serv | default: 0 }}">
+  <a class="rcp__back" href="{{ blog.url }}?tab={% if tipo == 'Vlog' %}vlog{% else %}recetas{% endif %}">{% render 'icon', name: 'arrow-left' %}<span>{{ blog.title }}</span></a>
+
+  <div class="rcp-hero{% unless has_vid %} rcp-hero--photo{% endunless %}">
+    <div class="rcp-hero__media">
+      {%- if has_vid -%}
+        {% render 'recipe-media', art: art, mode: 'hero' %}
+      {%- elsif art.image -%}
+        {{ art.image | image_url: width: 1400 | image_tag: widths: '700, 1000, 1400', sizes: '(min-width: 990px) 560px, 100vw', class: 'rcp-hero__video', alt: art.image.alt | default: art.title }}
+      {%- else -%}
+        <span class="rcp-hero__ph">{% render 'icon', name: 'mortar' %}</span>
+      {%- endif -%}
+    </div>
+    <div class="rcp-hero__copy">
+      {%- if art.tags.size > 0 -%}<p class="rcp__tags">{{ art.tags | join: ' · ' }}</p>{%- endif -%}
+      <h1 class="rcp__title">{{ art.title }}</h1>
+      {%- if art.excerpt != blank -%}<div class="rcp__lead">{{ art.excerpt | strip_html }}</div>{%- endif -%}
+      {%- if tipo != 'Vlog' -%}
+        <ul class="rcp__meta" role="list">
+          {%- if mins -%}<li><b>{{ mins }}</b><span>minutos</span></li>{%- endif -%}
+          {%- if serv -%}<li><b>{{ serv }}</b><span>porciones</span></li>{%- endif -%}
+          {%- if diff -%}<li><b>{{ diff }}</b><span>dificultad</span></li>{%- endif -%}
+        </ul>
+      {%- else -%}
+        <p class="rcp__by">{{ art.published_at | date: '%d/%m/%Y' }}{% if art.author != blank %} · {{ art.author }}{% endif %}</p>
+      {%- endif -%}
+      <div class="rcp__actions">
+        <button type="button" class="rcp-btn rcp-btn--save" data-save-recipe="{{ art.handle }}" data-recipe-title="{{ art.title | escape }}" data-recipe-url="{{ art.url }}" data-recipe-img="{{ poster }}" aria-pressed="false">{% render 'icon', name: 'heart' %}<span data-save-label>Guardar</span></button>
+        <button type="button" class="rcp-btn" data-recipe-share data-share-title="{{ art.title | escape }}" data-share-url="{{ share_url }}">{% render 'icon', name: 'send' %}<span>Compartir</span></button>
+        <a class="rcp-btn rcp-btn--wa" href="https://wa.me/?text={{ art.title | append: ' — ' | append: share_url | url_encode }}" target="_blank" rel="noopener" aria-label="Compartir por WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.4L3 21Z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 .8c-1-.4-2-1.4-2.4-2.4l.8-1-1-2-1.9.6Z"/></svg><span>WhatsApp</span></a>
+      </div>
+    </div>
+  </div>
+
+  {%- if tipo != 'Vlog' and ing.size > 0 and art.metafields.custom.ingredientes.value != blank -%}
+    <div class="rcp-grid">
+      <section class="rcp-ing" aria-labelledby="IngTitle">
+        <div class="rcp-ing__head">
+          <h2 id="IngTitle">Ingredientes</h2>
+          {%- if serv -%}
+            <div class="rcp-serv" aria-label="Porciones">
+              <button type="button" data-serv="-1" aria-label="Menos porciones">−</button>
+              <span><b data-serv-n>{{ serv }}</b> porciones</span>
+              <button type="button" data-serv="1" aria-label="Más porciones">+</button>
+            </div>
+          {%- endif -%}
+        </div>
+        <ul class="rcp-ing__list" role="list">
+          {%- for line in ing -%}
+            {%- assign l = line | strip -%}
+            {%- if l != blank -%}
+              {%- assign parts = l | split: '|' -%}
+              {%- if parts.size > 1 -%}
+                <li><span class="rcp-ing__qty" data-qty="{{ parts[0] | strip | escape }}">{{ parts[0] | strip }}</span><span>{{ parts[1] | strip }}</span></li>
+              {%- else -%}
+                <li><span class="rcp-ing__qty"></span><span>{{ l }}</span></li>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+
+        {%- if prods != blank and prods.size > 0 -%}
+          <div class="rcp-shop" data-recipe-shop>
+            <h3>Lo que tenemos para esta receta</h3>
+            <ul class="rcp-shop__list" role="list">
+              {%- for p in prods -%}
+                {%- liquid
+                  assign pv = p.selected_or_first_available_variant
+                  for v in p.variants
+                    if v.available and v.title contains '100 g'
+                      assign pv = v
+                      break
+                    endif
+                  endfor
+                -%}
+                {%- if pv.available -%}
+                  <li>
+                    <label>
+                      <input type="checkbox" checked value="{{ pv.id }}" data-shop-item data-price="{{ pv.price }}">
+                      <span class="rcp-shop__img">{%- if p.featured_image -%}{{ p.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}{%- else -%}{% render 'icon', name: 'leaf' %}{%- endif -%}</span>
+                      <span class="rcp-shop__name"><b>{{ p.title }}</b>{% unless pv.title == 'Default Title' %}<small>{{ pv.title }}</small>{% endunless %}</span>
+                      <span class="rcp-shop__price">{{ pv.price | money_without_trailing_zeros }}</span>
+                    </label>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+            <button type="button" class="button button--full rcp-shop__btn" data-shop-add>Agregar ingredientes al carrito · <span data-shop-total></span></button>
+          </div>
+        {%- endif -%}
+      </section>
+
+      <section class="rcp-steps" aria-labelledby="StepsTitle">
+        <h2 id="StepsTitle">Preparación</h2>
+        <ol class="rcp-steps__list">
+          {%- assign k = 0 -%}
+          {%- for st in steps -%}
+            {%- assign t = st | strip -%}
+            {%- if t != blank -%}
+              {%- assign k = k | plus: 1 -%}
+              <li><label><input type="checkbox" data-step="{{ k }}"><span class="rcp-steps__n">{{ k }}</span><span class="rcp-steps__t">{{ t }}</span></label></li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ol>
+        {%- if art.content != blank -%}
+          <div class="rcp-notes rte"><h3>Consejos de la casa</h3>{{ art.content }}</div>
+        {%- endif -%}
+      </section>
+    </div>
+  {%- else -%}
+    <div class="rcp-body rte">{{ art.content }}</div>
   {%- endif -%}
-  <div class="rte">{{ article.content }}</div>
+
+  {%- assign shown = 0 -%}
+  {%- capture more -%}
+    {%- for a in blog.articles limit: 12 -%}
+      {%- if a.handle != art.handle and shown < 3 -%}
+        {%- assign shown = shown | plus: 1 -%}
+        {%- capture ap -%}{% render 'recipe-media', art: a, mode: 'poster' %}{%- endcapture -%}{%- assign ap = ap | strip -%}
+        <a class="blg-card blg-card--mini" href="{{ a.url }}">
+          <span class="blg-card__img{% if ap == '' %} is-empty{% endif %}">{%- if ap != '' -%}<img src="{{ ap }}" alt="" loading="lazy">{%- else -%}{% render 'icon', name: 'mortar' %}{%- endif -%}</span>
+          <span class="blg-card__body"><b class="blg-card__title">{{ a.title }}</b>{%- if a.metafields.custom.tiempo.value -%}<span class="blg-card__meta"><span>⏱ {{ a.metafields.custom.tiempo.value }} min</span></span>{%- endif -%}</span>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+  {%- if shown > 0 -%}
+    <section class="rcp-more"><h2>Más para cocinar</h2><div class="rcp-more__grid">{{ more }}</div></section>
+  {%- endif -%}
 </article>
+
+<script>
+  (function () {
+    var root = document.querySelector('[data-recipe]'); if (!root) return;
+    var key = 'tramo_steps_' + root.getAttribute('data-recipe');
+    /* Pasos: se recuerdan los marcados */
+    var done = {}; try { done = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+    root.querySelectorAll('[data-step]').forEach(function (c) {
+      c.checked = !!done[c.getAttribute('data-step')];
+      c.addEventListener('change', function () { done[c.getAttribute('data-step')] = c.checked; try { localStorage.setItem(key, JSON.stringify(done)); } catch (e) {} });
+    });
+    /* Porciones: recalcula cantidades que empiezan con número (200 g, 1/2 cdta, 1 1/2 tazas) */
+    var base = parseInt(root.getAttribute('data-servings'), 10) || 0, cur = base;
+    function parseQ(s) {
+      var m = String(s).trim().match(/^(\d+)\s+(\d+)\/(\d+)|^(\d+)\/(\d+)|^(\d+(?:[.,]\d+)?)/);
+      if (!m) return null;
+      var n = m[1] ? +m[1] + m[2] / m[3] : m[4] ? m[4] / m[5] : parseFloat(m[6].replace(',', '.'));
+      return { n: n, rest: String(s).trim().slice(m[0].length) };
+    }
+    function fmt(n) {
+      var w = Math.floor(n), f = n - w, fr = [[0, ''], [0.25, '1/4'], [1 / 3, '1/3'], [0.5, '1/2'], [2 / 3, '2/3'], [0.75, '3/4'], [1, '']];
+      if (n >= 10) return String(Math.round(n));
+      var best = fr.reduce(function (a, b) { return Math.abs(b[0] - f) < Math.abs(a[0] - f) ? b : a; });
+      if (best[0] === 1) { w += 1; best = [0, '']; }
+      if (Math.abs(best[0] - f) > 0.12) return (Math.round(n * 10) / 10).toString().replace('.', ',');
+      return (w ? w + (best[1] ? ' ' : '') : '') + best[1] || '0';
+    }
+    function scale() {
+      root.querySelectorAll('[data-qty]').forEach(function (el) {
+        var q = parseQ(el.getAttribute('data-qty'));
+        el.textContent = q && base ? fmt(q.n * cur / base) + q.rest : el.getAttribute('data-qty');
+      });
+      var n = root.querySelector('[data-serv-n]'); if (n) n.textContent = cur;
+    }
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-serv]');
+      if (b && base) { cur = Math.max(1, Math.min(base * 6, cur + Number(b.getAttribute('data-serv')))); scale(); }
+      var sh = e.target.closest('[data-recipe-share]');
+      if (sh) {
+        var data = { title: sh.getAttribute('data-share-title'), url: sh.getAttribute('data-share-url') };
+        if (navigator.share) navigator.share(data).catch(function () {});
+        else if (navigator.clipboard) navigator.clipboard.writeText(data.url).then(function () { var s = sh.querySelector('span'); var t = s.textContent; s.textContent = '¡Enlace copiado!'; setTimeout(function () { s.textContent = t; }, 1600); });
+      }
+    });
+    /* Ingredientes al carrito */
+    var shop = root.querySelector('[data-recipe-shop]');
+    if (shop) {
+      var fmtM = new Intl.NumberFormat('es-CR', { style: 'currency', currency: {{ cart.currency.iso_code | json }}, maximumFractionDigits: 0 });
+      var totalEl = shop.querySelector('[data-shop-total]'), btn = shop.querySelector('[data-shop-add]');
+      function total() {
+        var t = 0, n = 0;
+        shop.querySelectorAll('[data-shop-item]').forEach(function (c) { if (c.checked) { t += +c.getAttribute('data-price'); n++; } });
+        totalEl.textContent = fmtM.format(t / 100); btn.disabled = n === 0;
+      }
+      shop.addEventListener('change', total); total();
+      btn.addEventListener('click', function () {
+        var items = []; shop.querySelectorAll('[data-shop-item]').forEach(function (c) { if (c.checked) items.push({ id: +c.value, quantity: 1, properties: { 'Receta': {{ art.title | json }} } }); });
+        if (!items.length) return;
+        var t = btn.innerHTML; btn.disabled = true; btn.textContent = 'Agregando…';
+        fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ items: items }) })
+          .then(function (r) { if (!r.ok) throw new Error(); document.dispatchEvent(new CustomEvent('tramo:open-cart')); })
+          .catch(function () { alert('No se pudieron agregar. Intenta de nuevo.'); })
+          .then(function () { btn.innerHTML = t; total(); });
+      });
+    }
+  })();
+</script>
 
 {% schema %}
 {
-  "name": "Artículo",
+  "name": "Receta o entrada",
   "settings": []
 }
 {% endschema %}

@@ -136,7 +136,7 @@
         var target = $('[data-search-input]', drawer) || $('.close-button, [data-drawer-close]:not(.drawer__backdrop)', drawer);
         if (target && typeof target.focus === 'function') target.focus({ preventScroll: true });
       }, 60);
-      if (name === 'reels') { setReelsView(opts && opts.view); startReels(); }
+      if (name === 'reels') { setReelsView(opts && opts.view, opts && opts.index); startReels(); }
       if (name === 'help') showHelpTopic(null);
       if (name === 'likes') renderLikes();
     }
@@ -899,6 +899,43 @@
     }
   }
 
+  /* Flechas (computadora) y teclado para pasar de video */
+  function stepReel(dir) {
+    var feed = $('[data-reels]');
+    if (!feed) return;
+    var reels = $$('[data-reel]', feed), cur = 0, best = Infinity;
+    reels.forEach(function (r, i) { var d = Math.abs(r.offsetTop - feed.scrollTop); if (d < best) { best = d; cur = i; } });
+    var nx = reels[Math.max(0, Math.min(reels.length - 1, cur + dir))];
+    if (nx) feed.scrollTo({ top: nx.offsetTop, behavior: 'smooth' });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!$('[data-drawer="reels"].is-open')) return;
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); stepReel(1); }
+    else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); stepReel(-1); }
+  });
+
+  /* Recetas guardadas (en este navegador; se ven en Mi cuenta → Mis recetas) */
+  var RECIPES_KEY = 'tramo_recipes';
+  function getRecipes() { try { var v = JSON.parse(localStorage.getItem(RECIPES_KEY) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+  function syncRecipes() {
+    var list = getRecipes();
+    $$('[data-save-recipe]').forEach(function (b) {
+      var on = list.some(function (r) { return r.handle === b.getAttribute('data-save-recipe'); });
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var lbl = $('[data-save-label]', b); if (lbl) lbl.textContent = on ? 'Guardada' : 'Guardar';
+    });
+  }
+  function toggleRecipe(btn) {
+    var h = btn.getAttribute('data-save-recipe'), list = getRecipes();
+    var i = -1; list.forEach(function (r, k) { if (r.handle === h) i = k; });
+    if (i > -1) { list.splice(i, 1); showToast('Receta quitada de tus guardadas'); }
+    else { list.unshift({ handle: h, title: btn.getAttribute('data-recipe-title') || '', url: btn.getAttribute('data-recipe-url') || '', img: (btn.getAttribute('data-recipe-img') || '').trim() }); showToast('Receta guardada ♥'); }
+    try { localStorage.setItem(RECIPES_KEY, JSON.stringify(list.slice(0, 200))); } catch (e) {}
+    syncRecipes();
+    document.dispatchEvent(new CustomEvent('tramo:recipes-changed'));
+  }
+  syncRecipes();
+
   function startReels() {
     var container = $('[data-reels]');
     if (!container) return;
@@ -1184,7 +1221,11 @@
         if (opener.classList.contains('header__searchbar') && window.matchMedia('(min-width: 750px)').matches) toggleSearchDrop(opener);
         else openSearch(null);
       }
-      else if (name === 'reels') openDrawer(name, { view: opener.getAttribute('data-reels-view') });
+      else if (name === 'reels') {
+        var rh = opener.getAttribute('data-reel-handle'), ridx = 0;
+        if (rh) { $$('[data-reels] [data-reel]').some(function (r, i) { if (r.getAttribute('data-reel-handle') === rh) { ridx = i; return true; } return false; }); }
+        openDrawer(name, { view: rh ? 'feed' : opener.getAttribute('data-reels-view'), index: ridx });
+      }
       else openDrawer(name);
       return;
     }
@@ -1242,6 +1283,12 @@
     if (expandBtn) { event.preventDefault(); expandCollection(expandBtn.closest('[data-category-section]')); return; }
     var collapseBtn = target.closest('[data-collection-collapse]');
     if (collapseBtn) { collapseCollection(collapseBtn.closest('[data-category-section]')); return; }
+
+    var rnav = target.closest('[data-reels-prev], [data-reels-next]');
+    if (rnav) { stepReel(rnav.hasAttribute('data-reels-next') ? 1 : -1); return; }
+
+    var saveR = target.closest('[data-save-recipe]');
+    if (saveR) { toggleRecipe(saveR); return; }
 
     var showGrid = target.closest('[data-reels-show-grid]');
     if (showGrid) { setReelsView('grid'); return; }

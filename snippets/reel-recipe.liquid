@@ -1,0 +1,21 @@
+{%- comment -%} Un reel hecho desde una receta del blog {%- endcomment -%}
+{%- assign mins = art.metafields.custom.tiempo.value -%}
+<article class="reel" data-reel data-reel-handle="{{ art.handle }}">
+  {% render 'recipe-media', art: art, mode: 'reel' %}
+  <div class="reel__gradient"></div>
+  <span class="reel__paused" aria-hidden="true">{% render 'icon', name: 'play' %}</span>
+  <div class="reel__bar"><span data-reel-progress></span></div>
+  <div class="reel__copy">
+    <small>{% if art.metafields.custom.tipo.value == 'Vlog' %}Vlog{% else %}Receta{% endif %}{% if mins %} · {{ mins }} min{% endif %}</small>
+    <h2>{{ art.title }}</h2>
+    <a href="{{ art.url }}" class="button button--light button--small" data-close-reels>{% if art.metafields.custom.tipo.value == 'Vlog' %}Ver más{% else %}Ver receta{% endif %}</a>
+  </div>
+  <div class="reel__actions">
+    <button type="button" class="reel__action" data-save-recipe="{{ art.handle }}" data-recipe-title="{{ art.title | escape }}" data-recipe-url="{{ art.url }}" data-recipe-img="{% render 'recipe-media', art: art, mode: 'poster' %}" aria-pressed="false" aria-label="Guardar receta">{% render 'icon', name: 'heart' %}</button>
+    <button type="button" class="reel__action" data-reel-share data-share-title="{{ art.title | escape }}" data-share-url="{{ request.origin }}{{ art.url }}" aria-label="Compartir">{% render 'icon', name: 'send' %}</button>
+    <button type="button" class="reel__action" data-reel-mute aria-label="Sonido" aria-pressed="false">
+      <span data-icon-sound>{% render 'icon', name: 'sound' %}</span>
+      <span data-icon-muted hidden>{% render 'icon', name: 'mute' %}</span>
+    </button>
+  </div>
+</article>
