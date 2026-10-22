@@ -74,8 +74,9 @@
         "reel-1": {
           "type": "reel",
           "settings": {
-            "kicker": "Preparado al momento",
-            "heading": "Así tostamos el comino"
+            "kicker": "Receta rápida",
+            "heading": "Pasta con chile seco",
+            "video_url": "tramo-tv.mp4"
           }
         }
       },

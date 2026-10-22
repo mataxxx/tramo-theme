@@ -9,7 +9,8 @@
             {%- for source in fb.settings.video.sources -%}{%- if source.mime_type == 'video/mp4' -%}<source src="{{ source.url }}" type="video/mp4">{%- break -%}{%- endif -%}{%- endfor -%}
           </video>
         {%- elsif fb.settings.video_url != blank -%}
-          <video muted loop playsinline autoplay preload="metadata" src="{{ fb.settings.video_url }}"{% if fb.settings.poster != blank %} poster="{{ fb.settings.poster | image_url: width: 360 }}"{% endif %}></video>
+          {%- assign vu = fb.settings.video_url -%}{%- assign vp = '' -%}{%- unless vu contains '//' -%}{%- assign vp = vu | replace: '.mp4', '-poster.jpg' | asset_url -%}{%- assign vu = vu | asset_url -%}{%- endunless -%}
+          <video muted loop playsinline autoplay preload="metadata" src="{{ vu }}"{% if fb.settings.poster != blank %} poster="{{ fb.settings.poster | image_url: width: 360 }}"{% elsif vp != blank %} poster="{{ vp }}"{% endif %}></video>
         {%- elsif fb.settings.poster != blank -%}
           {{ fb.settings.poster | image_url: width: 360 | image_tag: alt: '', loading: 'lazy' }}
         {%- else -%}
@@ -113,15 +114,16 @@
             {%- endfor -%}
           </video>
         {%- elsif block.settings.video_url != blank -%}
+          {%- assign vu = block.settings.video_url -%}{%- assign vp = '' -%}{%- unless vu contains '//' -%}{%- assign vp = vu | replace: '.mp4', '-poster.jpg' | asset_url -%}{%- assign vu = vu | asset_url -%}{%- endunless -%}
           <video
             class="reel__video"
             muted
             loop
             playsinline
             preload="none"
-            {% if block.settings.poster != blank %}poster="{{ block.settings.poster | image_url: width: 900 }}"{% endif %}
+            {% if block.settings.poster != blank %}poster="{{ block.settings.poster | image_url: width: 900 }}"{% elsif vp != blank %}poster="{{ vp }}"{% endif %}
           >
-            <source src="{{ block.settings.video_url }}" type="video/mp4">
+            <source src="{{ vu }}" type="video/mp4">
           </video>
         {%- elsif block.settings.poster != blank -%}
           {{ block.settings.poster | image_url: width: 900 | image_tag: loading: 'lazy', class: 'reel__video', alt: '' }}
@@ -171,7 +173,8 @@
           {%- elsif tile_video != blank and tile_video.preview_image != blank -%}
             {{ tile_video.preview_image | image_url: width: 400 | image_tag: widths: '200, 300, 400', sizes: '(min-width: 750px) 230px, 33vw', loading: 'lazy', class: 'reel-tile__media', alt: '' }}
           {%- elsif block.settings.video_url != blank -%}
-            <video class="reel-tile__media" muted playsinline preload="metadata" src="{{ block.settings.video_url }}#t=0.1"></video>
+            {%- assign vu = block.settings.video_url -%}{%- assign vp = '' -%}{%- unless vu contains '//' -%}{%- assign vp = vu | replace: '.mp4', '-poster.jpg' | asset_url -%}{%- assign vu = vu | asset_url -%}{%- endunless -%}
+            <video class="reel-tile__media" muted playsinline preload="metadata" src="{{ vu }}#t=0.1"{% if vp != blank %} poster="{{ vp }}"{% endif %}></video>
           {%- else -%}
             <span class="reel-tile__media reel-tile__media--empty"></span>
           {%- endif -%}
@@ -214,7 +217,7 @@
       "name": "Video",
       "settings": [
         { "type": "video", "id": "video", "label": "Video (subido a Shopify)" },
-        { "type": "text", "id": "video_url", "label": "O enlace directo a un video .mp4", "info": "Solo se usa si no subes un video arriba." },
+        { "type": "text", "id": "video_url", "label": "O enlace directo a un video .mp4", "info": "Solo se usa si no subes un video arriba. También acepta el nombre de un video del tema (ej: tramo-tv.mp4)." },
         { "type": "image_picker", "id": "poster", "label": "Imagen de portada" },
         { "type": "text", "id": "kicker", "label": "Texto pequeño", "default": "Preparado al momento" },
         { "type": "text", "id": "heading", "label": "Título", "default": "Así tostamos el comino" },
