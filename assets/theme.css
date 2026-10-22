@@ -1614,3 +1614,4 @@ a.header__user { text-decoration: none; color: inherit; }
   .drawer--sheet .quick-view__content { padding: 34px 30px 20px; }
   .drawer--sheet .quick-view .sticky-add { position: sticky !important; grid-column: 1 / -1; left: auto; right: auto; width: auto; bottom: 0 !important; }
 }
+.rack { max-width: none; }
