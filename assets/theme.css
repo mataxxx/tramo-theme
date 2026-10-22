@@ -2398,3 +2398,5 @@ a, button { touch-action: manipulation; }
 }
 .cm-switch[hidden] { display: none !important; }
 .float-btn--blog { gap: 8px; }
+/* Sin botón de "imagen en imagen" ni controles del navegador sobre los videos en bucle */
+.tv-pip video::-internal-media-controls-overlay-cast-button, .reel video::-internal-media-controls-overlay-cast-button { display: none; }

@@ -24,12 +24,12 @@
           {%- capture pv -%}{% render 'recipe-media', art: rfirst, mode: 'reel' %}{%- endcapture -%}
           {{ pv | replace: 'class="reel__video"', 'class="tv-pip__media" autoplay' | replace: 'preload="none"', 'preload="metadata"' }}
         {%- elsif fb.settings.video != blank -%}
-          <video muted loop playsinline autoplay preload="metadata" poster="{% if fb.settings.poster != blank %}{{ fb.settings.poster | image_url: width: 360 }}{% else %}{{ fb.settings.video.preview_image | image_url: width: 360 }}{% endif %}">
+          <video disablepictureinpicture disableremoteplayback muted loop playsinline autoplay preload="metadata" poster="{% if fb.settings.poster != blank %}{{ fb.settings.poster | image_url: width: 360 }}{% else %}{{ fb.settings.video.preview_image | image_url: width: 360 }}{% endif %}">
             {%- for source in fb.settings.video.sources -%}{%- if source.mime_type == 'video/mp4' -%}<source src="{{ source.url }}" type="video/mp4">{%- break -%}{%- endif -%}{%- endfor -%}
           </video>
         {%- elsif fb.settings.video_url != blank -%}
           {%- assign vu = fb.settings.video_url -%}{%- assign vp = '' -%}{%- unless vu contains '//' -%}{%- assign vp = vu | replace: '.mp4', '-poster.jpg' | asset_url -%}{%- assign vu = vu | asset_url -%}{%- endunless -%}
-          <video muted loop playsinline autoplay preload="metadata" src="{{ vu }}"{% if fb.settings.poster != blank %} poster="{{ fb.settings.poster | image_url: width: 360 }}"{% elsif vp != blank %} poster="{{ vp }}"{% endif %}></video>
+          <video disablepictureinpicture disableremoteplayback muted loop playsinline autoplay preload="metadata" src="{{ vu }}"{% if fb.settings.poster != blank %} poster="{{ fb.settings.poster | image_url: width: 360 }}"{% elsif vp != blank %} poster="{{ vp }}"{% endif %}></video>
         {%- elsif fb.settings.poster != blank -%}
           {{ fb.settings.poster | image_url: width: 360 | image_tag: alt: '', loading: 'lazy' }}
         {%- else -%}
@@ -135,7 +135,7 @@
       {%- assign video = block.settings.video -%}
       <article class="reel" data-reel {{ block.shopify_attributes }}>
         {%- if video != blank -%}
-          <video
+          <video disablepictureinpicture disableremoteplayback
             class="reel__video"
             muted
             loop
@@ -149,7 +149,7 @@
           </video>
         {%- elsif block.settings.video_url != blank -%}
           {%- assign vu = block.settings.video_url -%}{%- assign vp = '' -%}{%- unless vu contains '//' -%}{%- assign vp = vu | replace: '.mp4', '-poster.jpg' | asset_url -%}{%- assign vu = vu | asset_url -%}{%- endunless -%}
-          <video
+          <video disablepictureinpicture disableremoteplayback
             class="reel__video"
             muted
             loop
@@ -219,7 +219,7 @@
             {{ tile_video.preview_image | image_url: width: 400 | image_tag: widths: '200, 300, 400', sizes: '(min-width: 750px) 230px, 33vw', loading: 'lazy', class: 'reel-tile__media', alt: '' }}
           {%- elsif block.settings.video_url != blank -%}
             {%- assign vu = block.settings.video_url -%}{%- assign vp = '' -%}{%- unless vu contains '//' -%}{%- assign vp = vu | replace: '.mp4', '-poster.jpg' | asset_url -%}{%- assign vu = vu | asset_url -%}{%- endunless -%}
-            <video class="reel-tile__media" muted playsinline preload="metadata" src="{{ vu }}#t=0.1"{% if vp != blank %} poster="{{ vp }}"{% endif %}></video>
+            <video disablepictureinpicture disableremoteplayback class="reel-tile__media" muted playsinline preload="metadata" src="{{ vu }}#t=0.1"{% if vp != blank %} poster="{{ vp }}"{% endif %}></video>
           {%- else -%}
             <span class="reel-tile__media reel-tile__media--empty"></span>
           {%- endif -%}

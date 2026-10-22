@@ -23,14 +23,14 @@
 {%- case mode -%}
   {%- when 'poster' -%}{{ rposter }}
   {%- when 'tile' -%}
-    {%- if rposter != '' -%}<img class="reel-tile__media" src="{{ rposter }}" alt="" loading="lazy">{%- elsif ru != blank -%}<video class="reel-tile__media" muted playsinline preload="metadata" src="{{ ru }}#t=0.1"></video>{%- else -%}<span class="reel-tile__media reel-tile__media--empty"></span>{%- endif -%}
+    {%- if rposter != '' -%}<img class="reel-tile__media" src="{{ rposter }}" alt="" loading="lazy">{%- elsif ru != blank -%}<video disablepictureinpicture disableremoteplayback class="reel-tile__media" muted playsinline preload="metadata" src="{{ ru }}#t=0.1"></video>{%- else -%}<span class="reel-tile__media reel-tile__media--empty"></span>{%- endif -%}
   {%- else -%}
     {%- if rv != blank -%}
-      <video class="{% if mode == 'hero' %}rcp-hero__video{% else %}reel__video{% endif %}" {% if mode == 'hero' %}controls{% else %}muted loop{% endif %} playsinline preload="{% if mode == 'hero' %}metadata{% else %}none{% endif %}"{% if rposter != '' %} poster="{{ rposter }}"{% endif %}>
+      <video disablepictureinpicture disableremoteplayback class="{% if mode == 'hero' %}rcp-hero__video{% else %}reel__video{% endif %}" {% if mode == 'hero' %}controls{% else %}muted loop{% endif %} playsinline preload="{% if mode == 'hero' %}metadata{% else %}none{% endif %}"{% if rposter != '' %} poster="{{ rposter }}"{% endif %}>
         {%- for source in rv.sources -%}<source src="{{ source.url }}" type="{{ source.mime_type }}">{%- endfor -%}
       </video>
     {%- elsif ru != blank -%}
-      <video class="{% if mode == 'hero' %}rcp-hero__video{% else %}reel__video{% endif %}" {% if mode == 'hero' %}controls{% else %}muted loop{% endif %} playsinline preload="{% if mode == 'hero' %}metadata{% else %}none{% endif %}"{% if rposter != '' %} poster="{{ rposter }}"{% endif %}>
+      <video disablepictureinpicture disableremoteplayback class="{% if mode == 'hero' %}rcp-hero__video{% else %}reel__video{% endif %}" {% if mode == 'hero' %}controls{% else %}muted loop{% endif %} playsinline preload="{% if mode == 'hero' %}metadata{% else %}none{% endif %}"{% if rposter != '' %} poster="{{ rposter }}"{% endif %}>
         <source src="{{ ru }}" type="video/mp4">
       </video>
     {%- elsif rposter != '' -%}

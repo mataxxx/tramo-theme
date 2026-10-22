@@ -3,7 +3,7 @@
   <section class="product-video page-width">
     {%- if section.settings.heading != blank -%}<h2 class="product-video__title">{{ section.settings.heading }}</h2>{%- endif -%}
     <div class="product-video__frame">
-      <video controls playsinline preload="metadata" poster="{{ pvideo.preview_image | image_url: width: 1100 }}">
+      <video disablepictureinpicture disableremoteplayback controls playsinline preload="metadata" poster="{{ pvideo.preview_image | image_url: width: 1100 }}">
         {%- for source in pvideo.sources -%}
           <source src="{{ source.url }}" type="{{ source.mime_type }}">
         {%- endfor -%}
