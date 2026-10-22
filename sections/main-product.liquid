@@ -51,7 +51,10 @@
             <p class="eyebrow" {{ block.shopify_attributes }}>{{ product.type }}</p>
           {%- endif -%}
         {%- when 'title' -%}
-          <h1 class="product-info__title" {{ block.shopify_attributes }}>{{ product.title }}</h1>
+          <div class="quick-view__titlerow" {{ block.shopify_attributes }}>
+            <h1 class="product-info__title">{{ product.title }}</h1>
+            <button type="button" class="like-btn like-btn--inline" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button>
+          </div>
         {%- when 'price' -%}
           <div class="product-info__price" {{ block.shopify_attributes }}>
             {% render 'price', product: product, variant: product.selected_or_first_available_variant %}

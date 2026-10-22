@@ -1736,3 +1736,20 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
 @media (min-width: 750px) {
   #CartDrawer .drawer__panel { width: min(900px, 94vw); height: 90vh; height: 90dvh; max-height: none; }
 }
+
+
+/* Ronda 46: todo redondeado, modular */
+.login-ask { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; }
+.login-ask[hidden] { display: none; }
+.login-ask__bg { position: absolute; inset: 0; background: rgba(22,32,22,.55); }
+.login-ask__card { position: relative; width: min(400px, 100%); background: var(--color-surface); border-radius: 22px; padding: 26px 24px 20px; display: grid; gap: 12px; text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,.3); }
+.login-ask__card p { margin: 0; color: var(--color-muted); }
+.login-ask__title { font-family: var(--font-heading); font-size: 24px; color: var(--color-text) !important; }
+@media (min-width: 750px) {
+  .hero-wrap--tiles .hero-slider { border-radius: 24px; }
+  .hero-tile, .hero-tile:first-child { border-radius: 24px; }
+  .hero-wrap:not(.hero-wrap--tiles) .hero-slider { border-radius: 24px; }
+  .trust-bar { width: fit-content; max-width: calc(100% - 2 * var(--page-pad)); margin: 14px auto 6px; padding: 9px 26px; border-radius: 999px; }
+}
+@media (max-width: 749px) { .hero-slider { border-radius: 18px; } .trust-bar { border-radius: 999px; margin: 10px 18px 6px; } }
+.product-info .quick-view__titlerow { margin-bottom: 6px; }

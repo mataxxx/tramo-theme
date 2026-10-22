@@ -56,6 +56,8 @@
         moneyFormat: {{ shop.money_format | json }},
         cartDrawer: {{ settings.cart_type | default: 'drawer' | json }},
         cartPopup: {{ settings.cart_popup | json }},
+        loggedIn: {% if customer %}true{% else %}false{% endif %},
+        loginUrl: {{ routes.account_login_url | json }},
         routes: {
           root: {{ routes.root_url | json }},
           cart: {{ routes.cart_url | json }},
