@@ -2024,3 +2024,27 @@ a[href], button:not(:disabled), summary, label[for], select, [role="button"], [d
 .login-ask__later:hover { color: var(--color-text); }
 .login-ask__card { animation: login-in .3s cubic-bezier(.22,.61,.36,1) both; }
 @keyframes login-in { from { opacity: 0; transform: translateY(16px) scale(.97); } to { opacity: 1; transform: none; } }
+
+
+/* Ronda 64: componente <shopify-account> con el estilo de la tienda (si Shopify lo carga; si no, queda el botón propio) */
+shopify-account {
+  --shopify-account-color-accent: var(--color-primary);
+  --shopify-account-color-background: var(--color-surface, #fffef6);
+  --shopify-account-color-text: var(--color-text);
+  --shopify-account-font-heading: var(--font-heading), Georgia, serif;
+  --shopify-account-font-body: var(--font-body), system-ui, sans-serif;
+  --shopify-account-radius-base: 14px;
+  --shopify-account-radius-dialog: 24px;
+  --shopify-account-radius-button: 14px;
+  --shopify-account-radius-input: 14px;
+}
+.header__account-wc:not(:defined) { display: none; }
+@media (min-width: 750px) {
+  .header__account-wc--mob { display: none !important; }
+  .header__account-wc--desk:defined { grid-column: 3; grid-row: 1; justify-self: end; display: inline-flex; }
+  .header__account-wc--desk:defined ~ .header__account-desk { display: none !important; }
+}
+@media (max-width: 749px) {
+  .header__account-wc--desk { display: none !important; }
+  .header__account-wc--mob:defined ~ .header__user { display: none !important; }
+}
