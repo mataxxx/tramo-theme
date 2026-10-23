@@ -2,7 +2,8 @@
   Parámetros: part ('top' = "Paga en SINPE Móvil, Transferencia ó Tarjeta", 'bottom' = candado + pagos seguros), text
 {%- endcomment -%}
 {%- if part == 'top' -%}
-  {%- if settings.show_pay_methods and settings.pay_methods != blank -%}
+  {%- if settings.order_mode -%}{%- comment -%} el carrito ya lo explica {%- endcomment -%}
+  {%- elsif settings.show_pay_methods and settings.pay_methods != blank -%}
     <div class="secure-pay secure-pay--top">{% render 'pay-methods', mode: 'sentence' %}</div>
   {%- endif -%}
 {%- else -%}

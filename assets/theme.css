@@ -2425,3 +2425,10 @@ a, button { touch-action: manipulation; }
   .category-modal__body { padding-top: 4px; }
 }
 @media (min-width: 1250px) { .category-modal__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; } }
+
+/* Ronda 86: modo pedidos por WhatsApp — cómo se paga y se entrega, legible en el carrito */
+.cart-howto { list-style: none; margin: 4px 0 12px; padding: 12px 14px; display: grid; gap: 10px; background: #f1f5ec; border: 1px solid #d9e5cf; border-radius: 14px; }
+.cart-howto li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; font-size: 15px; line-height: 1.4; color: var(--color-text, #1f2a1e); }
+.cart-howto .icon { width: 20px; height: 20px; color: var(--color-primary); margin-top: 1px; }
+.cart-howto small { font-size: 13px; color: var(--color-muted, #666); }
+.spay__title--sinpe { font-size: 14px; font-weight: 600; }

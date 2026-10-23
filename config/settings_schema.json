@@ -751,7 +751,7 @@
         "type": "textarea",
         "id": "order_pickup_note",
         "label": "Nota de retiro",
-        "default": "Te avisamos por WhatsApp cuando tu pedido esté listo para recoger."
+        "default": "Te enviamos por WhatsApp la ubicación exacta de nuestro local en el Mercado Central y te avisamos cuando tu pedido esté listo para recoger."
       },
       {
         "type": "text",

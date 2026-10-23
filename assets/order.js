@@ -65,7 +65,7 @@
     $('[data-order-pay-pickup]', M).hidden = m !== 'pickup';
     $('[data-order-pay-delivery]', M).hidden = m !== 'delivery';
     $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
-    if (m === 'delivery') initMap();
+    if (m === 'delivery') { initMap(); if (!gotAuto && !loc) { gotAuto = true; locate($('[data-order-locate]', M), true); } }
     validate();
   }
 
@@ -90,7 +90,7 @@
       map = L.map(el, { zoomControl: true, attributionControl: true }).setView(c, 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
       map.on('click', function (e) { place(e.latlng.lat, e.latlng.lng); });
-      if (loc) place(loc.lat, loc.lng, 17);
+      if (loc) { place(loc.lat, loc.lng, acc && acc < 60 ? 18 : 17, acc ? 'gps' : null); showAcc(loc.lat, loc.lng); }
       setTimeout(function () { map.invalidateSize(); }, 80);
     }).catch(function () {
       el.classList.remove('is-loading');
@@ -98,33 +98,62 @@
     });
   }
   var pinIcon = null;
-  function place(lat, lng, zoom) {
+  function place(lat, lng, zoom, src) {
     loc = { lat: +lat.toFixed(6), lng: +lng.toFixed(6) };
+    if (src !== 'gps' && accCircle) { map.removeLayer(accCircle); accCircle = null; acc = null; }
     if (window.L && map) {
       if (!pinIcon) pinIcon = L.divIcon({ className: 'ord-pin', html: '<span></span>', iconSize: [34, 44], iconAnchor: [17, 42] });
       if (!pin) {
         pin = L.marker([lat, lng], { draggable: true, icon: pinIcon }).addTo(map);
-        pin.on('dragend', function () { var p = pin.getLatLng(); loc = { lat: +p.lat.toFixed(6), lng: +p.lng.toFixed(6) }; hint(); validate(); });
+        pin.on('dragend', function () { var p = pin.getLatLng(); loc = { lat: +p.lat.toFixed(6), lng: +p.lng.toFixed(6) }; if (accCircle) { map.removeLayer(accCircle); accCircle = null; } hint('moved'); validate(); });
       } else pin.setLatLng([lat, lng]);
       map.setView([lat, lng], zoom || Math.max(map.getZoom(), 16));
     }
-    hint(); validate();
+    hint(src); validate();
   }
-  function hint() {
+  var acc = null, accCircle = null, gotAuto = false;
+  function hint(state) {
     var h = $('[data-order-maphint]', M);
-    h.classList.toggle('is-ok', !!loc);
-    h.textContent = loc ? '✓ Ubicación marcada. Puedes arrastrar el pin para ajustarla.' : 'Toca el mapa o arrastra el pin hasta tu casa.';
+    h.classList.toggle('is-ok', !!loc && state !== 'busy');
+    h.classList.toggle('is-busy', state === 'busy');
+    if (state === 'busy') { h.textContent = 'Buscando tu ubicación exacta…'; return; }
+    if (!loc) { h.textContent = 'Toca el mapa o arrastra el pin hasta tu casa.'; return; }
+    h.textContent = acc && state === 'gps'
+      ? '✓ Te ubicamos con una precisión de ±' + Math.round(acc) + ' m. Si el pin no está justo en tu casa, arrástralo.'
+      : '✓ Ubicación marcada. Si no está justo en tu casa, arrastra el pin.';
   }
-  function locate(btn) {
-    if (!navigator.geolocation) { err('Tu navegador no permite compartir la ubicación. Márcala en el mapa.'); return; }
-    btn.classList.add('is-busy');
-    navigator.geolocation.getCurrentPosition(function (p) {
-      btn.classList.remove('is-busy');
-      place(p.coords.latitude, p.coords.longitude, 17);
-    }, function () {
-      btn.classList.remove('is-busy');
-      err('No pudimos obtener tu ubicación. Revisa el permiso del navegador o márcala en el mapa.');
-    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+  function showAcc(lat, lng) {
+    if (!(window.L && map) || !acc) return;
+    if (accCircle) accCircle.setLatLng([lat, lng]).setRadius(acc);
+    else accCircle = L.circle([lat, lng], { radius: acc, color: '#2f7fd8', weight: 1, fillColor: '#2f7fd8', fillOpacity: .12, interactive: false }).addTo(map);
+  }
+  /* GPS como Uber: se queda escuchando unos segundos y se queda con la lectura más precisa */
+  function locate(btn, auto) {
+    if (!navigator.geolocation) { if (!auto) err('Tu navegador no permite compartir la ubicación. Márcala en el mapa.'); return; }
+    if (btn) btn.classList.add('is-busy');
+    hint('busy');
+    var best = null, done = false, wid = null;
+    function finish() {
+      if (done) return; done = true;
+      if (wid != null) navigator.geolocation.clearWatch(wid);
+      if (btn) btn.classList.remove('is-busy');
+      if (!best) { hint(); if (!auto) err('No pudimos obtener tu ubicación. Revisa el permiso de ubicación del navegador o márcala en el mapa.'); return; }
+      acc = best.coords.accuracy;
+      place(best.coords.latitude, best.coords.longitude, acc < 60 ? 18 : 17, 'gps');
+      showAcc(best.coords.latitude, best.coords.longitude);
+    }
+    wid = navigator.geolocation.watchPosition(function (p) {
+      if (!best || p.coords.accuracy < best.coords.accuracy) {
+        best = p; acc = p.coords.accuracy;
+        place(p.coords.latitude, p.coords.longitude, acc < 60 ? 18 : 17, 'gps');
+        showAcc(p.coords.latitude, p.coords.longitude);
+        hint('busy');
+      }
+      if (p.coords.accuracy <= 20) finish();
+    }, function (e) {
+      if (e && e.code === 1) { best = null; finish(); }
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    setTimeout(finish, 9000);
   }
   function find(q) {
     q = (q || '').trim(); if (!q) return;
@@ -182,7 +211,7 @@
     if (!w) setTimeout(function () { location.href = url; }, 900);
     $('[data-order-code]', M).textContent = c;
     $('[data-order-done-text]', M).textContent = mode === 'pickup'
-      ? 'Solo falta tocar Enviar en WhatsApp y hacer el SINPE de ' + money(cart.total_price) + (D.sinpe ? ' al ' + D.sinpe : '') + '. Te avisamos cuando esté listo para recoger.'
+      ? 'Solo falta tocar Enviar en WhatsApp y hacer el SINPE de ' + money(cart.total_price) + (D.sinpe ? ' al ' + D.sinpe : '') + '. Te mandamos la ubicación exacta del local y te avisamos cuando esté listo.'
       : 'Solo falta tocar Enviar en WhatsApp. Te respondemos con el costo del Uber Flash y el total para pagar por SINPE.';
     $('[data-order-resend]', M).href = url;
     show('done');
