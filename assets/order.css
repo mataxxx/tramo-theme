@@ -119,7 +119,7 @@
 .ord-prog[hidden] { display: none; }
 .ord-prog__bar { position: relative; height: 4px; border-radius: 4px; background: #e6dfcf; margin: 0 22px 8px; overflow: hidden; }
 .ord-prog__bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--color-primary, #263d25); border-radius: inherit; transition: width .35s cubic-bezier(.22,.61,.36,1); }
-.ord-prog__steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
+.ord-prog__steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
 .ord-prog__steps li { display: grid; justify-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #9a958a; transition: color .2s; }
 .ord-prog__steps span { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #ece6d8; color: #8a857a; font-size: 12.5px; font-weight: 700; transition: background-color .25s, color .25s, transform .25s; }
 .ord-prog__steps li.is-on { color: var(--color-primary, #263d25); }
@@ -156,3 +156,6 @@
 .ord-sinpe-box__num b { font-size: 22px; letter-spacing: .5px; color: var(--color-primary, #263d25); }
 .ord-sinpe-box__num small { font-size: 13px; font-weight: 600; color: #444; text-transform: uppercase; letter-spacing: .3px; }
 .ord-sinpe-box__hint { color: #666; font-size: 13px !important; }
+
+/* 3 pasos centrados: la barra va de centro a centro */
+.ord-prog__bar { margin: 0 calc(100% / 6) 8px; }
