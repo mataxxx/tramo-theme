@@ -11,11 +11,16 @@
       </div>
       <div class="help__grid">
         {%- for block in section.blocks -%}
-          <button type="button" class="help-card" data-help-open="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+          {%- capture card_inner -%}
             <span class="help-card__icon">{% render 'icon', name: block.settings.icon %}</span>
             <strong class="help-card__title">{{ block.settings.title }}</strong>
             {%- if block.settings.summary != blank -%}<span class="help-card__summary">{{ block.settings.summary }}</span>{%- endif -%}
-          </button>
+          {%- endcapture -%}
+          {%- if block.settings.card_link != blank -%}
+            <a class="help-card" href="{{ block.settings.card_link }}"{% if block.settings.card_link contains '//' %} target="_blank" rel="noopener"{% endif %} {{ block.shopify_attributes }}>{{ card_inner }}</a>
+          {%- else -%}
+            <button type="button" class="help-card" data-help-open="{{ forloop.index0 }}" {{ block.shopify_attributes }}>{{ card_inner }}</button>
+          {%- endif -%}
         {%- endfor -%}
       </div>
       {%- if section.settings.show_whatsapp and wa != blank -%}
@@ -92,6 +97,7 @@
         { "type": "text", "id": "title", "label": "Título", "default": "Preguntas frecuentes" },
         { "type": "text", "id": "summary", "label": "Descripción corta", "default": "Respuestas rápidas" },
         { "type": "richtext", "id": "content", "label": "Contenido" },
+        { "type": "url", "id": "card_link", "label": "O abrir un enlace directo", "info": "Si lo llenas, la cajita abre este enlace (ej: https://wa.me/50671426533) en vez del contenido." },
         { "type": "checkbox", "id": "opens_account", "label": "Abre el panel de pedidos del cliente", "info": "Para la cajita de rastrear pedido.", "default": false },
         { "type": "text", "id": "cta_label", "label": "Texto del botón (opcional)" },
         { "type": "url", "id": "cta_url", "label": "Enlace del botón (opcional)" },

@@ -2478,3 +2478,10 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .cats-section .product-rail:not(:has(> .product-rail__item:nth-child(4))) .cats-tile__title { font-size: clamp(14px, calc(var(--cat-photo-d, 150px) / 11), 20px); }
   .cats-section .cats-tile__media:has(.cats-tile__photo) { border-radius: 18px; }
 }
+
+/* Ronda 91: barra inferior con un solo botón (buscar) centrado; ayuda en el encabezado */
+@media (max-width: 749px) {
+  .bottom-nav:not(:has(> .bottom-nav__item:nth-child(2))) { justify-content: center; }
+  .bottom-nav:not(:has(> .bottom-nav__item:nth-child(2))) > .bottom-nav__item { flex: 0 0 auto; min-width: 96px; }
+}
+@media (max-width: 749px) { body.no-accounts .site-header > .header__help { display: grid !important; place-items: center; } }
