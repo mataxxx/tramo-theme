@@ -1676,6 +1676,7 @@
     $$('[data-likes-count]').forEach(function (c) { c.textContent = tot; c.hidden = tot === 0; });
   }
   function askLogin(reason) {
+    if (document.body.classList.contains('no-accounts')) return;
     var box = $('[data-login-ask]');
     if (!box) { window.location.href = T.loginUrl || '/account/login'; return; }
     var t = $('[data-login-title]', box), x = $('[data-login-text]', box);

@@ -38,7 +38,9 @@
   {%- endif -%}
 {%- endfor -%}
 <header class="site-header{% if s.sticky %} site-header--sticky{% endif %}{% if s.scroll_shadow %} site-header--shadow{% endif %}{% if s.scroll_shrink %} site-header--shrink{% endif %}" data-site-header>
-  {%- if customer -%}
+  {%- if settings.show_accounts == false -%}
+    <span class="header__menu header__user header__user--off" aria-hidden="true"></span>
+  {%- elsif customer -%}
     <button type="button" class="icon-button header__menu header__user" data-open="account" aria-label="Mi cuenta">
       {% render 'icon', name: 'user' %}
     </button>
@@ -85,7 +87,8 @@
         <span class="count-bubble" data-likes-count hidden>0</span>
       </button>
     {%- endif -%}
-    {%- if customer -%}
+    {%- if settings.show_accounts == false -%}
+    {%- elsif customer -%}
       <button type="button" class="icon-button header__account-desk header__account-desk--in" data-open="account" aria-label="Mi cuenta">{% render 'icon', name: 'user' %}</button>
     {%- else -%}
       <a href="{{ routes.storefront_login_url }}" data-login-open class="header__account-desk header__account-desk--out">Iniciar sesión</a>

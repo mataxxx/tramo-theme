@@ -2,7 +2,7 @@
   Métodos de pago informativos (SINPE Móvil, transferencia, tarjeta). Se editan en Configuración del tema → Carrito.
 {%- endcomment -%}
 {%- if settings.order_mode -%}
-  {%- if mode == 'sentence' -%}<p class="pay-sentence">Paga por <strong>SINPE Móvil</strong></p>{%- endif -%}
+  {%- if mode == 'sentence' -%}<p class="pay-sentence">Paga con <strong>SINPE Móvil</strong>, o al recoger en el local también con <strong>efectivo</strong> o <strong>tarjeta</strong></p>{%- endif -%}
 {%- elsif settings.show_pay_methods and settings.pay_methods != blank and mode == 'sentence' -%}
   {%- assign sm = settings.pay_methods | split: ',' -%}
   <p class="pay-sentence">{{ settings.pay_prefix | default: 'Paga en' }}
