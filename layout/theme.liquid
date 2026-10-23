@@ -1,6 +1,20 @@
 <!doctype html>
 <html class="no-js" lang="{{ request.locale.iso_code }}">
   <head>
+    {%- liquid
+      assign coll_blocked = false
+      if settings.allowed_collections != blank
+        assign coll_allow = settings.allowed_collections | remove: ' ' | split: ','
+        if template.name == 'list-collections'
+          assign coll_blocked = true
+        elsif template.name == 'collection'
+          unless coll_allow contains collection.handle
+            assign coll_blocked = true
+          endunless
+        endif
+      endif
+    -%}
+    {%- if coll_blocked -%}<meta http-equiv="refresh" content="0;url={{ routes.root_url }}"><script>location.replace({{ routes.root_url | json }});</script>{%- endif -%}
  {%- capture ecom_header_content -%}{%- render 'ecom_header' -%}{%- endcapture -%}{%- unless ecom_header_content contains 'Liquid error' -%}{{ ecom_header_content }}{%- endunless -%}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
