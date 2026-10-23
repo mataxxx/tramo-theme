@@ -1,5 +1,5 @@
 {%- style -%}
-  #shopify-section-{{ section.id }} { padding-top: {{ section.settings.space_top }}px; padding-bottom: {{ section.settings.space_bottom }}px; }
+  #shopify-section-{{ section.id }} { padding-top: {{ section.settings.space_top }}px; padding-bottom: {{ section.settings.space_bottom }}px; --cat-photo-d: {{ section.settings.photo_size_desktop | default: 150 }}px; --cat-photo-m: {{ section.settings.photo_size_mobile | default: 90 }}px; }
 {%- endstyle -%}
 <section class="category-section cats-section">
   {%- if section.settings.heading != blank -%}<h2 class="cats-heading">{{ section.settings.heading }}</h2>{%- endif -%}
@@ -81,6 +81,8 @@
     { "type": "text", "id": "button_label", "label": "Texto del botón \"Ver\"", "default": "Ver" },
     { "type": "text", "id": "heading", "label": "Título", "default": "Compra por categoría" },
     { "type": "text", "id": "panel_title", "label": "Título de la ventana", "default": "Nuestras categorías" },
+    { "type": "range", "id": "photo_size_desktop", "label": "Tamaño de las fotos en computadora", "info": "Para categorías con foto cuando hay 3 o menos.", "min": 80, "max": 320, "step": 10, "unit": "px", "default": 150 },
+    { "type": "range", "id": "photo_size_mobile", "label": "Tamaño de las fotos en celular", "min": 60, "max": 130, "step": 5, "unit": "px", "default": 90 },
     { "type": "range", "id": "space_top", "label": "Espacio arriba", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 },
     { "type": "range", "id": "space_bottom", "label": "Espacio abajo", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 }
   ],

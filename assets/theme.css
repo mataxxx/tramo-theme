@@ -2467,3 +2467,14 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .category-tiles:has(> :nth-child(3):last-child) .category-tile__media { aspect-ratio: 3 / 4; }
   .category-tiles:has(> :nth-child(3):last-child) .category-tile__title { font-size: 14px; padding: 26px 8px 8px; line-height: 1.15; }
 }
+
+/* Ronda 90: tamaño de las fotos de categoría ajustable (Personalizar → sección de categorías) */
+.cats-section .product-rail:not(:has(> .product-rail__item:nth-child(4))) > .product-rail__item { flex: 0 0 var(--cat-photo-m, 90px); max-width: none; }
+.cats-section .product-rail:not(:has(> .product-rail__item:nth-child(4))) { gap: 16px; }
+.cats-section .product-rail:not(:has(> .product-rail__item:nth-child(4))) .cats-tile__title { font-size: 13.5px; }
+@media (min-width: 750px) {
+  .cats-section .product-rail:not(:has(> .product-rail__item:nth-child(4))) > .product-rail__item { flex: 0 0 var(--cat-photo-d, 150px); }
+  .cats-section .product-rail:not(:has(> .product-rail__item:nth-child(4))) { gap: 24px; }
+  .cats-section .product-rail:not(:has(> .product-rail__item:nth-child(4))) .cats-tile__title { font-size: clamp(14px, calc(var(--cat-photo-d, 150px) / 11), 20px); }
+  .cats-section .cats-tile__media:has(.cats-tile__photo) { border-radius: 18px; }
+}
