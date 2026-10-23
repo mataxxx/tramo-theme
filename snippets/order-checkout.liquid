@@ -4,8 +4,6 @@
 {%- if settings.order_mode -%}
 <div class="ord" data-order hidden role="dialog" aria-modal="true" aria-labelledby="OrdTitle"
   data-wa="{{ settings.order_whatsapp | remove: ' ' | remove: '-' | remove: '+' | escape }}"
-  data-sinpe="{{ settings.order_sinpe_number | escape }}"
-  data-sinpe-name="{{ settings.order_sinpe_name | escape }}"
   data-prefix="{{ settings.order_prefix | default: 'PED' | escape }}"
   data-shop="{{ shop.name | escape }}"
   data-pickup="{{ settings.order_pickup_place | escape }}"
@@ -72,16 +70,28 @@
           </div>
         </div>
 
-        <div class="ord-box ord-pay" data-order-pay hidden>
-          <h3 class="ord-h">Pago por SINPE Móvil</h3>
-          <div data-order-pay-pickup>
-            <p>Transfiere <b data-order-total></b> al <b class="ord-sinpe">{{ settings.order_sinpe_number | default: '(número pendiente)' }}</b>{% if settings.order_sinpe_name != blank %} a nombre de <b>{{ settings.order_sinpe_name }}</b>{% endif %} y envíanos el comprobante por WhatsApp.</p>
-            {%- if settings.order_sinpe_number != blank -%}<button type="button" class="ord-copy" data-order-copy="{{ settings.order_sinpe_number | remove: '-' | remove: ' ' | escape }}">Copiar número</button>{%- endif -%}
+        <div class="ord-box">
+          <h3 class="ord-h">¿Deseas factura electrónica?</h3>
+          <div class="ord-yn" role="radiogroup">
+            <label><input type="radio" name="ord-fe" value="no" data-order-fe checked><span>No</span></label>
+            <label><input type="radio" name="ord-fe" value="si" data-order-fe><span>Sí, con factura</span></label>
           </div>
-          <div data-order-pay-delivery hidden>
-            <p>Primero te mandamos por WhatsApp el costo del envío y el <b>total</b>. Después pagas por SINPE al <b class="ord-sinpe">{{ settings.order_sinpe_number | default: '(número pendiente)' }}</b>{% if settings.order_sinpe_name != blank %} a nombre de <b>{{ settings.order_sinpe_name }}</b>{% endif %}.</p>
+          <div class="ord-fe" data-order-fe-fields hidden>
+            <label class="ord-field"><span>Tipo de cédula</span>
+              <select data-order-fe-type>
+                <option value="Física">Física</option>
+                <option value="Jurídica">Jurídica</option>
+                <option value="DIMEX">DIMEX</option>
+                <option value="NITE">NITE</option>
+              </select>
+            </label>
+            <label class="ord-field"><span>Número de cédula</span><input type="text" data-order-fe-id inputmode="numeric" placeholder="1-2345-6789"></label>
+            <label class="ord-field"><span>Nombre o razón social</span><input type="text" data-order-fe-name autocomplete="organization" placeholder="Como aparece en Hacienda"></label>
+            <label class="ord-field"><span>Correo para la factura</span><input type="email" data-order-fe-mail autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
           </div>
         </div>
+
+        <p class="ord-paynote">{% render 'icon', name: 'phone' %}<span>El pago es por <b>SINPE Móvil</b>. Te pasamos los datos y el total por WhatsApp.</span></p>
         <p class="ord-err" data-order-err role="alert" hidden></p>
       </div>
 

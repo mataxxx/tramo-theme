@@ -53,7 +53,6 @@
     }).join('');
     var t = money(cart.total_price);
     $('[data-order-subtotal]', M).textContent = t;
-    $('[data-order-total]', M).textContent = t;
     $('[data-order-total2]', M).textContent = t;
   }
 
@@ -61,9 +60,6 @@
   function setMode(m) {
     mode = m;
     $$('[data-order-pane]', M).forEach(function (p) { p.hidden = p.getAttribute('data-order-pane') !== m; });
-    $('[data-order-pay]', M).hidden = false;
-    $('[data-order-pay-pickup]', M).hidden = m !== 'pickup';
-    $('[data-order-pay-delivery]', M).hidden = m !== 'delivery';
     $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
     if (m === 'delivery') { initMap(); if (!gotAuto && !loc) { gotAuto = true; locate($('[data-order-locate]', M), true); } }
     validate();
@@ -172,10 +168,13 @@
   function err(msg) { var e = $('[data-order-err]', M); e.textContent = msg; e.hidden = !msg; if (msg) setTimeout(function () { e.hidden = true; }, 5000); }
   function digits(s) { return String(s || '').replace(/\D/g, ''); }
   function validate() {
-    var ok = cart && cart.item_count && $('[data-order-name]', M).value.trim().length > 1 && digits($('[data-order-phone]', M).value).length >= 8 && mode && (mode === 'pickup' || loc);
+    var fe = wantsFE();
+    var feOk = !fe || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim()));
+    var ok = feOk && cart && cart.item_count && $('[data-order-name]', M).value.trim().length > 1 && digits($('[data-order-phone]', M).value).length >= 8 && mode && (mode === 'pickup' || loc);
     $('[data-order-send]', M).disabled = !ok;
     return ok;
   }
+  function wantsFE() { var r = $('[data-order-fe]:checked', M); return !!(r && r.value === 'si'); }
   function code() {
     var A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = '', r = new Uint8Array(4);
     (window.crypto || window.msCrypto).getRandomValues(r);
@@ -191,14 +190,22 @@
     L1.push('', '*Subtotal:* ' + money(cart.total_price), '');
     if (mode === 'pickup') {
       L1.push('*Entrega:* Recoger en ' + (D.pickup || 'el Mercado Central'));
-      L1.push('*Pago:* SINPE Móvil' + (D.sinpe ? ' al ' + D.sinpe : '') + ' por ' + money(cart.total_price) + '. Envío el comprobante por aquí.');
     } else {
       var n = $('[data-order-notes]', M).value.trim();
       L1.push('*Entrega:* ' + (D.delivery || 'Uber Flash'));
       L1.push('*Ubicación:* https://maps.google.com/?q=' + loc.lat + ',' + loc.lng);
       if (n) L1.push('*Señas:* ' + n);
-      L1.push('', 'Quedo atento al costo del envío y el total para pagar por SINPE Móvil.');
     }
+    L1.push('');
+    if (wantsFE()) {
+      L1.push('*Factura electrónica:* Sí');
+      L1.push('Cédula ' + $('[data-order-fe-type]', M).value + ': ' + $('[data-order-fe-id]', M).value.trim());
+      L1.push('Nombre: ' + $('[data-order-fe-name]', M).value.trim());
+      L1.push('Correo: ' + $('[data-order-fe-mail]', M).value.trim());
+    } else {
+      L1.push('*Factura electrónica:* No');
+    }
+    L1.push('', '*Pago:* SINPE Móvil. Quedo atento a los datos' + (mode === 'delivery' ? ', el costo del envío' : '') + ' y el total.');
     return L1.join('\n');
   }
   function send() {
@@ -211,8 +218,8 @@
     if (!w) setTimeout(function () { location.href = url; }, 900);
     $('[data-order-code]', M).textContent = c;
     $('[data-order-done-text]', M).textContent = mode === 'pickup'
-      ? 'Solo falta tocar Enviar en WhatsApp y hacer el SINPE de ' + money(cart.total_price) + (D.sinpe ? ' al ' + D.sinpe : '') + '. Te mandamos la ubicación exacta del local y te avisamos cuando esté listo.'
-      : 'Solo falta tocar Enviar en WhatsApp. Te respondemos con el costo del Uber Flash y el total para pagar por SINPE.';
+      ? 'Solo falta tocar Enviar en WhatsApp. Te respondemos con los datos de SINPE, la ubicación exacta del local y te avisamos cuando esté listo.'
+      : 'Solo falta tocar Enviar en WhatsApp. Te respondemos con el costo del Uber Flash, el total y los datos de SINPE.';
     $('[data-order-resend]', M).href = url;
     show('done');
     fetch('/cart/clear.js', { method: 'POST', headers: { Accept: 'application/json' } })
@@ -221,7 +228,10 @@
   }
 
   /* ---------- eventos ---------- */
-  M.addEventListener('change', function (e) { if (e.target.matches('[data-order-mode]')) setMode(e.target.value); });
+  M.addEventListener('change', function (e) {
+    if (e.target.matches('[data-order-mode]')) setMode(e.target.value);
+    if (e.target.matches('[data-order-fe]')) { var f = $('[data-order-fe-fields]', M); f.hidden = !wantsFE(); if (wantsFE()) { var n = $('[data-order-fe-name]', M); if (!n.value) n.value = $('[data-order-name]', M).value.trim(); } validate(); }
+  });
   M.addEventListener('input', validate);
   M.addEventListener('submit', function (e) { var f = e.target.closest('[data-order-find]'); if (f) { e.preventDefault(); find($('[data-order-find-q]', M).value); } });
   M.addEventListener('click', function (e) {

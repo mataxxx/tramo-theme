@@ -710,7 +710,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Si lo activas, el carrito no va al pago de Shopify: el cliente elige retiro o envío por Uber Flash, y el pedido llega a tu WhatsApp. Se paga por SINPE Móvil."
+        "content": "Si lo activas, el carrito no va al pago de Shopify: el cliente elige retiro o envío por Uber Flash, indica si quiere factura electrónica, y el pedido llega a tu WhatsApp. Los datos de SINPE se los das por WhatsApp."
       },
       {
         "type": "checkbox",
@@ -723,17 +723,6 @@
         "id": "order_whatsapp",
         "label": "WhatsApp de la tienda",
         "info": "Con código de país, solo números. Ej: 50688887777"
-      },
-      {
-        "type": "text",
-        "id": "order_sinpe_number",
-        "label": "Número de SINPE Móvil",
-        "info": "Ej: 8888-7777"
-      },
-      {
-        "type": "text",
-        "id": "order_sinpe_name",
-        "label": "SINPE a nombre de"
       },
       {
         "type": "text",
