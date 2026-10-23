@@ -50,19 +50,32 @@
         "tile2_link": "/collections/all",
         "hide_tiles": true,
         "show_tv": false,
-        "show_tile2": false
+        "show_tile2": false,
+        "image_asset": "xmas-queque.jpg"
       },
       "blocks": {
         "s1": {
           "type": "slide",
           "settings": {
-            "heading": "TEMPORADA\nNAVIDEÑA",
-            "text": "Frutas, especias y condimentos\npara tu mesa de fin de año."
+            "image_asset": "xmas-tamales.jpg",
+            "heading": "TAMALES\nDE LA CASA",
+            "text": "Todo para el tamal:\nmezcla, pasas, aceitunas y más.",
+            "overlay_opacity": 45
+          }
+        },
+        "s2": {
+          "type": "slide",
+          "settings": {
+            "image_asset": "xmas-condimentos.jpg",
+            "heading": "LA PIERNA\nPERFECTA",
+            "text": "Nuestros condimentos\npara la pierna navideña.",
+            "overlay_opacity": 45
           }
         }
       },
       "block_order": [
-        "s1"
+        "s1",
+        "s2"
       ]
     },
     "circles": {
@@ -74,7 +87,8 @@
             "collection": "queque-navideno",
             "title": "Queque navideño",
             "icon": "cake",
-            "search_noun": "producto"
+            "search_noun": "producto",
+            "image_asset": "xmas-queque-sm.jpg"
           }
         },
         "t": {
@@ -83,16 +97,18 @@
             "collection": "tamales",
             "title": "Tamales",
             "icon": "tamal",
-            "search_noun": "producto"
+            "search_noun": "producto",
+            "image_asset": "xmas-tamales-sm.jpg"
           }
         },
         "e": {
           "type": "category",
           "settings": {
             "collection": "especias-navidenas",
-            "title": "Especias",
+            "title": "Condimentos",
             "icon": "mortar",
-            "search_noun": "especia"
+            "search_noun": "especia",
+            "image_asset": "xmas-condimentos-sm.jpg"
           }
         }
       },
