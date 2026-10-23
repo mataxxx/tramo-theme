@@ -5,6 +5,7 @@
     "cashback_enabled": false,
     "show_pay_methods": false,
     "require_pay_choice": false,
-    "quick_show_ask": false
+    "quick_show_ask": false,
+    "show_accounts": false
   }
 }

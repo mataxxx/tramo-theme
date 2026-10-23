@@ -54,7 +54,7 @@
         "brand_note": "Desde 1946",
         "menu": "",
         "sticky": true,
-        "show_likes": true
+        "show_likes": false
       }
     }
   },
