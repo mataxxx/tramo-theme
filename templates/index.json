@@ -109,7 +109,8 @@
             "icon": "mortar",
             "search_noun": "especia",
             "image_asset": "xmas-condimentos-sm.jpg"
-          }
+          },
+          "disabled": true
         }
       },
       "block_order": [
@@ -149,7 +150,8 @@
         "collection": "especias-navidenas",
         "heading": "Especias para la pierna y más",
         "search_noun": "especia"
-      }
+      },
+      "disabled": true
     }
   },
   "order": [

@@ -50,7 +50,8 @@
             "collection": "especias-navidenas",
             "title": "Condimentos",
             "search_noun": "especia"
-          }
+          },
+          "disabled": true
         }
       },
       "block_order": [
