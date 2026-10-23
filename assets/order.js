@@ -55,7 +55,7 @@
     $('[data-order-next-label]', M).textContent = 'Continuar';
     $('[data-order-body]', M).scrollTop = 0;
     if (page === 3 && mode === 'delivery') initMap();
-    if (page === 4) renderReview();
+    if (page === 4) { var py = $('[data-order-payer]', M); if (py && !py.value) py.value = $('[data-order-name]', M).value.trim(); renderReview(); }
     if (page === 2) setTimeout(function () { var n = $('[data-order-name]', M); if (!n.value) n.focus(); }, 320);
     validate();
   }
@@ -63,7 +63,7 @@
     if (n === 1) return !!(cart && cart.item_count);
     if (n === 2) return $('[data-order-name]', M).value.trim().length > 1 && digits($('[data-order-phone]', M).value).length >= 8;
     if (n === 3) return !!mode && (mode === 'pickup' || !!loc);
-    if (n === 4) return !wantsFE() || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim()));
+    if (n === 4) return ($('[data-order-payer]', M).value.trim().length > 2) && (!wantsFE() || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim())));
     return true;
   }
   function renderReview() {
@@ -86,6 +86,7 @@
     }).join('');
     var t = money(cart.total_price);
     $('[data-order-subtotal]', M).textContent = t;
+    $$('[data-order-amount]', M).forEach(function (el) { el.textContent = t; });
   }
 
   /* ---------- modo de entrega ---------- */
@@ -95,7 +96,7 @@
     $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
     var pt = $('[data-order-paytext]', M);
     if (pt) pt.innerHTML = m === 'pickup'
-      ? 'Pagas por <b>SINPE Móvil</b> antes de retirar' + (D.sinpe ? ': <b>' + esc(D.sinpe) + '</b>' + (D.sinpeName ? ' a nombre de ' + esc(D.sinpeName) : '') : '') + '. Envíanos el comprobante por WhatsApp; confirmaremos tu pago y te contactaremos para coordinar el retiro.'
+      ? 'Deposita <b>' + (cart ? money(cart.total_price) : 'el total') + '</b> por <b>SINPE Móvil</b>' + (D.sinpe ? ' al <b>' + esc(D.sinpe) + '</b>' + (D.sinpeName ? ' a nombre de ' + esc(D.sinpeName) : '') : '') + '. El sistema confirmará tu SINPE y te contactaremos por WhatsApp para coordinar el retiro.'
       : 'Te enviaremos por WhatsApp el <b>monto total</b> (productos + Uber Flash). Pagas por <b>SINPE Móvil</b>; al confirmar tu pago te contactamos para coordinar el envío.';
     if (m === 'delivery') { initMap(); if (!gotAuto && !loc) { gotAuto = true; locate($('[data-order-locate]', M), true); } }
     validate();
@@ -241,8 +242,10 @@
     } else {
       L1.push('*Factura electrónica:* No');
     }
-    if (mode === 'pickup') L1.push('', '*Pago:* SINPE Móvil' + (D.sinpe ? ' al ' + D.sinpe + (D.sinpeName ? ' (' + D.sinpeName + ')' : '') : '') + ' por ' + money(cart.total_price) + '. Te envío el comprobante.');
-    else L1.push('', '*Pago:* SINPE Móvil. Quedo atento a los datos, el costo del envío y el total.');
+    var payer = ($('[data-order-payer]', M) || {}).value; payer = payer ? payer.trim() : '';
+    if (mode === 'pickup') L1.push('', '*Pago:* SINPE Móvil' + (D.sinpe ? ' al ' + D.sinpe + (D.sinpeName ? ' (' + D.sinpeName + ')' : '') : '') + ' por ' + money(cart.total_price) + '.');
+    else L1.push('', '*Pago:* SINPE Móvil. Quedo atento al costo del envío y el total.');
+    if (payer) L1.push('*SINPE a nombre de:* ' + payer);
     return L1.join('\n');
   }
   function send() {
@@ -257,7 +260,7 @@
     else { var w = null; try { w = window.open(url, '_blank'); if (w) { try { w.opener = null; } catch (e2) {} } } catch (e) {} if (!w) setTimeout(function () { location.href = url; }, 300); }
     $('[data-order-code]', M).textContent = c;
     $('[data-order-done-text]', M).textContent = mode === 'pickup'
-      ? 'Solo falta tocar Enviar en WhatsApp. Deposita ' + money(cart.total_price) + (D.sinpe ? ' al SINPE ' + D.sinpe + (D.sinpeName ? ' a nombre de ' + D.sinpeName : '') : '') + ' y envíanos el comprobante. Confirmaremos tu pago y te contactaremos por WhatsApp para coordinar el retiro.'
+      ? 'Solo falta tocar Enviar en WhatsApp. Deposita ' + money(cart.total_price) + (D.sinpe ? ' al SINPE ' + D.sinpe + (D.sinpeName ? ' a nombre de ' + D.sinpeName : '') : '') + '. No necesitas enviar comprobante: el sistema confirmará tu SINPE y te contactaremos por WhatsApp para coordinar el retiro.'
       : 'Solo falta tocar Enviar en WhatsApp. Te enviaremos por WhatsApp el monto total (productos + Uber Flash). Cuando confirmemos tu pago, te contactamos para coordinar el envío.';
     var rs = $('[data-order-resend]', M); rs.href = url; if (mobile) rs.removeAttribute('target');
     show('done');
