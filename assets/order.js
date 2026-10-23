@@ -96,8 +96,8 @@
     $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
     var pt = $('[data-order-paytext]', M);
     if (pt) pt.innerHTML = m === 'pickup'
-      ? 'Pagas al recoger en el local: <b>efectivo, SINPE Móvil o tarjeta</b>.'
-      : 'Pagas por <b>SINPE Móvil</b>. Te pasamos los datos, el costo del envío y el total por WhatsApp.';
+      ? 'Pagas por <b>SINPE Móvil</b> antes de retirar. Te pasamos los datos y el total por WhatsApp.'
+      : 'Pagas por <b>SINPE Móvil</b> antes del envío. Te pasamos los datos, el costo del Uber Flash y el total por WhatsApp.';
     if (m === 'delivery') { initMap(); if (!gotAuto && !loc) { gotAuto = true; locate($('[data-order-locate]', M), true); } }
     validate();
   }
@@ -242,7 +242,7 @@
     } else {
       L1.push('*Factura electrónica:* No');
     }
-    if (mode === 'pickup') L1.push('', '*Pago:* En el local (efectivo, SINPE o tarjeta).');
+    if (mode === 'pickup') L1.push('', '*Pago:* SINPE Móvil antes de retirar. Quedo atento a los datos y el total.');
     else L1.push('', '*Pago:* SINPE Móvil. Quedo atento a los datos, el costo del envío y el total.');
     return L1.join('\n');
   }
@@ -256,7 +256,7 @@
     if (!w) setTimeout(function () { location.href = url; }, 900);
     $('[data-order-code]', M).textContent = c;
     $('[data-order-done-text]', M).textContent = mode === 'pickup'
-      ? 'Solo falta tocar Enviar en WhatsApp. Te mandamos la ubicación exacta del local y te avisamos cuando esté listo. Ahí pagas en efectivo, SINPE o tarjeta.'
+      ? 'Solo falta tocar Enviar en WhatsApp. Te pasamos los datos de SINPE y el total; cuando pagues, te mandamos la ubicación exacta del local y te avisamos cuando esté listo.'
       : 'Solo falta tocar Enviar en WhatsApp. Te respondemos con el costo del Uber Flash, el total y los datos de SINPE.';
     $('[data-order-resend]', M).href = url;
     show('done');

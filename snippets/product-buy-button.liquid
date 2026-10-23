@@ -13,6 +13,9 @@
   <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id {% unless current_variant.available %}disabled{% endunless %}>
   <input type="hidden" name="quantity" value="1" data-quantity-field>
   {% render 'product-spice', product: product %}
+  {%- if settings.order_mode -%}
+    <p class="pay-order">{% render 'icon', name: 'phone' %}<span>Paga por <b>SINPE Móvil</b> y retira en el <b>Mercado Central</b>, o coordina el envío por <b>Uber Flash</b>.</span></p>
+  {%- endif -%}
   <button
     type="submit"
     class="button button--full"
@@ -30,7 +33,7 @@
   </button>
   <p class="form-error" data-form-error role="alert" hidden></p>
 {% endform %}
-{% render 'pay-methods', mode: 'sentence' %}
+{%- unless settings.order_mode -%}{% render 'pay-methods', mode: 'sentence' %}{%- endunless -%}
 {% render 'sticky-pay' %}
 <div class="trust-bar trust-bar--sticky" data-sticky-trust hidden>
   <ul class="trust-bar__list" role="list">

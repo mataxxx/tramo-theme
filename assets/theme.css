@@ -2485,3 +2485,7 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .bottom-nav:not(:has(> .bottom-nav__item:nth-child(2))) > .bottom-nav__item { flex: 0 0 auto; min-width: 96px; }
 }
 @media (max-width: 749px) { body.no-accounts .site-header > .header__help { display: grid !important; place-items: center; } }
+
+/* Ronda 92: aviso de pago/entrega arriba del botón de compra (modo pedidos) */
+.pay-order { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 12px; padding: 11px 13px; border-radius: 12px; background: #f1f5ec; border: 1px solid #d9e5cf; font-size: 14.5px; line-height: 1.4; color: var(--color-text, #1f2a1e); }
+.pay-order .icon { flex: 0 0 20px; width: 20px; height: 20px; color: var(--color-primary); margin-top: 1px; }
