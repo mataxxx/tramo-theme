@@ -289,10 +289,11 @@
       });
   }
 
-  function roundToUnit(grams) {
+  function roundToUnit(grams, min) {
     var unit = BULK.unit || 10;
-    var value = Math.round((parseInt(grams, 10) || BULK.min) / unit) * unit;
-    return Math.max(BULK.min, value);
+    min = parseInt(min, 10) || BULK.min;
+    var value = Math.round((parseInt(grams, 10) || min) / unit) * unit;
+    return Math.max(min, value);
   }
 
   function handleLineEvent(event) {
@@ -312,11 +313,11 @@
       if (btn.hasAttribute('data-line-bulk-minus') || btn.hasAttribute('data-line-bulk-plus')) {
         var current = parseInt(gramsInput.value, 10) || BULK.min;
         var next = btn.hasAttribute('data-line-bulk-plus') ? current + BULK.step : current - BULK.step;
-        changeLine(lineEl, roundToUnit(next) / BULK.unit);
+        changeLine(lineEl, roundToUnit(next, gramsInput.min) / BULK.unit);
         return true;
       }
     } else if (event.type === 'change') {
-      if (isBulk && target === gramsInput) { changeLine(lineEl, roundToUnit(gramsInput.value) / BULK.unit); return true; }
+      if (isBulk && target === gramsInput) { changeLine(lineEl, roundToUnit(gramsInput.value, gramsInput.min) / BULK.unit); return true; }
       if (!isBulk && target === qtyInput) { changeLine(lineEl, Math.max(0, parseInt(qtyInput.value, 10) || 0)); return true; }
     }
     return false;
@@ -447,7 +448,7 @@
 
     function currentQuantity(variant) {
       if (variant && variant.bulk) {
-        var grams = roundToUnit(bulkInput ? bulkInput.value : BULK.min);
+        var grams = roundToUnit(bulkInput ? bulkInput.value : BULK.min, bulkInput && bulkInput.min);
         return grams / BULK.unit;
       }
       return Math.max(1, parseInt(qtyInput ? qtyInput.value : 1, 10) || 1);
@@ -517,7 +518,7 @@
         qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) || 1);
         update(false);
       } else if (event.target === bulkInput) {
-        bulkInput.value = roundToUnit(bulkInput.value);
+        bulkInput.value = roundToUnit(bulkInput.value, bulkInput.min);
         update(false);
       }
     });
@@ -530,9 +531,9 @@
       } else if (btn.hasAttribute('data-qty-plus')) {
         qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1; update(false);
       } else if (btn.hasAttribute('data-bulk-minus')) {
-        bulkInput.value = roundToUnit((parseInt(bulkInput.value, 10) || BULK.min) - BULK.step); update(false);
+        bulkInput.value = roundToUnit((parseInt(bulkInput.value, 10) || BULK.min) - BULK.step, bulkInput.min); update(false);
       } else if (btn.hasAttribute('data-bulk-plus')) {
-        bulkInput.value = roundToUnit((parseInt(bulkInput.value, 10) || BULK.min) + BULK.step); update(false);
+        bulkInput.value = roundToUnit((parseInt(bulkInput.value, 10) || BULK.min) + BULK.step, bulkInput.min); update(false);
       } else if (btn.hasAttribute('data-thumb')) {
         var strip = $('[data-gallery-strip]', root);
         var slides = strip ? Array.prototype.slice.call(strip.children) : [];
