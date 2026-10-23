@@ -251,13 +251,15 @@
     var c = code(), url = 'https://wa.me/' + D.wa + '?text=' + encodeURIComponent(message(c));
     try { localStorage.setItem(LS, JSON.stringify({ n: $('[data-order-name]', M).value.trim(), p: $('[data-order-phone]', M).value.trim() })); } catch (e) {}
     last = { code: c, url: url, mode: mode };
-    var w = null; try { w = window.open(url, '_blank'); if (w) w.opener = null; } catch (e) {}
-    if (!w) setTimeout(function () { location.href = url; }, 900);
+    /* Celular: abrir WhatsApp en la misma pestaña (la app se abre sola). Computadora: pestaña nueva (WhatsApp Web). */
+    var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+    if (mobile) { setTimeout(function () { location.href = url; }, 60); }
+    else { var w = null; try { w = window.open(url, '_blank', 'noopener'); } catch (e) {} if (!w) setTimeout(function () { location.href = url; }, 300); }
     $('[data-order-code]', M).textContent = c;
     $('[data-order-done-text]', M).textContent = mode === 'pickup'
       ? 'Solo falta tocar Enviar en WhatsApp. Deposita ' + money(cart.total_price) + (D.sinpe ? ' al SINPE ' + D.sinpe + (D.sinpeName ? ' a nombre de ' + D.sinpeName : '') : '') + ' y envíanos el comprobante. Te mandamos la ubicación exacta del local y te avisamos cuando esté listo.'
       : 'Solo falta tocar Enviar en WhatsApp. Te respondemos con el costo del Uber Flash, el total y los datos de SINPE.';
-    $('[data-order-resend]', M).href = url;
+    var rs = $('[data-order-resend]', M); rs.href = url; if (mobile) rs.removeAttribute('target');
     show('done');
     fetch('/cart/clear.js', { method: 'POST', headers: { Accept: 'application/json' } })
       .then(function () { document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { silent: true } })); })
