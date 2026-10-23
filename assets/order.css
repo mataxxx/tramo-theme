@@ -148,3 +148,11 @@
 .ord-next .icon { width: 18px; height: 18px; }
 .ord-next:disabled { opacity: .45; cursor: not-allowed; }
 .ord-next { background: var(--color-primary, #263d25); border-color: var(--color-primary, #263d25); color: #fff; }
+
+/* Datos de SINPE para retiro */
+.ord-sinpe-box { margin-bottom: 10px; padding: 12px 14px; border-radius: 14px; background: #f1f5ec; border: 1px solid #d9e5cf; display: grid; gap: 6px; justify-items: start; }
+.ord-sinpe-box p { margin: 0; font-size: 14px; }
+.ord-sinpe-box__num { display: grid; }
+.ord-sinpe-box__num b { font-size: 22px; letter-spacing: .5px; color: var(--color-primary, #263d25); }
+.ord-sinpe-box__num small { font-size: 13px; font-weight: 600; color: #444; text-transform: uppercase; letter-spacing: .3px; }
+.ord-sinpe-box__hint { color: #666; font-size: 13px !important; }
