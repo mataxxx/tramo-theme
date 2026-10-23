@@ -79,7 +79,7 @@
     </script>
   </head>
 
-  <body class="template-{{ template.name | handleize }}">
+  <body class="template-{{ template.name | handleize }}{% if settings.show_accounts == false %} no-accounts{% endif %}">
     <a class="skip-link" href="#MainContent">{{ 'general.skip_to_content' | t }}</a>
 
     {% sections 'header-group' %}
@@ -93,7 +93,7 @@
 
     {% render 'quick-view-sheet' %}
     {% render 'cart-added-popup' %}
-    {% render 'login-popup' %}
+    {%- unless settings.show_accounts == false -%}{% render 'login-popup' %}{%- endunless -%}
     {% render 'quick-choice' %}
     {% render 'category-modal' %}
     {% render 'blog-modal' %}

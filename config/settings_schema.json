@@ -719,6 +719,12 @@
         "default": false
       },
       {
+        "type": "checkbox",
+        "id": "show_accounts",
+        "label": "Mostrar cuentas de cliente (iniciar sesión y favoritos)",
+        "default": true
+      },
+      {
         "type": "text",
         "id": "order_whatsapp",
         "label": "WhatsApp de la tienda",
@@ -740,7 +746,7 @@
         "type": "textarea",
         "id": "order_pickup_note",
         "label": "Nota de retiro",
-        "default": "Te enviamos por WhatsApp la ubicación exacta de nuestro local en el Mercado Central y te avisamos cuando tu pedido esté listo para recoger."
+        "default": "Te enviamos por WhatsApp la ubicación exacta de nuestro local en el Mercado Central y te avisamos cuando tu pedido esté listo. En el local puedes pagar en efectivo, SINPE Móvil o tarjeta."
       },
       {
         "type": "text",
