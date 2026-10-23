@@ -36,7 +36,7 @@
 
     var byId = {};
     data.spices.forEach(function (s) { byId[s.id] = s; });
-    var st = { step: 1, model: null, slots: [], active: 0, tab: 'classic', q: '' };
+    var st = { step: 1, model: null, slots: [], active: 0, tab: 'classic', q: '', multi: false, sel: [], cap: 0 };
 
     var bar = $('[data-rb-bar]', root), label = $('[data-rb-steplabel]', root), footer = $('[data-rb-footer]', root);
     var totalEl = $('[data-rb-total]', root), countEl = $('[data-rb-count]', root), next = $('[data-rb-next]', root);
@@ -146,8 +146,13 @@
       var grid = $('[data-rb-grid]', root);
       if (!list.length) { grid.innerHTML = '<p class="rb__empty">' + (q ? 'No encontramos esa especia.' : 'Pronto agregamos opciones aquí.') + '</p>'; return; }
       grid.innerHTML = list.map(function (s) {
-        var cur = st.slots[st.active] === s.id;
-        return '<button type="button" class="rb-opt' + (cur ? ' is-on' : '') + '" data-rb-pick="' + s.id + '"><span class="rb-opt__jar rb-jar is-full">' + jarHTML(s) + '</span><b>' + esc(s.title) + '</b>' +
+        var k = st.multi ? st.sel.indexOf(s.id) : -1;
+        var cur = st.multi ? k > -1 : st.slots[st.active] === s.id;
+        var inRack = inRackCount(s.id);
+        return '<button type="button" class="rb-opt' + (cur ? ' is-on' : '') + '" data-rb-pick="' + s.id + '" aria-pressed="' + (cur ? 'true' : 'false') + '">' +
+          (k > -1 ? '<em class="rb-opt__n">' + (k + 1) + '</em>' : '') +
+          (inRack ? '<em class="rb-opt__have" title="Ya está en tu especiero">' + (inRack > 1 ? '×' + inRack : '✓') + '</em>' : '') +
+          '<span class="rb-opt__jar rb-jar is-full">' + jarHTML(s) + '</span><b>' + esc(s.title) + '</b>' +
           '<small>' + (s.group === 'classic' ? 'Incluida' : '+' + money(data.extra.price)) + (s.hot ? ' · 🌶' : '') + '</small></button>';
       }).join('');
     }
@@ -159,8 +164,13 @@
     function openPicker(i) {
       st.active = i; st.q = '';
       $('[data-rb-search]', root).value = '';
-      $('[data-rb-pick-title]', root).textContent = 'Frasco ' + (i + 1) + ' de ' + st.model.slots;
       var cur = st.slots[i] && byId[st.slots[i]];
+      st.multi = !cur; st.sel = [];
+      st.cap = st.slots.filter(function (x) { return !x; }).length;
+      $('[data-rb-pick-title]', root).textContent = st.multi
+        ? (st.cap > 1 ? 'Elige hasta ' + st.cap + ' especias' : 'Elige 1 especia')
+        : 'Cambiar frasco ' + (i + 1);
+      updatePickFoot();
       var rm = $('[data-rb-remove]', root); if (rm) rm.hidden = !cur;
       setTab(cur ? cur.group : st.tab);
       picker.hidden = false;
@@ -170,7 +180,53 @@
       picker.classList.remove('is-open');
       setTimeout(function () { picker.hidden = true; }, 220);
     }
+    function inRackCount(id) {
+      var n = 0; st.slots.forEach(function (x, i) { if (x === id && !(!st.multi && i === st.active)) n++; }); return n;
+    }
+    function updatePickFoot() {
+      var f = $('[data-rb-pick-foot]', root); if (!f) return;
+      f.hidden = !st.multi;
+      if (!st.multi) return;
+      var n = st.sel.length;
+      $('[data-rb-pick-count]', root).innerHTML = '<b>' + n + '</b> de ' + st.cap + ' frascos';
+      var d = $('[data-rb-pick-done]', root);
+      d.disabled = n === 0;
+      d.textContent = n ? 'Llenar ' + n + (n === 1 ? ' frasco' : ' frascos') : 'Listo';
+    }
+    var toastEl, toastT;
+    function toast(msg) {
+      if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'rb-toast'; toastEl.setAttribute('role', 'status'); toastEl.setAttribute('aria-live', 'polite'); document.body.appendChild(toastEl); }
+      toastEl.innerHTML = msg;
+      toastEl.classList.remove('is-on'); void toastEl.offsetWidth; toastEl.classList.add('is-on');
+      clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('is-on'); }, 2200);
+    }
+    function togglePick(id) {
+      id = Number(id);
+      var k = st.sel.indexOf(id);
+      if (k > -1) { st.sel.splice(k, 1); }
+      else {
+        if (st.sel.length >= st.cap) { toast(st.cap === 1 ? 'Solo queda 1 frasco libre. Toca la elegida para quitarla.' : 'Ya elegiste los ' + st.cap + ' frascos libres. Toca una elegida para quitarla.'); return; }
+        st.sel.push(id);
+        var n = inRackCount(id);
+        if (n) toast('<b>' + esc(byId[id].title) + '</b> ya está en tu especiero' + (n > 1 ? ' (' + n + ' frascos)' : '') + '. Se va a repetir.');
+      }
+      renderGrid(); updatePickFoot();
+    }
+    function fillSelected() {
+      if (!st.sel.length) return;
+      var order = [], n = st.slots.length;
+      for (var j = 0; j < n; j++) { var idx = (st.active + j) % n; if (!st.slots[idx]) order.push(idx); }
+      var first = null, cnt = Math.min(st.sel.length, order.length);
+      st.sel.forEach(function (id, k) { if (order[k] != null) { st.slots[order[k]] = id; if (first == null) first = order[k]; } });
+      var nx = st.slots.indexOf(null); st.active = nx > -1 ? nx : 0;
+      st.sel = [];
+      closePicker(); renderSlots();
+      order.slice(0, cnt).forEach(function (i) { var el = $('[data-rb-slot="' + i + '"]', root); if (el && st.slots[i]) el.classList.add('is-pop'); });
+    }
     function choose(id) {
+      if (st.multi) { togglePick(id); return; }
+      var dup = inRackCount(Number(id));
+      if (dup && st.slots[st.active] !== Number(id)) toast('<b>' + esc(byId[id].title) + '</b> ya está en tu especiero. Se va a repetir.');
       st.slots[st.active] = Number(id);
       var nx = st.slots.indexOf(null);
       st.active = nx > -1 ? nx : st.active;
@@ -226,6 +282,7 @@
       var m = t.closest('[data-rb-model]'); if (m) { pickModel(m.getAttribute('data-rb-model')); return; }
       var g = t.closest('[data-rb-go]'); if (g) { go(Number(g.getAttribute('data-rb-go'))); return; }
       var sl = t.closest('[data-rb-slot]'); if (sl) { openPicker(Number(sl.getAttribute('data-rb-slot'))); return; }
+      if (t.closest('[data-rb-pick-done]')) { fillSelected(); return; }
       if (t.closest('[data-rb-pick-close]')) { closePicker(); return; }
       var tb = t.closest('[data-rb-tab]'); if (tb) { st.q = ''; $('[data-rb-search]', root).value = ''; setTab(tb.getAttribute('data-rb-tab')); return; }
       var pk = t.closest('[data-rb-pick]'); if (pk) { choose(pk.getAttribute('data-rb-pick')); return; }
