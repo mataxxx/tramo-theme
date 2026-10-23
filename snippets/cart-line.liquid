@@ -3,7 +3,7 @@
 {%- endcomment -%}
 {%- liquid
   assign bulk_unit = settings.bulk_unit_grams | default: 10
-  assign bulk_min = settings.bulk_min_grams | default: 250
+  assign bulk_min = item.product.metafields.custom.granel_min.value | default: settings.bulk_min_grams | default: 250
   assign is_bulk = false
   if item.variant.options contains settings.bulk_variant_name
     assign is_bulk = true
