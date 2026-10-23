@@ -17,22 +17,37 @@
       <h2 id="OrdTitle" data-order-title>Finalizar pedido</h2>
       <button type="button" class="ord__x" data-order-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
     </header>
+    <div class="ord-prog" data-order-prog>
+      <div class="ord-prog__bar"><i data-order-prog-fill></i></div>
+      <ol class="ord-prog__steps">
+        <li data-order-dot="1"><span>1</span>Pedido</li>
+        <li data-order-dot="2"><span>2</span>Datos</li>
+        <li data-order-dot="3"><span>3</span>Entrega</li>
+        <li data-order-dot="4"><span>4</span>Factura</li>
+      </ol>
+    </div>
 
     <div class="ord__body" data-order-body>
       {%- comment -%} Paso 1: resumen, datos y entrega {%- endcomment -%}
       <div class="ord__step" data-order-step="form">
+        <div class="ord-page" data-order-page="1">
         <div class="ord-box">
           <h3 class="ord-h">Tu pedido</h3>
           <ul class="ord-lines" data-order-lines></ul>
           <div class="ord-sub"><span>Subtotal</span><b data-order-subtotal></b></div>
         </div>
-
-        <div class="ord-box">
-          <h3 class="ord-h">Tus datos</h3>
-          <label class="ord-field"><span>Nombre</span><input type="text" data-order-name autocomplete="name" required placeholder="¿A nombre de quién?"></label>
-          <label class="ord-field"><span>Teléfono / WhatsApp</span><input type="tel" data-order-phone autocomplete="tel" inputmode="tel" required placeholder="8888-8888"></label>
         </div>
 
+        <div class="ord-page" data-order-page="2" hidden>
+        <div class="ord-box">
+          <h3 class="ord-h">¿A nombre de quién?</h3>
+          <label class="ord-field"><span>Nombre</span><input type="text" data-order-name autocomplete="name" required placeholder="¿A nombre de quién?"></label>
+          <label class="ord-field"><span>Teléfono / WhatsApp</span><input type="tel" data-order-phone autocomplete="tel" inputmode="tel" required placeholder="8888-8888"></label>
+          <p class="ord-tip">Te escribimos a este número para confirmar tu pedido.</p>
+        </div>
+        </div>
+
+        <div class="ord-page" data-order-page="3" hidden>
         <div class="ord-box">
           <h3 class="ord-h">¿Cómo lo recibes?</h3>
           <div class="ord-opts" role="radiogroup">
@@ -69,7 +84,9 @@
             <p class="ord-note">{{ settings.order_delivery_note }}</p>
           </div>
         </div>
+        </div>
 
+        <div class="ord-page" data-order-page="4" hidden>
         <div class="ord-box">
           <h3 class="ord-h">¿Deseas factura electrónica?</h3>
           <div class="ord-yn" role="radiogroup">
@@ -91,7 +108,9 @@
           </div>
         </div>
 
+        <div class="ord-box ord-review" data-order-review></div>
         <p class="ord-paynote">{% render 'icon', name: 'phone' %}<span data-order-paytext>Si recoges en el local, pagas ahí en <b>efectivo, SINPE Móvil o tarjeta</b>. Si es envío, pagas por <b>SINPE Móvil</b> y te pasamos los datos y el total por WhatsApp.</span></p>
+        </div>
         <p class="ord-err" data-order-err role="alert" hidden></p>
       </div>
 
@@ -106,8 +125,9 @@
     </div>
 
     <footer class="ord__foot" data-order-foot>
-      <div class="ord__sum"><small>Subtotal</small><b data-order-total2></b></div>
-      <button type="button" class="button ord-send" data-order-send disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.4L3 21Z"/></svg><span data-order-send-label>Enviar pedido por WhatsApp</span></button>
+      <button type="button" class="ord-backbtn" data-order-prev hidden>{% render 'icon', name: 'arrow-left' %}<span>Atrás</span></button>
+      <button type="button" class="button ord-next" data-order-next disabled><span data-order-next-label>Continuar</span>{% render 'icon', name: 'chevron-right' %}</button>
+      <button type="button" class="button ord-send" data-order-send disabled hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.4L3 21Z"/></svg><span data-order-send-label>Enviar pedido por WhatsApp</span></button>
     </footer>
   </section>
 </div>
