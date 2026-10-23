@@ -4,45 +4,61 @@
 {%- endstyle -%}
 
 {%- liquid
-  assign speed = section.settings.speed | default: 4
-  assign duration = 11 | minus: speed | times: 7
+  assign hold = section.settings.hold | default: 4
   assign classes = 'announcement'
-  if section.settings.animate
-    assign classes = classes | append: ' announcement--animated'
-  else
-    assign classes = classes | append: ' announcement--static'
+  if section.settings.animate and section.blocks.size > 1
+    assign classes = classes | append: ' announcement--rotate'
   endif
   if section.settings.direction == 'right'
     assign classes = classes | append: ' announcement--right'
-  endif
-  if section.settings.pause_on_hover
-    assign classes = classes | append: ' announcement--pause'
   endif
 -%}
 
 {%- if section.blocks.size > 0 -%}
   <div
     class="{{ classes }}"
-    style="--announce-duration: {{ duration }}s; --announce-bg: {{ section.settings.bg_color }};"
+    style="--announce-bg: {{ section.settings.bg_color }};"
+    data-announcement
+    data-hold="{{ hold }}"
+    {% if section.settings.pause_on_hover %}data-pause{% endif %}
     role="region"
     aria-label="Anuncio"
   >
-    <div class="announcement__track">
-      {%- for round in (1..2) -%}
-        <ul class="announcement__group" role="list"{% if round == 2 %} aria-hidden="true"{% endif %}>
-          {%- for block in section.blocks -%}
-            <li class="announcement__item"{% if round == 1 %} {{ block.shopify_attributes }}{% endif %}>
-              {%- if block.settings.link != blank -%}
-                <a href="{{ block.settings.link }}"{% if round == 2 %} tabindex="-1"{% endif %}>{{ block.settings.text }}</a>
-              {%- else -%}
-                {{ block.settings.text }}
-              {%- endif -%}
-            </li>
-          {%- endfor -%}
-        </ul>
+    <ul class="announcement__list" role="list">
+      {%- for block in section.blocks -%}
+        <li class="announcement__item{% if forloop.first %} is-active{% endif %}" {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}">{{ block.settings.text }}</a>
+          {%- else -%}
+            {{ block.settings.text }}
+          {%- endif -%}
+        </li>
       {%- endfor -%}
-    </div>
+    </ul>
   </div>
+  <script>
+    (function () {
+      var bar = document.querySelector('#shopify-section-{{ section.id }} [data-announcement]');
+      if (!bar || !bar.classList.contains('announcement--rotate')) return;
+      var items = bar.querySelectorAll('.announcement__item');
+      var hold = (parseFloat(bar.dataset.hold) || 4) * 1000;
+      var i = 0, paused = false;
+      if (bar.hasAttribute('data-pause')) {
+        bar.addEventListener('mouseenter', function () { paused = true; });
+        bar.addEventListener('mouseleave', function () { paused = false; });
+      }
+      setInterval(function () {
+        if (paused || document.hidden) return;
+        var cur = items[i];
+        i = (i + 1) % items.length;
+        var next = items[i];
+        cur.classList.remove('is-active');
+        cur.classList.add('is-leaving');
+        next.classList.add('is-active');
+        setTimeout(function () { cur.classList.remove('is-leaving'); }, 700);
+      }, hold + 700);
+    })();
+  </script>
 {%- endif -%}
 
 {% schema %}
@@ -62,23 +78,23 @@
     {
       "type": "checkbox",
       "id": "animate",
-      "label": "Mover el texto hacia el lado",
+      "label": "Cambiar entre mensajes",
       "default": true
     },
     {
       "type": "range",
-      "id": "speed",
-      "label": "Velocidad",
-      "min": 1,
+      "id": "hold",
+      "label": "Segundos que se queda cada mensaje",
+      "min": 2,
       "max": 10,
       "step": 1,
-      "default": 4,
-      "info": "1 = lenta, 10 = rápida"
+      "unit": "s",
+      "default": 4
     },
     {
       "type": "select",
       "id": "direction",
-      "label": "Dirección",
+      "label": "Hacia dónde sale el mensaje",
       "options": [
         {
           "value": "left",
@@ -159,7 +175,7 @@
           "type": "text",
           "id": "text",
           "label": "Texto",
-          "default": "Envíos a todo el país"
+          "default": "Envíos a todo Costa Rica"
         },
         {
           "type": "url",

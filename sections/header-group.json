@@ -17,13 +17,13 @@
         "m1": {
           "type": "message",
           "settings": {
-            "text": "Envíos a todo el país"
+            "text": "Envíos a todo Costa Rica"
           }
         },
         "m2": {
           "type": "message",
           "settings": {
-            "text": "Especias y sabores desde 1946"
+            "text": "Desde 1946"
           }
         }
       },
@@ -33,7 +33,7 @@
       ],
       "settings": {
         "animate": true,
-        "speed": 4,
+        "hold": 4,
         "direction": "left",
         "pause_on_hover": true,
         "bg_color": "#263d25"

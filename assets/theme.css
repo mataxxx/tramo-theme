@@ -98,22 +98,19 @@ ul[role="list"], .reset-list { list-style: none; margin: 0; padding: 0; }
 
 /* Anuncio y encabezado --------------------------------------------------- */
 .announcement { background: var(--announce-bg, var(--color-primary)); color: var(--color-on-primary); font-size: 13px; overflow: hidden; }
-.announcement__track { display: flex; width: max-content; }
-.announcement__group { display: flex; flex-shrink: 0; min-width: 100vw; justify-content: space-around; align-items: center; margin: 0; padding: 9px 0; list-style: none; }
-.announcement__item { padding: 0 40px; white-space: nowrap; }
+.announcement__list { position: relative; display: grid; margin: 0; padding: 9px 16px; list-style: none; text-align: center; }
+.announcement__item { grid-area: 1 / 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .announcement__item a { text-decoration: none; }
 .announcement__item a:hover { text-decoration: underline; }
-.announcement--animated .announcement__track { animation: announce-scroll var(--announce-duration, 30s) linear infinite; }
-.announcement--right .announcement__track { animation-direction: reverse; }
-.announcement--pause:hover .announcement__track { animation-play-state: paused; }
-.announcement--static .announcement__track { width: 100%; justify-content: center; }
-.announcement--static .announcement__group { min-width: 0; }
-.announcement--static .announcement__group[aria-hidden="true"] { display: none; }
-@keyframes announce-scroll { to { transform: translateX(-50%); } }
+.announcement--rotate .announcement__item { opacity: 0; transform: translateX(36px); transition: opacity .6s ease, transform .6s ease; pointer-events: none; }
+.announcement--rotate .announcement__item.is-active { opacity: 1; transform: none; transition-delay: .35s; pointer-events: auto; }
+.announcement--rotate .announcement__item.is-leaving { opacity: 0; transform: translateX(-36px); transition-delay: 0s; }
+.announcement--right .announcement__item { transform: translateX(-36px); }
+.announcement--right .announcement__item.is-leaving { transform: translateX(36px); }
+.announcement:not(.announcement--rotate) .announcement__item:not(:first-child) { display: none; }
 @media (prefers-reduced-motion: reduce) {
-  .announcement--animated .announcement__track { animation: none; width: 100%; justify-content: center; }
-  .announcement--animated .announcement__group { min-width: 0; }
-  .announcement--animated .announcement__group[aria-hidden="true"] { display: none; }
+  .announcement--rotate .announcement__item,
+  .announcement--rotate .announcement__item.is-leaving { transform: none; }
 }
 
 .site-header {
