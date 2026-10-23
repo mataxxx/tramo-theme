@@ -570,7 +570,7 @@
         var quantity = currentQuantity(variant);
         buyNow.disabled = true;
         addToCart(parseInt(idInput.value, 10), quantity, formProps(form))
-          .then(function () { window.location.href = '/checkout'; })
+          .then(function () { if (window.TramoOrder) { window.TramoOrder.open(); } else { window.location.href = '/checkout'; } })
           .catch(function (error) {
             buyNow.disabled = false;
             if (errorEl) { errorEl.textContent = error.message || 'No se pudo agregar al carrito'; errorEl.hidden = false; }
@@ -1348,7 +1348,7 @@
       if (!choice.id) return;
       choiceBuy.disabled = true;
       addToCart(choice.id, 1)
-        .then(function () { window.location.href = '/checkout'; })
+        .then(function () { if (window.TramoOrder) { window.TramoOrder.open(); } else { window.location.href = '/checkout'; } })
         .catch(function (error) { choiceBuy.disabled = false; showToast(error.message || 'No se pudo agregar al carrito'); });
       return;
     }

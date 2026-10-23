@@ -704,5 +704,79 @@
         "default": "Cada compra suma este porcentaje a tu saldo (sobre los productos, sin envío ni IVA). Con tu saldo generas códigos para pagar en el checkout. No vence."
       }
     ]
+  },
+  {
+    "name": "Pedidos por WhatsApp",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Si lo activas, el carrito no va al pago de Shopify: el cliente elige retiro o envío por Uber Flash, y el pedido llega a tu WhatsApp. Se paga por SINPE Móvil."
+      },
+      {
+        "type": "checkbox",
+        "id": "order_mode",
+        "label": "Recibir pedidos por WhatsApp (sin pago en línea)",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "order_whatsapp",
+        "label": "WhatsApp de la tienda",
+        "info": "Con código de país, solo números. Ej: 50688887777"
+      },
+      {
+        "type": "text",
+        "id": "order_sinpe_number",
+        "label": "Número de SINPE Móvil",
+        "info": "Ej: 8888-7777"
+      },
+      {
+        "type": "text",
+        "id": "order_sinpe_name",
+        "label": "SINPE a nombre de"
+      },
+      {
+        "type": "text",
+        "id": "order_prefix",
+        "label": "Prefijo del número de pedido",
+        "default": "NAV"
+      },
+      {
+        "type": "text",
+        "id": "order_pickup_place",
+        "label": "Lugar de retiro",
+        "default": "Mercado Central de San José · Tramo San Rafael #1"
+      },
+      {
+        "type": "textarea",
+        "id": "order_pickup_note",
+        "label": "Nota de retiro",
+        "default": "Te avisamos por WhatsApp cuando tu pedido esté listo para recoger."
+      },
+      {
+        "type": "text",
+        "id": "order_delivery_label",
+        "label": "Nombre del envío",
+        "default": "Envío por Uber Flash"
+      },
+      {
+        "type": "textarea",
+        "id": "order_delivery_note",
+        "label": "Nota del envío",
+        "default": "Te cotizamos el Uber Flash por WhatsApp y te mandamos el monto total. Pagas por SINPE y lo enviamos."
+      },
+      {
+        "type": "text",
+        "id": "order_map_lat",
+        "label": "Mapa: latitud inicial",
+        "default": "9.9349"
+      },
+      {
+        "type": "text",
+        "id": "order_map_lng",
+        "label": "Mapa: longitud inicial",
+        "default": "-84.0789"
+      }
+    ]
   }
 ]

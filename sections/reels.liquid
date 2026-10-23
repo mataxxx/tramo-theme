@@ -46,7 +46,7 @@
     </div>
     <button type="button" class="float-btn float-btn--video" data-tv-restore hidden aria-label="Mostrar video de Tramo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="13" height="14" rx="2.5"/><path d="m16 10 5-3v10l-5-3"/></svg></button>
   {%- endif -%}
-  {%- if rblog != blank -%}<a class="float-btn float-btn--blog" href="{{ rblog.url }}" aria-label="Recetas y vlog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10a2 2 0 0 1 2 2v14l-4-2-4 2-4-2V6a2 2 0 0 1 2-2Z"/><path d="M9 9h6M9 13h4"/></svg><span>Blog</span></a>{%- endif -%}
+  {%- if rblog != blank and section.settings.show_blog != false -%}<a class="float-btn float-btn--blog" href="{{ rblog.url }}" aria-label="Recetas y vlog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10a2 2 0 0 1 2 2v14l-4-2-4 2-4-2V6a2 2 0 0 1 2-2Z"/><path d="M9 9h6M9 13h4"/></svg><span>Blog</span></a>{%- endif -%}
   <button type="button" class="float-btn float-btn--help" data-open="help" aria-label="Ayuda"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.8M12 17h.01"/></svg><span>Ayuda</span></button>
 </div>
 <script>
@@ -254,7 +254,8 @@
     { "type": "text", "id": "all_label", "label": "Texto del botón \"ver todos\"", "default": "Ver todo en el Blog" },
     { "type": "text", "id": "grid_title", "label": "Título de la cuadrícula", "default": "Todos los videos" },
     { "type": "checkbox", "id": "show_float", "label": "Botón flotante de videos (computadora)", "default": true },
-    { "type": "text", "id": "float_label", "label": "Texto del botón flotante", "default": "Blog" }
+    { "type": "text", "id": "float_label", "label": "Texto del botón flotante", "default": "Blog" },
+    { "type": "checkbox", "id": "show_blog", "label": "Botón flotante del Blog (computadora)", "default": true }
   ],
   "blocks": [
     {
