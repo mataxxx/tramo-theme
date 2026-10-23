@@ -100,3 +100,16 @@
 .ord-wa .icon { width: 18px; height: 18px; }
 .ord-link { border: 0; background: none; font: inherit; font-size: 14px; text-decoration: underline; color: #555; cursor: pointer; padding: 8px; }
 .ord-maphint.is-busy { color: #2f7fd8; font-weight: 600; }
+
+/* Factura electrónica y nota de pago */
+.ord-yn { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ord-yn label { position: relative; cursor: pointer; }
+.ord-yn input { position: absolute; opacity: 0; pointer-events: none; }
+.ord-yn span { display: block; text-align: center; padding: 11px 10px; border: 1.5px solid #e3dccb; border-radius: 12px; font-size: 14.5px; font-weight: 600; transition: border-color .2s, background-color .2s; }
+.ord-yn input:checked + span { border-color: var(--color-primary, #263d25); background: #f1f5ec; color: var(--color-primary, #263d25); }
+.ord-yn input:focus-visible + span { outline: 2px solid var(--color-primary, #263d25); outline-offset: 2px; }
+.ord-fe { margin-top: 12px; }
+.ord-fe[hidden] { display: none; }
+.ord-field select { width: 100%; box-sizing: border-box; border: 1.5px solid #ddd6c6; border-radius: 12px; padding: 11px 12px; font: inherit; font-size: 16px; background: #fffdf8; color: inherit; }
+.ord-paynote { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 12px 14px; border-radius: 14px; background: #f1f5ec; border: 1px solid #d9e5cf; font-size: 15px; line-height: 1.4; }
+.ord-paynote .icon { flex: 0 0 20px; width: 20px; height: 20px; color: var(--color-primary, #263d25); margin-top: 1px; }
