@@ -1,8 +1,10 @@
 <nav class="bottom-nav" aria-label="Navegación rápida">
+  {%- if section.settings.show_help != false -%}
   <button type="button" class="bottom-nav__item" data-open="help">
     {% render 'icon', name: 'help' %}
     <span>{{ section.settings.label_help }}</span>
   </button>
+  {%- endif -%}
   <button type="button" class="bottom-nav__item bottom-nav__search" data-open="search" aria-label="{{ section.settings.label_search | escape }}">
     <span class="bottom-nav__bubble">{% render 'icon', name: 'search' %}</span>
     <span>{{ section.settings.label_search }}</span>
@@ -37,6 +39,7 @@
     { "type": "paragraph", "content": "Solo se muestra en celulares." },
     { "type": "text", "id": "label_home", "label": "Texto: inicio", "default": "Inicio" },
     { "type": "text", "id": "label_search", "label": "Texto: buscar", "default": "Buscar" },
+    { "type": "checkbox", "id": "show_help", "label": "Mostrar botón de ayuda", "default": true },
     { "type": "text", "id": "label_help", "label": "Texto: ayuda", "default": "Ayuda" },
     { "type": "checkbox", "id": "show_float_videos", "label": "Botón flotante de videos (solo computadora)", "default": true },
     { "type": "checkbox", "id": "show_videos", "label": "Mostrar botón de videos", "default": true },

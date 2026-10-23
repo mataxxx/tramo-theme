@@ -39,7 +39,7 @@
 {%- endfor -%}
 <header class="site-header{% if s.sticky %} site-header--sticky{% endif %}{% if s.scroll_shadow %} site-header--shadow{% endif %}{% if s.scroll_shrink %} site-header--shrink{% endif %}" data-site-header>
   {%- if settings.show_accounts == false -%}
-    <span class="header__menu header__user header__user--off" aria-hidden="true"></span>
+    <button type="button" class="icon-button header__menu header__user header__help" data-open="help" aria-label="Ayuda">{% render 'icon', name: 'help' %}</button>
   {%- elsif customer -%}
     <button type="button" class="icon-button header__menu header__user" data-open="account" aria-label="Mi cuenta">
       {% render 'icon', name: 'user' %}
