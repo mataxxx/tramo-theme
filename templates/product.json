@@ -29,9 +29,6 @@
         },
         "combo": {
           "type": "combo"
-        },
-        "ask": {
-          "type": "ask"
         }
       },
       "block_order": [
@@ -42,8 +39,7 @@
         "quantity",
         "buy_buttons",
         "combo",
-        "description",
-        "ask"
+        "description"
       ],
       "settings": {}
     },

@@ -4,6 +4,7 @@
     "order_prefix": "NAV",
     "cashback_enabled": false,
     "show_pay_methods": false,
-    "require_pay_choice": false
+    "require_pay_choice": false,
+    "quick_show_ask": false
   }
 }
