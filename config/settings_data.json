@@ -6,6 +6,8 @@
     "show_pay_methods": false,
     "require_pay_choice": false,
     "quick_show_ask": false,
-    "show_accounts": false
+    "show_accounts": false,
+    "whatsapp_number": "50671426533",
+    "order_whatsapp": "50671426533"
   }
 }
