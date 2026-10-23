@@ -20,11 +20,14 @@
   <strong class="price__current" data-price-current>
     {%- if variant == blank and product.price_varies and prefix_from -%}
       {{ product.price_min | money }}
+    {%- elsif is_bulk -%}
+      {%- assign per_kg = 1000 | divided_by: settings.bulk_unit_grams | default: 100 -%}
+      {{ target.price | times: per_kg | money }}
     {%- else -%}
       {{ target.price | money }}
     {%- endif -%}
   </strong>
   {%- if is_bulk and variant != blank -%}
-    <span class="price__unit">/ {{ settings.bulk_unit_grams | default: 10 }} g</span>
+    <span class="price__unit">/ kg</span>
   {%- endif -%}
 </div>

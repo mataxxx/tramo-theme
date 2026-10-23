@@ -460,8 +460,8 @@
       if (variant.compare_at_price > variant.price) {
         html += '<s class="price__compare" data-price-compare>' + formatMoney(variant.compare_at_price) + '</s>';
       }
-      html += '<strong class="price__current" data-price-current>' + formatMoney(variant.price) + '</strong>';
-      if (variant.bulk) html += '<span class="price__unit">/ ' + BULK.unit + ' g</span>';
+      html += '<strong class="price__current" data-price-current>' + formatMoney(variant.bulk ? variant.price * (1000 / BULK.unit) : variant.price) + '</strong>';
+      if (variant.bulk) html += '<span class="price__unit">/ kg</span>';
       priceEl.innerHTML = html;
       priceEl.classList.toggle('price--sale', variant.compare_at_price > variant.price);
     }
@@ -499,7 +499,7 @@
       if (addButton) addButton.disabled = false;
       if (addLabel) addLabel.textContent = defaultLabel;
       if (addPrice) addPrice.textContent = '· ' + formatMoney(variant.price * quantity);
-      if (bulkKg) bulkKg.textContent = isBulk ? ' · precio por kilo ' + formatMoney(variant.price * (1000 / BULK.unit)) : '';
+      if (bulkKg) bulkKg.textContent = '';
       renderPrice(variant);
 
       if (fromUser) {
@@ -578,6 +578,25 @@
           });
       });
     }
+
+    /* Por defecto: si el producto se vende a granel, abrir con "A granel" (precio por kilo) seleccionado */
+    (function preferBulk() {
+      var hasParam = false; try { hasParam = !inQuickView && new URL(window.location.href).searchParams.has('variant'); } catch (e) {}
+      if (hasParam || !groups.length) return;
+      var cur = findVariant(selectedOptions());
+      if (cur && cur.bulk) return;
+      var base = cur ? cur.options : null;
+      var pick = null;
+      variants.forEach(function (v) {
+        if (!v.bulk || !v.available) return;
+        if (!pick) pick = v;
+        if (base) { var same = v.options.every(function (o, k) { return o === base[k] || o === BULK.name; }); if (same) pick = v; }
+      });
+      if (!pick) return;
+      groups.forEach(function (group, k) {
+        $$('input', group).forEach(function (inp) { inp.checked = inp.value === pick.options[k]; });
+      });
+    })();
 
     update(false);
   }
