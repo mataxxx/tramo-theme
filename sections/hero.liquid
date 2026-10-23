@@ -39,6 +39,8 @@
         <div class="hero__media">
           {%- if sl.image != blank -%}
             {{ sl.image | image_url: width: 2000 | image_tag: widths: '750, 1100, 1500, 2000', sizes: '(min-width: 1440px) 1440px, 100vw', loading: 'eager', alt: sl.image.alt }}
+          {%- elsif sl.image_asset != blank -%}
+            <img src="{{ sl.image_asset | asset_url }}" alt="" width="1254" height="1254" loading="{% if i == 0 %}eager{% else %}lazy{% endif %}"{% if i == 0 %} fetchpriority="high"{% endif %}>
           {%- elsif i == 0 -%}
             <img src="{{ 'hero-default.jpg' | asset_url }}" alt="" width="1584" height="672" loading="eager" fetchpriority="high">
           {%- else -%}
@@ -151,6 +153,7 @@
       "label": "Imagen",
       "info": "Si la dejas vacía se usa la foto de especias incluida en el tema."
     },
+    { "type": "text", "id": "image_asset", "label": "O imagen del tema (nombre de archivo)", "info": "Ej: xmas-queque.jpg. Solo si no eliges una imagen arriba." },
     {
       "type": "textarea",
       "id": "heading",
@@ -364,6 +367,7 @@
       "name": "Diapositiva",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Imagen" },
+        { "type": "text", "id": "image_asset", "label": "O imagen del tema (nombre de archivo)", "info": "Ej: xmas-tamales.jpg. Solo si no eliges una imagen arriba." },
         { "type": "color", "id": "overlay_color", "label": "Color del sombreado", "default": "#000000" },
         { "type": "range", "id": "overlay_opacity", "label": "Intensidad del sombreado", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 70 },
         { "type": "text", "id": "kicker", "label": "Texto pequeño" },

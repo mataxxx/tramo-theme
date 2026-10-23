@@ -2432,3 +2432,7 @@ a, button { touch-action: manipulation; }
 .cart-howto .icon { width: 20px; height: 20px; color: var(--color-primary); margin-top: 1px; }
 .cart-howto small { font-size: 13px; color: var(--color-muted, #666); }
 .spay__title--sinpe { font-size: 14px; font-weight: 600; }
+
+/* Ronda 87: categorías con foto completa (llena el cuadro) */
+.cats-section .cats-tile__media img.cats-tile__photo, .cats-panel .cats-tile__media img.cats-tile__photo { object-fit: cover; filter: none; border-radius: inherit; width: 100%; height: 100%; }
+.cats-tile__media:has(.cats-tile__photo) { background: #e9e2d0; }
