@@ -11,12 +11,12 @@
   var fmt = new Intl.NumberFormat('es-CR', { style: 'currency', currency: D.currency || 'CRC', maximumFractionDigits: 0 });
   function money(c) { return fmt.format(c / 100); }
   var LS = 'tramo.order.me';
-  var cart = null, mode = null, map = null, pin = null, loc = null, last = null, page = 1, PAGES = 4;
+  var cart = null, mode = null, map = null, pin = null, loc = null, last = null, page = 2, FIRST = 2, PAGES = 4;
 
   /* ---------- abrir / cerrar ---------- */
   function open() {
     var dr = document.querySelector('.drawer.is-open'); if (dr) { var c = dr.querySelector('[data-drawer-close]'); if (c) c.click(); }
-    show('form'); go(1);
+    show('form'); go(FIRST);
     M.hidden = false;
     document.body.classList.add('is-locked', 'is-ord');
     requestAnimationFrame(function () { M.classList.add('is-open'); });
@@ -45,14 +45,14 @@
   /* ---------- pasos ---------- */
   var TITLES = ['', 'Tu pedido', 'Tus datos', 'Entrega', 'Factura y envío'];
   function go(n) {
-    page = Math.max(1, Math.min(PAGES, n));
+    page = Math.max(FIRST, Math.min(PAGES, n));
     $$('[data-order-page]', M).forEach(function (p) { var on = +p.getAttribute('data-order-page') === page; p.hidden = !on; if (on) { p.classList.remove('is-in'); void p.offsetWidth; p.classList.add('is-in'); } });
     $$('[data-order-dot]', M).forEach(function (d) { var k = +d.getAttribute('data-order-dot'); d.classList.toggle('is-done', k < page); d.classList.toggle('is-on', k === page); });
-    $('[data-order-prog-fill]', M).style.width = ((page - 1) / (PAGES - 1) * 100) + '%';
-    $('[data-order-prev]', M).hidden = page === 1;
+    $('[data-order-prog-fill]', M).style.width = ((page - FIRST) / (PAGES - FIRST) * 100) + '%';
+    $('[data-order-prev]', M).hidden = page === FIRST;
     $('[data-order-next]', M).hidden = page === PAGES;
     $('[data-order-send]', M).hidden = page !== PAGES;
-    $('[data-order-next-label]', M).textContent = page === 1 && cart ? 'Continuar · ' + money(cart.total_price) : 'Continuar';
+    $('[data-order-next-label]', M).textContent = 'Continuar';
     $('[data-order-body]', M).scrollTop = 0;
     if (page === 3 && mode === 'delivery') initMap();
     if (page === 4) renderReview();
@@ -70,7 +70,6 @@
     var r = $('[data-order-review]', M); if (!r || !cart) return;
     var ent = mode === 'pickup' ? 'Recoger en el Mercado Central' : mode === 'delivery' ? (D.delivery || 'Envío por Uber Flash') : '—';
     r.innerHTML = '<h3 class="ord-h">Resumen</h3><dl class="ord-rev">' +
-      '<div><dt>Productos</dt><dd>' + cart.item_count + ' · ' + money(cart.total_price) + '</dd></div>' +
       '<div><dt>A nombre de</dt><dd>' + esc($('[data-order-name]', M).value.trim()) + ' · ' + esc($('[data-order-phone]', M).value.trim()) + '</dd></div>' +
       '<div><dt>Entrega</dt><dd>' + esc(ent) + (mode === 'delivery' ? ' <small>(envío se cotiza)</small>' : '') + '</dd></div></dl>';
   }
@@ -96,7 +95,7 @@
     $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
     var pt = $('[data-order-paytext]', M);
     if (pt) pt.innerHTML = m === 'pickup'
-      ? 'Pagas por <b>SINPE Móvil</b> antes de retirar. Te pasamos los datos y el total por WhatsApp.'
+      ? 'Pagas por <b>SINPE Móvil</b> antes de retirar' + (D.sinpe ? ': <b>' + esc(D.sinpe) + '</b>' + (D.sinpeName ? ' a nombre de ' + esc(D.sinpeName) : '') : '') + '. Envíanos el comprobante por WhatsApp.'
       : 'Pagas por <b>SINPE Móvil</b> antes del envío. Te pasamos los datos, el costo del Uber Flash y el total por WhatsApp.';
     if (m === 'delivery') { initMap(); if (!gotAuto && !loc) { gotAuto = true; locate($('[data-order-locate]', M), true); } }
     validate();
@@ -242,7 +241,7 @@
     } else {
       L1.push('*Factura electrónica:* No');
     }
-    if (mode === 'pickup') L1.push('', '*Pago:* SINPE Móvil antes de retirar. Quedo atento a los datos y el total.');
+    if (mode === 'pickup') L1.push('', '*Pago:* SINPE Móvil' + (D.sinpe ? ' al ' + D.sinpe + (D.sinpeName ? ' (' + D.sinpeName + ')' : '') : '') + ' por ' + money(cart.total_price) + '. Te envío el comprobante.');
     else L1.push('', '*Pago:* SINPE Móvil. Quedo atento a los datos, el costo del envío y el total.');
     return L1.join('\n');
   }
@@ -256,7 +255,7 @@
     if (!w) setTimeout(function () { location.href = url; }, 900);
     $('[data-order-code]', M).textContent = c;
     $('[data-order-done-text]', M).textContent = mode === 'pickup'
-      ? 'Solo falta tocar Enviar en WhatsApp. Te pasamos los datos de SINPE y el total; cuando pagues, te mandamos la ubicación exacta del local y te avisamos cuando esté listo.'
+      ? 'Solo falta tocar Enviar en WhatsApp. Deposita ' + money(cart.total_price) + (D.sinpe ? ' al SINPE ' + D.sinpe + (D.sinpeName ? ' a nombre de ' + D.sinpeName : '') : '') + ' y envíanos el comprobante. Te mandamos la ubicación exacta del local y te avisamos cuando esté listo.'
       : 'Solo falta tocar Enviar en WhatsApp. Te respondemos con el costo del Uber Flash, el total y los datos de SINPE.';
     $('[data-order-resend]', M).href = url;
     show('done');

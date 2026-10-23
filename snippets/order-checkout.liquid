@@ -4,6 +4,8 @@
 {%- if settings.order_mode -%}
 <div class="ord" data-order hidden role="dialog" aria-modal="true" aria-labelledby="OrdTitle"
   data-wa="{{ settings.order_whatsapp | remove: ' ' | remove: '-' | remove: '+' | escape }}"
+  data-sinpe="{{ settings.order_sinpe_number | escape }}"
+  data-sinpe-name="{{ settings.order_sinpe_name | escape }}"
   data-prefix="{{ settings.order_prefix | default: 'PED' | escape }}"
   data-shop="{{ shop.name | escape }}"
   data-pickup="{{ settings.order_pickup_place | escape }}"
@@ -20,25 +22,17 @@
     <div class="ord-prog" data-order-prog>
       <div class="ord-prog__bar"><i data-order-prog-fill></i></div>
       <ol class="ord-prog__steps">
-        <li data-order-dot="1"><span>1</span>Pedido</li>
-        <li data-order-dot="2"><span>2</span>Datos</li>
-        <li data-order-dot="3"><span>3</span>Entrega</li>
-        <li data-order-dot="4"><span>4</span>Factura</li>
+        <li data-order-dot="2"><span>1</span>Datos</li>
+        <li data-order-dot="3"><span>2</span>Entrega</li>
+        <li data-order-dot="4"><span>3</span>Factura</li>
       </ol>
     </div>
 
     <div class="ord__body" data-order-body>
       {%- comment -%} Paso 1: resumen, datos y entrega {%- endcomment -%}
       <div class="ord__step" data-order-step="form">
-        <div class="ord-page" data-order-page="1">
-        <div class="ord-box">
-          <h3 class="ord-h">Tu pedido</h3>
-          <ul class="ord-lines" data-order-lines></ul>
-          <div class="ord-sub"><span>Subtotal</span><b data-order-subtotal></b></div>
-        </div>
-        </div>
 
-        <div class="ord-page" data-order-page="2" hidden>
+        <div class="ord-page" data-order-page="2">
         <div class="ord-box">
           <h3 class="ord-h">¿A nombre de quién?</h3>
           <label class="ord-field"><span>Nombre</span><input type="text" data-order-name autocomplete="name" required placeholder="¿A nombre de quién?"></label>
@@ -66,6 +60,14 @@
           </div>
 
           <div class="ord-pane" data-order-pane="pickup" hidden>
+            {%- if settings.order_sinpe_number != blank -%}
+            <div class="ord-sinpe-box">
+              <p>Deposita el total al <b>SINPE Móvil</b>:</p>
+              <p class="ord-sinpe-box__num"><b>{{ settings.order_sinpe_number }}</b>{%- if settings.order_sinpe_name != blank -%}<small>{{ settings.order_sinpe_name }}</small>{%- endif -%}</p>
+              <button type="button" class="ord-copy" data-order-copy="{{ settings.order_sinpe_number | remove: '-' | remove: ' ' | escape }}">Copiar número</button>
+              <p class="ord-sinpe-box__hint">Envíanos el comprobante por WhatsApp junto con tu pedido.</p>
+            </div>
+            {%- endif -%}
             <p class="ord-note">{{ settings.order_pickup_note }}</p>
           </div>
 
@@ -108,6 +110,11 @@
           </div>
         </div>
 
+        <div class="ord-box">
+          <h3 class="ord-h">Tu pedido</h3>
+          <ul class="ord-lines" data-order-lines></ul>
+          <div class="ord-sub"><span>Subtotal</span><b data-order-subtotal></b></div>
+        </div>
         <div class="ord-box ord-review" data-order-review></div>
         <p class="ord-paynote">{% render 'icon', name: 'phone' %}<span data-order-paytext>Pagas por <b>SINPE Móvil</b> antes de retirar o de enviar tu pedido. Te pasamos los datos y el total por WhatsApp.</span></p>
         </div>

@@ -738,6 +738,17 @@
       },
       {
         "type": "text",
+        "id": "order_sinpe_number",
+        "label": "SINPE Móvil para retiros",
+        "info": "Se muestra cuando eligen retirar en el Mercado Central. Ej: 7095-5061"
+      },
+      {
+        "type": "text",
+        "id": "order_sinpe_name",
+        "label": "SINPE a nombre de"
+      },
+      {
+        "type": "text",
         "id": "order_prefix",
         "label": "Prefijo del número de pedido",
         "default": "NAV"
