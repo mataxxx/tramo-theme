@@ -109,8 +109,7 @@
             "icon": "mortar",
             "search_noun": "especia",
             "image_asset": "xmas-condimentos-sm.jpg"
-          },
-          "disabled": true
+          }
         }
       },
       "block_order": [
@@ -128,7 +127,7 @@
         "icon": "none",
         "popup_search": "icon",
         "collection": "queque-navideno",
-        "heading": "Queque navideño",
+        "heading": "Todo para el queque navideño",
         "search_noun": "producto"
       }
     },
@@ -138,7 +137,7 @@
         "icon": "none",
         "popup_search": "icon",
         "collection": "tamales",
-        "heading": "Tamales",
+        "heading": "Todo para los tamales",
         "search_noun": "producto"
       }
     },
@@ -148,10 +147,9 @@
         "icon": "none",
         "popup_search": "icon",
         "collection": "especias-navidenas",
-        "heading": "Especias para la pierna y más",
+        "heading": "Todo en condimentos",
         "search_noun": "especia"
-      },
-      "disabled": true
+      }
     }
   },
   "order": [
