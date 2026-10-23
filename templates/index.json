@@ -9,78 +9,35 @@
  */
 {
   "sections": {
-    "circles": {
-      "type": "category-circles",
+    "trust": {
+      "type": "trust-bar",
       "blocks": {
-        "c0": {
-          "type": "category",
+        "t1": {
+          "type": "item",
           "settings": {
-            "collection": "frontpage",
-            "title": "Hierbas & Especias",
-            "search_noun": "especia",
-            "icon": "chili"
+            "icon": "chat",
+            "text": "Pedidos por WhatsApp · SINPE Móvil"
           }
         },
-        "c1": {
-          "type": "category",
+        "t2": {
+          "type": "item",
           "settings": {
-            "collection": "condimentos-de-la-casa",
-            "title": "Condimentos de la casa",
-            "search_noun": "condimento",
-            "icon": "house-hand"
-          }
-        },
-        "c2": {
-          "type": "category",
-          "settings": {
-            "collection": "condimentos-del-mundo",
-            "title": "Condimentos del mundo",
-            "search_noun": "condimento",
-            "icon": "globe-hand"
-          }
-        },
-        "c3": {
-          "type": "category",
-          "settings": {
-            "collection": "test2",
-            "title": "Semillas & Granos",
-            "search_noun": "semilla",
-            "icon": "leaf"
-          }
-        },
-        "rack": {
-          "type": "category",
-          "settings": {
-            "link": "#arma-tu-especiero",
-            "title": "Arma tu especiero",
-            "icon": "rack"
-          }
-        },
-        "navidad": {
-          "type": "category",
-          "settings": {
-            "collection": "temporada-navidena",
-            "title": "Temporada navideña",
-            "icon": "tree",
-            "search_noun": "producto",
-            "filters": "Queque navideño, Tamales, Especias"
+            "icon": "truck",
+            "text": "Retiro en el Mercado Central o Uber Flash"
           }
         }
       },
       "block_order": [
-        "navidad",
-        "c1",
-        "c2",
-        "rack",
-        "c0",
-        "c3"
-      ]
+        "t1",
+        "t2"
+      ],
+      "settings": {}
     },
     "hero": {
       "type": "hero",
       "settings": {
-        "heading": "DE NUESTRA\nTRADICIÓN A\nTU MESA",
-        "text": "Especias, ingredientes\ny sabores del mundo\ndesde 1946.",
+        "heading": "TODO PARA\nTU NAVIDAD",
+        "text": "Queque navideño, tamales\ny especias para la pierna.",
         "tile1_kicker": "Hecho a mano en Costa Rica",
         "tile1_heading": "Arma tu especiero",
         "tile1_text": "Elige el modelo y llénalo con tus especias.",
@@ -91,14 +48,16 @@
         "tile2_text": "Lo mejor de esta época.",
         "tile2_button": "Ver más",
         "tile2_link": "/collections/all",
-        "hide_tiles": true
+        "hide_tiles": true,
+        "show_tv": false,
+        "show_tile2": false
       },
       "blocks": {
         "s1": {
           "type": "slide",
           "settings": {
-            "heading": "DESDE 1946",
-            "text": "Tres generaciones llevando\nlas mejores especias a tu mesa."
+            "heading": "TEMPORADA\nNAVIDEÑA",
+            "text": "Frutas, especias y condimentos\npara tu mesa de fin de año."
           }
         }
       },
@@ -106,88 +65,74 @@
         "s1"
       ]
     },
-    "especias": {
-      "type": "featured-collection",
-      "settings": {
-        "collection": "frontpage",
-        "heading": "Hierbas & Especias",
-        "search_noun": "especia"
-      }
-    },
-    "semillas": {
-      "type": "featured-collection",
-      "settings": {
-        "collection": "test2",
-        "heading": "Semillas & Granos",
-        "search_noun": "semilla"
-      }
-    },
-    "frutas": {
-      "type": "featured-collection",
-      "settings": {
-        "collection": "frutas-otros-deshidratados",
-        "heading": "Frutas & otros deshidratados",
-        "search_noun": "fruta"
-      }
-    },
-    "reposteria": {
-      "type": "featured-collection",
-      "settings": {
-        "collection": "insumos-para-reposteria",
-        "heading": "Insumos para Repostería",
-        "search_noun": "insumo"
-      }
-    },
-    "trust": {
-      "type": "trust-bar",
+    "circles": {
+      "type": "category-circles",
       "blocks": {
-        "t1": {
-          "type": "item",
+        "q": {
+          "type": "category",
           "settings": {
-            "icon": "shield",
-            "text": "Pagos seguros"
+            "collection": "queque-navideno",
+            "title": "Queque navideño",
+            "icon": "cake",
+            "search_noun": "producto"
           }
         },
-        "t2": {
-          "type": "item",
+        "t": {
+          "type": "category",
           "settings": {
-            "icon": "truck",
-            "text": "Entregas confiables"
+            "collection": "tamales",
+            "title": "Tamales",
+            "icon": "tamal",
+            "search_noun": "producto"
+          }
+        },
+        "e": {
+          "type": "category",
+          "settings": {
+            "collection": "especias-navidenas",
+            "title": "Especias",
+            "icon": "mortar",
+            "search_noun": "especia"
           }
         }
       },
       "block_order": [
-        "t1",
-        "t2"
+        "q",
+        "t",
+        "e"
       ],
-      "settings": {}
-    },
-    "condimentos_casa": {
-      "type": "featured-collection",
       "settings": {
-        "collection": "condimentos-de-la-casa",
-        "heading": "Condimentos de la casa",
-        "search_noun": "condimento",
-        "icon": "none",
-        "popup_search": "icon"
+        "heading": "Compra por categoría"
       }
     },
-    "condimentos_mundo": {
+    "queque": {
       "type": "featured-collection",
       "settings": {
-        "collection": "condimentos-del-mundo",
-        "heading": "Condimentos del mundo",
-        "search_noun": "condimento",
         "icon": "none",
         "popup_search": "icon",
-        "filter_tags": "África, Asia, Europa, América, Medio Oriente"
+        "collection": "queque-navideno",
+        "heading": "Queque navideño",
+        "search_noun": "producto"
       }
     },
-    "rack_teaser": {
-      "type": "rack-teaser",
+    "tamales": {
+      "type": "featured-collection",
       "settings": {
-        "text": "Elige 6, 12 o 18 frascos y llénalo con tus especias favoritas.",
-        "button_label": "Armar mi especiero"
+        "icon": "none",
+        "popup_search": "icon",
+        "collection": "tamales",
+        "heading": "Tamales",
+        "search_noun": "producto"
+      }
+    },
+    "especias": {
+      "type": "featured-collection",
+      "settings": {
+        "icon": "none",
+        "popup_search": "icon",
+        "collection": "especias-navidenas",
+        "heading": "Especias para la pierna y más",
+        "search_noun": "especia"
       }
     }
   },
@@ -195,12 +140,8 @@
     "trust",
     "hero",
     "circles",
-    "condimentos_casa",
-    "condimentos_mundo",
-    "rack_teaser",
-    "especias",
-    "semillas",
-    "frutas",
-    "reposteria"
+    "queque",
+    "tamales",
+    "especias"
   ]
 }

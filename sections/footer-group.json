@@ -13,13 +13,6 @@
             "text": "<p>Especias, ingredientes y sabores del mundo desde 1946.</p>"
           }
         },
-        "menu": {
-          "type": "menu",
-          "settings": {
-            "heading": "Tienda",
-            "menu": "footer"
-          }
-        },
         "contact": {
           "type": "text",
           "settings": {
@@ -28,7 +21,10 @@
           }
         }
       },
-      "block_order": ["brand", "menu", "contact"],
+      "block_order": [
+        "brand",
+        "contact"
+      ],
       "settings": {
         "show_social": true,
         "show_payment_icons": true,
@@ -36,5 +32,7 @@
       }
     }
   },
-  "order": ["footer"]
+  "order": [
+    "footer"
+  ]
 }

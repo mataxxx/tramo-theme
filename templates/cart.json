@@ -2,8 +2,12 @@
   "sections": {
     "main": {
       "type": "main-cart",
-      "settings": {}
+      "settings": {
+        "checkout_label": "Hacer pedido"
+      }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

@@ -1,3 +1,9 @@
 {
-  "current": {}
+  "current": {
+    "order_mode": true,
+    "order_prefix": "NAV",
+    "cashback_enabled": false,
+    "show_pay_methods": false,
+    "require_pay_choice": false
+  }
 }
