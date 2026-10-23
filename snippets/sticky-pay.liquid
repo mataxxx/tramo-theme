@@ -1,7 +1,7 @@
 {%- comment -%} Franja profesional de métodos de pago bajo/sobre el botón fijo. Logos editables en Configuración del tema → Barra del botón de compra. {%- endcomment -%}
 <div class="spay" data-sticky-pay hidden>
   {%- if settings.order_mode -%}
-  <p class="spay__title spay__title--sinpe">{% render 'icon', name: 'phone' %}<span>SINPE Móvil · en el local también efectivo o tarjeta</span></p>
+  <p class="spay__title spay__title--sinpe">{% render 'icon', name: 'phone' %}<span>Paga por SINPE Móvil · retiro o envío por Uber Flash</span></p>
   {%- else -%}
   <p class="spay__title">{% render 'icon', name: 'lock' %}<span>{{ settings.spay_title | default: 'Pago 100% seguro' }}</span></p>
   <ul class="spay__list" role="list">
