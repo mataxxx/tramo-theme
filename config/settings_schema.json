@@ -726,6 +726,12 @@
       },
       {
         "type": "text",
+        "id": "allowed_collections",
+        "label": "Solo permitir estas colecciones",
+        "info": "Handles separados por coma (ej: queque-navideno, tamales). Cualquier otra colección redirige a la portada. Vacío = todas."
+      },
+      {
+        "type": "text",
         "id": "order_whatsapp",
         "label": "WhatsApp de la tienda",
         "info": "Con código de país, solo números. Ej: 50688887777"
