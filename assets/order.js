@@ -11,12 +11,12 @@
   var fmt = new Intl.NumberFormat('es-CR', { style: 'currency', currency: D.currency || 'CRC', maximumFractionDigits: 0 });
   function money(c) { return fmt.format(c / 100); }
   var LS = 'tramo.order.me';
-  var cart = null, mode = null, map = null, pin = null, loc = null, last = null;
+  var cart = null, mode = null, map = null, pin = null, loc = null, last = null, page = 1, PAGES = 4;
 
   /* ---------- abrir / cerrar ---------- */
   function open() {
     var dr = document.querySelector('.drawer.is-open'); if (dr) { var c = dr.querySelector('[data-drawer-close]'); if (c) c.click(); }
-    show('form');
+    show('form'); go(1);
     M.hidden = false;
     document.body.classList.add('is-locked', 'is-ord');
     requestAnimationFrame(function () { M.classList.add('is-open'); });
@@ -25,7 +25,7 @@
     fetch('/cart.js', { headers: { Accept: 'application/json' } }).then(function (r) { return r.json(); }).then(function (c) {
       cart = c;
       if (!c.item_count) { close(); return; }
-      renderCart(); validate();
+      renderCart(); go(page);
     }).catch(function () { $('[data-order-lines]', M).innerHTML = '<li class="ord-lines__load">No se pudo cargar el carrito. Intenta de nuevo.</li>'; });
   }
   function close() {
@@ -38,7 +38,41 @@
     $$('[data-order-step]', M).forEach(function (s) { s.hidden = s.getAttribute('data-order-step') !== step; });
     $('[data-order-foot]', M).hidden = step !== 'form';
     $('[data-order-title]', M).textContent = step === 'done' ? 'Último paso' : 'Finalizar pedido';
+    $('[data-order-prog]', M).hidden = step !== 'form';
     $('[data-order-body]', M).scrollTop = 0;
+  }
+
+  /* ---------- pasos ---------- */
+  var TITLES = ['', 'Tu pedido', 'Tus datos', 'Entrega', 'Factura y envío'];
+  function go(n) {
+    page = Math.max(1, Math.min(PAGES, n));
+    $$('[data-order-page]', M).forEach(function (p) { var on = +p.getAttribute('data-order-page') === page; p.hidden = !on; if (on) { p.classList.remove('is-in'); void p.offsetWidth; p.classList.add('is-in'); } });
+    $$('[data-order-dot]', M).forEach(function (d) { var k = +d.getAttribute('data-order-dot'); d.classList.toggle('is-done', k < page); d.classList.toggle('is-on', k === page); });
+    $('[data-order-prog-fill]', M).style.width = ((page - 1) / (PAGES - 1) * 100) + '%';
+    $('[data-order-prev]', M).hidden = page === 1;
+    $('[data-order-next]', M).hidden = page === PAGES;
+    $('[data-order-send]', M).hidden = page !== PAGES;
+    $('[data-order-next-label]', M).textContent = page === 1 && cart ? 'Continuar · ' + money(cart.total_price) : 'Continuar';
+    $('[data-order-body]', M).scrollTop = 0;
+    if (page === 3 && mode === 'delivery') initMap();
+    if (page === 4) renderReview();
+    if (page === 2) setTimeout(function () { var n = $('[data-order-name]', M); if (!n.value) n.focus(); }, 320);
+    validate();
+  }
+  function pageOk(n) {
+    if (n === 1) return !!(cart && cart.item_count);
+    if (n === 2) return $('[data-order-name]', M).value.trim().length > 1 && digits($('[data-order-phone]', M).value).length >= 8;
+    if (n === 3) return !!mode && (mode === 'pickup' || !!loc);
+    if (n === 4) return !wantsFE() || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim()));
+    return true;
+  }
+  function renderReview() {
+    var r = $('[data-order-review]', M); if (!r || !cart) return;
+    var ent = mode === 'pickup' ? 'Recoger en el Mercado Central' : mode === 'delivery' ? (D.delivery || 'Envío por Uber Flash') : '—';
+    r.innerHTML = '<h3 class="ord-h">Resumen</h3><dl class="ord-rev">' +
+      '<div><dt>Productos</dt><dd>' + cart.item_count + ' · ' + money(cart.total_price) + '</dd></div>' +
+      '<div><dt>A nombre de</dt><dd>' + esc($('[data-order-name]', M).value.trim()) + ' · ' + esc($('[data-order-phone]', M).value.trim()) + '</dd></div>' +
+      '<div><dt>Entrega</dt><dd>' + esc(ent) + (mode === 'delivery' ? ' <small>(envío se cotiza)</small>' : '') + '</dd></div></dl>';
   }
 
   function variantLabel(it) {
@@ -53,7 +87,6 @@
     }).join('');
     var t = money(cart.total_price);
     $('[data-order-subtotal]', M).textContent = t;
-    $('[data-order-total2]', M).textContent = t;
   }
 
   /* ---------- modo de entrega ---------- */
@@ -172,11 +205,11 @@
   function err(msg) { var e = $('[data-order-err]', M); e.textContent = msg; e.hidden = !msg; if (msg) setTimeout(function () { e.hidden = true; }, 5000); }
   function digits(s) { return String(s || '').replace(/\D/g, ''); }
   function validate() {
-    var fe = wantsFE();
-    var feOk = !fe || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim()));
-    var ok = feOk && cart && cart.item_count && $('[data-order-name]', M).value.trim().length > 1 && digits($('[data-order-phone]', M).value).length >= 8 && mode && (mode === 'pickup' || loc);
-    $('[data-order-send]', M).disabled = !ok;
-    return ok;
+    var okPage = pageOk(page);
+    $('[data-order-next]', M).disabled = !okPage;
+    var all = pageOk(1) && pageOk(2) && pageOk(3) && pageOk(4);
+    $('[data-order-send]', M).disabled = !all;
+    return all;
   }
   function wantsFE() { var r = $('[data-order-fe]:checked', M); return !!(r && r.value === 'si'); }
   function code() {
@@ -245,9 +278,14 @@
     var lb = t.closest('[data-order-locate]'); if (lb) { locate(lb); return; }
     var cp = t.closest('[data-order-copy]');
     if (cp && navigator.clipboard) { navigator.clipboard.writeText(cp.getAttribute('data-order-copy')).then(function () { var o = cp.textContent; cp.textContent = '¡Copiado!'; setTimeout(function () { cp.textContent = o; }, 1500); }); return; }
+    if (t.closest('[data-order-next]')) { if (pageOk(page)) go(page + 1); return; }
+    if (t.closest('[data-order-prev]')) { go(page - 1); return; }
     if (t.closest('[data-order-send]')) send();
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !M.hidden) close(); });
+  M.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.matches('input:not([type=search])') && page < PAGES) { e.preventDefault(); if (pageOk(page)) go(page + 1); }
+  });
 
   /* Cualquier botón de pago abre este pedido en lugar del checkout de Shopify */
   document.addEventListener('click', function (e) {
