@@ -85,7 +85,7 @@
           "type": "category",
           "settings": {
             "collection": "queque-navideno",
-            "title": "Ingredientes para queque",
+            "title": "Queque navideño",
             "icon": "cake",
             "search_noun": "producto",
             "icon_asset": "cat-queque.png"
@@ -95,7 +95,7 @@
           "type": "category",
           "settings": {
             "collection": "tamales",
-            "title": "Ingredientes para tamal",
+            "title": "Tamales",
             "icon": "tamal",
             "search_noun": "producto",
             "icon_asset": "cat-tamal.png"
@@ -118,7 +118,7 @@
         "e"
       ],
       "settings": {
-        "heading": "Compra por categoría"
+        "heading": "Ingredientes para…"
       }
     },
     "queque": {
