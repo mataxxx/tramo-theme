@@ -2580,3 +2580,15 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 .cats-section .cats-tile__media:has(.cats-tile__icoimg), .cats-section .cats-tile__media:has(.cats-tile__icoimg):is(*) { width: 100%; max-width: none; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden; background: #f3eedf !important; border: 1px solid #e4dcc6; box-shadow: 0 6px 16px rgba(38,61,37,.10) !important; }
 .cats-section .cats-tile__media .cats-tile__icoimg, .cats-panel .cats-tile__media .cats-tile__icoimg { width: 100%; height: 100%; object-fit: contain; padding: 10%; box-sizing: border-box; border-radius: 0; filter: none; transition: transform .35s ease; }
 .cats-section .cats-tile:hover .cats-tile__icoimg { transform: scale(1.06) rotate(-2deg); }
+
+/* Ronda 98: etiquetas de opciones y cantidad más grandes; "Ver más" visible */
+.variant-picker__label, .product-quantity .field-label, .qty--bulk .field-label { font-size: 15px; font-weight: 700; color: var(--color-text); letter-spacing: .1px; margin-bottom: 10px; }
+.variant-picker .pill { font-size: 15px; padding: 10px 16px; min-height: 44px; }
+.product-info__desc-more {
+  display: inline-flex !important; align-items: center; gap: 6px; margin-top: 8px !important; padding: 7px 14px !important;
+  border: 1.5px solid var(--color-primary) !important; border-radius: 999px !important; background: #fff !important;
+  color: var(--color-primary) !important; font-size: 14px !important; font-weight: 700 !important; line-height: 1 !important; cursor: pointer;
+}
+.product-info__desc-more[hidden] { display: none !important; }
+.product-info__desc-more:hover { background: color-mix(in srgb, var(--color-primary) 8%, #fff) !important; }
+.product-info__desc-more .icon { width: 16px; height: 16px; stroke-width: 2.2; }
