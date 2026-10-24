@@ -500,6 +500,7 @@
 
     function renderPrice(variant) {
       if (!priceEl || !variant) return;
+      if (!variant.price) { priceEl.innerHTML = '<span class="price__soon">Precio próximamente</span>'; return; }
       var html = '';
       if (variant.compare_at_price > variant.price) {
         html += '<s class="price__compare" data-price-compare>' + formatMoney(variant.compare_at_price) + '</s>';
@@ -537,6 +538,14 @@
         return;
       }
 
+      if (!variant.price) {
+        if (idInput) { idInput.disabled = true; idInput.value = variant.id; }
+        if (addButton) addButton.disabled = true;
+        if (addLabel) addLabel.textContent = 'Precio próximamente';
+        if (addPrice) addPrice.textContent = '';
+        renderPrice(variant);
+        return;
+      }
       var quantity = currentQuantity(variant);
       if (idInput) { idInput.disabled = false; idInput.value = variant.id; }
       if (qtyField) qtyField.value = quantity;

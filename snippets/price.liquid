@@ -8,6 +8,9 @@
     assign is_bulk = true
   endif
 -%}
+{%- if target.price == 0 -%}
+<div class="price" data-price><span class="price__soon">Precio próximamente</span></div>
+{%- else -%}
 <div class="price{% if target.compare_at_price > target.price %} price--sale{% endif %}" data-price>
   {%- if product.tags contains 'especiero-modelo' -%}
     <span class="price__from">Desde</span>
@@ -31,3 +34,4 @@
     <span class="price__unit">/ kg</span>
   {%- endif -%}
 </div>
+{%- endif -%}

@@ -2684,3 +2684,29 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .drawer--sheet .quick-view > .sticky-add { grid-column: 2; grid-row: 2; position: static !important; margin: 0; border-radius: 0 0 24px 0; }
   .drawer--sheet .quick-view > .sticky-add[hidden] { display: none; }
 }
+
+/* Ronda 102: productos sin precio todavía */
+.price__soon { display: inline-block; font-size: 13px; font-weight: 700; color: #7a5a12; background: #f3ead1; border-radius: 999px; padding: 4px 10px; }
+.quick-view__price .price__soon, .product-info__price .price__soon { font-size: 15px; padding: 6px 12px; }
+
+/* 4 categorías: mismo tamaño ajustable */
+.cats-section .product-rail:not(:has(> .product-rail__item:nth-child(5))) > .product-rail__item { flex: 0 0 var(--cat-photo-m, 90px); max-width: none; }
+.cats-section .product-rail:not(:has(> .product-rail__item:nth-child(5))) { gap: 12px; justify-content: center; overflow: visible; }
+.cats-section .product-rail:not(:has(> .product-rail__item:nth-child(5))) .cats-tile__title { font-size: 13px; font-weight: 700; line-height: 1.2; }
+@media (min-width: 750px) {
+  .cats-section .product-rail:not(:has(> .product-rail__item:nth-child(5))) > .product-rail__item { flex: 0 0 var(--cat-photo-d, 150px); }
+  .cats-section .product-rail:not(:has(> .product-rail__item:nth-child(5))) { gap: 24px; }
+  .cats-section .product-rail:not(:has(> .product-rail__item:nth-child(5))) .cats-tile__title { font-size: clamp(14px, calc(var(--cat-photo-d, 150px) / 11), 20px); }
+}
+.cats-section .cats-tile__media:has(.icon):not(:has(img)) { width: 100%; max-width: none; aspect-ratio: 1 / 1; border-radius: 18px; background: #f3eedf !important; border: 1px solid #e4dcc6; }
+@media (max-width: 749px) {
+  .category-tiles:has(> :nth-child(4):last-child) { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .category-tiles:has(> :nth-child(4):last-child) .category-tile__media { aspect-ratio: 4 / 3; }
+}
+@media (min-width: 750px) {
+  .search-panel:has(.category-tiles > :nth-child(4):last-child) { width: min(1080px, 100%); }
+  .category-tiles:has(> :nth-child(4):last-child) { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .category-tiles:has(> :nth-child(4):last-child) .category-tile { border-radius: 18px; }
+  .category-tiles:has(> :nth-child(4):last-child) .category-tile__media { aspect-ratio: 1 / 1; }
+  .category-tiles:has(> :nth-child(4):last-child) .category-tile__title { font-size: 20px; padding: 36px 14px 14px; }
+}
