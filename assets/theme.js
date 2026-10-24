@@ -71,6 +71,48 @@
       return data;
     });
   }
+  /* ---------- Búsqueda local: catálogo completo en memoria, resultados desde 2 letras ---------- */
+  var CATALOG_P = null;
+  function searchNorm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  function loadCatalog() {
+    if (CATALOG_P) return CATALOG_P;
+    var base = ROOT.replace(/\/$/, '');
+    CATALOG_P = fetch(base + '/products.json?limit=250', { headers: { Accept: 'application/json' } })
+      .then(parseJSON)
+      .then(function (d) {
+        return (d.products || []).map(function (p) {
+          var vs = p.variants || [];
+          var fixed = vs.filter(function (v) { return !/granel/i.test(v.title || ''); });
+          var use = fixed.length ? fixed : vs;
+          var prices = use.map(function (v) { return parseFloat(v.price); }).filter(function (n) { return !isNaN(n); });
+          var img = p.images && p.images[0] ? p.images[0].src : '';
+          return {
+            title: p.title, url: base + '/products/' + p.handle, image: img, featured_image: { url: img },
+            type: p.product_type || '', vendor: '',
+            price_min: prices.length ? String(Math.min.apply(null, prices)) : '',
+            price_max: prices.length ? String(Math.max.apply(null, prices)) : '',
+            _hay: searchNorm([p.title, p.product_type, (p.tags || []).join(' ')].join(' ')),
+            _title: searchNorm(p.title)
+          };
+        });
+      })
+      .catch(function () { CATALOG_P = null; return []; });
+    return CATALOG_P;
+  }
+  function searchProducts(q, limit) {
+    var words = searchNorm(q).split(/\s+/).filter(Boolean);
+    return loadCatalog().then(function (list) {
+      var hits = list.filter(function (p) { return words.every(function (w) { return p._hay.indexOf(w) > -1; }); });
+      hits.sort(function (a, b) {
+        var sa = a._title.indexOf(words[0]) === 0 ? 0 : (a._title.indexOf(' ' + words[0]) > -1 ? 1 : 2);
+        var sb = b._title.indexOf(words[0]) === 0 ? 0 : (b._title.indexOf(' ' + words[0]) > -1 ? 1 : 2);
+        return sa - sb || a.title.localeCompare(b.title);
+      });
+      return hits.slice(0, limit || 6);
+    });
+  }
+  setTimeout(loadCatalog, 1500);
+
 
   function showToast(message) {
     var toast = $('[data-toast]');
@@ -729,11 +771,15 @@
       mode(wrap, q);
       if (!box.children.length) box.innerHTML = '<p class="hsd__empty">Buscando…</p>';
       var base = ROOT.replace(/\/$/, '');
-      fetch(base + '/search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=5')
-        .then(parseJSON)
-        .then(function (data) {
+      searchProducts(q, 6)
+        .then(function (local) {
+          if (local.length) return local;
+          return fetch(base + '/search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product&resources[limit]=5')
+            .then(parseJSON)
+            .then(function (data) { return (data.resources && data.resources.results && data.resources.results.products) || []; });
+        })
+        .then(function (list) {
           if (mine !== token) return;
-          var list = (data.resources && data.resources.results && data.resources.results.products) || [];
           if (!list.length) { box.innerHTML = '<p class="hsd__empty">No encontramos “' + esc(q) + '”. Prueba con otra palabra o elige una categoría.</p>'; return; }
           box.innerHTML = list.map(function (p) {
             var lo = parseFloat(p.price_min || p.price), hi = parseFloat(p.price_max || p.price);
@@ -824,11 +870,15 @@
     if (!els) return;
     if (query.length < 2) { els.results.innerHTML = ''; els.global.hidden = false; return; }
     els.global.hidden = true;
-    fetch(T.routes.predictiveSearch + '?q=' + encodeURIComponent(query) + '&resources[type]=product&resources[limit]=8')
-      .then(parseJSON)
-      .then(function (data) {
+    searchProducts(query, 8)
+      .then(function (local) {
+        if (local.length) return local;
+        return fetch(T.routes.predictiveSearch + '?q=' + encodeURIComponent(query) + '&resources[type]=product&resources[limit]=8')
+          .then(parseJSON)
+          .then(function (data) { return (data.resources && data.resources.results && data.resources.results.products) || []; });
+      })
+      .then(function (products) {
         if (els.input.value.trim() !== query) return;
-        var products = (data.resources && data.resources.results && data.resources.results.products) || [];
         var items = products.map(function (p) {
           var img = p.featured_image && p.featured_image.url || p.image || '';
           return {
