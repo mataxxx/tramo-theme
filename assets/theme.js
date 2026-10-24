@@ -1558,7 +1558,10 @@
   function openCategory(opener) {
     var scope = opener.closest('[data-category-scope]');
     var tpl = scope && $('[data-category-template]', scope);
-    if (!tpl) { var href = opener.getAttribute('href'); if (href) window.location.href = href; return; }
+    if (!tpl) {
+      if (scope && scope.getAttribute('data-category-handle')) { openCategoryByHandle(scope.getAttribute('data-category-handle'), opener.getAttribute('data-category-title') || '', opener.getAttribute('data-category-question') || ''); return; }
+      var href = opener.getAttribute('href'); if (href) window.location.href = href; return;
+    }
     catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters'), search: scope.getAttribute('data-category-search'), banner: scope.getAttribute('data-category-banner'), subtitle: scope.getAttribute('data-category-subtitle') });
     var tmp = document.createElement('div');
     tmp.appendChild(tpl.content.cloneNode(true));
