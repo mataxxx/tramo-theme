@@ -78,11 +78,15 @@
     {%- endif -%}
     <div class="product-card__row">
       <div class="price{% if shown.compare_at_price > shown.price %} price--sale{% endif %}" data-price>
+        {%- if product.price_max == 0 -%}
+        <span class="price__soon">Precio pronto</span>
+        {%- else -%}
         {%- if show_from or product.tags contains 'especiero-modelo' -%}<span class="price__from">Desde</span>{%- endif -%}
         {%- if shown.compare_at_price > shown.price -%}<s class="price__compare">{{ shown.compare_at_price | money }}</s>{%- endif -%}
         <strong class="price__current">{{ shown.price | money }}</strong>
+        {%- endif -%}
       </div>
-      {%- if show_quick_add and settings.card_quick_add and product.available -%}
+      {%- if show_quick_add and settings.card_quick_add and product.available and product.price_max > 0 -%}
         {%- if product.has_only_default_variant or shown_is_bulk == false -%}
           <button
             type="button"

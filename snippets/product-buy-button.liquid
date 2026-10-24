@@ -20,16 +20,18 @@
     type="submit"
     class="button button--full"
     data-add-button
-    {% unless current_variant.available %}disabled{% endunless %}
+    {% unless current_variant.available and current_variant.price > 0 %}disabled{% endunless %}
   >
     <span data-add-label>
-      {%- if current_variant.available -%}
+      {%- if current_variant.price == 0 -%}
+        Precio próximamente
+      {%- elsif current_variant.available -%}
         {{ label | default: 'Agregar al carrito' }}
       {%- else -%}
         Agotado
       {%- endif -%}
     </span>
-    <span class="button__price" data-add-price>{% if current_variant.available %}· {{ current_variant.price | money }}{% endif %}</span>
+    <span class="button__price" data-add-price>{% if current_variant.available and current_variant.price > 0 %}· {{ current_variant.price | money }}{% endif %}</span>
   </button>
   <p class="form-error" data-form-error role="alert" hidden></p>
 {% endform %}
