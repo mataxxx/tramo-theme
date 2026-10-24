@@ -2591,3 +2591,8 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 @keyframes rail-tap { 0%, 100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-3px) scale(1); } 55% { transform: translateY(1px) scale(.9); } 70% { transform: translateY(0) scale(1); } }
 @keyframes rail-ring { 0%, 50% { transform: scale(1); opacity: 0; } 56% { opacity: .7; } 100% { transform: scale(1.6); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .rail-end__tap, .rail-end__tap::after { animation: none; } }
+
+/* Ronda 97: íconos ilustrados en las categorías */
+.cats-section .cats-tile__media:has(.cats-tile__icoimg), .cats-section .cats-tile__media:has(.cats-tile__icoimg):is(*) { width: 100%; max-width: none; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden; background: #f3eedf !important; border: 1px solid #e4dcc6; box-shadow: 0 6px 16px rgba(38,61,37,.10) !important; }
+.cats-section .cats-tile__media .cats-tile__icoimg, .cats-panel .cats-tile__media .cats-tile__icoimg { width: 100%; height: 100%; object-fit: contain; padding: 10%; box-sizing: border-box; border-radius: 0; filter: none; transition: transform .35s ease; }
+.cats-section .cats-tile:hover .cats-tile__icoimg { transform: scale(1.06) rotate(-2deg); }

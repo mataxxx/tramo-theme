@@ -13,6 +13,8 @@
         <span class="cats-tile__media">
           {%- if img != blank -%}
             {{ img | image_url: width: 400 | image_tag: widths: '200, 400', sizes: '225px', loading: 'lazy', alt: t }}
+          {%- elsif block.settings.icon_asset != blank -%}
+            <img class="cats-tile__icoimg" src="{{ block.settings.icon_asset | asset_url }}" alt="" width="360" height="360" loading="lazy">
           {%- elsif block.settings.image_asset != blank -%}
             <img class="cats-tile__photo" src="{{ block.settings.image_asset | asset_url }}" alt="{{ t | escape }}" width="480" height="480" loading="lazy">
           {%- else -%}
@@ -51,7 +53,9 @@
           <span class="cats-tile__media">
             {%- if img != blank -%}
               {{ img | image_url: width: 400 | image_tag: widths: '200, 400', sizes: '180px', loading: 'lazy', alt: t }}
-            {%- elsif block.settings.image_asset != blank -%}
+            {%- elsif block.settings.icon_asset != blank -%}
+            <img class="cats-tile__icoimg" src="{{ block.settings.icon_asset | asset_url }}" alt="" width="360" height="360" loading="lazy">
+          {%- elsif block.settings.image_asset != blank -%}
               <img class="cats-tile__photo" src="{{ block.settings.image_asset | asset_url }}" alt="{{ t | escape }}" width="480" height="480" loading="lazy">
             {%- else -%}
               {% render 'icon', name: block.settings.icon %}
@@ -95,6 +99,7 @@
         { "type": "url", "id": "link", "label": "O un enlace", "info": "Para llevar al banner del especiero usa #arma-tu-especiero" },
         { "type": "text", "id": "title", "label": "Nombre (opcional)", "info": "Si lo dejas vacío usa el de la colección." },
         { "type": "image_picker", "id": "image", "label": "Foto (opcional)", "info": "Sube un PNG con fondo transparente (producto recortado). Sin foto se muestra el ícono." },
+        { "type": "text", "id": "icon_asset", "label": "O ícono ilustrado del tema (nombre de archivo)", "info": "PNG transparente que se muestra sobre fondo claro. Ej: cat-queque.png" },
         { "type": "text", "id": "image_asset", "label": "O foto del tema (nombre de archivo)", "info": "Foto completa que llena el círculo. Ej: xmas-tamales-sm.jpg" },
         {
           "type": "select",
