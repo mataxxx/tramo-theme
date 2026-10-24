@@ -47,7 +47,10 @@
         "brand_note": "Desde 1946",
         "menu": "main-menu",
         "sticky": true,
-        "show_likes": true
+        "show_likes": true,
+        "logo_asset": "logo-tramo.png",
+        "logo_width": 200,
+        "logo_width_mobile": 170
       }
     }
   },
