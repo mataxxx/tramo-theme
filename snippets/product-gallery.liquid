@@ -1,5 +1,6 @@
 {%- comment -%} Galería del producto: fotos deslizables, flechas y miniaturas abajo. Parámetros: product, sizes {%- endcomment -%}
-<div class="product-gallery" data-gallery>
+{%- assign pg_ar = product.featured_media.preview_image.aspect_ratio | default: 1 -%}
+<div class="product-gallery" data-gallery style="--pg-ar: {{ pg_ar }}">
   <div class="product-gallery__frame">
     <div class="product-gallery__strip" data-gallery-strip>
       {%- for media in product.media -%}
