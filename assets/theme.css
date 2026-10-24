@@ -2560,7 +2560,7 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 
 /* Descripción debajo del título, con "Ver más" si es larga ---------------- */
 .product-info__desc { margin: -2px 0 16px; }
-.product-info__desc .product-info__description { color: var(--color-muted); font-size: 15px; line-height: 1.5; }
+.product-info__desc .product-info__description { color: var(--color-text); opacity: .82; font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
 .product-info__desc .product-info__description > :first-child { margin-top: 0; }
 .product-info__desc.is-clamped:not(.is-open) .product-info__description {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
@@ -2622,3 +2622,13 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .drawer--sheet .quick-view__media .product-gallery__slide img { width: 100%; height: 100%; object-fit: cover; }
   .drawer--sheet .quick-view__media .product-gallery__thumbs { margin: 0; padding: 10px 12px; background: var(--color-surface); }
 }
+
+/* Nota debajo de las opciones (ej. qué semillas trae, cuántos queques rinde) */
+.variant-picker__note {
+  margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; font-size: 14.5px; line-height: 1.45; color: var(--color-text);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)); border-left: 3px solid var(--color-primary);
+  animation: vp-note-in .3s ease;
+}
+.variant-picker__note[hidden] { display: none; }
+@keyframes vp-note-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.product-info__desc.is-clamped:not(.is-open) .product-info__description > *::after { content: " "; }

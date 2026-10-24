@@ -2,6 +2,7 @@
   Selector de opciones (presentaciones). Parámetros: product, form_id, section_id
 {%- endcomment -%}
 {%- unless product.has_only_default_variant -%}
+  {%- assign notes_lines = product.metafields.custom.notas_opciones.value | default: '' | newline_to_br | split: '<br />' -%}
   <div class="variant-picker" data-variant-picker>
     {%- for option in product.options_with_values -%}
       {%- assign opt_index = forloop.index0 -%}
@@ -23,6 +24,22 @@
             <label for="{{ input_id }}" class="pill">{{ value }}</label>
           {%- endfor -%}
         </div>
+        {%- if notes_lines.size > 0 -%}
+          {%- for value in option.values -%}
+            {%- assign key = value | append: ':' -%}
+            {%- for line in notes_lines -%}
+              {%- assign l = line | strip -%}
+              {%- if l contains key -%}
+                {%- assign head = l | slice: 0, key.size -%}
+                {%- if head == key -%}
+                  {%- assign note = l | remove_first: key | strip -%}
+                  <p class="variant-picker__note" data-option-note="{{ value | escape }}"{% unless option.selected_value == value %} hidden{% endunless %}>{{ note | escape }}</p>
+                  {%- break -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        {%- endif -%}
       </fieldset>
     {%- endfor -%}
   </div>

@@ -2021,3 +2021,12 @@
   }
 })();
 
+/* Notas de opciones: mostrar la del botón seleccionado */
+document.addEventListener('change', function (e) {
+  var input = e.target.closest && e.target.closest('[data-option-value]');
+  if (!input) return;
+  var group = input.closest('.variant-picker__group');
+  if (!group) return;
+  group.querySelectorAll('[data-option-note]').forEach(function (n) { n.hidden = n.getAttribute('data-option-note') !== input.value; });
+});
+
