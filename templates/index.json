@@ -88,7 +88,7 @@
             "title": "Queque navideño",
             "icon": "cake",
             "search_noun": "producto",
-            "image_asset": "xmas-queque-sm.jpg"
+            "icon_asset": "cat-queque.png"
           }
         },
         "t": {
@@ -98,7 +98,7 @@
             "title": "Tamales",
             "icon": "tamal",
             "search_noun": "producto",
-            "image_asset": "xmas-tamales-sm.jpg"
+            "icon_asset": "cat-tamal.png"
           }
         },
         "e": {
@@ -108,7 +108,7 @@
             "title": "Condimentos",
             "icon": "mortar",
             "search_noun": "especia",
-            "image_asset": "xmas-condimentos-sm.jpg"
+            "icon_asset": "cat-condimentos.png"
           }
         }
       },
