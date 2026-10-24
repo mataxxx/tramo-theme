@@ -39,6 +39,24 @@
           {% render 'product-card', product: product, show_quick_add: section.settings.show_quick_add %}
         </div>
       {%- endfor -%}
+      {%- if section.settings.show_expand -%}
+        <div class="product-rail__item product-rail__item--end">
+          <button type="button" class="rail-end" data-category-open data-rail-end data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">
+            <span class="rail-end__fan" aria-hidden="true">
+              {%- assign fan = 0 -%}
+              {%- for product in coll.products -%}
+                {%- if product.featured_image != blank and fan < 3 -%}
+                  {%- assign fan = fan | plus: 1 -%}
+                  <span class="rail-end__thumb rail-end__thumb--{{ fan }}">{{ product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: '' }}</span>
+                {%- endif -%}
+              {%- endfor -%}
+              <span class="rail-end__circle">{% render 'icon', name: 'chevron-right' %}</span>
+            </span>
+            <span class="rail-end__label">Ver todo</span>
+            <span class="rail-end__count">{{ coll.products_count }} productos</span>
+          </button>
+        </div>
+      {%- endif -%}
     {%- else -%}
       {%- for i in (1..4) -%}
         <div class="product-rail__item">

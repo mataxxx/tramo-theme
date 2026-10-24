@@ -1977,3 +1977,14 @@
     }, true);
   })();
 })();
+
+/* Final del carrusel: animar "Ver todo" cuando aparece */
+(function () {
+  var ends = document.querySelectorAll('[data-rail-end]');
+  if (!ends.length) return;
+  if (!('IntersectionObserver' in window)) { ends.forEach(function (el) { el.classList.add('is-visible'); }); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.35 });
+  ends.forEach(function (el) { io.observe(el); });
+})();
