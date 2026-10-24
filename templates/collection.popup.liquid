@@ -1,5 +1,5 @@
 {%- layout none -%}
-{%- paginate collection.products by 60 -%}
+{%- paginate collection.products by 250 -%}
   {%- for product in collection.products -%}
     {% render 'category-item', product: product %}
   {%- endfor -%}

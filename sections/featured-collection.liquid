@@ -76,11 +76,14 @@
   </div>
 
   {%- if section.settings.show_expand and coll != blank and coll.products.size > 0 -%}
+    {%- comment -%} Si la colección tiene más de 50 productos, la ventana los carga todos desde la página de la colección {%- endcomment -%}
+    {%- if coll.products_count <= 50 -%}
     <template data-category-template>
-      {%- for product in coll.products limit: section.settings.expand_limit -%}
+      {%- for product in coll.products limit: 50 -%}
         {% render 'category-item', product: product %}
       {%- endfor -%}
     </template>
+    {%- endif -%}
   {%- endif -%}
 </section>
 
