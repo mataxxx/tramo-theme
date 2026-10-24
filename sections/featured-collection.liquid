@@ -50,8 +50,7 @@
                   <span class="rail-end__thumb rail-end__thumb--{{ fan }}">{{ product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: '' }}</span>
                 {%- endif -%}
               {%- endfor -%}
-              <span class="rail-end__circle">{% render 'icon', name: 'chevron-right' %}</span>
-              <svg class="rail-end__hand" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.84 15.87l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.91-1.38z"/></svg>
+              <span class="rail-end__tap"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-1.5a1.5 1.5 0 0 1 3 0V11m0-1a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1-6 6h-.6a5.5 5.5 0 0 1-4.3-2.1L5 15.4a1.5 1.5 0 0 1 2.3-2L9 15"/></svg></span>
             </span>
             <span class="rail-end__label">Ver todo</span>
             <span class="rail-end__count">{{ coll.products_count }} productos</span>
