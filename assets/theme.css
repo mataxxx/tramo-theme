@@ -2647,3 +2647,7 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   #QuickView .quick-view__content { grid-row: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
   #QuickView .quick-view .sticky-add { grid-row: 2; position: relative !important; bottom: auto !important; align-self: end; }
 }
+
+/* "Volver a …" siempre en su lugar (no se va al desplazar la ventana) */
+#QuickView .quickview-back { position: sticky; top: 12px; left: auto; align-self: flex-start; flex-shrink: 0; height: 40px; margin: 12px 0 -52px 12px; }
+#QuickView .close-button { position: sticky; top: 12px; align-self: flex-end; flex-shrink: 0; z-index: 6; margin: 12px 12px -54px 0; }
