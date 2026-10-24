@@ -2636,12 +2636,14 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 /* "/ kg" más visible junto al precio grande */
 .quick-view__price .price__unit, .product-info .price__unit { font-size: 18px; font-weight: 600; color: var(--color-text); opacity: .7; margin-left: 2px; }
 
-/* Ventana del producto en computadora: tamaño fijo para que no brinque al cambiar de presentación */
+
+/* Ventana del producto en computadora: tamaño fijo. La columna de texto se desplaza por dentro
+   y el botón de agregar (con Compra segura · Entrega rápida) queda siempre fijo abajo */
 @media (min-width: 750px) {
-  #QuickView.drawer--sheet .drawer__panel { height: min(680px, 90vh); height: min(680px, 90dvh); }
-  #QuickView .quick-view { min-height: 100%; grid-template-rows: 1fr auto; }
-}
-@media (min-width: 750px) {
-  #QuickView .quick-view__body { flex: 1 0 auto; display: flex; flex-direction: column; }
-  #QuickView .quick-view__body > .quick-view { flex: 1 0 auto; }
+  #QuickView.drawer--sheet .drawer__panel { width: min(980px, 100%); height: min(720px, 92vh); height: min(720px, 92dvh); overflow: hidden; }
+  #QuickView .quick-view__body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  #QuickView .quick-view__body > .quick-view { flex: 1 1 auto; min-height: 0; height: 100%; overflow: hidden; grid-template-rows: minmax(0, 1fr) auto; }
+  #QuickView .quick-view__media { grid-row: 1 / span 2; min-height: 0; }
+  #QuickView .quick-view__content { grid-row: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  #QuickView .quick-view .sticky-add { grid-row: 2; position: relative !important; bottom: auto !important; align-self: end; }
 }
