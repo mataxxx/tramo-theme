@@ -2632,3 +2632,16 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 .variant-picker__note[hidden] { display: none; }
 @keyframes vp-note-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .product-info__desc.is-clamped:not(.is-open) .product-info__description > *::after { content: " "; }
+
+/* "/ kg" más visible junto al precio grande */
+.quick-view__price .price__unit, .product-info .price__unit { font-size: 18px; font-weight: 600; color: var(--color-text); opacity: .7; margin-left: 2px; }
+
+/* Ventana del producto en computadora: tamaño fijo para que no brinque al cambiar de presentación */
+@media (min-width: 750px) {
+  #QuickView.drawer--sheet .drawer__panel { height: min(680px, 90vh); height: min(680px, 90dvh); }
+  #QuickView .quick-view { min-height: 100%; grid-template-rows: 1fr auto; }
+}
+@media (min-width: 750px) {
+  #QuickView .quick-view__body { flex: 1 0 auto; display: flex; flex-direction: column; }
+  #QuickView .quick-view__body > .quick-view { flex: 1 0 auto; }
+}

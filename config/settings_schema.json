@@ -710,7 +710,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Si lo activas, el carrito no va al pago de Shopify: el cliente elige retiro o envío por Uber Flash, indica si quiere factura electrónica, y el pedido llega a tu WhatsApp. Los datos de SINPE se los das por WhatsApp."
+        "content": "Si lo activas, el carrito no va al pago de Shopify: el cliente elige envío por Uber Flash, retiro o encomienda, indica si quiere factura electrónica, y el pedido llega a tu WhatsApp. Los datos de SINPE se los das por WhatsApp."
       },
       {
         "type": "checkbox",
@@ -776,6 +776,18 @@
         "id": "order_delivery_note",
         "label": "Nota del envío",
         "default": "Te cotizamos el Uber Flash por WhatsApp y te mandamos el monto total. Pagas por SINPE y lo enviamos."
+      },
+      {
+        "type": "text",
+        "id": "order_courier_label",
+        "label": "Nombre de la encomienda",
+        "default": "Envío por encomienda"
+      },
+      {
+        "type": "textarea",
+        "id": "order_courier_note",
+        "label": "Nota de la encomienda",
+        "default": "Te cotizamos la encomienda por WhatsApp y te mandamos el monto total. Pagas por SINPE y la despachamos."
       },
       {
         "type": "text",

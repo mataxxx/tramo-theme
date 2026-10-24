@@ -36,7 +36,7 @@
             {% render 'cart-cashback' %}
 {%- if settings.order_mode -%}<ul class="cart-howto" role="list">
               <li>{% render 'icon', name: 'phone' %}<span><b>Pagas por SINPE Móvil</b> antes de retirar o de enviar tu pedido.</span></li>
-              <li>{% render 'icon', name: 'map-pin' %}<span>Recoges en el <b>Mercado Central</b> o te lo enviamos por <b>Uber Flash</b> <small>(el envío se cotiza aparte)</small></span></li>
+              <li>{% render 'icon', name: 'map-pin' %}<span>Te lo enviamos por <b>Uber Flash</b>, recoges en el <b>Mercado Central</b> o va por <b>encomienda</b> a todo el país <small>(el envío se cotiza aparte)</small></span></li>
             </ul>{%- else -%}<p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>{%- endif -%}
             <button type="{% if settings.order_mode %}button{% else %}submit{% endif %}"{% unless settings.order_mode %} name="checkout"{% endunless %} class="button button--full" data-checkout-button{% if settings.order_mode %} data-order-open{% endif %}{% if settings.show_pay_methods and settings.require_pay_choice and settings.pay_methods != blank and cart.attributes['Método de pago'] == blank %} disabled{% endif %}>{{ section.settings.checkout_label }}</button>
             {%- if section.settings.show_secure and settings.order_mode != true -%}
