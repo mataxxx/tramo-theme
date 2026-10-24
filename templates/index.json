@@ -113,12 +113,22 @@
             "search_noun": "especia",
             "icon_asset": "cat-condimentos.png"
           }
+        },
+        "c": {
+          "type": "category",
+          "settings": {
+            "collection": "conservas-y-dulces",
+            "title": "Conservas y dulces",
+            "icon": "package",
+            "search_noun": "producto"
+          }
         }
       },
       "block_order": [
         "q",
         "t",
-        "e"
+        "e",
+        "c"
       ],
       "settings": {
         "heading": "Ingredientes para…"
@@ -153,6 +163,16 @@
         "heading": "Condimentos",
         "search_noun": "especia"
       }
+    },
+    "conservas": {
+      "type": "featured-collection",
+      "settings": {
+        "icon": "none",
+        "popup_search": "icon",
+        "collection": "conservas-y-dulces",
+        "heading": "Conservas y dulces",
+        "search_noun": "producto"
+      }
     }
   },
   "order": [
@@ -161,6 +181,7 @@
     "circles",
     "queque",
     "tamales",
-    "especias"
+    "especias",
+    "conservas"
   ]
 }

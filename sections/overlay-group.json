@@ -51,12 +51,21 @@
             "title": "Condimentos",
             "search_noun": "especia"
           }
+        },
+        "c4": {
+          "type": "category",
+          "settings": {
+            "collection": "conservas-y-dulces",
+            "title": "Conservas y dulces",
+            "search_noun": "producto"
+          }
         }
       },
       "block_order": [
         "c1",
         "c2",
-        "c3"
+        "c3",
+        "c4"
       ]
     },
     "reels": {
