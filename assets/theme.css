@@ -2592,3 +2592,6 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 .product-info__desc-more[hidden] { display: none !important; }
 .product-info__desc-more:hover { background: color-mix(in srgb, var(--color-primary) 8%, #fff) !important; }
 .product-info__desc-more .icon { width: 16px; height: 16px; stroke-width: 2.2; }
+
+/* Ronda 99: título de categorías visible también en celular */
+@media (max-width: 749px) { .cats-section > .cats-heading { display: block !important; font-size: 20px; margin: 4px 0 12px !important; } }
