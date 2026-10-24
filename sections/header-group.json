@@ -31,10 +31,17 @@
           "settings": {
             "text": "Envío por Uber Flash, retiro en el Mercado Central o encomienda"
           }
+        },
+        "m4": {
+          "type": "message",
+          "settings": {
+            "text": "Bomba Tamalera · la receta original de la casa"
+          }
         }
       },
       "block_order": [
         "m1",
+        "m4",
         "m2",
         "m3"
       ],

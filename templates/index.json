@@ -58,9 +58,12 @@
           "type": "slide",
           "settings": {
             "image_asset": "xmas-tamales.jpg",
-            "heading": "TODO PARA\nTUS TAMALES",
-            "text": "Condimento, pasas, ciruelas\ny más para tu tamal.",
-            "overlay_opacity": 45
+            "heading": "LA RECETA\nORIGINAL",
+            "text": "Bomba Tamalera de la casa:\nblanca o con el tono del tamal.",
+            "overlay_opacity": 45,
+            "kicker": "Receta de la casa",
+            "button_label": "",
+            "button_link": ""
           }
         },
         "s2": {
