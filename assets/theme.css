@@ -2579,3 +2579,22 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 .pbrand__label { font-size: 11px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: #8a8375; line-height: 1.1; max-width: 62px; }
 .pbrand__logo { height: 38px; width: auto; display: block; }
 @media (min-width: 750px) { .pbrand__logo { height: 44px; } }
+
+/* Ronda 95: "Ver todo" con el dedito de los videos (sin flecha verde) */
+.rail-end__tap {
+  position: absolute; left: 50%; bottom: 8px; z-index: 2; width: 48px; height: 48px; margin-left: -24px;
+  display: grid; place-items: center; border-radius: 50%; background: #fff; color: #1f3d22;
+  box-shadow: 0 6px 16px rgba(0,0,0,.18); animation: rail-tap 2.2s ease-in-out infinite;
+}
+.rail-end__tap::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--color-primary) 55%, transparent); animation: rail-ring 2.2s ease-out infinite; }
+.rail-end__tap svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes rail-tap { 0%, 100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-3px) scale(1); } 55% { transform: translateY(1px) scale(.9); } 70% { transform: translateY(0) scale(1); } }
+@keyframes rail-ring { 0%, 50% { transform: scale(1); opacity: 0; } 56% { opacity: .7; } 100% { transform: scale(1.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .rail-end__tap, .rail-end__tap::after { animation: none; } }
+
+/* Ronda 96: fotos de producto completas (sin recortar) sobre fondo blanco */
+.product-card__media:has(img) { background: #fff; }
+.product-card__media img { object-fit: contain; }
+.product-gallery__slide:has(img) { background: #fff; }
+.product-gallery__slide img { object-fit: contain; }
+.quick-view__media:has(img) { background: #fff; }
