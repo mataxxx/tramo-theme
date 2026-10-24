@@ -37,7 +37,7 @@
       "type": "hero",
       "settings": {
         "heading": "TODO PARA\nTU NAVIDAD",
-        "text": "Queque navideño, tamales\ny especias para la pierna.",
+        "text": "Ingredientes para tu queque,\ntus tamales y la pierna.",
         "tile1_kicker": "Hecho a mano en Costa Rica",
         "tile1_heading": "Arma tu especiero",
         "tile1_text": "Elige el modelo y llénalo con tus especias.",
@@ -58,8 +58,8 @@
           "type": "slide",
           "settings": {
             "image_asset": "xmas-tamales.jpg",
-            "heading": "TAMALES\nDE LA CASA",
-            "text": "Todo para el tamal:\nmezcla, pasas, aceitunas y más.",
+            "heading": "TODO PARA\nTUS TAMALES",
+            "text": "Condimento, pasas, ciruelas\ny más para tu tamal.",
             "overlay_opacity": 45
           }
         },
@@ -85,7 +85,7 @@
           "type": "category",
           "settings": {
             "collection": "queque-navideno",
-            "title": "Queque navideño",
+            "title": "Ingredientes para queque",
             "icon": "cake",
             "search_noun": "producto",
             "icon_asset": "cat-queque.png"
@@ -95,7 +95,7 @@
           "type": "category",
           "settings": {
             "collection": "tamales",
-            "title": "Tamales",
+            "title": "Ingredientes para tamal",
             "icon": "tamal",
             "search_noun": "producto",
             "icon_asset": "cat-tamal.png"
@@ -127,7 +127,7 @@
         "icon": "none",
         "popup_search": "icon",
         "collection": "queque-navideno",
-        "heading": "Todo para el queque navideño",
+        "heading": "Ingredientes para queque",
         "search_noun": "producto"
       }
     },
@@ -137,7 +137,7 @@
         "icon": "none",
         "popup_search": "icon",
         "collection": "tamales",
-        "heading": "Todo para los tamales",
+        "heading": "Ingredientes para tamal",
         "search_noun": "producto"
       }
     },
@@ -147,7 +147,7 @@
         "icon": "none",
         "popup_search": "icon",
         "collection": "especias-navidenas",
-        "heading": "Todo en condimentos",
+        "heading": "Condimentos",
         "search_noun": "especia"
       }
     }

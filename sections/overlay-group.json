@@ -32,7 +32,7 @@
           "type": "category",
           "settings": {
             "collection": "queque-navideno",
-            "title": "Queque navideño",
+            "title": "Ingredientes para queque",
             "search_noun": "producto"
           }
         },
@@ -40,7 +40,7 @@
           "type": "category",
           "settings": {
             "collection": "tamales",
-            "title": "Tamales",
+            "title": "Ingredientes para tamal",
             "search_noun": "producto"
           }
         },
