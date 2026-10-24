@@ -3,7 +3,7 @@
   <div class="product-gallery__frame">
     <div class="product-gallery__strip" data-gallery-strip>
       {%- for media in product.media -%}
-        <div class="product-gallery__slide" data-media-id="{{ media.id }}">
+        <div class="product-gallery__slide product-gallery__slide--blur" data-media-id="{{ media.id }}" style="--pg-bg: url('{{ media.preview_image | image_url: width: 240 }}')">
           {{ media.preview_image | image_url: width: 1100 | image_tag: widths: '450, 600, 800, 1100', sizes: sizes | default: '(min-width: 750px) 50vw, 100vw', loading: lazy | default: 'lazy', alt: media.alt | default: product.title }}
         </div>
       {%- else -%}

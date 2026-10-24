@@ -2659,3 +2659,8 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .cm-top > .category-modal__searchwrap { grid-column: 2; grid-row: 1; }
   .cm-top > .cm-filters { grid-column: 3; grid-row: 1; }
 }
+/* Ronda 100: foto del producto completa, con la misma foto desenfocada de fondo */
+.product-gallery__slide--blur { position: relative; overflow: hidden; isolation: isolate; background: #2a2622; }
+.product-gallery__slide--blur::before { content: ''; position: absolute; inset: -40px; z-index: 0; background: var(--pg-bg) center / cover no-repeat; filter: blur(30px) saturate(1.25) brightness(.92); transform: scale(1.15); }
+.product-gallery__slide--blur::after { content: ''; position: absolute; inset: 0; z-index: 0; background: radial-gradient(ellipse at center, rgba(255,255,255,.10), rgba(0,0,0,.18)); pointer-events: none; }
+.product-gallery__slide--blur img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain !important; filter: drop-shadow(0 14px 28px rgba(0,0,0,.28)); }
