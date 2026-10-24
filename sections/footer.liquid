@@ -23,6 +23,8 @@
             {%- if block.settings.logo != blank -%}
               {%- assign footer_logo_style = 'width:' | append: block.settings.logo_width | append: 'px;max-width:100%;height:auto' -%}
               {{ block.settings.logo | image_url: width: 600 | image_tag: class: 'footer-logo', loading: 'lazy', alt: shop.name, style: footer_logo_style }}
+            {%- elsif block.settings.logo_asset != blank -%}
+              <img class="footer-logo" src="{{ block.settings.logo_asset | asset_url }}" alt="{{ shop.name | escape }}" width="1000" height="364" loading="lazy" style="width:{{ block.settings.logo_width }}px;max-width:100%;height:auto">
             {%- endif -%}
             {%- if block.settings.brand_title != blank -%}
               <p class="footer-brand">{{ block.settings.brand_title | escape | newline_to_br }}</p>
@@ -327,6 +329,7 @@
           "label": "Logo (opcional)",
           "info": "Si subes un logo se muestra arriba del texto."
         },
+        { "type": "text", "id": "logo_asset", "label": "O logo del tema (nombre de archivo)", "info": "Ej: logo-tramo-claro.png" },
         {
           "type": "range",
           "id": "logo_width",

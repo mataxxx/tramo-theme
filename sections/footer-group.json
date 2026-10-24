@@ -8,9 +8,11 @@
         "brand": {
           "type": "brand",
           "settings": {
-            "brand_title": "TRAMO\nSAN RAFAEL #1",
-            "brand_subtitle": "— FUNDADORES —",
-            "text": "<p>Especias, ingredientes y sabores del mundo desde 1946.</p>"
+            "brand_title": "",
+            "brand_subtitle": "",
+            "text": "<p>Especias, ingredientes y sabores del mundo desde 1946.</p>",
+            "logo_asset": "logo-tramo-claro.png",
+            "logo_width": 200
           }
         },
         "contact": {
