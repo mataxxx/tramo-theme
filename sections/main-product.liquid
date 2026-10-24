@@ -40,7 +40,12 @@
           </div>
         {%- when 'description' -%}
           {%- if product.description != blank -%}
-            <div class="rte product-info__description" {{ block.shopify_attributes }}>{{ product.description }}</div>
+            <div class="product-info__desc" data-desc {{ block.shopify_attributes }}>
+              <div class="rte product-info__description" data-desc-body>{{ product.description }}</div>
+              <button type="button" class="product-info__desc-more" data-desc-toggle aria-expanded="false" hidden>
+                <span data-desc-label>Ver más</span>{% render 'icon', name: 'chevron-down' %}
+              </button>
+            </div>
           {%- endif -%}
         {%- when 'text' -%}
           {%- if block.settings.text != blank -%}

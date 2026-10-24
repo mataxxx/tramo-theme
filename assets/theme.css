@@ -305,7 +305,7 @@ ul[role="list"], .reset-list { list-style: none; margin: 0; padding: 0; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
 .product-info__title { font-size: clamp(30px, 5vw, 46px); margin-bottom: 12px; }
 .product-info__price .price__current { font-size: 26px; }
-.product-info__description { margin-top: 26px; }
+.product-info__description { margin-top: 0; }
 .collapsible { border-top: 1px solid var(--color-line); padding: 14px 0; margin-top: 8px; }
 .collapsible summary { cursor: pointer; font-weight: 600; }
 .collapsible .rte { margin-top: 10px; }
@@ -2557,3 +2557,20 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .rail-end, .rail-end__thumb, .rail-end__circle { transition: none; }
   .rail-end__circle::after, .rail-end.is-visible .rail-end__circle, .rail-end.is-visible .rail-end__hand { animation: none; }
 }
+
+/* Descripción debajo del título, con "Ver más" si es larga ---------------- */
+.product-info__desc { margin: -2px 0 16px; }
+.product-info__desc .product-info__description { color: var(--color-muted); font-size: 15px; line-height: 1.5; }
+.product-info__desc .product-info__description > :first-child { margin-top: 0; }
+.product-info__desc.is-clamped:not(.is-open) .product-info__description {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.product-info__desc.is-clamped:not(.is-open) .product-info__description > * { display: inline; margin: 0; }
+.product-info__desc-more {
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 4px 0;
+  background: none; border: 0; font: inherit; font-size: 14px; font-weight: 600; color: var(--color-text); cursor: pointer;
+}
+.product-info__desc-more[hidden] { display: none; }
+.product-info__desc-more .icon { width: 16px; height: 16px; transition: transform .25s ease; }
+.product-info__desc.is-open .product-info__desc-more .icon { transform: rotate(180deg); }
+.product-info__desc .quick-view__description { margin-top: 0; }

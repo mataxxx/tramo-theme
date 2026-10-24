@@ -1988,3 +1988,33 @@
   }, { threshold: 0.35 });
   ends.forEach(function (el) { io.observe(el); });
 })();
+
+/* Descripción del producto: recortar a 2 líneas con flechita si es larga */
+(function () {
+  function setup(box) {
+    if (box.dataset.descReady) return;
+    box.dataset.descReady = '1';
+    var body = box.querySelector('[data-desc-body]');
+    var btn = box.querySelector('[data-desc-toggle]');
+    if (!body || !btn) return;
+    box.classList.add('is-clamped');
+    requestAnimationFrame(function () {
+      if (body.scrollHeight - body.clientHeight > 4) { btn.hidden = false; }
+      else { box.classList.remove('is-clamped'); }
+    });
+    btn.addEventListener('click', function () {
+      var open = box.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var label = btn.querySelector('[data-desc-label]');
+      if (label) label.textContent = open ? 'Ver menos' : 'Ver más';
+    });
+  }
+  function scan(root) { (root || document).querySelectorAll('[data-desc]').forEach(setup); }
+  scan();
+  if ('MutationObserver' in window) {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) if (muts[i].addedNodes.length) { scan(); break; }
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+})();
+

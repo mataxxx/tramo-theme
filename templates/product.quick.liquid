@@ -15,6 +15,14 @@
       <h2 class="quick-view__title">{{ product.title }}</h2>
       <button type="button" class="like-btn like-btn--inline" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button>
     </div>
+    {%- if settings.quick_show_description and product.description != blank -%}
+      <div class="product-info__desc" data-desc>
+        <div class="rte product-info__description quick-view__description" data-desc-body>{{ product.description }}</div>
+        <button type="button" class="product-info__desc-more" data-desc-toggle aria-expanded="false" hidden>
+          <span data-desc-label>Ver más</span>{% render 'icon', name: 'chevron-down' %}
+        </button>
+      </div>
+    {%- endif -%}
     <div class="quick-view__price">{% render 'price', product: product, variant: product.selected_or_first_available_variant %}</div>
     {% render 'product-variant-picker', product: product, form_id: form_id, section_id: form_id %}
     {% render 'product-quantity', product: product %}
@@ -25,9 +33,6 @@
     {%- endif -%}
     {%- if settings.quick_show_video and settings.quick_video_position == 'before_description' -%}
       {% render 'product-video', product: product, title: settings.quick_video_title %}
-    {%- endif -%}
-    {%- if settings.quick_show_description and product.description != blank -%}
-      <div class="rte quick-view__description">{{ product.description }}</div>
     {%- endif -%}
     {%- if settings.quick_show_video and settings.quick_video_position == 'after_description' -%}
       {% render 'product-video', product: product, title: settings.quick_video_title %}

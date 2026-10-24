@@ -34,12 +34,12 @@
       "block_order": [
         "type",
         "title",
+        "description",
         "price",
         "variant_picker",
         "quantity",
         "buy_buttons",
-        "combo",
-        "description"
+        "combo"
       ],
       "settings": {}
     },
