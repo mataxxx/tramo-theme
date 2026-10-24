@@ -15,10 +15,13 @@
   {%- assign text_sel = '#shopify-section-' | append: section.id | append: ' .menu-list > ul > li > a' -%}
   {% render 'text-style', s: s, p: 'menu', sel: text_sel %}
 
-  #shopify-section-{{ section.id }} .brand-mark__logo { width: {{ s.logo_width_mobile }}px; max-width: 100%; height: auto; }
+  #shopify-section-{{ section.id }} .brand-mark__logo { width: {{ s.logo_width_mobile }}px; max-width: 100%; height: auto; object-fit: contain; }
   @media (min-width: 750px) {
     #shopify-section-{{ section.id }} .brand-mark__logo { width: {{ s.logo_width }}px; }
   }
+  {%- comment -%} Sin deformar: si el alto queda limitado, el ancho se ajusta solo {%- endcomment -%}
+  #shopify-section-{{ section.id }} .site-header .brand-mark__logo { aspect-ratio: auto; }
+  #shopify-section-{{ section.id }} .site-header .brand-mark__logo[width][height] { height: auto !important; max-height: none !important; }
   .drawer--left .drawer__panel { --menu-bg: {{ s.menu_bg }}; }
   {%- if bg_image %}
   .drawer--left .drawer__panel {
