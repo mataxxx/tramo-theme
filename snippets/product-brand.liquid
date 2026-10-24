@@ -1,0 +1,17 @@
+{%- comment -%}
+  Logo de la marca del producto. Agrega al producto la etiqueta "marca-<nombre>" y sube el logo al tema como assets/marca-<nombre>.png
+  Ej: etiqueta "marca-el-angel" → assets/marca-el-angel.png
+{%- endcomment -%}
+{%- for t in product.tags -%}
+  {%- assign tl = t | downcase -%}
+  {%- assign pre = tl | slice: 0, 6 -%}
+  {%- if pre == 'marca-' -%}
+    {%- assign file = tl | handleize | append: '.png' -%}
+    {%- assign brand_name = tl | remove_first: 'marca-' | replace: '-', ' ' | capitalize -%}
+    <div class="pbrand">
+      <span class="pbrand__label">Producto de</span>
+      <img class="pbrand__logo" src="{{ file | asset_url }}" alt="{{ brand_name | escape }}" width="600" height="210" loading="lazy">
+    </div>
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}

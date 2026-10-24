@@ -15,6 +15,7 @@
       <h2 class="quick-view__title">{{ product.title }}</h2>
       <button type="button" class="like-btn like-btn--inline" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button>
     </div>
+    {% render 'product-brand', product: product %}
     {%- if settings.quick_show_description and product.description != blank -%}
       <div class="product-info__desc" data-desc>
         <div class="rte product-info__description quick-view__description" data-desc-body>{{ product.description }}</div>
