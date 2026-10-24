@@ -22,6 +22,7 @@
             <h1 class="product-info__title">{{ product.title }}</h1>
             <button type="button" class="like-btn like-btn--inline" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button>
           </div>
+          {% render 'product-brand', product: product %}
         {%- when 'price' -%}
           <div class="product-info__price" {{ block.shopify_attributes }}>
             {% render 'price', product: product, variant: product.selected_or_first_available_variant %}

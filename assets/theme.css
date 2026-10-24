@@ -2557,3 +2557,9 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .rail-end, .rail-end__thumb, .rail-end__circle { transition: none; }
   .rail-end__circle::after, .rail-end.is-visible .rail-end__circle, .rail-end.is-visible .rail-end__hand { animation: none; }
 }
+
+/* Ronda 94: logo de la marca en la ficha del producto */
+.pbrand { display: inline-flex; align-items: center; gap: 10px; margin: 2px 0 10px; padding: 6px 12px 6px 10px; background: #fff; border: 1px solid #ece4d3; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+.pbrand__label { font-size: 11px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: #8a8375; line-height: 1.1; max-width: 62px; }
+.pbrand__logo { height: 38px; width: auto; display: block; }
+@media (min-width: 750px) { .pbrand__logo { height: 44px; } }
