@@ -1,6 +1,6 @@
 {%- comment -%}
   Tarjeta de producto. Parámetros: product, show_quick_add (bool), lazy (bool)
-  Muestra "Desde" + el precio de la presentación más barata (sin contar "A granel", que se cobra por 10 g).
+  Si el producto se vende a granel, muestra primero el precio por kilo. Si no, "Desde" + la presentación más barata.
 {%- endcomment -%}
 {%- liquid
   assign pick = nil
@@ -33,9 +33,23 @@
   if shown.options contains settings.bulk_variant_name
     assign shown_is_bulk = true
   endif
+  assign bulk_variant = nil
+  for v in product.variants
+    if v.options contains settings.bulk_variant_name
+      if bulk_variant == nil or v.price < bulk_variant.price
+        assign bulk_variant = v
+      endif
+    endif
+  endfor
+  assign per_kg = 1000 | divided_by: settings.bulk_unit_grams | default: 100
   assign show_from = false
   assign subtitle = ''
-  if product.variants.size > 1
+  if bulk_variant != nil
+    assign subtitle = 'A granel o en bolsa'
+    if counted == 0
+      assign subtitle = 'A granel'
+    endif
+  elsif product.variants.size > 1
     assign show_from = true
     assign subtitle = 'Varias presentaciones'
   elsif product.has_only_default_variant == false
@@ -78,9 +92,13 @@
     {%- endif -%}
     <div class="product-card__row">
       <div class="price{% if shown.compare_at_price > shown.price %} price--sale{% endif %}" data-price>
+        {%- if bulk_variant != nil -%}
+          <strong class="price__current">{{ bulk_variant.price | times: per_kg | money }}</strong><span class="price__unit">/ kg</span>
+        {%- else -%}
         {%- if show_from or product.tags contains 'especiero-modelo' -%}<span class="price__from">Desde</span>{%- endif -%}
         {%- if shown.compare_at_price > shown.price -%}<s class="price__compare">{{ shown.compare_at_price | money }}</s>{%- endif -%}
         <strong class="price__current">{{ shown.price | money }}</strong>
+        {%- endif -%}
       </div>
       {%- if show_quick_add and settings.card_quick_add and product.available -%}
         {%- if product.has_only_default_variant or shown_is_bulk == false -%}

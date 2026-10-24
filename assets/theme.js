@@ -82,9 +82,10 @@
       .then(function (d) {
         return (d.products || []).map(function (p) {
           var vs = p.variants || [];
-          var fixed = vs.filter(function (v) { return !/granel/i.test(v.title || ''); });
-          var use = fixed.length ? fixed : vs;
-          var prices = use.map(function (v) { return parseFloat(v.price); }).filter(function (n) { return !isNaN(n); });
+          var bulk = vs.filter(function (v) { return /granel/i.test(v.title || ''); });
+          var use = bulk.length ? bulk : vs;
+          var mult = bulk.length ? 1000 / (BULK.unit || 10) : 1;
+          var prices = use.map(function (v) { return parseFloat(v.price) * mult; }).filter(function (n) { return !isNaN(n); });
           var img = p.images && p.images[0] ? p.images[0].src : '';
           return {
             title: p.title, url: base + '/products/' + p.handle, image: img, featured_image: { url: img },
@@ -92,6 +93,7 @@
             price_min: prices.length ? String(Math.min.apply(null, prices)) : '',
             price_max: prices.length ? String(Math.max.apply(null, prices)) : '',
             _hay: searchNorm([p.title, p.product_type, (p.tags || []).join(' ')].join(' ')),
+            per_kg: bulk.length > 0,
             _title: searchNorm(p.title)
           };
         });
@@ -783,7 +785,7 @@
           if (!list.length) { box.innerHTML = '<p class="hsd__empty">No encontramos “' + esc(q) + '”. Prueba con otra palabra o elige una categoría.</p>'; return; }
           box.innerHTML = list.map(function (p) {
             var lo = parseFloat(p.price_min || p.price), hi = parseFloat(p.price_max || p.price);
-            var price = isNaN(lo) ? '' : ((hi > lo ? 'Desde ' : '') + formatMoney(toCents(lo)));
+            var price = isNaN(lo) ? '' : (p.per_kg ? formatMoney(toCents(lo)) + ' / kg' : ((hi > lo ? 'Desde ' : '') + formatMoney(toCents(lo))));
             var sub = [p.type, price].filter(Boolean).map(esc).join('<i>•</i>');
             return '<a class="hsd__item" href="' + esc(p.url) + '" data-quick-view="' + esc(p.url) + '">' +
               '<span class="hsd__img">' + (p.image ? '<img src="' + esc(p.image) + '" alt="" loading="lazy">' : '') + '</span>' +
@@ -841,9 +843,10 @@
         .then(parseJSON)
         .then(function (data) {
           search.items = (data.products || []).map(function (p) {
-            var normal = (p.variants || []).filter(function (v) { return [v.option1, v.option2, v.option3].indexOf(BULK.name) === -1; });
-            var list = normal.length ? normal : (p.variants || []);
-            var prices = list.map(function (v) { return toCents(v.price); });
+            var bulkV = (p.variants || []).filter(function (v) { return [v.option1, v.option2, v.option3].indexOf(BULK.name) > -1; });
+            var list = bulkV.length ? bulkV : (p.variants || []);
+            var mult = bulkV.length ? 1000 / (BULK.unit || 10) : 1;
+            var prices = list.map(function (v) { return toCents(v.price) * mult; });
             var min = prices.length ? Math.min.apply(null, prices) : 0;
             var max = prices.length ? Math.max.apply(null, prices) : 0;
             return {
@@ -851,7 +854,7 @@
               url: base + '/products/' + p.handle,
               image: sizedImage(p.images && p.images[0] && p.images[0].src, 160),
               price: min,
-              sub: prices.length ? (min < max ? 'Desde ' : '') + formatMoney(min) : ''
+              sub: prices.length ? (bulkV.length ? formatMoney(min) + ' / kg' : (min < max ? 'Desde ' : '') + formatMoney(min)) : ''
             };
           });
           renderScopedResults();
@@ -1872,15 +1875,17 @@
       fetch(ROOT + 'products/' + encodeURIComponent(h) + '.js')
         .then(function (r) { if (!r.ok) throw new Error('x'); return r.json(); })
         .then(function (p) {
-          var prices = (p.variants || []).filter(function (v) { return !(v.options && v.options.indexOf(BULK.name) > -1); }).map(function (v) { return v.price; });
+          var bulkL = (p.variants || []).filter(function (v) { return v.options && v.options.indexOf(BULK.name) > -1; });
+          var prices = (bulkL.length ? bulkL : (p.variants || [])).map(function (v) { return v.price * (bulkL.length ? 1000 / (BULK.unit || 10) : 1); });
           var min = prices.length ? Math.min.apply(null, prices) : p.price;
           var max = prices.length ? Math.max.apply(null, prices) : p.price;
+          var kg = bulkL.length > 0;
           var li = document.createElement('li');
           li.className = 'like-row';
           li.innerHTML =
             '<a class="like-row__main" href="' + esc(p.url) + '" data-quick-view="' + esc(p.url) + '">' +
             '<span class="like-row__img">' + (p.featured_image ? '<img src="' + esc(sizedImage(p.featured_image, 160)) + '" alt="" width="64" height="64">' : '') + '</span>' +
-            '<span class="like-row__info"><strong>' + esc(p.title) + '</strong><span>' + (min < max ? 'Desde ' : '') + formatMoney(min) + '</span></span></a>' +
+            '<span class="like-row__info"><strong>' + esc(p.title) + '</strong><span>' + (kg ? formatMoney(min) + ' / kg' : (min < max ? 'Desde ' : '') + formatMoney(min)) + '</span></span></a>' +
             '<button type="button" class="like-btn like-btn--row" data-like="' + esc(h) + '" aria-pressed="true" aria-label="Quitar de favoritos"><svg class="icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></button>';
           listEl.appendChild(li);
         })
