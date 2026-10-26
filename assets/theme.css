@@ -2736,3 +2736,10 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .header__right > * { grid-column: auto; grid-row: auto; margin: 0; }
 }
 
+
+/* Ingredientes para…: íconos sin cajita de fondo */
+.cats-section .cats-tile__media:has(.cats-tile__icoimg), .cats-section .cats-tile__media:has(.cats-tile__icoimg):is(*),
+.cats-section .cats-tile__media:has(.icon):not(:has(img)), .cats-section .cats-tile__media:has(.icon):not(:has(img)):is(*) {
+  background: transparent !important; border: 0 !important; box-shadow: none !important; overflow: visible;
+}
+.cats-section .cats-tile__media .cats-tile__icoimg { padding: 4%; filter: drop-shadow(0 4px 6px rgba(38,61,37,.10)); }
