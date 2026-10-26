@@ -86,6 +86,7 @@
         </form>
       </div>
     {%- endif -%}
+    <div class="header__right">
     {%- if s.show_likes -%}
       <button type="button" class="icon-button header__likes" data-open="likes" aria-label="Favoritos">
         {% render 'icon', name: 'heart' %}
@@ -104,6 +105,7 @@
         <span class="count-bubble" data-cart-count{% if cart_count == 0 %} hidden{% endif %}>{{ cart_count }}</span>
       </a>
     {%- endif -%}
+    </div>
   </div>
 </header>
 

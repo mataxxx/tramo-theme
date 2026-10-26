@@ -2725,3 +2725,13 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 .pmini__price small { font-weight: 500; color: var(--color-muted); font-size: 11.5px; }
 .product-related--mini { padding-top: 10px; padding-bottom: 30px; }
 @media (min-width: 750px) { .pmini { flex-basis: 132px; } }
+
+/* Encabezado en computadora: buscador a la izquierda, logo al centro, carrito a la derecha */
+.header__right { display: contents; }
+@media (min-width: 750px) {
+  .site-header { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 24px; }
+  .site-header .brand-mark { grid-column: 2; grid-row: 1; justify-self: center; text-align: center; }
+  .header__searchwrap { grid-column: 1; grid-row: 1; justify-self: start; width: 100%; max-width: 360px; }
+  .header__right { grid-column: 3; grid-row: 1; justify-self: end; display: flex; align-items: center; gap: 12px; }
+  .header__right > * { grid-column: auto; grid-row: auto; margin: 0; }
+}
