@@ -61,7 +61,7 @@
             <label class="ord-opt">
               <input type="radio" name="ord-delivery" value="courier" data-order-mode>
               <span class="ord-opt__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/><path d="M7.5 5.5l9 5"/></svg></span>
-              <span class="ord-opt__txt"><b>{{ settings.order_courier_label | default: 'Envío por encomienda' }}</b><small>A cualquier parte del país</small></span>
+              <span class="ord-opt__txt"><b>{{ settings.order_courier_label | default: 'Envío por encomienda' }}</b><small data-courier-sub>A cualquier parte del país</small></span>
               <em class="ord-opt__tag ord-opt__tag--soft">Se cotiza</em>
             </label>
           </div>
@@ -78,6 +78,7 @@
             <p class="ord-note">{{ settings.order_pickup_note }}</p>
           </div>
 
+          <p class="ord-courier-block" data-courier-block hidden></p>
           <div class="ord-pane" data-order-pane="courier" hidden>
             <label class="ord-field"><span>Provincia, cantón y distrito</span><input type="text" data-order-courier-area placeholder="Ej. Alajuela, San Carlos, Quesada" autocomplete="address-level2"></label>
             <label class="ord-field"><span>Dirección exacta</span><textarea data-order-courier-address rows="3" placeholder="Calle, número de casa, señas…" autocomplete="street-address"></textarea></label>

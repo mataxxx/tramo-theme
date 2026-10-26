@@ -14,7 +14,12 @@
   <input type="hidden" name="quantity" value="1" data-quantity-field>
   {% render 'product-spice', product: product %}
   {%- if settings.order_mode -%}
+    {%- if product.metafields.custom.sin_encomienda.value == true -%}
+    <p class="pay-order">{% render 'icon', name: 'phone' %}<span>Paga por <b>SINPE Móvil</b> y coordina el envío por <b>Uber Flash</b> o retira en el <b>Mercado Central</b>.</span></p>
+    <p class="ship-warn">{% render 'icon', name: 'truck' %}<span><b>No se envía por encomienda.</b> Este producto solo se entrega por Uber Flash o retiro en el Mercado Central.</span></p>
+    {%- else -%}
     <p class="pay-order">{% render 'icon', name: 'phone' %}<span>Paga por <b>SINPE Móvil</b> y coordina el envío por <b>Uber Flash</b>, retira en el <b>Mercado Central</b> o te lo mandamos por <b>encomienda</b> a todo el país.</span></p>
+    {%- endif -%}
   {%- endif -%}
   <button
     type="submit"

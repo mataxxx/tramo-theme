@@ -2743,3 +2743,26 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   background: transparent !important; border: 0 !important; box-shadow: none !important; overflow: visible;
 }
 .cats-section .cats-tile__media .cats-tile__icoimg { padding: 4%; filter: drop-shadow(0 4px 6px rgba(38,61,37,.10)); }
+
+/* Aviso: no se envía por encomienda */
+.ship-warn { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: #fdf3e2; border: 1px solid #f0d9a8; color: #6b4a12; font-size: 14px; line-height: 1.4; }
+.ship-warn .icon { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+.cart-line__warn { display: inline-flex; align-items: center; gap: 5px; margin: 4px 0 0; padding: 2px 8px; border-radius: 999px; background: #fdf3e2; color: #8a5a10; font-size: 12px; font-weight: 600; }
+.cart-line__warn .icon { width: 14px; height: 14px; }
+.ord-opt.is-disabled { opacity: .5; cursor: not-allowed; }
+.ord-opt.is-disabled * { cursor: not-allowed; }
+.ord-courier-block { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: #fdf3e2; border: 1px solid #f0d9a8; color: #6b4a12; font-size: 14px; line-height: 1.4; }
+.ord-courier-block[hidden] { display: none; }
+
+/* Equivalencia en tazas */
+.cup-note { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: 14px; color: var(--color-text); opacity: .85; }
+.cup-note .icon { width: 18px; height: 18px; color: var(--color-primary); flex-shrink: 0; }
+
+/* Celular: foto del producto un poco más pequeña */
+@media (max-width: 749px) {
+  #QuickView .quick-view__media { aspect-ratio: 1 / 0.68; }
+  #QuickView .quick-view__media .product-gallery, #QuickView .quick-view__media .product-gallery__frame, #QuickView .quick-view__media .product-gallery__strip { height: 100%; }
+  #QuickView .quick-view__media .product-gallery__slide { aspect-ratio: auto; height: 100%; border-radius: 0; }
+  .product-info, .product-gallery__slide { scroll-margin-top: 0; }
+  .main-product .product-gallery__slide, .product-page .product-gallery__slide { aspect-ratio: 1 / 0.85; }
+}

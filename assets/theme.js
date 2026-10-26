@@ -519,6 +519,28 @@
       if (strip && vi > -1) strip.scrollTo({ left: vi * strip.clientWidth, behavior: 'smooth' });
     }
 
+    /* Equivalencia en tazas (si el producto tiene "Gramos por taza") */
+    var cupNote = $('[data-cup-note]', root);
+    function cupText(c) {
+      var q = Math.round(c * 4) / 4; if (q <= 0) q = 0.25;
+      var whole = Math.floor(q), frac = q - whole;
+      var f = frac === 0.25 ? '¼' : frac === 0.5 ? '½' : frac === 0.75 ? '¾' : '';
+      var num = (whole ? String(whole) : '') + f;
+      return num + (q > 1 ? ' tazas' : ' taza');
+    }
+    function updateCups(variant, quantity) {
+      if (!cupNote) return;
+      var per = parseFloat(cupNote.getAttribute('data-cup-grams')); var txt = cupNote.querySelector('[data-cup-text]');
+      if (!per || !txt) return;
+      var grams = 0;
+      if (variant && variant.bulk) grams = quantity * (BULK.unit || 10);
+      else if (variant) {
+        var m = String(variant.title || '').replace(',', '.').match(/(\d+(?:\.\d+)?)\s*(kg|g)\b/i);
+        if (m) grams = parseFloat(m[1]) * (m[2].toLowerCase() === 'kg' ? 1000 : 1) * (quantity || 1);
+      }
+      txt.textContent = grams ? grams + ' g ≈ ' + cupText(grams / per) + '  ·  1 taza = ' + per + ' g' : '1 taza ≈ ' + per + ' g';
+    }
+
     function update(fromUser) {
       var options = selectedOptions();
       var variant = findVariant(options);
@@ -554,6 +576,7 @@
       if (addPrice) addPrice.textContent = '· ' + formatMoney(variant.price * quantity);
       if (bulkKg) bulkKg.textContent = '';
       renderPrice(variant);
+      updateCups(variant, quantity);
 
       if (fromUser) {
         scrollToMedia(variant);

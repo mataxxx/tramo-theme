@@ -26,7 +26,36 @@
       cart = c;
       if (!c.item_count) { close(); return; }
       renderCart(); go(page);
+      loadFlags();
     }).catch(function () { $('[data-order-lines]', M).innerHTML = '<li class="ord-lines__load">No se pudo cargar el carrito. Intenta de nuevo.</li>'; });
+  }
+  /* Productos que no se envían por encomienda: se bloquea esa opción */
+  var noCourier = [];
+  function loadFlags() {
+    var root = (window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/';
+    fetch(root + '?sections=order-flags', { headers: { Accept: 'application/json' } })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var html = d && d['order-flags'] || '';
+        var m = html.match(/<script[^>]*data-order-flags[^>]*>([\s\S]*?)<\/script>/);
+        var data = m ? JSON.parse(m[1]) : {};
+        noCourier = (data.noCourier || []).filter(Boolean);
+        applyCourierBlock();
+      })
+      .catch(function () {});
+  }
+  function applyCourierBlock() {
+    var radio = $('input[data-order-mode][value="courier"]', M); if (!radio) return;
+    var opt = radio.closest('.ord-opt'), sub = $('[data-courier-sub]', M), box = $('[data-courier-block]', M);
+    var blocked = noCourier.length > 0;
+    radio.disabled = blocked;
+    if (opt) opt.classList.toggle('is-disabled', blocked);
+    if (sub) sub.textContent = blocked ? 'No disponible para tu pedido' : 'A cualquier parte del país';
+    if (box) {
+      box.hidden = !blocked;
+      if (blocked) box.innerHTML = '<b>' + noCourier.map(esc).join(', ') + '</b> ' + (noCourier.length > 1 ? 'no se envían' : 'no se envía') + ' por encomienda. Elige Uber Flash o retiro en el Mercado Central, o quítalo del carrito para usar encomienda.';
+    }
+    if (blocked && mode === 'courier') { radio.checked = false; mode = null; $$('[data-order-pane]', M).forEach(function (p) { p.hidden = true; }); validate(); }
   }
   function close() {
     M.classList.remove('is-open');
@@ -62,7 +91,7 @@
   function pageOk(n) {
     if (n === 1) return !!(cart && cart.item_count);
     if (n === 2) return $('[data-order-name]', M).value.trim().length > 1 && digits($('[data-order-phone]', M).value).length >= 8;
-    if (n === 3) return !!mode && (mode === 'pickup' || (mode === 'delivery' && !!loc) || (mode === 'courier' && courierOk()));
+    if (n === 3) return !!mode && (mode === 'pickup' || (mode === 'delivery' && !!loc) || (mode === 'courier' && !noCourier.length && courierOk()));
     if (n === 4) return ($('[data-order-payer]', M).value.trim().length > 2) && (!wantsFE() || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim())));
     return true;
   }
