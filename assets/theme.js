@@ -2228,7 +2228,10 @@ document.addEventListener('change', function (e) {
     };
   }
   /* Cambio de página: si la siguiente tarda, se ve el indicador */
-  window.addEventListener('beforeunload', function () { timer = setTimeout(show, DELAY); });
+  window.addEventListener('beforeunload', function () {
+    timer = setTimeout(function () { show(); setTimeout(hide, 6000); }, DELAY); /* si la página no cambia (ej. se abrió WhatsApp), se quita sola */
+  });
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && !pending) hide(); });
   window.addEventListener('pageshow', function () { pending = 0; hide(); });
 })();
 
