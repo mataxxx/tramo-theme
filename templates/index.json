@@ -58,10 +58,10 @@
           "type": "slide",
           "settings": {
             "image_asset": "xmas-tamales.jpg",
-            "heading": "LA RECETA\nORIGINAL",
-            "text": "Bomba Tamalera de la casa:\nblanca o con el tono del tamal.",
+            "heading": "LA BOMBA\nTAMALERA ORIGINAL",
+            "text": "El sabor del tamal tico de siempre,\nblanca o con el tono del tamal.",
             "overlay_opacity": 45,
-            "kicker": "Receta de la casa",
+            "kicker": "Receta tradicional",
             "button_label": "",
             "button_link": ""
           }

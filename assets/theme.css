@@ -2795,3 +2795,19 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .drawer__panel { background: var(--color-surface); }
   #QuickView .quick-view__media { margin-top: 0; }
 }
+
+/* Celular: la barra de abajo se queda arriba del pie de página (no lo tapa) */
+@media (max-width: 749px) {
+  body { padding-bottom: 0 !important; }
+  .site-footer { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+}
+
+/* Ventana de categoría en celular: 20% menos espacio arriba del título */
+@media (max-width: 749px) { .cm-hero__copy { padding-top: 44px !important; } }
+
+/* Ficha: botón de volver solo con flecha */
+#QuickView .quickview-back { width: 42px; height: 42px; padding: 0; justify-content: center; border-radius: 50%; gap: 0; }
+#QuickView .quickview-back .icon { width: 20px; height: 20px; }
+
+/* Ficha: la foto se ve completa (sin recortar) sobre fondo neutro */
+#QuickView .product-gallery__slide--blur img { object-fit: contain !important; }

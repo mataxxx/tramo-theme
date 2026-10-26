@@ -516,12 +516,12 @@
       priceEl.classList.toggle('price--sale', variant.compare_at_price > variant.price);
     }
 
-    function scrollToMedia(variant) {
+    function scrollToMedia(variant, instant) {
       if (!variant || !variant.media_id) return;
       var strip = $('[data-gallery-strip]', root);
       var vsl = strip ? Array.prototype.slice.call(strip.children) : [];
       var vi = vsl.findIndex(function (sl) { return sl.getAttribute('data-media-id') === String(variant.media_id); });
-      if (strip && vi > -1) strip.scrollTo({ left: vi * strip.clientWidth, behavior: 'smooth' });
+      if (strip && vi > -1) strip.scrollTo({ left: vi * strip.clientWidth, behavior: instant ? 'auto' : 'smooth' });
     }
 
     /* Equivalencia en tazas (si el producto tiene "Gramos por taza") */
@@ -680,6 +680,17 @@
     })();
 
     update(false);
+    /* Al abrir: mostrar la foto de la presentación elegida (ej. la de granel) */
+    (function () {
+      var v0 = findVariant(selectedOptions());
+      if (!v0 || !v0.media_id) return;
+      var tries = 0;
+      (function jump() {
+        var strip = $('[data-gallery-strip]', root);
+        if (strip && strip.clientWidth) { scrollToMedia(v0, true); return; }
+        if (++tries < 20) setTimeout(jump, 100);
+      })();
+    })();
   }
 
   /* ---------- Flechas de carruseles ------------------------------------- */
@@ -2171,5 +2182,23 @@ document.addEventListener('change', function (e) {
     open(img);
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box) { e.stopPropagation(); close(); } }, true);
+})();
+
+/* Celular: la barra de abajo sube al llegar al pie de página para no taparlo */
+(function () {
+  var nav = document.querySelector('.bottom-nav'), foot = document.querySelector('.site-footer');
+  if (!nav || !foot) return;
+  var ticking = false;
+  function place() {
+    ticking = false;
+    if (window.innerWidth >= 750) { nav.style.bottom = ''; return; }
+    var top = foot.getBoundingClientRect().top;
+    var lift = Math.max(0, window.innerHeight - top);
+    nav.style.bottom = lift ? lift + 'px' : '';
+  }
+  function req() { if (!ticking) { ticking = true; requestAnimationFrame(place); } }
+  window.addEventListener('scroll', req, { passive: true });
+  window.addEventListener('resize', req);
+  place();
 })();
 
