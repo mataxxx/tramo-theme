@@ -1,0 +1,96 @@
+{%- comment -%} Datos estructurados para Google (invisibles): negocio local, sitio y producto {%- endcomment -%}
+{%- liquid
+  assign wa = settings.order_whatsapp | remove: ' ' | remove: '-' | remove: '+'
+  assign opens = settings.order_open | default: '07:30'
+  assign closes = settings.order_close | default: '17:30'
+  assign day_nums = settings.order_days | default: '1,2,3,4,5,6' | split: ','
+  assign day_names = 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday' | split: ','
+  assign days_json = ''
+  for n in day_nums
+    assign i = n | strip | plus: 0
+    assign days_json = days_json | append: '"https://schema.org/' | append: day_names[i] | append: '",'
+  endfor
+  assign days_json = days_json | remove_last: ','
+  assign base = request.origin
+-%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "GroceryStore",
+      "@id": "{{ base }}/#negocio",
+      "name": {{ shop.name | json }},
+      "url": "{{ base }}/",
+      "logo": "https:{{ 'logo-tramo.png' | asset_url }}",
+      "image": "https:{{ 'logo-tramo.png' | asset_url }}",
+      "description": {{ settings.seo_description | strip_newlines | json }},
+      "foundingDate": "1946",
+      {%- if wa != blank -%}"telephone": "+{{ wa }}",{%- endif -%}
+      "priceRange": "₡",
+      "currenciesAccepted": "CRC",
+      "paymentAccepted": "SINPE Móvil, efectivo",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": {{ settings.seo_street | default: 'Mercado Central de San José' | json }},
+        "addressLocality": {{ settings.seo_city | default: 'San José' | json }},
+        "addressRegion": "San José",
+        "addressCountry": "CR"
+      },
+      "geo": { "@type": "GeoCoordinates", "latitude": {{ settings.seo_lat | default: '9.9349' }}, "longitude": {{ settings.seo_lng | default: '-84.0789' }} },
+      "areaServed": "CR",
+      "openingHoursSpecification": [{ "@type": "OpeningHoursSpecification", "dayOfWeek": [{{ days_json }}], "opens": "{{ opens }}", "closes": "{{ closes }}" }]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "{{ base }}/#sitio",
+      "url": "{{ base }}/",
+      "name": {{ shop.name | json }},
+      "inLanguage": "es-CR",
+      "publisher": { "@id": "{{ base }}/#negocio" },
+      "potentialAction": { "@type": "SearchAction", "target": "{{ base }}/search?q={search_term_string}", "query-input": "required name=search_term_string" }
+    }
+    {%- if request.page_type == 'product' and product -%}
+    {%- liquid
+      assign lo = nil
+      assign hi = 0
+      assign count = 0
+      for v in product.variants
+        unless v.options contains settings.bulk_variant_name
+          if v.price > 0
+            assign count = count | plus: 1
+            if lo == nil or v.price < lo
+              assign lo = v.price
+            endif
+            if v.price > hi
+              assign hi = v.price
+            endif
+          endif
+        endunless
+      endfor
+    -%}
+    ,{
+      "@type": "Product",
+      "name": {{ product.title | json }},
+      "url": "{{ base }}{{ product.url }}",
+      "description": {{ product.description | strip_html | strip_newlines | truncate: 500 | json }},
+      {%- if product.featured_media -%}"image": ["https:{{ product.featured_media | image_url: width: 1200 }}"],{%- endif -%}
+      "brand": { "@type": "Brand", "name": {{ shop.name | json }} },
+      {%- if product.type != blank -%}"category": {{ product.type | json }},{%- endif -%}
+      "sku": {{ product.selected_or_first_available_variant.sku | default: product.handle | json }}
+      {%- if count > 0 -%}
+      ,"offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "CRC",
+        "lowPrice": "{{ lo | divided_by: 100.0 }}",
+        "highPrice": "{{ hi | divided_by: 100.0 }}",
+        "offerCount": {{ count }},
+        "availability": "https://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}",
+        "seller": { "@id": "{{ base }}/#negocio" }
+      }
+      {%- endif -%}
+    }
+    {%- endif -%}
+  ]
+}
+</script>

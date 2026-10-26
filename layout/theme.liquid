@@ -32,11 +32,13 @@
       {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
     </title>
 
-    {%- if page_description -%}
-      <meta name="description" content="{{ page_description | escape }}">
+    {%- assign seo_desc = page_description | default: settings.seo_description -%}
+    {%- if seo_desc != blank -%}
+      <meta name="description" content="{{ seo_desc | strip_newlines | escape }}">
     {%- endif -%}
 
     {% render 'meta-tags' %}
+    {% render 'seo-schema' %}
 
     {{ content_for_header }}
 
@@ -99,6 +101,7 @@
     {% sections 'header-group' %}
 
     <main id="MainContent" class="main" tabindex="-1">
+      {%- if request.page_type == 'index' -%}<h1 class="visually-hidden">{{ settings.seo_h1 | default: shop.name }}</h1>{%- endif -%}
       {{ content_for_layout }}
     </main>
 

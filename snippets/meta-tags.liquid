@@ -10,8 +10,9 @@
 <meta property="og:url" content="{{ og_url }}">
 <meta property="og:title" content="{{ og_title | escape }}">
 <meta property="og:type" content="{{ og_type }}">
-{%- if page_description %}
-  <meta property="og:description" content="{{ page_description | escape }}">
+{%- assign og_desc = page_description | default: settings.seo_description -%}
+{%- if og_desc != blank %}
+  <meta property="og:description" content="{{ og_desc | strip_newlines | escape }}">
 {%- endif -%}
 {%- if page_image %}
   <meta property="og:image" content="http:{{ page_image | image_url: width: 1200 }}">

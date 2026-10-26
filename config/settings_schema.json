@@ -838,5 +838,46 @@
         "default": "-84.0789"
       }
     ]
+  },
+  {
+    "name": "SEO (Google)",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "seo_description",
+        "label": "Descripción para Google (cuando una página no tiene la suya)",
+        "default": "Especias, frutas confitadas, semillas e ingredientes para queque navideño y tamal. Por bolsa o a granel en el Mercado Central de San José, desde 1946. Envíos por Uber Flash y encomienda a todo Costa Rica."
+      },
+      {
+        "type": "text",
+        "id": "seo_h1",
+        "label": "Título principal oculto de la portada",
+        "default": "Tramo San Rafael #1 · Especias e ingredientes en el Mercado Central desde 1946"
+      },
+      {
+        "type": "text",
+        "id": "seo_street",
+        "label": "Dirección",
+        "default": "Mercado Central de San José"
+      },
+      {
+        "type": "text",
+        "id": "seo_city",
+        "label": "Ciudad",
+        "default": "San José"
+      },
+      {
+        "type": "text",
+        "id": "seo_lat",
+        "label": "Latitud del local",
+        "default": "9.9349"
+      },
+      {
+        "type": "text",
+        "id": "seo_lng",
+        "label": "Longitud del local",
+        "default": "-84.0789"
+      }
+    ]
   }
 ]
