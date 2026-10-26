@@ -2779,3 +2779,7 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 @media (min-width: 750px) { .zoomer.is-zoomed .zoomer__img { width: 180vw; } }
 .zoomer__close { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 2; width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: #151914; display: grid; place-items: center; font-size: 22px; cursor: pointer; }
 .zoomer__hint { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 2; color: rgba(255,255,255,.8); font-size: 13px; background: rgba(0,0,0,.4); padding: 6px 12px; border-radius: 999px; pointer-events: none; }
+
+/* Pie de página: sello PYME */
+.site-footer__badge { display: flex; justify-content: center; padding: 18px 16px 6px; }
+.site-footer__badge img { max-width: 100%; height: auto; display: block; }

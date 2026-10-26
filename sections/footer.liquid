@@ -110,6 +110,19 @@
 
   </div>
 
+  {%- if section.settings.badge_image != blank or section.settings.badge_asset != blank -%}
+  <div class="site-footer__badge">
+    {%- capture badge_img -%}
+      {%- if section.settings.badge_image != blank -%}
+        {{ section.settings.badge_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: section.settings.badge_alt, style: 'width:' | append: section.settings.badge_width | append: 'px' }}
+      {%- else -%}
+        <img src="{{ section.settings.badge_asset | asset_url }}" alt="{{ section.settings.badge_alt | escape }}" loading="lazy" style="width:{{ section.settings.badge_width }}px">
+      {%- endif -%}
+    {%- endcapture -%}
+    {%- if section.settings.badge_link != blank -%}<a href="{{ section.settings.badge_link }}" target="_blank" rel="noopener">{{ badge_img }}</a>{%- else -%}{{ badge_img }}{%- endif -%}
+  </div>
+  {%- endif -%}
+
   <div class="site-footer__bottom">
     <p class="site-footer__copy">
       {%- if section.settings.copyright != blank -%}{{ section.settings.copyright }}{%- else -%}&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}{%- endif -%}
@@ -174,14 +187,55 @@
       "type": "header",
       "content": "Colores"
     },
-    { "type": "link_list", "id": "shop_menu", "label": "Menú para la columna Tienda", "info": "Se usa si el menú del bloque Tienda está vacío. Si no eliges ninguno se usa el menú «MAIN TRAMO»." },
-    { "type": "header", "content": "Columna Información" },
-    { "type": "text", "id": "info_heading", "label": "Título", "default": "Información" },
-    { "type": "link_list", "id": "info_menu", "label": "Menú de Información", "info": "Si lo dejas vacío se muestran enlaces básicos." },
-    { "type": "header", "content": "Marca y fondo" },
-    { "type": "text", "id": "since_text", "label": "Texto bajo la marca", "default": "Desde 1946", "info": "Escribe - para ocultarlo." },
-    { "type": "image_picker", "id": "bg_image", "label": "Imagen de fondo (opcional)", "info": "Si subes una imagen, se usa en lugar del color." },
-    { "type": "range", "id": "bg_image_dim", "label": "Oscurecer la imagen", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 40 },
+    {
+      "type": "link_list",
+      "id": "shop_menu",
+      "label": "Menú para la columna Tienda",
+      "info": "Se usa si el menú del bloque Tienda está vacío. Si no eliges ninguno se usa el menú «MAIN TRAMO»."
+    },
+    {
+      "type": "header",
+      "content": "Columna Información"
+    },
+    {
+      "type": "text",
+      "id": "info_heading",
+      "label": "Título",
+      "default": "Información"
+    },
+    {
+      "type": "link_list",
+      "id": "info_menu",
+      "label": "Menú de Información",
+      "info": "Si lo dejas vacío se muestran enlaces básicos."
+    },
+    {
+      "type": "header",
+      "content": "Marca y fondo"
+    },
+    {
+      "type": "text",
+      "id": "since_text",
+      "label": "Texto bajo la marca",
+      "default": "Desde 1946",
+      "info": "Escribe - para ocultarlo."
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Imagen de fondo (opcional)",
+      "info": "Si subes una imagen, se usa en lugar del color."
+    },
+    {
+      "type": "range",
+      "id": "bg_image_dim",
+      "label": "Oscurecer la imagen",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 40
+    },
     {
       "type": "color",
       "id": "bg_color",
@@ -315,6 +369,43 @@
       "step": 4,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Sello PYME u otro sello"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_image",
+      "label": "Imagen del sello",
+      "info": "Ej. el sello PYME del MEIC. Se muestra al final del pie de página."
+    },
+    {
+      "type": "text",
+      "id": "badge_asset",
+      "label": "O archivo del tema",
+      "info": "Nombre de archivo en assets, ej. sello-pyme.png"
+    },
+    {
+      "type": "range",
+      "id": "badge_width",
+      "label": "Ancho",
+      "min": 60,
+      "max": 240,
+      "step": 5,
+      "unit": "px",
+      "default": 110
+    },
+    {
+      "type": "text",
+      "id": "badge_alt",
+      "label": "Texto alternativo",
+      "default": "Empresa PYME registrada en el MEIC"
+    },
+    {
+      "type": "url",
+      "id": "badge_link",
+      "label": "Enlace (opcional)"
     }
   ],
   "blocks": [
@@ -329,7 +420,12 @@
           "label": "Logo (opcional)",
           "info": "Si subes un logo se muestra arriba del texto."
         },
-        { "type": "text", "id": "logo_asset", "label": "O logo del tema (nombre de archivo)", "info": "Ej: logo-tramo-claro.png" },
+        {
+          "type": "text",
+          "id": "logo_asset",
+          "label": "O logo del tema (nombre de archivo)",
+          "info": "Ej: logo-tramo-claro.png"
+        },
         {
           "type": "range",
           "id": "logo_width",
