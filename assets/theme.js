@@ -2117,3 +2117,11 @@ document.addEventListener('change', function (e) {
   group.querySelectorAll('[data-option-note]').forEach(function (n) { n.hidden = n.getAttribute('data-option-note') !== input.value; });
 });
 
+/* Teclado del celular: la hoja de búsqueda sube junto con el teclado */
+(function () {
+  var vv = window.visualViewport; if (!vv) return;
+  var el = document.getElementById('SearchOverlay'); if (!el) return;
+  function fit() { var kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); el.style.setProperty('--kb', kb + 'px'); }
+  vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); fit();
+})();
+
