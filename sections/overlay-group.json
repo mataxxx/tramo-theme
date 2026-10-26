@@ -22,41 +22,36 @@
     },
     "search-overlay": {
       "type": "search-overlay",
-      "settings": {
-        "title": "¿Qué producto estás buscando?",
-        "placeholder": "Escribe el nombre del producto...",
-        "helper": "O busca por categoría"
-      },
       "blocks": {
         "c1": {
           "type": "category",
           "settings": {
-            "collection": "queque-navideno",
             "title": "Ingredientes para queque",
+            "collection": "queque-navideno",
             "search_noun": "producto"
           }
         },
         "c2": {
           "type": "category",
           "settings": {
-            "collection": "tamales",
             "title": "Ingredientes para tamal",
+            "collection": "tamales",
             "search_noun": "producto"
           }
         },
         "c3": {
           "type": "category",
           "settings": {
-            "collection": "especias-navidenas",
             "title": "Condimentos",
+            "collection": "especias-navidenas",
             "search_noun": "especia"
           }
         },
         "c4": {
           "type": "category",
           "settings": {
-            "collection": "conservas-y-dulces",
             "title": "Conservas y dulces",
+            "collection": "conservas-y-dulces",
             "search_noun": "producto"
           }
         }
@@ -66,12 +61,15 @@
         "c2",
         "c3",
         "c4"
-      ]
+      ],
+      "settings": {
+        "title": "¿Qué producto estás buscando?",
+        "placeholder": "Escribe el nombre del producto...",
+        "helper": "O busca por categoría"
+      }
     },
     "reels": {
       "type": "reels",
-      "blocks": {},
-      "block_order": [],
       "settings": {
         "show_float": false,
         "float_label": "Blog",
@@ -83,11 +81,11 @@
       "settings": {
         "label_home": "Inicio",
         "label_search": "Buscar",
-        "label_videos": "Vlog",
-        "label_cart": "Carrito",
-        "show_videos": false,
+        "show_help": false,
         "show_float_videos": false,
-        "show_help": false
+        "show_videos": false,
+        "label_videos": "Vlog",
+        "label_cart": "Carrito"
       }
     },
     "account-panel": {
@@ -178,8 +176,8 @@
             "icon": "cart",
             "title": "Cómo comprar",
             "summary": "Paso a paso, muy fácil",
-            "show_whatsapp": true,
-            "content": "<p><strong>1. Elige tus productos.</strong> Entra a Queque navideño o Tamales, o usa la lupa para buscar.</p><p><strong>2. Escoge la presentación.</strong> Toca el producto y elige el tamaño (25 g, 100 g, 250 g…). Si quieres una cantidad exacta, elige <em>A granel</em> y escribe los gramos. Agrégalo al carrito.</p><p><strong>3. Abre el carrito</strong> y toca <strong>“Hacer pedido”</strong>.</p><p><strong>4. Completa los 4 pasos:</strong> revisa tu pedido, escribe tu nombre y teléfono, elige cómo lo recibes (envío por Uber Flash marcando tu ubicación en el mapa, recoger en el Mercado Central o encomienda a cualquier parte del país) e indica si deseas factura electrónica.</p><p><strong>5. Toca “Enviar pedido por WhatsApp”</strong> y envía el mensaje que se abre. Te confirmamos por ahí.</p><p><strong>6. Paga por SINPE Móvil.</strong> Te pasamos los datos y el total por WhatsApp (si es envío, incluye el costo del Uber Flash o de la encomienda). Con el pago confirmado, te lo enviamos o lo retiras en el Mercado Central.</p>"
+            "content": "<p><strong>1. Elige tus productos.</strong> Entra a Queque navideño o Tamales, o usa la lupa para buscar.</p><p><strong>2. Escoge la presentación.</strong> Toca el producto y elige el tamaño (25 g, 100 g, 250 g…). Si quieres una cantidad exacta, elige <em>A granel</em> y escribe los gramos. Agrégalo al carrito.</p><p><strong>3. Abre el carrito</strong> y toca <strong>“Hacer pedido”</strong>.</p><p><strong>4. Completa los 4 pasos:</strong> revisa tu pedido, escribe tu nombre y teléfono, elige cómo lo recibes (envío por Uber Flash marcando tu ubicación en el mapa, recoger en el Mercado Central o encomienda a cualquier parte del país) e indica si deseas factura electrónica.</p><p><strong>5. Toca “Enviar pedido por WhatsApp”</strong> y envía el mensaje que se abre. Te confirmamos por ahí.</p><p><strong>6. Paga por SINPE Móvil.</strong> Te pasamos los datos y el total por WhatsApp (si es envío, incluye el costo del Uber Flash o de la encomienda). Con el pago confirmado, te lo enviamos o lo retiras en el Mercado Central.</p>",
+            "show_whatsapp": true
           }
         },
         "h5": {
@@ -197,8 +195,8 @@
             "icon": "info",
             "title": "Términos y condiciones",
             "summary": "Pedidos, pagos y envíos",
-            "show_whatsapp": true,
-            "content": "<p><strong>Pedidos.</strong> Tu pedido queda confirmado cuando te respondemos por WhatsApp. Los precios están en colones y pueden cambiar sin previo aviso; la disponibilidad está sujeta a inventario.</p><p><strong>Pagos.</strong> Todos los pedidos, tanto de retiro como de envío, se pagan por SINPE Móvil por adelantado. En los envíos, el pago incluye el costo del Uber Flash o de la encomienda.</p><p><strong>Envíos por Uber Flash.</strong> El costo del envío lo paga el cliente y se cotiza según la ubicación. Es responsabilidad del cliente estar disponible para recibir el pedido en la ubicación indicada. <strong>Solo hay un intento de entrega.</strong> Si el pedido no se puede entregar y el cliente desea que se envíe de nuevo, deberá pagar todo nuevamente.</p><p><strong>Envíos por encomienda.</strong> Enviamos a todo el país. El costo lo paga el cliente y se cotiza según el destino. Los tiempos de entrega dependen de la empresa de encomiendas; es responsabilidad del cliente dar una dirección completa y correcta.</p><p><strong>Productos a granel.</strong> El peso final puede variar levemente según la cantidad solicitada.</p><p><strong>Cambios y devoluciones.</strong> Por tratarse de alimentos, solo aceptamos cambios por producto dañado o error en el pedido, reportado dentro de las 48 horas posteriores a la entrega o retiro.</p><p><strong>Factura electrónica.</strong> Si la solicitas, se emite con los datos que nos indiques en el pedido.</p>"
+            "content": "<p><strong>Pedidos.</strong> Tu pedido queda confirmado cuando te respondemos por WhatsApp. Los precios están en colones y pueden cambiar sin previo aviso; la disponibilidad está sujeta a inventario.</p><p><strong>Pagos.</strong> Todos los pedidos, tanto de retiro como de envío, se pagan por SINPE Móvil por adelantado. En los envíos, el pago incluye el costo del Uber Flash o de la encomienda.</p><p><strong>Envíos por Uber Flash.</strong> El costo del envío lo paga el cliente y se cotiza según la ubicación. Es responsabilidad del cliente estar disponible para recibir el pedido en la ubicación indicada. <strong>Solo hay un intento de entrega.</strong> Si el pedido no se puede entregar y el cliente desea que se envíe de nuevo, deberá pagar todo nuevamente.</p><p><strong>Envíos por encomienda.</strong> Enviamos a todo el país. El costo lo paga el cliente y se cotiza según el destino. Los tiempos de entrega dependen de la empresa de encomiendas; es responsabilidad del cliente dar una dirección completa y correcta.</p><p><strong>Productos a granel.</strong> El peso final puede variar levemente según la cantidad solicitada.</p><p><strong>Cambios y devoluciones.</strong> Por tratarse de alimentos, solo aceptamos cambios por producto dañado o error en el pedido, reportado dentro de las 48 horas posteriores a la entrega o retiro.</p><p><strong>Factura electrónica.</strong> Si la solicitas, se emite con los datos que nos indiques en el pedido.</p>",
+            "show_whatsapp": true
           }
         }
       },
