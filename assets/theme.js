@@ -104,7 +104,12 @@
   function searchProducts(q, limit) {
     var words = searchNorm(q).split(/\s+/).filter(Boolean);
     return loadCatalog().then(function (list) {
-      var hits = list.filter(function (p) { return words.every(function (w) { return p._hay.indexOf(w) > -1; }); });
+      var hits = list.filter(function (p) {
+        return words.every(function (w) {
+          if (w.length < 3) return (' ' + p._hay).indexOf(' ' + w) > -1; /* 1-2 letras: solo al inicio de una palabra */
+          return p._hay.indexOf(w) > -1;
+        });
+      });
       hits.sort(function (a, b) {
         var sa = a._title.indexOf(words[0]) === 0 ? 0 : (a._title.indexOf(' ' + words[0]) > -1 ? 1 : 2);
         var sb = b._title.indexOf(words[0]) === 0 ? 0 : (b._title.indexOf(' ' + words[0]) > -1 ? 1 : 2);
