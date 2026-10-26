@@ -58,3 +58,18 @@ En Shopify abre el pedido y agrega la etiqueta de la etapa: `estado-preparando`,
 - Mínimo para generar un código: `CASHBACK_MIN` (1000).
 - No vence. Los códigos se ven en el admin en **Productos → Tarjetas de regalo**.
 - Variables opcionales en Cloudflare: `CASHBACK_PCT`, `CASHBACK_TAX`, `CASHBACK_MIN`. Si cambias el % aquí, cámbialo también en el personalizador (Configuración del tema → Cash back).
+
+
+## Pedidos automáticos (copia a Shopify y aviso a tu WhatsApp)
+
+Cuando el cliente toca "Enviar pedido", la página manda una copia a `/apps/tramo/order`, aunque el cliente no envíe el WhatsApp:
+
+- Se crea un **pedido en Shopify** con estado **Pago pendiente**, las etiquetas `pedido-whatsapp`, `pago-pendiente` y el tipo de entrega (`entrega-uber`, `entrega-retiro`, `entrega-encomienda`), y los datos del cliente, cuándo se entrega, ubicación o dirección.
+- Si configuras `OWNER_PHONE` y `CALLMEBOT_KEY`, te llega el pedido completo por **WhatsApp**.
+
+Pasos:
+1. App en dev.shopify.com → versión nueva → agrega el permiso **`write_orders`** → Release → acepta la actualización en la tienda.
+2. Cloudflare → Worker → Edit code → pega el `worker.js` nuevo → Deploy.
+3. WhatsApp (opcional pero recomendado): sigue las instrucciones de https://www.callmebot.com/blog/free-api-whatsapp-messages/ desde el teléfono 7017-0518 (le mandas un mensaje a su número y te responde con tu **apikey**). En Cloudflare → Settings → Variables and Secrets agrega `OWNER_PHONE` = `50670170518` y el secreto `CALLMEBOT_KEY` = tu apikey.
+
+Panel de pedidos: la app de Shopify en el celular (Pedidos). Filtra por la etiqueta `pago-pendiente`. Cuando te paguen, "Marcar como pagado" y quita esa etiqueta; cuando esté listo agrega `estado-listo`.

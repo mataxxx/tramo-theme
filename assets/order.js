@@ -103,7 +103,8 @@
     var ent = mode === 'pickup' ? 'Recoger en el Mercado Central' : mode === 'delivery' ? (D.delivery || 'Envío por Uber Flash') : mode === 'courier' ? (D.courier || 'Envío por encomienda') + ' · ' + courierArea() : '—';
     r.innerHTML = '<h3 class="ord-h">Resumen</h3><dl class="ord-rev">' +
       '<div><dt>A nombre de</dt><dd>' + esc($('[data-order-name]', M).value.trim()) + ' · ' + esc($('[data-order-phone]', M).value.trim()) + '</dd></div>' +
-      '<div><dt>Entrega</dt><dd>' + esc(ent) + (mode === 'delivery' || mode === 'courier' ? ' <small>(envío se cotiza)</small>' : '') + '</dd></div></dl>';
+      '<div><dt>Entrega</dt><dd>' + esc(ent) + (mode === 'delivery' || mode === 'courier' ? ' <small>(envío se cotiza)</small>' : '') + '</dd></div>' +
+      (mode ? '<div><dt>Cuándo</dt><dd>' + esc(etaPlain(mode)) + '</dd></div>' : '') + '</dl>';
   }
 
   function variantLabel(it) {
@@ -121,10 +122,50 @@
     $$('[data-order-amount]', M).forEach(function (el) { el.textContent = t; });
   }
 
+  /* ---------- horario: cuándo se entrega (automático según la hora de Costa Rica) ---------- */
+  var DAYS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  function hm(s, d) { var m = String(s || d).match(/(\d{1,2}):(\d{2})/); return m ? (+m[1]) * 60 + (+m[2]) : hm(d, d); }
+  function fmtHM(min) { var h = Math.floor(min / 60), m = min % 60, ap = h >= 12 ? 'p. m.' : 'a. m.'; var h12 = h % 12 || 12; return h12 + ':' + (m < 10 ? '0' : '') + m + ' ' + ap; }
+  function crNow() {
+    var p = {};
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: 'America/Costa_Rica', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        .formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+    } catch (e) { var d = new Date(); return { day: d.getDay(), min: d.getHours() * 60 + d.getMinutes() }; }
+    var wd = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }[p.weekday];
+    return { day: wd, min: (+p.hour) * 60 + (+p.minute) };
+  }
+  function eta() {
+    var open = hm(D.open, '07:30'), close = hm(D.close, '17:30'), cut = hm(D.cutoff, '16:30');
+    var days = String(D.days || '1,2,3,4,5,6').split(',').map(function (x) { return +x; });
+    var now = crNow(), isDay = days.indexOf(now.day) > -1;
+    var r = { open: open, close: close, cut: cut, why: isDay ? (now.min >= cut ? 'late' : '') : 'closed' };
+    if (isDay && now.min >= open && now.min < cut) { r.when = 'hoy'; r.today = true; r.label = 'hoy'; return r; }
+    if (isDay && now.min < open) { r.when = 'hoy'; r.today = true; r.fromOpen = true; r.label = 'hoy desde las ' + fmtHM(open); return r; }
+    for (var i = 1; i <= 7; i++) {
+      var d = (now.day + i) % 7;
+      if (days.indexOf(d) > -1) { r.when = i === 1 ? 'mañana' : 'el ' + DAYS[d]; r.today = false; r.label = r.when + ' desde las ' + fmtHM(open); return r; }
+    }
+    r.when = 'pronto'; r.label = 'pronto'; return r;
+  }
+  function etaText(m) {
+    var e = eta(), late = e.today ? '' : e.why === 'late' ? ' <small>(los pedidos después de las ' + fmtHM(e.cut) + ' salen el siguiente día)</small>' : e.why === 'closed' ? ' <small>(hoy no abrimos)</small>' : '';
+    if (m === 'pickup') return '🕒 Listo para recoger <b>' + e.label + '</b>' + (e.today && !e.fromOpen ? ' · hasta las ' + fmtHM(e.close) : '') + late;
+    if (m === 'delivery') return '🛵 Te lo enviamos <b>' + e.label + '</b>' + late;
+    if (m === 'courier') return '📦 Se despacha <b>' + e.label + '</b> · llega en hasta ' + (D.courierHours || 48) + ' h' + late;
+    return '';
+  }
+  function etaPlain(m) { return etaText(m).replace(/<[^>]+>/g, '').replace(/^\S+\s/, ''); }
+  function showEta(m) {
+    var el = $('[data-order-eta]', M); if (!el) return;
+    var t = etaText(m); el.hidden = !t; el.innerHTML = t;
+  }
+
   /* ---------- modo de entrega ---------- */
   function setMode(m) {
     mode = m;
     $$('[data-order-pane]', M).forEach(function (p) { p.hidden = p.getAttribute('data-order-pane') !== m; });
+    showEta(m);
     $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
     var pt = $('[data-order-paytext]', M);
     if (pt) pt.innerHTML = m === 'pickup'
@@ -271,6 +312,7 @@
       L1.push('*Ubicación:* https://maps.google.com/?q=' + loc.lat + ',' + loc.lng);
       if (n) L1.push('*Señas:* ' + n);
     }
+    if (mode) L1.push('*Cuándo:* ' + etaPlain(mode));
     L1.push('');
     if (wantsFE()) {
       L1.push('*Factura electrónica:* Sí');
@@ -292,6 +334,23 @@
     var c = code(), url = 'https://wa.me/' + D.wa + '?text=' + encodeURIComponent(message(c));
     try { localStorage.setItem(LS, JSON.stringify({ n: $('[data-order-name]', M).value.trim(), p: $('[data-order-phone]', M).value.trim() })); } catch (e) {}
     last = { code: c, url: url, mode: mode };
+    /* Copia automática del pedido a la tienda (no depende de que el cliente envíe el WhatsApp) */
+    try {
+      var root = (window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/';
+      var fe = wantsFE() ? ($('[data-order-fe-type]', M).value + ' ' + $('[data-order-fe-id]', M).value.trim() + ' · ' + $('[data-order-fe-name]', M).value.trim() + ' · ' + $('[data-order-fe-mail]', M).value.trim()) : '';
+      var payload = {
+        code: c, mode: mode, eta: etaPlain(mode),
+        name: $('[data-order-name]', M).value.trim(), phone: $('[data-order-phone]', M).value.trim(),
+        payer: (($('[data-order-payer]', M) || {}).value || '').trim(),
+        location: mode === 'delivery' && loc ? 'https://maps.google.com/?q=' + loc.lat + ',' + loc.lng : '',
+        address: mode === 'courier' ? courierAddr() : (mode === 'delivery' ? (($('[data-order-notes]', M) || {}).value || '').trim() : ''),
+        area: mode === 'courier' ? courierArea() : '',
+        fe: fe,
+        items: cart.items.map(function (it) { return { variant_id: it.variant_id, quantity: it.quantity }; }),
+        message: message(c)
+      };
+      fetch(root.replace(/\/$/, '') + '/apps/tramo/order', { method: 'POST', keepalive: true, quiet: true, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) }).catch(function () {});
+    } catch (e) {}
     /* Celular: abrir WhatsApp en la misma pestaña (la app se abre sola). Computadora: pestaña nueva (WhatsApp Web). */
     var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
     if (mobile) { setTimeout(function () { location.href = url; }, 60); }

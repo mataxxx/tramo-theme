@@ -4,6 +4,8 @@
 //   POST /apps/tramo/ai      -> respuestas de IA sobre un producto (Claude)
 //   GET  /apps/tramo/cashback         -> saldo de cash back y códigos del cliente
 //   POST /apps/tramo/cashback/redeem  -> convierte saldo en un código (tarjeta de regalo) para el checkout
+//   POST /apps/tramo/order   -> registra el pedido de WhatsApp como pedido de Shopify (pago pendiente) y avisa al dueño por WhatsApp
+// Pedidos: necesita el permiso write_orders. Aviso por WhatsApp (opcional): OWNER_PHONE (ej. 50670170518) y CALLMEBOT_KEY
 // Cash back (opcionales): CASHBACK_PCT (5), CASHBACK_TAX (0.13), CASHBACK_MIN (1000)
 // Variables (secretas) que necesita: SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, SHOPIFY_SHOP, ANTHROPIC_API_KEY
 // IA: por defecto usa Workers AI de Cloudflare (gratis, sin clave). Si no hay AI, usa Claude con ANTHROPIC_API_KEY.
@@ -280,6 +282,84 @@ async function handleAI(request, url, env) {
   return json({ answer: text });
 }
 
+// ---------- Pedidos de la tienda (WhatsApp + SINPE) ----------
+const ORDER_CREATE = `
+mutation ($order: OrderCreateOrderInput!, $options: OrderCreateOptionsInput) {
+  orderCreate(order: $order, options: $options) {
+    order { id name }
+    userErrors { field message }
+  }
+}`;
+
+const MODE_TAG = { pickup: 'entrega-retiro', delivery: 'entrega-uber', courier: 'entrega-encomienda' };
+const MODE_LABEL = { pickup: 'Retiro en el Mercado Central', delivery: 'Uber Flash', courier: 'Encomienda' };
+
+function clean(s, max) { return String(s == null ? '' : s).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, max || 200); }
+
+async function notifyOwner(env, text) {
+  if (!env.OWNER_PHONE || !env.CALLMEBOT_KEY) return false;
+  const u = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(env.OWNER_PHONE) +
+    '&text=' + encodeURIComponent(text.slice(0, 3500)) + '&apikey=' + encodeURIComponent(env.CALLMEBOT_KEY);
+  try { const r = await fetch(u); return r.ok; } catch (e) { return false; }
+}
+
+async function handleNewOrder(request, env) {
+  let b;
+  try { b = await request.json(); } catch (e) { return json({ error: 'datos inválidos' }, 400); }
+  const items = Array.isArray(b.items) ? b.items.slice(0, 60) : [];
+  const lineItems = items
+    .map((it) => ({ variantId: 'gid://shopify/ProductVariant/' + parseInt(it.variant_id, 10), quantity: Math.min(10000, Math.max(1, parseInt(it.quantity, 10) || 0)) }))
+    .filter((li) => !/NaN$/.test(li.variantId));
+  const name = clean(b.name, 80), phone = clean(b.phone, 30), code = clean(b.code, 20);
+  const mode = MODE_TAG[b.mode] ? b.mode : 'pickup';
+  if (!lineItems.length || name.length < 2 || phone.replace(/\D/g, '').length < 8) return json({ error: 'pedido incompleto' }, 400);
+
+  const message = clean(b.message, 4000);
+  const eta = clean(b.eta, 120);
+  const attrs = [
+    { key: 'Pedido', value: code },
+    { key: 'Cliente', value: name },
+    { key: 'Teléfono', value: phone },
+    { key: 'Entrega', value: MODE_LABEL[mode] },
+    { key: 'Cuándo', value: eta || '—' }
+  ];
+  if (b.payer) attrs.push({ key: 'SINPE a nombre de', value: clean(b.payer, 80) });
+  if (b.location) attrs.push({ key: 'Ubicación', value: clean(b.location, 200) });
+  if (b.address) attrs.push({ key: 'Dirección', value: clean(b.address, 300) });
+  if (b.fe) attrs.push({ key: 'Factura electrónica', value: clean(b.fe, 300) });
+
+  let orderName = '';
+  let ok = false;
+  try {
+    // Precio real de cada presentación (no se confía en lo que manda el navegador)
+    const pv = await adminGraphql(env, `query ($ids: [ID!]!) { nodes(ids: $ids) { ... on ProductVariant { id price } } }`, { ids: lineItems.map((li) => li.variantId) });
+    const price = {};
+    (pv.nodes || []).forEach((n) => { if (n && n.id) price[n.id] = n.price; });
+    lineItems.forEach((li) => { if (price[li.variantId]) li.priceSet = { shopMoney: { amount: price[li.variantId], currencyCode: 'CRC' } }; });
+    for (let i = lineItems.length - 1; i >= 0; i--) if (!lineItems[i].priceSet) lineItems.splice(i, 1);
+    if (!lineItems.length) throw new Error('sin productos válidos');
+    const data = await adminGraphql(env, ORDER_CREATE, {
+      order: {
+        lineItems,
+        financialStatus: 'PENDING',
+        note: message,
+        tags: ['pedido-whatsapp', 'pago-pendiente', MODE_TAG[mode]],
+        customAttributes: attrs,
+        shippingAddress: mode === 'pickup' ? undefined : { firstName: name, phone, address1: clean(b.address || b.location || 'Ver nota', 250), city: clean(b.area || 'Costa Rica', 80), countryCode: 'CR' },
+        billingAddress: { firstName: name, phone, address1: 'Costa Rica', city: 'Costa Rica', countryCode: 'CR' }
+      },
+      options: { sendReceipt: false, sendFulfillmentReceipt: false, inventoryBehaviour: 'BYPASS' }
+    });
+    const r = data.orderCreate;
+    if (r && r.order) { orderName = r.order.name; ok = true; }
+  } catch (e) { ok = false; }
+
+  // Aviso al dueño por WhatsApp (aunque el pedido en Shopify falle, para no perderlo)
+  const head = '🛒 Pedido nuevo ' + (orderName || code) + ' · ' + MODE_LABEL[mode] + (eta ? ' · ' + eta : '');
+  const sent = await notifyOwner(env, head + '\n\n' + message);
+  return json({ ok, order: orderName, notified: sent });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -289,6 +369,7 @@ export default {
       if (url.pathname.endsWith('/ai') && request.method === 'POST') return await handleAI(request, url, env);
       if (url.pathname.endsWith('/cashback') && request.method === 'GET') return await handleCashback(url, env);
       if (url.pathname.endsWith('/cashback/redeem') && request.method === 'POST') return await handleRedeem(request, url, env);
+      if (url.pathname.endsWith('/order') && request.method === 'POST') return await handleNewOrder(request, env);
       return json({ ok: true, service: 'tramo' });
     } catch (e) {
       return json({ error: 'error interno' }, 500);

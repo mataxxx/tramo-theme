@@ -754,6 +754,42 @@
         "default": "NAV"
       },
       {
+        "type": "header",
+        "content": "Horario de atención"
+      },
+      {
+        "type": "text",
+        "id": "order_open",
+        "label": "Abre (hora 24 h)",
+        "default": "07:30"
+      },
+      {
+        "type": "text",
+        "id": "order_close",
+        "label": "Cierra (hora 24 h)",
+        "default": "17:30"
+      },
+      {
+        "type": "text",
+        "id": "order_cutoff",
+        "label": "Hora límite para entrega el mismo día",
+        "default": "16:30",
+        "info": "Pedidos entre la apertura y esta hora se envían o recogen el mismo día. Después, quedan para el siguiente día de atención."
+      },
+      {
+        "type": "text",
+        "id": "order_days",
+        "label": "Días de atención",
+        "default": "1,2,3,4,5,6",
+        "info": "Números separados por coma: 0 domingo, 1 lunes … 6 sábado."
+      },
+      {
+        "type": "text",
+        "id": "order_courier_hours",
+        "label": "Encomienda: horas máximas de entrega",
+        "default": "48"
+      },
+      {
         "type": "text",
         "id": "order_pickup_place",
         "label": "Lugar de retiro",

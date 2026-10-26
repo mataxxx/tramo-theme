@@ -9,6 +9,11 @@
   data-prefix="{{ settings.order_prefix | default: 'PED' | escape }}"
   data-shop="{{ shop.name | escape }}"
   data-pickup="{{ settings.order_pickup_place | escape }}"
+  data-open="{{ settings.order_open | default: '07:30' | escape }}"
+  data-close="{{ settings.order_close | default: '17:30' | escape }}"
+  data-cutoff="{{ settings.order_cutoff | default: '16:30' | escape }}"
+  data-days="{{ settings.order_days | default: '1,2,3,4,5,6' | escape }}"
+  data-courier-hours="{{ settings.order_courier_hours | default: '48' | escape }}"
   data-delivery="{{ settings.order_delivery_label | default: 'Envío por Uber Flash' | escape }}"
   data-courier="{{ settings.order_courier_label | default: 'Envío por encomienda' | escape }}"
   data-lat="{{ settings.order_map_lat | default: '9.9349' }}"
@@ -78,6 +83,7 @@
             <p class="ord-note">{{ settings.order_pickup_note }}</p>
           </div>
 
+          <p class="ord-eta" data-order-eta hidden></p>
           <p class="ord-courier-block" data-courier-block hidden></p>
           <div class="ord-pane" data-order-pane="courier" hidden>
             <label class="ord-field"><span>Provincia, cantón y distrito</span><input type="text" data-order-courier-area placeholder="Ej. Alajuela, San Carlos, Quesada" autocomplete="address-level2"></label>
