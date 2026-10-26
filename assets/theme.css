@@ -2755,38 +2755,27 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 .ord-courier-block[hidden] { display: none; }
 
 /* Equivalencia en tazas */
-.cup-note { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: 14px; color: var(--color-text); opacity: .85; }
-.cup-note .icon { width: 18px; height: 18px; color: var(--color-primary); flex-shrink: 0; }
+.cup-note { display: flex; align-items: center; gap: 10px; margin: 12px 0 4px; padding: 10px 14px; border-radius: 12px; font-size: 16px; font-weight: 600; color: var(--color-text); background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)); border: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent); }
+.cup-note .icon { width: 24px; height: 24px; color: var(--color-primary); flex-shrink: 0; }
 
 /* Celular: foto del producto un poco más pequeña */
 @media (max-width: 749px) {
-  #QuickView .quick-view__media { aspect-ratio: 1 / 0.72 !important; height: auto !important; }
+  #QuickView .quick-view__media { aspect-ratio: 1 / 0.94 !important; height: auto !important; }
   #QuickView .quick-view__media .product-gallery, #QuickView .quick-view__media .product-gallery__frame, #QuickView .quick-view__media .product-gallery__strip { height: 100% !important; }
   #QuickView .quick-view__media .product-gallery__slide { aspect-ratio: auto !important; height: 100% !important; border-radius: 0; }
   #QuickView .quick-view__media .product-gallery__thumbs { display: none; }
-  .product-page .product-gallery__slide { aspect-ratio: 1 / 0.75 !important; }
+  .product-page .product-gallery__slide { aspect-ratio: 1 / 0.97 !important; }
 }
 
-/* Búsqueda en celular: hoja desde abajo, con el buscador abajo al alcance del dedo */
-@media (max-width: 749px) {
-  #SearchOverlay.drawer--top { align-items: flex-end; padding: 0 0 var(--kb, 0px); }
-  #SearchOverlay .search-panel {
-    width: 100%; display: flex; flex-direction: column; gap: 12px;
-    max-height: calc(100dvh - var(--kb, 0px) - 36px); overflow-y: auto; overscroll-behavior: contain;
-    border-radius: 22px 22px 0 0; padding: 16px 14px 0; transform: translateY(40px);
-    box-shadow: 0 -12px 40px rgba(0,0,0,.25);
-  }
-  #SearchOverlay.is-open .search-panel { transform: none; }
-  #SearchOverlay .search-panel__header { order: 1; }
-  #SearchOverlay .search-panel__header h2 { font-size: 22px; }
-  #SearchOverlay [data-search-global] { order: 2; }
-  #SearchOverlay [data-search-global] .search-helper { margin-top: 0; }
-  #SearchOverlay .search-sort { order: 3; }
-  #SearchOverlay .search-results { order: 4; }
-  #SearchOverlay .search-results:empty { display: none; }
-  #SearchOverlay [data-search-form] {
-    order: 5; position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 2; margin: 2px 0 calc(12px + env(safe-area-inset-bottom));
-    border: 1.5px solid var(--color-primary); border-radius: 14px; background: var(--color-bg); padding: 12px 14px;
-    box-shadow: 0 0 0 12px var(--color-surface), 0 -14px 18px 8px var(--color-surface);
-  }
-}
+
+/* Ver foto en grande con zoom */
+.product-gallery__slide img { cursor: zoom-in; }
+.zoomer { position: fixed; inset: 0; z-index: 200; background: rgba(12,16,12,.94); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .2s ease; }
+.zoomer.is-open { opacity: 1; }
+.zoomer__scroll { position: absolute; inset: 0; overflow: auto; display: flex; align-items: center; justify-content: center; touch-action: pan-x pan-y pinch-zoom; -webkit-overflow-scrolling: touch; }
+.zoomer__img { max-width: 100vw; max-height: 100dvh; object-fit: contain; cursor: zoom-in; transition: transform .25s ease; transform-origin: center; user-select: none; -webkit-user-drag: none; }
+.zoomer.is-zoomed .zoomer__scroll { display: block; }
+.zoomer.is-zoomed .zoomer__img { max-width: none; max-height: none; width: 220vw; cursor: zoom-out; }
+@media (min-width: 750px) { .zoomer.is-zoomed .zoomer__img { width: 180vw; } }
+.zoomer__close { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 2; width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: #151914; display: grid; place-items: center; font-size: 22px; cursor: pointer; }
+.zoomer__hint { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 2; color: rgba(255,255,255,.8); font-size: 13px; background: rgba(0,0,0,.4); padding: 6px 12px; border-radius: 999px; pointer-events: none; }

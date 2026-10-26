@@ -2122,11 +2122,54 @@ document.addEventListener('change', function (e) {
   group.querySelectorAll('[data-option-note]').forEach(function (n) { n.hidden = n.getAttribute('data-option-note') !== input.value; });
 });
 
-/* Teclado del celular: la hoja de búsqueda sube junto con el teclado */
+/* Tocar la foto del producto: verla en grande con zoom (pellizcar o tocar para acercar) */
 (function () {
-  var vv = window.visualViewport; if (!vv) return;
-  var el = document.getElementById('SearchOverlay'); if (!el) return;
-  function fit() { var kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); el.style.setProperty('--kb', kb + 'px'); }
-  vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); fit();
+  var box = null;
+  function bigSrc(img) {
+    var src = img.currentSrc || img.src || '';
+    return src.replace(/([?&])width=\d+/, '$1width=2000');
+  }
+  function close() {
+    if (!box) return;
+    box.classList.remove('is-open');
+    var b = box; box = null;
+    setTimeout(function () { b.remove(); }, 200);
+    document.documentElement.style.overflow = '';
+  }
+  function open(img) {
+    close();
+    box = document.createElement('div');
+    box.className = 'zoomer';
+    box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Foto en grande');
+    box.innerHTML = '<div class="zoomer__scroll"><img class="zoomer__img" alt=""></div>' +
+      '<button type="button" class="zoomer__close" aria-label="Cerrar">✕</button>' +
+      '<span class="zoomer__hint">Toca la foto para acercar</span>';
+    var big = box.querySelector('.zoomer__img');
+    big.src = bigSrc(img); big.alt = img.alt || '';
+    document.body.appendChild(box);
+    document.documentElement.style.overflow = 'hidden';
+    requestAnimationFrame(function () { box && box.classList.add('is-open'); });
+    var scroller = box.querySelector('.zoomer__scroll');
+    big.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var r = big.getBoundingClientRect();
+      var fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+      var zoomed = box.classList.toggle('is-zoomed');
+      var hint = box.querySelector('.zoomer__hint'); if (hint) hint.textContent = zoomed ? 'Desliza para moverte · toca para alejar' : 'Toca la foto para acercar';
+      if (zoomed) requestAnimationFrame(function () {
+        scroller.scrollLeft = big.offsetWidth * fx - scroller.clientWidth / 2;
+        scroller.scrollTop = big.offsetHeight * fy - scroller.clientHeight / 2;
+      });
+    });
+    box.querySelector('.zoomer__close').addEventListener('click', close);
+    scroller.addEventListener('click', function (e) { if (e.target === scroller && !box.classList.contains('is-zoomed')) close(); });
+  }
+  document.addEventListener('click', function (e) {
+    var img = e.target.closest && e.target.closest('.product-gallery__slide img');
+    if (!img) return;
+    if (img.closest('a')) e.preventDefault();
+    open(img);
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box) { e.stopPropagation(); close(); } }, true);
 })();
 
