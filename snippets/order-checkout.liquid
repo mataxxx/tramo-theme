@@ -101,8 +101,13 @@
                 <input type="search" data-order-find-q placeholder="Buscar dirección o lugar" autocomplete="off" aria-label="Buscar dirección">
                 <button type="submit">Buscar</button>
               </form>
-              <button type="button" class="ord-locate" data-order-locate><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg><span>Usar mi ubicación</span></button>
+              <div class="ord-locrow">
+                <button type="button" class="ord-locate" data-order-locate><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg><span>Usar mi ubicación</span></button>
+                <button type="button" class="ord-locate ord-locate--wa" data-order-waloc><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.4L3 21Z"/></svg><span>La envío por WhatsApp</span></button>
+              </div>
             </div>
+            <div class="ord-find-res" data-order-find-res hidden></div>
+            <p class="ord-waloc-note" data-order-waloc-note hidden>📍 Listo. Después de enviar tu pedido, en el chat de WhatsApp toca <b>📎 → Ubicación</b> y envíanos la ubicación de tu casa. <button type="button" class="ord-link" data-order-waloc-undo>Mejor la marco en el mapa</button></p>
             <div class="ord-map" data-order-map aria-label="Mapa: toca para marcar tu ubicación"></div>
             <p class="ord-maphint" data-order-maphint>Toca el mapa o arrastra el pin hasta tu casa.</p>
             <label class="ord-field"><span>Otras señas <small>(opcional)</small></span><textarea data-order-notes rows="2" placeholder="Casa verde, portón negro, 2º piso…"></textarea></label>
@@ -146,6 +151,7 @@
         </div>
         <div class="ord-box ord-review" data-order-review></div>
         </div>
+        <button type="button" class="ord-more" data-order-more hidden aria-label="Ver más abajo"><span>Desliza para ver más</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <p class="ord-err" data-order-err role="alert" hidden></p>
       </div>
 

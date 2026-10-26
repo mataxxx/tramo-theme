@@ -11,7 +11,7 @@
   var fmt = new Intl.NumberFormat('es-CR', { style: 'currency', currency: D.currency || 'CRC', maximumFractionDigits: 0 });
   function money(c) { return fmt.format(c / 100); }
   var LS = 'tramo.order.me';
-  var cart = null, mode = null, map = null, pin = null, loc = null, last = null, page = 2, FIRST = 2, PAGES = 4;
+  var cart = null, mode = null, map = null, pin = null, loc = null, last = null, page = 2, FIRST = 2, PAGES = 4, waLoc = false;
 
   /* ---------- abrir / cerrar ---------- */
   function open() {
@@ -72,6 +72,14 @@
     $('[data-order-body]', M).scrollTop = 0;
   }
 
+  /* ---------- indicador "hay más abajo" ---------- */
+  function moreCheck() {
+    var bd = $('[data-order-body]', M), mb = $('[data-order-more]', M); if (!bd || !mb) return;
+    mb.hidden = !(bd.scrollHeight - bd.scrollTop - bd.clientHeight > 40);
+  }
+  (function () { var bd = $('[data-order-body]', M); if (bd) bd.addEventListener('scroll', moreCheck, { passive: true }); window.addEventListener('resize', moreCheck); })();
+  if (window.MutationObserver) new MutationObserver(function () { requestAnimationFrame(moreCheck); }).observe(M, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden'] });
+
   /* ---------- pasos ---------- */
   var TITLES = ['', 'Tu pedido', 'Tus datos', 'Entrega', 'Pago'];
   function go(n) {
@@ -92,7 +100,7 @@
   function pageOk(n) {
     if (n === 1) return !!(cart && cart.item_count);
     if (n === 2) return $('[data-order-name]', M).value.trim().length > 1 && digits($('[data-order-phone]', M).value).length >= 8;
-    if (n === 3) return !!mode && (mode === 'pickup' || (mode === 'delivery' && !!loc) || (mode === 'courier' && !noCourier.length && courierOk()));
+    if (n === 3) return !!mode && (mode === 'pickup' || (mode === 'delivery' && (!!loc || waLoc)) || (mode === 'courier' && !noCourier.length && courierOk()));
     if (n === 4) return ($('[data-order-payer]', M).value.trim().length > 2) && (!wantsFE() || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim())));
     return true;
   }
@@ -212,6 +220,7 @@
   }
   var pinIcon = null;
   function place(lat, lng, zoom, src) {
+    setWaLoc(false);
     loc = { lat: +lat.toFixed(6), lng: +lng.toFixed(6) };
     if (src !== 'gps' && accCircle) { map.removeLayer(accCircle); accCircle = null; acc = null; }
     if (window.L && map) {
@@ -268,17 +277,39 @@
     }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
     setTimeout(finish, 9000);
   }
+  function findMsg(html) { var r = $('[data-order-find-res]', M); r.innerHTML = html; r.hidden = !html; }
   function find(q) {
-    q = (q || '').trim(); if (!q) return;
+    q = String(q || '').trim(); if (q.length < 3) { findMsg('<p class="ord-find-res__msg">Escribe al menos 3 letras.</p>'); return; }
     var b = $('[data-order-find] button', M); b.disabled = true; b.textContent = '…';
-    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=cr&accept-language=es&q=' + encodeURIComponent(q))
+    findMsg('<p class="ord-find-res__msg">Buscando…</p>');
+    var done = function () { b.disabled = false; b.textContent = 'Buscar'; };
+    var fromNominatim = fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=cr&accept-language=es&q=' + encodeURIComponent(q))
       .then(function (r) { return r.json(); })
-      .then(function (a) {
-        if (!a || !a[0]) { err('No encontramos esa dirección. Prueba con un lugar conocido cercano o marca en el mapa.'); return; }
-        place(parseFloat(a[0].lat), parseFloat(a[0].lon), 16);
-      })
-      .catch(function () { err('No se pudo buscar. Marca tu ubicación en el mapa.'); })
-      .then(function () { b.disabled = false; b.textContent = 'Buscar'; });
+      .then(function (a) { return (a || []).map(function (x) { return { lat: +x.lat, lng: +x.lon, name: x.display_name }; }); })
+      .catch(function () { return []; });
+    fromNominatim.then(function (list) {
+      if (list.length) return list;
+      return fetch('https://photon.komoot.io/api/?limit=6&lang=default&lat=9.93&lon=-84.08&q=' + encodeURIComponent(q))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          return ((d && d.features) || []).filter(function (f) { return f.properties && f.properties.countrycode === 'CR'; }).map(function (f) {
+            var p = f.properties; return { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0], name: [p.name, p.street, p.district || p.locality, p.city, p.state].filter(Boolean).join(', ') };
+          });
+        }).catch(function () { return []; });
+    }).then(function (list) {
+      done();
+      if (!list.length) { findMsg('<p class="ord-find-res__msg">No encontramos “' + esc(q) + '”. Prueba con un lugar conocido cercano (escuela, iglesia, comercio), toca el mapa o envía tu ubicación por WhatsApp.</p>'); return; }
+      if (list.length === 1) { findMsg(''); place(list[0].lat, list[0].lng, 17); return; }
+      findMsg(list.slice(0, 5).map(function (x, i) { return '<button type="button" class="ord-find-res__item" data-find-pick="' + i + '">📍 ' + esc(x.name) + '</button>'; }).join(''));
+      M._findList = list;
+    });
+  }
+  function setWaLoc(on) {
+    waLoc = !!on;
+    var n = $('[data-order-waloc-note]', M); if (n) n.hidden = !waLoc;
+    var btn = $('[data-order-waloc]', M); if (btn) btn.classList.toggle('is-on', waLoc);
+    var h = $('[data-order-maphint]', M); if (h) h.hidden = waLoc;
+    var mp = $('[data-order-map]', M); if (mp) mp.classList.toggle('is-dim', waLoc);
   }
 
   /* ---------- validar y enviar ---------- */
@@ -314,7 +345,7 @@
     } else {
       var n = $('[data-order-notes]', M).value.trim();
       L1.push('*Entrega:* ' + (D.delivery || 'Uber Flash'));
-      L1.push('*Ubicación:* https://maps.google.com/?q=' + loc.lat + ',' + loc.lng);
+      L1.push('*Ubicación:* ' + (loc && !waLoc ? 'https://maps.google.com/?q=' + loc.lat + ',' + loc.lng : 'Se la envío aquí por WhatsApp 📍'));
       if (n) L1.push('*Señas:* ' + n);
     }
     if (mode) L1.push('*Cuándo:* ' + etaPlain(mode));
@@ -347,7 +378,7 @@
         code: c, mode: mode, eta: etaPlain(mode),
         name: $('[data-order-name]', M).value.trim(), phone: $('[data-order-phone]', M).value.trim(),
         payer: (($('[data-order-payer]', M) || {}).value || '').trim(),
-        location: mode === 'delivery' && loc ? 'https://maps.google.com/?q=' + loc.lat + ',' + loc.lng : '',
+        location: mode === 'delivery' ? (loc && !waLoc ? 'https://maps.google.com/?q=' + loc.lat + ',' + loc.lng : 'La envía por WhatsApp') : '',
         address: mode === 'courier' ? courierAddr() : (mode === 'delivery' ? (($('[data-order-notes]', M) || {}).value || '').trim() : ''),
         area: mode === 'courier' ? courierArea() : '',
         fe: fe,
@@ -369,7 +400,7 @@
       ? 'Solo falta tocar Enviar en WhatsApp. Deposita ' + money(cart.total_price) + (D.sinpe ? ' al SINPE ' + D.sinpe + (D.sinpeName ? ' a nombre de ' + D.sinpeName : '') : '') + '. No necesitas enviar comprobante: el sistema confirmará tu SINPE y te contactaremos por WhatsApp para coordinar el retiro.'
       : mode === 'courier'
       ? 'Solo falta tocar Enviar en WhatsApp. Te enviaremos por WhatsApp el monto total (productos + encomienda). Cuando confirmemos tu pago, despachamos tu pedido y te pasamos el número de guía.'
-      : 'Solo falta tocar Enviar en WhatsApp. Te enviaremos por WhatsApp el monto total (productos + Uber Flash). Cuando confirmemos tu pago, te contactamos para coordinar el envío.';
+      : 'Solo falta tocar Enviar en WhatsApp.' + (waLoc ? ' Después envíanos tu ubicación en ese chat (📎 → Ubicación).' : '') + ' Te enviaremos por WhatsApp el monto total (productos + Uber Flash). Cuando confirmemos tu pago, te contactamos para coordinar el envío.';
     var rs = $('[data-order-resend]', M); rs.href = url; if (mobile) rs.removeAttribute('target');
     show('done');
     fetch('/cart/clear.js', { method: 'POST', headers: { Accept: 'application/json' } })
@@ -395,7 +426,11 @@
   M.addEventListener('click', function (e) {
     var t = e.target;
     if (t.closest('[data-order-close]')) { close(); return; }
-    var lb = t.closest('[data-order-locate]'); if (lb) { locate(lb); return; }
+    var lb = t.closest('[data-order-locate]'); if (lb) { setWaLoc(false); locate(lb); return; }
+    if (t.closest('[data-order-waloc]')) { setWaLoc(!waLoc); validate(); return; }
+    if (t.closest('[data-order-waloc-undo]')) { setWaLoc(false); validate(); return; }
+    var fp = t.closest('[data-find-pick]'); if (fp && M._findList) { var x = M._findList[+fp.getAttribute('data-find-pick')]; findMsg(''); if (x) place(x.lat, x.lng, 17); return; }
+    if (t.closest('[data-order-more]')) { var bd = $('[data-order-body]', M); bd.scrollBy({ top: bd.clientHeight * 0.7, behavior: 'smooth' }); return; }
     var cp = t.closest('[data-order-copy]');
     if (cp && navigator.clipboard) { navigator.clipboard.writeText(cp.getAttribute('data-order-copy')).then(function () { var o = cp.textContent; cp.textContent = '¡Copiado!'; setTimeout(function () { cp.textContent = o; }, 1500); }); return; }
     if (t.closest('[data-order-next]')) { if (pageOk(page)) go(page + 1); return; }
