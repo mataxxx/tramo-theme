@@ -2735,3 +2735,4 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .header__right { grid-column: 3; grid-row: 1; justify-self: end; display: flex; align-items: center; gap: 12px; }
   .header__right > * { grid-column: auto; grid-row: auto; margin: 0; }
 }
+
