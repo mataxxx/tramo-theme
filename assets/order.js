@@ -278,35 +278,42 @@
     setTimeout(finish, 9000);
   }
   function findMsg(html) { var r = $('[data-order-find-res]', M); r.innerHTML = html; r.hidden = !html; }
-  function find(q) {
-    q = String(q || '').trim(); if (q.length < 3) { findMsg('<p class="ord-find-res__msg">Escribe al menos 3 letras.</p>'); return; }
-    var b = $('[data-order-find] button', M); b.disabled = true; b.textContent = '…';
-    findMsg('<p class="ord-find-res__msg">Buscando…</p>');
-    var done = function () { b.disabled = false; b.textContent = 'Buscar'; };
-    var fromNominatim = fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=cr&accept-language=es&q=' + encodeURIComponent(q))
-      .then(function (r) { return r.json(); })
-      .then(function (a) { return (a || []).map(function (x) { return { lat: +x.lat, lng: +x.lon, name: x.display_name }; }); })
-      .catch(function () { return []; });
-    fromNominatim.then(function (list) {
+  var findToken = 0, findTimer = null;
+  function geoSearch(q) {
+    var photon = fetch('https://photon.komoot.io/api/?limit=8&lat=9.93&lon=-84.08&q=' + encodeURIComponent(q + ' Costa Rica'))
+      .then(function (r) { if (!r.ok) throw new Error('photon ' + r.status); return r.json(); })
+      .then(function (d) {
+        return ((d && d.features) || []).filter(function (f) { return f.properties && f.properties.countrycode === 'CR'; }).map(function (f) {
+          var p = f.properties;
+          return { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0], name: [p.name, p.street, p.district || p.locality, p.city || p.county, p.state].filter(function (x, i, arr) { return x && arr.indexOf(x) === i; }).join(', ') };
+        });
+      });
+    return photon.catch(function () { return []; }).then(function (list) {
       if (list.length) return list;
-      return fetch('https://photon.komoot.io/api/?limit=6&lang=default&lat=9.93&lon=-84.08&q=' + encodeURIComponent(q))
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          return ((d && d.features) || []).filter(function (f) { return f.properties && f.properties.countrycode === 'CR'; }).map(function (f) {
-            var p = f.properties; return { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0], name: [p.name, p.street, p.district || p.locality, p.city, p.state].filter(Boolean).join(', ') };
-          });
-        }).catch(function () { return []; });
-    }).then(function (list) {
-      done();
-      if (!list.length) { findMsg('<p class="ord-find-res__msg">No encontramos “' + esc(q) + '”. Prueba con un lugar conocido cercano (escuela, iglesia, comercio), toca el mapa o envía tu ubicación por WhatsApp.</p>'); return; }
-      if (list.length === 1) { findMsg(''); place(list[0].lat, list[0].lng, 17); return; }
-      findMsg(list.slice(0, 5).map(function (x, i) { return '<button type="button" class="ord-find-res__item" data-find-pick="' + i + '">📍 ' + esc(x.name) + '</button>'; }).join(''));
-      M._findList = list;
+      return fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=cr&accept-language=es&q=' + encodeURIComponent(q))
+        .then(function (r) { if (!r.ok) throw new Error('nominatim ' + r.status); return r.json(); })
+        .then(function (a) { return (a || []).map(function (x) { return { lat: +x.lat, lng: +x.lon, name: x.display_name }; }); });
     });
+  }
+  function find(q, live) {
+    q = String(q || '').trim();
+    if (q.length < 3) { if (!live) findMsg('<p class="ord-find-res__msg">Escribe al menos 3 letras.</p>'); else findMsg(''); return; }
+    var mine = ++findToken;
+    var b = $('[data-order-find-go]', M); if (b && !live) { b.disabled = true; b.textContent = '…'; }
+    if (!live) findMsg('<p class="ord-find-res__msg ord-find-res__msg--soft">Buscando…</p>');
+    geoSearch(q).then(function (list) {
+      if (mine !== findToken) return;
+      if (!list.length) { findMsg('<p class="ord-find-res__msg">No encontramos “' + esc(q) + '”. Prueba con un lugar conocido cercano (escuela, iglesia, comercio) o toca el mapa.</p>'); return; }
+      M._findList = list;
+      findMsg(list.slice(0, 5).map(function (x, i) { return '<button type="button" class="ord-find-res__item" data-find-pick="' + i + '">📍 ' + esc(x.name) + '</button>'; }).join(''));
+    }).catch(function (e) {
+      if (mine !== findToken) return;
+      findMsg('<p class="ord-find-res__msg">El buscador de mapas no respondió. Toca el mapa para marcar tu casa o usa tu ubicación.</p>');
+    }).then(function () { if (b) { b.disabled = false; b.textContent = 'Buscar'; } });
   }
   function setWaLoc(on) {
     waLoc = !!on;
-    var n = $('[data-order-waloc-note]', M); if (n) n.hidden = !waLoc;
+    var lb = $('[data-order-waloc-label]', M); if (lb) lb.textContent = waLoc ? '✓ La envío por WhatsApp' : 'La envío por WhatsApp';
     var btn = $('[data-order-waloc]', M); if (btn) btn.classList.toggle('is-on', waLoc);
     var h = $('[data-order-maphint]', M); if (h) h.hidden = waLoc;
     var mp = $('[data-order-map]', M); if (mp) mp.classList.toggle('is-dim', waLoc);
@@ -422,13 +429,20 @@
     if (e.target.matches('[data-order-fe]')) { var f = $('[data-order-fe-fields]', M); f.hidden = !wantsFE(); if (wantsFE()) { var n = $('[data-order-fe-name]', M); if (!n.value) n.value = $('[data-order-name]', M).value.trim(); } validate(); }
   });
   M.addEventListener('input', validate);
-  M.addEventListener('submit', function (e) { var f = e.target.closest('[data-order-find]'); if (f) { e.preventDefault(); find($('[data-order-find-q]', M).value); } });
+  M.addEventListener('input', function (e) {
+    if (!e.target.matches('[data-order-find-q]')) return;
+    clearTimeout(findTimer); var v = e.target.value;
+    findTimer = setTimeout(function () { find(v, true); }, 450);
+  });
+  M.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.matches('[data-order-find-q]')) { e.preventDefault(); clearTimeout(findTimer); find(e.target.value); e.target.blur(); }
+  });
   M.addEventListener('click', function (e) {
     var t = e.target;
     if (t.closest('[data-order-close]')) { close(); return; }
     var lb = t.closest('[data-order-locate]'); if (lb) { setWaLoc(false); locate(lb); return; }
+    if (t.closest('[data-order-find-go]')) { clearTimeout(findTimer); find($('[data-order-find-q]', M).value); return; }
     if (t.closest('[data-order-waloc]')) { setWaLoc(!waLoc); validate(); return; }
-    if (t.closest('[data-order-waloc-undo]')) { setWaLoc(false); validate(); return; }
     var fp = t.closest('[data-find-pick]'); if (fp && M._findList) { var x = M._findList[+fp.getAttribute('data-find-pick')]; findMsg(''); if (x) place(x.lat, x.lng, 17); return; }
     if (t.closest('[data-order-more]')) { var bd = $('[data-order-body]', M); bd.scrollBy({ top: bd.clientHeight * 0.7, behavior: 'smooth' }); return; }
     var cp = t.closest('[data-order-copy]');
@@ -439,7 +453,7 @@
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !M.hidden) close(); });
   M.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && e.target.matches('input:not([type=search])') && page < PAGES) { e.preventDefault(); if (pageOk(page)) go(page + 1); }
+    if (e.key === 'Enter' && e.target.matches('input:not([type=search]):not([data-order-find-q])') && page < PAGES) { e.preventDefault(); if (pageOk(page)) go(page + 1); }
   });
 
   /* Cualquier botón de pago abre este pedido en lugar del checkout de Shopify */

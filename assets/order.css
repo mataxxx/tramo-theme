@@ -199,3 +199,4 @@
 .ord-more { width: 40px; height: 40px; padding: 0; margin: 6px 0 0 auto; justify-content: center; bottom: 12px; opacity: .92; }
 .ord-more span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .ord-more svg { width: 22px; height: 22px; }
+.ord-find-res__msg--soft { background: #f1f5ec; color: #3d5a36; }
