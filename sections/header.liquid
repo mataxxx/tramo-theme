@@ -57,7 +57,7 @@
     {%- if s.logo != blank -%}
       {{ s.logo | image_url: width: 800 | image_tag: widths: '200, 300, 400, 600, 800', sizes: '(min-width: 750px) 400px, 200px', class: 'brand-mark__logo', loading: 'eager', alt: shop.name }}
     {%- elsif s.logo_asset != blank -%}
-      <img class="brand-mark__logo" src="{{ s.logo_asset | asset_url }}" alt="{{ shop.name | escape }}" width="1000" height="364" loading="eager" fetchpriority="high">
+      <img class="brand-mark__logo" src="{{ s.logo_asset | asset_url }}" alt="{{ shop.name | escape }}" width="900" height="371" loading="eager" fetchpriority="high">
     {%- else -%}
       {%- if s.brand_title != blank -%}
         <strong class="brand-mark__title">{% render 'curved-text', text: s.brand_title, curve: s.brand_curve %}</strong>
