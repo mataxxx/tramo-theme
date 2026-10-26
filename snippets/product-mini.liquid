@@ -1,0 +1,40 @@
+{%- comment -%} Tarjeta mini para el carrusel de relacionados. Parámetro: product {%- endcomment -%}
+{%- liquid
+  assign bulk = nil
+  assign min_p = nil
+  assign max_p = 0
+  for v in product.variants
+    if v.options contains settings.bulk_variant_name
+      if bulk == nil or v.price < bulk.price
+        assign bulk = v
+      endif
+    else
+      if min_p == nil or v.price < min_p
+        assign min_p = v.price
+      endif
+      if v.price > max_p
+        assign max_p = v.price
+      endif
+    endif
+  endfor
+  assign per_kg = 1000 | divided_by: settings.bulk_unit_grams | default: 100
+-%}
+<a class="pmini" href="{{ product.url }}" data-quick-view="{{ product.url }}">
+  <span class="pmini__img">
+    {%- if product.featured_media -%}
+      {{ product.featured_media | image_url: width: 240 | image_tag: loading: 'lazy', alt: product.title, sizes: '120px', widths: '120, 240' }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </span>
+  <span class="pmini__title">{{ product.title }}</span>
+  <span class="pmini__price">
+    {%- if bulk != nil -%}
+      {{ bulk.price | times: per_kg | money }}<small> / kg</small>
+    {%- elsif min_p != nil -%}
+      {%- if max_p > min_p -%}<small>Desde </small>{%- endif -%}{{ min_p | money }}
+    {%- else -%}
+      {{ product.price | money }}
+    {%- endif -%}
+  </span>
+</a>

@@ -272,7 +272,7 @@
       {
         "type": "checkbox",
         "id": "quick_show_related",
-        "label": "Mostrar relacionados (si el producto los tiene)",
+        "label": "Mostrar relacionados (elegidos o de la misma categoría)",
         "default": true
       },
       {

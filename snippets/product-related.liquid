@@ -1,14 +1,36 @@
-{%- comment -%} Carrusel de relacionados. Parámetros: product, title {%- endcomment -%}
-{%- assign related = product.metafields.custom.related.value -%}
-{%- if related.size > 0 -%}
-  <div class="prelated">
-    <p class="prelated__title">{{ title }}</p>
-    <div class="product-rail prelated__rail" tabindex="0">
-      {%- for item in related -%}
-        <div class="product-rail__item">
-          {% render 'product-card', product: item, show_quick_add: true %}
-        </div>
+{%- comment -%}
+  Carrusel pequeño de relacionados. Parámetros: product, title
+  Usa los relacionados elegidos en el campo "related" del producto; si no hay, toma productos de sus mismas categorías
+  (primero los del mismo tipo). Máximo 10.
+{%- endcomment -%}
+{%- assign picked = product.metafields.custom.related.value -%}
+{%- assign handles = '' -%}
+{%- capture cards -%}
+  {%- if picked.size > 0 -%}
+    {%- for item in picked limit: 10 -%}
+      {%- if item.available -%}{% render 'product-mini', product: item %}{%- assign handles = handles | append: item.handle | append: ',' -%}{%- endif -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- assign count = 0 -%}
+    {%- for pass in (1..2) -%}
+      {%- for coll in product.collections -%}
+        {%- for item in coll.products limit: 40 -%}
+          {%- if count >= 10 -%}{%- break -%}{%- endif -%}
+          {%- if item.id == product.id or item.available == false -%}{%- continue -%}{%- endif -%}
+          {%- assign key = item.handle | append: ',' -%}
+          {%- if handles contains key -%}{%- continue -%}{%- endif -%}
+          {%- if pass == 1 and item.type != product.type -%}{%- continue -%}{%- endif -%}
+          {% render 'product-mini', product: item %}
+          {%- assign handles = handles | append: key -%}
+          {%- assign count = count | plus: 1 -%}
+        {%- endfor -%}
       {%- endfor -%}
-    </div>
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+{%- if handles != '' -%}
+  <div class="prelated">
+    <p class="prelated__title">{{ title | default: 'También te puede gustar' }}</p>
+    <div class="prelated__rail" tabindex="0">{{ cards }}</div>
   </div>
 {%- endif -%}

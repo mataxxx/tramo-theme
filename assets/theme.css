@@ -2710,3 +2710,18 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
   .category-tiles:has(> :nth-child(4):last-child) .category-tile__media { aspect-ratio: 1 / 1; }
   .category-tiles:has(> :nth-child(4):last-child) .category-tile__title { font-size: 20px; padding: 36px 14px 14px; }
 }
+
+/* Relacionados: carrusel pequeño y tranquilo */
+.prelated { margin-top: 26px; }
+.prelated__title { font-family: var(--font-heading); font-size: 18px; margin: 0 0 10px; }
+.prelated__rail { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding: 2px 2px 8px; margin: 0 -2px; }
+.prelated__rail::-webkit-scrollbar { display: none; }
+.pmini { flex: 0 0 116px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--color-text); }
+.pmini__img { display: block; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e9e2d0; border: 1px solid var(--color-line); }
+.pmini__img img, .pmini__img svg { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+.pmini:hover .pmini__img img { transform: scale(1.05); }
+.pmini__title { font-size: 13px; font-weight: 600; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pmini__price { font-size: 13px; font-weight: 700; }
+.pmini__price small { font-weight: 500; color: var(--color-muted); font-size: 11.5px; }
+.product-related--mini { padding-top: 10px; padding-bottom: 30px; }
+@media (min-width: 750px) { .pmini { flex-basis: 132px; } }

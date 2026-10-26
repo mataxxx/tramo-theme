@@ -1,24 +1,12 @@
-{%- assign related = product.metafields.custom.related.value -%}
-{%- if related.size > 0 -%}
-  <section class="category-section product-related">
-    <div class="category-heading"><h2 class="category-title">{{ section.settings.heading }}</h2></div>
-    <div class="product-rail" tabindex="0" aria-label="{{ section.settings.heading | escape }}">
-      {%- for item in related -%}
-        <div class="product-rail__item">
-          {% render 'product-card', product: item, show_quick_add: section.settings.show_quick_add %}
-        </div>
-      {%- endfor -%}
-    </div>
-  </section>
-{%- elsif request.design_mode -%}
-  <section class="page-width"><p class="muted small">Productos relacionados: este producto no tiene relacionados elegidos (campo "related" del producto).</p></section>
-{%- endif -%}
+<section class="page-width product-related product-related--mini">
+  {% render 'product-related', product: product, title: section.settings.heading %}
+</section>
 
 {% schema %}
 {
   "name": "Productos relacionados",
   "settings": [
-    { "type": "paragraph", "content": "Tú eliges los relacionados de cada producto en su campo \"related\". Si no hay, la sección no aparece." },
+    { "type": "paragraph", "content": "Usa los relacionados elegidos en el campo \"related\" del producto. Si no hay, muestra productos de la misma categoría." },
     { "type": "text", "id": "heading", "label": "Título", "default": "También te puede gustar" },
     { "type": "checkbox", "id": "show_quick_add", "label": "Mostrar botón + para agregar rápido", "default": true }
   ],
