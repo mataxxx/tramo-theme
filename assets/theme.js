@@ -1836,6 +1836,8 @@
   }
   function galleryIdx(g) { var strip = $('[data-gallery-strip]', g); return strip ? Math.round(strip.scrollLeft / Math.max(1, strip.clientWidth)) : 0; }
   document.addEventListener('click', function (e) {
+    var dot = e.target.closest && e.target.closest('[data-gallery-dot]');
+    if (dot) { e.preventDefault(); galleryGo(dot.closest('[data-gallery]'), +dot.getAttribute('data-gallery-dot')); return; }
     var b = e.target.closest && e.target.closest('[data-gallery-prev], [data-gallery-next]');
     if (!b) return;
     e.preventDefault();
@@ -1850,6 +1852,7 @@
       g._gt = false;
       var i = galleryIdx(g), slides = strip.children, n = slides.length;
       var c = $('[data-gallery-count]', g); if (c) c.textContent = (i + 1) + ' / ' + n;
+      $$('[data-gallery-dot]', g).forEach(function (d, k) { d.classList.toggle('is-on', k === i); });
       var id = slides[i] && slides[i].getAttribute('data-media-id');
       $$('[data-thumb]', g).forEach(function (t) { t.classList.toggle('is-active', t.getAttribute('data-thumb') === id); });
       var p = $('[data-gallery-prev]', g), nx = $('[data-gallery-next]', g);
@@ -2202,6 +2205,22 @@ document.addEventListener('change', function (e) {
   place();
 })();
 
-
-
+/* Videos de la galería: siempre en silencio y en bucle; se reproducen solo cuando se ven */
+(function () {
+  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      var v = en.target;
+      if (en.isIntersecting && en.intersectionRatio > 0.5) { v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      else v.pause();
+    });
+  }, { threshold: [0, 0.5, 0.9] }) : null;
+  function scan() {
+    document.querySelectorAll('video[data-gallery-video]:not([data-gv])').forEach(function (v) {
+      v.setAttribute('data-gv', '1'); v.muted = true; v.defaultMuted = true;
+      if (io) io.observe(v); else { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    });
+  }
+  scan();
+  if ('MutationObserver' in window) new MutationObserver(function () { scan(); }).observe(document.body, { childList: true, subtree: true });
+})();
 

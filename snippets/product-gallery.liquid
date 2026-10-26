@@ -1,11 +1,23 @@
-{%- comment -%} Galería del producto: fotos deslizables, flechas y miniaturas abajo. Parámetros: product, sizes {%- endcomment -%}
+{%- comment -%} Galería del producto: fotos y videos deslizables con puntitos (estilo Instagram) y miniaturas abajo. Parámetros: product, sizes {%- endcomment -%}
 {%- assign pg_ar = product.featured_media.preview_image.aspect_ratio | default: 1 -%}
 <div class="product-gallery" data-gallery style="--pg-ar: {{ pg_ar }}">
   <div class="product-gallery__frame">
     <div class="product-gallery__strip" data-gallery-strip>
       {%- for media in product.media -%}
         <div class="product-gallery__slide product-gallery__slide--blur" data-media-id="{{ media.id }}" style="--pg-bg: url('{{ media.preview_image | image_url: width: 240 }}')">
+          {%- if media.media_type == 'video' -%}
+            {%- assign vsrc = nil -%}
+            {%- for s in media.sources -%}
+              {%- if s.mime_type == 'video/mp4' -%}
+                {%- if vsrc == nil or s.height <= 1080 and s.height > vsrc.height -%}{%- assign vsrc = s -%}{%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+            <video class="product-gallery__video" data-gallery-video muted autoplay loop playsinline webkit-playsinline preload="metadata" poster="{{ media.preview_image | image_url: width: 1100 }}" aria-label="{{ media.alt | default: product.title | escape }}">
+              {%- if vsrc -%}<source src="{{ vsrc.url }}" type="video/mp4">{%- endif -%}
+            </video>
+          {%- else -%}
           {{ media.preview_image | image_url: width: 1100 | image_tag: widths: '450, 600, 800, 1100', sizes: sizes | default: '(min-width: 750px) 50vw, 100vw', loading: lazy | default: 'lazy', alt: media.alt | default: product.title }}
+          {%- endif -%}
         </div>
       {%- else -%}
         <div class="product-gallery__slide">
@@ -14,9 +26,9 @@
       {%- endfor -%}
     </div>
     {%- if product.media.size > 1 -%}
-      <button type="button" class="gallery-arrow gallery-arrow--prev" data-gallery-prev aria-label="Foto anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
-      <button type="button" class="gallery-arrow gallery-arrow--next" data-gallery-next aria-label="Foto siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
-      <span class="gallery-count" data-gallery-count>1 / {{ product.media.size }}</span>
+      <div class="gallery-dots" data-gallery-dots>
+        {%- for media in product.media -%}<button type="button" class="gallery-dot{% if forloop.first %} is-on{% endif %}" data-gallery-dot="{{ forloop.index0 }}" aria-label="Ver {{ forloop.index }} de {{ product.media.size }}"></button>{%- endfor -%}
+      </div>
     {%- endif -%}
   </div>
   {%- if product.media.size > 1 -%}
