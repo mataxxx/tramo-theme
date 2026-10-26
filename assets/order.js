@@ -164,9 +164,13 @@
 
   /* ---------- modo de entrega ---------- */
   function setMode(m) {
+    try { return setModeInner(m); } catch (ex) { err('No se pudo elegir la entrega (' + (ex && ex.message || ex) + '). Intenta de nuevo.'); }
+  }
+  function setModeInner(m) {
     mode = m;
+    $$('input[data-order-mode]', M).forEach(function (r) { r.checked = r.value === m; });
     $$('[data-order-pane]', M).forEach(function (p) { p.hidden = p.getAttribute('data-order-pane') !== m; });
-    showEta(m);
+    try { showEta(m); } catch (e2) {}
     $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
     var pt = $('[data-order-paytext]', M);
     if (pt) pt.innerHTML = m === 'pickup'
@@ -374,8 +378,16 @@
   }
 
   /* ---------- eventos ---------- */
+  /* Opciones de entrega: se eligen con el toque en toda la tarjeta (no depende del radio, para iPhone) */
+  M.addEventListener('click', function (e) {
+    var opt = e.target.closest && e.target.closest('.ord-opt'); if (!opt) return;
+    var inp = opt.querySelector('input[data-order-mode]'); if (!inp) return;
+    e.preventDefault();
+    if (inp.disabled) { applyCourierBlock(); return; }
+    setMode(inp.value);
+  });
   M.addEventListener('change', function (e) {
-    if (e.target.matches('[data-order-mode]')) setMode(e.target.value);
+    if (e.target.matches('[data-order-mode]') && e.target.value !== mode) setMode(e.target.value);
     if (e.target.matches('[data-order-fe]')) { var f = $('[data-order-fe-fields]', M); f.hidden = !wantsFE(); if (wantsFE()) { var n = $('[data-order-fe-name]', M); if (!n.value) n.value = $('[data-order-name]', M).value.trim(); } validate(); }
   });
   M.addEventListener('input', validate);

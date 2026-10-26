@@ -41,7 +41,7 @@
 
 .ord-opts { display: grid; gap: 8px; }
 .ord-opt { position: relative; display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px; padding: 12px; border: 1.5px solid #e3dccb; border-radius: 14px; cursor: pointer; transition: border-color .2s, background-color .2s; }
-.ord-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.ord-opt input { position: absolute; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .ord-opt:has(input:checked) { border-color: var(--color-primary, #263d25); background: #f1f5ec; }
 .ord-opt:has(input:focus-visible) { outline: 2px solid var(--color-primary, #263d25); outline-offset: 2px; }
 .ord-opt__ico { width: 40px; height: 40px; border-radius: 12px; background: #f3eee2; display: grid; place-items: center; color: var(--color-primary, #263d25); }

@@ -2788,9 +2788,6 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 #QuickView .drawer__panel, #QuickView .quick-view__content { overscroll-behavior: none; }
 body.is-locked { overscroll-behavior: none; }
 #QuickView .quick-view__media, #QuickView .product-gallery__strip, #QuickView .product-gallery__slide, #QuickView .product-gallery__frame { border-radius: 0 !important; }
-#QuickView .product-gallery__slide--blur { background: #e9e2d0; }
-#QuickView .product-gallery__slide--blur::before, #QuickView .product-gallery__slide--blur::after { display: none; }
-#QuickView .product-gallery__slide--blur img { object-fit: cover !important; filter: none; }
 @media (max-width: 749px) {
   #QuickView .drawer__panel { background: var(--color-surface); }
   #QuickView .quick-view__media { margin-top: 0; }
