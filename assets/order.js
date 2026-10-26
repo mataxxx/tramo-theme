@@ -67,12 +67,13 @@
     $$('[data-order-step]', M).forEach(function (s) { s.hidden = s.getAttribute('data-order-step') !== step; });
     $('[data-order-foot]', M).hidden = step !== 'form';
     $('[data-order-title]', M).textContent = step === 'done' ? 'Último paso' : 'Finalizar pedido';
+    var lead = $('[data-order-lead]', M); if (lead) lead.hidden = step === 'done';
     $('[data-order-prog]', M).hidden = step !== 'form';
     $('[data-order-body]', M).scrollTop = 0;
   }
 
   /* ---------- pasos ---------- */
-  var TITLES = ['', 'Tu pedido', 'Tus datos', 'Entrega', 'Factura y envío'];
+  var TITLES = ['', 'Tu pedido', 'Tus datos', 'Entrega', 'Pago'];
   function go(n) {
     page = Math.max(FIRST, Math.min(PAGES, n));
     $$('[data-order-page]', M).forEach(function (p) { var on = +p.getAttribute('data-order-page') === page; p.hidden = !on; if (on) { p.classList.remove('is-in'); void p.offsetWidth; p.classList.add('is-in'); } });
@@ -353,7 +354,7 @@
         }),
         message: message(c)
       };
-      fetch(root.replace(/\/$/, '') + '/apps/tramo/order', { method: 'POST', keepalive: true, quiet: true, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) }).catch(function () {});
+      fetch(root.replace(/\/$/, '') + '/apps/tramo/order', { method: 'POST', keepalive: true, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) }).catch(function () {});
     } catch (e) {}
     /* Celular: abrir WhatsApp en la misma pestaña (la app se abre sola). Computadora: pestaña nueva (WhatsApp Web). */
     var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');

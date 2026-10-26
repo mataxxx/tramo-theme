@@ -77,7 +77,7 @@
   function loadCatalog() {
     if (CATALOG_P) return CATALOG_P;
     var base = ROOT.replace(/\/$/, '');
-    CATALOG_P = fetch(base + '/products.json?limit=250', { headers: { Accept: 'application/json' }, quiet: true })
+    CATALOG_P = fetch(base + '/products.json?limit=250', { headers: { Accept: 'application/json' } })
       .then(parseJSON)
       .then(function (d) {
         return (d.products || []).map(function (p) {
@@ -2202,37 +2202,6 @@ document.addEventListener('change', function (e) {
   place();
 })();
 
-/* Indicador de carga: solo aparece si algo tarda más de medio segundo (pedidos al servidor o cambio de página) */
-(function () {
-  var DELAY = 550, pending = 0, timer = null, el = null;
-  function ensure() {
-    if (el) return el;
-    el = document.createElement('div');
-    el.className = 'tloader'; el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite');
-    el.innerHTML = '<span class="tloader__bar"></span><span class="tloader__badge"><svg viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="25" r="20"/></svg><span class="visually-hidden">Cargando…</span></span>';
-    document.body.appendChild(el);
-    return el;
-  }
-  function show() { ensure().classList.add('is-on'); }
-  function hide() { clearTimeout(timer); timer = null; if (el) el.classList.remove('is-on'); }
-  function start() { pending++; if (!timer && !(el && el.classList.contains('is-on'))) timer = setTimeout(show, DELAY); }
-  function end() { pending = Math.max(0, pending - 1); if (!pending) hide(); }
-  window.TramoLoader = { start: start, end: end };
 
-  if (window.fetch) {
-    var orig = window.fetch;
-    window.fetch = function (input, init) {
-      if (init && init.quiet) return orig.apply(this, arguments);
-      start();
-      return orig.apply(this, arguments).then(function (r) { end(); return r; }, function (e) { end(); throw e; });
-    };
-  }
-  /* Cambio de página: si la siguiente tarda, se ve el indicador */
-  window.addEventListener('beforeunload', function () {
-    timer = setTimeout(function () { show(); setTimeout(hide, 6000); }, DELAY); /* si la página no cambia (ej. se abrió WhatsApp), se quita sola */
-  });
-  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && !pending) hide(); });
-  window.addEventListener('pageshow', function () { pending = 0; hide(); });
-})();
 
 

@@ -164,3 +164,10 @@
 .ord-eta { margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; background: #eef5ea; border: 1px solid #cfe1c6; color: #24402a; font-size: 14.5px; line-height: 1.4; }
 .ord-eta[hidden] { display: none; }
 .ord-eta small { display: block; margin-top: 2px; color: #5b6b58; font-size: 12.5px; }
+
+/* Encabezado: aviso de que se paga al final */
+.ord__titles { flex: 1; min-width: 0; }
+.ord__titles h2 { margin: 0; }
+.ord__lead { margin: 3px 0 0; font-size: 13.5px; line-height: 1.35; color: #4f5c4c; }
+.ord__lead[hidden] { display: none; }
+.ord-paynote--top { margin: 0 0 12px; }

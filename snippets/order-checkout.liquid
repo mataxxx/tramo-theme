@@ -22,7 +22,10 @@
   <div class="ord__bg" data-order-close></div>
   <section class="ord__panel">
     <header class="ord__head">
-      <h2 id="OrdTitle" data-order-title>Finalizar pedido</h2>
+      <div class="ord__titles">
+        <h2 id="OrdTitle" data-order-title>Finalizar pedido</h2>
+        <p class="ord__lead" data-order-lead>No pagas nada ahora. Al final te damos el total y el SINPE Móvil para pagar.</p>
+      </div>
       <button type="button" class="ord__x" data-order-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
     </header>
     <div class="ord-prog" data-order-prog>
@@ -30,7 +33,7 @@
       <ol class="ord-prog__steps">
         <li data-order-dot="2"><span>1</span>Datos</li>
         <li data-order-dot="3"><span>2</span>Entrega</li>
-        <li data-order-dot="4"><span>3</span>Factura</li>
+        <li data-order-dot="4"><span>3</span>Pago</li>
       </ol>
     </div>
 
@@ -109,6 +112,7 @@
         </div>
 
         <div class="ord-page" data-order-page="4" hidden>
+        <p class="ord-paynote ord-paynote--top">{% render 'icon', name: 'phone' %}<span data-order-paytext>Pagas por <b>SINPE Móvil</b> antes de retirar o de enviar tu pedido. Confirmaremos tu pago y te contactaremos por WhatsApp para coordinar el retiro o el envío.</span></p>
         <div class="ord-box">
           <h3 class="ord-h">¿Deseas factura electrónica?</h3>
           <div class="ord-yn" role="radiogroup">
@@ -141,7 +145,6 @@
           <p class="ord-tip">Así identificamos tu pago sin que tengas que mandarnos el comprobante.</p>
         </div>
         <div class="ord-box ord-review" data-order-review></div>
-        <p class="ord-paynote">{% render 'icon', name: 'phone' %}<span data-order-paytext>Pagas por <b>SINPE Móvil</b> antes de retirar o de enviar tu pedido. Confirmaremos tu pago y te contactaremos por WhatsApp para coordinar el retiro o el envío.</span></p>
         </div>
         <p class="ord-err" data-order-err role="alert" hidden></p>
       </div>
