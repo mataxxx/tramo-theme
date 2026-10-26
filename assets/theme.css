@@ -2760,9 +2760,9 @@ body.no-accounts .like-btn, body.no-accounts [data-like], body.no-accounts [data
 
 /* Celular: foto del producto un poco más pequeña */
 @media (max-width: 749px) {
-  #QuickView .quick-view__media { aspect-ratio: 1 / 0.68; }
-  #QuickView .quick-view__media .product-gallery, #QuickView .quick-view__media .product-gallery__frame, #QuickView .quick-view__media .product-gallery__strip { height: 100%; }
-  #QuickView .quick-view__media .product-gallery__slide { aspect-ratio: auto; height: 100%; border-radius: 0; }
-  .product-info, .product-gallery__slide { scroll-margin-top: 0; }
-  .main-product .product-gallery__slide, .product-page .product-gallery__slide { aspect-ratio: 1 / 0.85; }
+  #QuickView .quick-view__media { aspect-ratio: 1 / 0.72 !important; height: auto !important; }
+  #QuickView .quick-view__media .product-gallery, #QuickView .quick-view__media .product-gallery__frame, #QuickView .quick-view__media .product-gallery__strip { height: 100% !important; }
+  #QuickView .quick-view__media .product-gallery__slide { aspect-ratio: auto !important; height: 100% !important; border-radius: 0; }
+  #QuickView .quick-view__media .product-gallery__thumbs { display: none; }
+  .product-page .product-gallery__slide { aspect-ratio: 1 / 0.75 !important; }
 }
