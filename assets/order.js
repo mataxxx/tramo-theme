@@ -150,8 +150,8 @@
   }
   function etaText(m) {
     var e = eta(), late = e.today ? '' : e.why === 'late' ? ' <small>(los pedidos después de las ' + fmtHM(e.cut) + ' salen el siguiente día)</small>' : e.why === 'closed' ? ' <small>(hoy no abrimos)</small>' : '';
-    if (m === 'pickup') return '🕒 Listo para recoger <b>' + e.label + '</b>' + (e.today && !e.fromOpen ? ' · hasta las ' + fmtHM(e.close) : '') + late;
-    if (m === 'delivery') return '🛵 Te lo enviamos <b>' + e.label + '</b>' + late;
+    if (m === 'pickup') return '🕒 Lo preparamos <b>' + e.label + '</b> · te escribimos por WhatsApp cuando esté listo para recoger' + late;
+    if (m === 'delivery') return '🛵 Sale <b>' + e.label + '</b> por Uber Flash · te avisamos cuando vaya en camino' + late;
     if (m === 'courier') return '📦 Se despacha <b>' + e.label + '</b> · llega en hasta ' + (D.courierHours || 48) + ' h' + late;
     return '';
   }
@@ -346,7 +346,11 @@
         address: mode === 'courier' ? courierAddr() : (mode === 'delivery' ? (($('[data-order-notes]', M) || {}).value || '').trim() : ''),
         area: mode === 'courier' ? courierArea() : '',
         fe: fe,
-        items: cart.items.map(function (it) { return { variant_id: it.variant_id, quantity: it.quantity }; }),
+        items: cart.items.map(function (it) {
+          var bulk = /granel/i.test(it.variant_title || '');
+          return { variant_id: it.variant_id, quantity: it.quantity, title: it.product_title, unit: it.price / 100,
+            label: bulk ? 'A granel · ' + (it.quantity * 10) + ' g' : variantLabel(it) };
+        }),
         message: message(c)
       };
       fetch(root.replace(/\/$/, '') + '/apps/tramo/order', { method: 'POST', keepalive: true, quiet: true, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) }).catch(function () {});

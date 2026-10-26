@@ -4,8 +4,9 @@
 //   POST /apps/tramo/ai      -> respuestas de IA sobre un producto (Claude)
 //   GET  /apps/tramo/cashback         -> saldo de cash back y códigos del cliente
 //   POST /apps/tramo/cashback/redeem  -> convierte saldo en un código (tarjeta de regalo) para el checkout
-//   POST /apps/tramo/order   -> registra el pedido de WhatsApp como pedido de Shopify (pago pendiente) y avisa al dueño por WhatsApp
-// Pedidos: necesita el permiso write_orders. Aviso por WhatsApp (opcional): OWNER_PHONE (ej. 50670170518) y CALLMEBOT_KEY
+//   POST /apps/tramo/order   -> guarda el pedido de WhatsApp en el panel propio (Cloudflare KV) y avisa al dueño por WhatsApp
+//   GET  /panel               -> panel de pedidos (PIN). Necesita: KV con binding ORDERS y el secreto PANEL_PIN
+// Aviso por WhatsApp (opcional): OWNER_PHONE (ej. 50670170518) y CALLMEBOT_KEY
 // Cash back (opcionales): CASHBACK_PCT (5), CASHBACK_TAX (0.13), CASHBACK_MIN (1000)
 // Variables (secretas) que necesita: SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, SHOPIFY_SHOP, ANTHROPIC_API_KEY
 // IA: por defecto usa Workers AI de Cloudflare (gratis, sin clave). Si no hay AI, usa Claude con ANTHROPIC_API_KEY.
@@ -282,19 +283,14 @@ async function handleAI(request, url, env) {
   return json({ answer: text });
 }
 
-// ---------- Pedidos de la tienda (WhatsApp + SINPE) ----------
-const ORDER_CREATE = `
-mutation ($order: OrderCreateOrderInput!, $options: OrderCreateOptionsInput) {
-  orderCreate(order: $order, options: $options) {
-    order { id name }
-    userErrors { field message }
-  }
-}`;
+// ---------- Pedidos de la tienda (WhatsApp + SINPE) y panel propio ----------
+// Los pedidos se guardan en Cloudflare KV (binding ORDERS). Shopify NO crea pedidos ni cobra nada.
+// Panel: https://<tu-worker>.workers.dev/panel  (PIN en la variable secreta PANEL_PIN)
 
-const MODE_TAG = { pickup: 'entrega-retiro', delivery: 'entrega-uber', courier: 'entrega-encomienda' };
 const MODE_LABEL = { pickup: 'Retiro en el Mercado Central', delivery: 'Uber Flash', courier: 'Encomienda' };
+const STATUSES = ['pago-pendiente', 'pagado', 'preparando', 'listo', 'entregado', 'cancelado'];
 
-function clean(s, max) { return String(s == null ? '' : s).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, max || 200); }
+function clean(s, max) { return String(s == null ? '' : s).replace(/[\u0000-\u0008\u000b-\u001f]/g, ' ').trim().slice(0, max || 200); }
 
 async function notifyOwner(env, text) {
   if (!env.OWNER_PHONE || !env.CALLMEBOT_KEY) return false;
@@ -304,66 +300,173 @@ async function notifyOwner(env, text) {
 }
 
 async function handleNewOrder(request, env) {
+  if (!env.ORDERS) return json({ error: 'falta configurar ORDERS' }, 500);
   let b;
   try { b = await request.json(); } catch (e) { return json({ error: 'datos inválidos' }, 400); }
-  const items = Array.isArray(b.items) ? b.items.slice(0, 60) : [];
-  const lineItems = items
-    .map((it) => ({ variantId: 'gid://shopify/ProductVariant/' + parseInt(it.variant_id, 10), quantity: Math.min(10000, Math.max(1, parseInt(it.quantity, 10) || 0)) }))
-    .filter((li) => !/NaN$/.test(li.variantId));
+  const raw = Array.isArray(b.items) ? b.items.slice(0, 60) : [];
   const name = clean(b.name, 80), phone = clean(b.phone, 30), code = clean(b.code, 20);
-  const mode = MODE_TAG[b.mode] ? b.mode : 'pickup';
-  if (!lineItems.length || name.length < 2 || phone.replace(/\D/g, '').length < 8) return json({ error: 'pedido incompleto' }, 400);
+  const mode = MODE_LABEL[b.mode] ? b.mode : 'pickup';
+  if (!raw.length || name.length < 2 || phone.replace(/\D/g, '').length < 8) return json({ error: 'pedido incompleto' }, 400);
 
-  const message = clean(b.message, 4000);
-  const eta = clean(b.eta, 120);
-  const attrs = [
-    { key: 'Pedido', value: code },
-    { key: 'Cliente', value: name },
-    { key: 'Teléfono', value: phone },
-    { key: 'Entrega', value: MODE_LABEL[mode] },
-    { key: 'Cuándo', value: eta || '—' }
-  ];
-  if (b.payer) attrs.push({ key: 'SINPE a nombre de', value: clean(b.payer, 80) });
-  if (b.location) attrs.push({ key: 'Ubicación', value: clean(b.location, 200) });
-  if (b.address) attrs.push({ key: 'Dirección', value: clean(b.address, 300) });
-  if (b.fe) attrs.push({ key: 'Factura electrónica', value: clean(b.fe, 300) });
-
-  let orderName = '';
-  let ok = false;
+  // Precio real de cada presentación desde Shopify (no se confía en el navegador)
+  const ids = raw.map((it) => 'gid://shopify/ProductVariant/' + parseInt(it.variant_id, 10));
+  let info = {};
   try {
-    // Precio real de cada presentación (no se confía en lo que manda el navegador)
-    const pv = await adminGraphql(env, `query ($ids: [ID!]!) { nodes(ids: $ids) { ... on ProductVariant { id price } } }`, { ids: lineItems.map((li) => li.variantId) });
-    const price = {};
-    (pv.nodes || []).forEach((n) => { if (n && n.id) price[n.id] = n.price; });
-    lineItems.forEach((li) => { if (price[li.variantId]) li.priceSet = { shopMoney: { amount: price[li.variantId], currencyCode: 'CRC' } }; });
-    for (let i = lineItems.length - 1; i >= 0; i--) if (!lineItems[i].priceSet) lineItems.splice(i, 1);
-    if (!lineItems.length) throw new Error('sin productos válidos');
-    const data = await adminGraphql(env, ORDER_CREATE, {
-      order: {
-        lineItems,
-        financialStatus: 'PENDING',
-        note: message,
-        tags: ['pedido-whatsapp', 'pago-pendiente', MODE_TAG[mode]],
-        customAttributes: attrs,
-        shippingAddress: mode === 'pickup' ? undefined : { firstName: name, phone, address1: clean(b.address || b.location || 'Ver nota', 250), city: clean(b.area || 'Costa Rica', 80), countryCode: 'CR' },
-        billingAddress: { firstName: name, phone, address1: 'Costa Rica', city: 'Costa Rica', countryCode: 'CR' }
-      },
-      options: { sendReceipt: false, sendFulfillmentReceipt: false, inventoryBehaviour: 'BYPASS' }
-    });
-    const r = data.orderCreate;
-    if (r && r.order) { orderName = r.order.name; ok = true; }
-  } catch (e) { ok = false; }
+    const pv = await adminGraphql(env, `query ($ids: [ID!]!) { nodes(ids: $ids) { ... on ProductVariant { id price title product { title } } } }`, { ids });
+    (pv.nodes || []).forEach((n) => { if (n && n.id) info[n.id] = n; });
+  } catch (e) { info = {}; }
+  let total = 0;
+  const items = raw.map((it, i) => {
+    const n = info[ids[i]] || {};
+    const qty = Math.min(10000, Math.max(1, parseInt(it.quantity, 10) || 1));
+    const unit = parseFloat(n.price || it.unit || 0) || 0;
+    const line = Math.round(unit * qty * 100) / 100;
+    total += line;
+    return { title: clean(n.product ? n.product.title : it.title, 120), variant: clean(it.label || n.title || '', 80), qty, line };
+  });
 
-  // Aviso al dueño por WhatsApp (aunque el pedido en Shopify falle, para no perderlo)
-  const head = '🛒 Pedido nuevo ' + (orderName || code) + ' · ' + MODE_LABEL[mode] + (eta ? ' · ' + eta : '');
-  const sent = await notifyOwner(env, head + '\n\n' + message);
-  return json({ ok, order: orderName, notified: sent });
+  const now = Date.now();
+  const order = {
+    id: code || String(now), code, created: now, status: 'pago-pendiente',
+    name, phone, mode, eta: clean(b.eta, 120),
+    payer: clean(b.payer, 80), location: clean(b.location, 200), address: clean(b.address, 300), area: clean(b.area, 120),
+    fe: clean(b.fe, 300), items, total: Math.round(total * 100) / 100, message: clean(b.message, 4000), history: [{ s: 'pago-pendiente', t: now }]
+  };
+  const key = 'o:' + String(9999999999999 - now).padStart(13, '0') + ':' + order.id;
+  order.key = key;
+  await env.ORDERS.put(key, JSON.stringify(order));
+  const head = '🛒 Pedido nuevo ' + (code || '') + ' · ₡' + Math.round(order.total).toLocaleString('es-CR') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '');
+  const sent = await notifyOwner(env, head + '\n\n' + order.message);
+  return json({ ok: true, notified: sent });
 }
+
+// ---------- Panel ----------
+async function sign(env, val) {
+  const key = await crypto.subtle.importKey('raw', enc.encode(env.PANEL_PIN + '|tramo'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return hex(await crypto.subtle.sign('HMAC', key, enc.encode(val)));
+}
+async function panelAuthed(request, env) {
+  if (!env.PANEL_PIN) return false;
+  const m = (request.headers.get('cookie') || '').match(/tp=([a-f0-9]+)\.(\d+)/);
+  if (!m) return false;
+  if (Date.now() - parseInt(m[2], 10) > 1000 * 60 * 60 * 24 * 60) return false;
+  return (await sign(env, m[2])) === m[1];
+}
+const html = (body, status = 200, headers = {}) => new Response(body, { status, headers: Object.assign({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }, headers) });
+
+async function handlePanel(request, url, env) {
+  const p = url.pathname.replace(/\/+$/, '');
+  if (p === '/panel/login' && request.method === 'POST') {
+    const form = await request.formData();
+    if (!env.PANEL_PIN || String(form.get('pin') || '') !== String(env.PANEL_PIN)) return html(loginPage('PIN incorrecto'), 401);
+    const t = String(Date.now());
+    return new Response(null, { status: 303, headers: { location: '/panel', 'set-cookie': `tp=${await sign(env, t)}.${t}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}` } });
+  }
+  if (!(await panelAuthed(request, env))) return p.startsWith('/panel/api') ? json({ error: 'login' }, 401) : html(loginPage(''));
+  if (p === '/panel/api/orders' && request.method === 'GET') {
+    const list = await env.ORDERS.list({ prefix: 'o:', limit: 150 });
+    const out = await Promise.all(list.keys.map((k) => env.ORDERS.get(k.name, 'json')));
+    return json({ orders: out.filter(Boolean) });
+  }
+  if (p === '/panel/api/status' && request.method === 'POST') {
+    const b = await request.json();
+    if (!STATUSES.includes(b.status) || !String(b.key || '').startsWith('o:')) return json({ error: 'datos' }, 400);
+    const o = await env.ORDERS.get(b.key, 'json');
+    if (!o) return json({ error: 'no existe' }, 404);
+    o.status = b.status; o.history = (o.history || []).concat({ s: b.status, t: Date.now() });
+    await env.ORDERS.put(b.key, JSON.stringify(o));
+    return json({ ok: true, order: o });
+  }
+  if (p === '/panel') return html(PANEL_HTML);
+  return json({ error: 'no encontrado' }, 404);
+}
+
+function loginPage(err) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pedidos · Tramo</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f6f1e6;font-family:system-ui,-apple-system,sans-serif;color:#1d2a1c}
+form{background:#fff;padding:28px 24px;border-radius:20px;box-shadow:0 10px 30px rgba(38,61,37,.12);width:min(340px,90vw);text-align:center}
+h1{font-size:20px;margin:0 0 4px}p{margin:0 0 18px;color:#6b7468;font-size:14px}
+input{width:100%;box-sizing:border-box;font-size:22px;letter-spacing:6px;text-align:center;padding:12px;border:1.5px solid #263d25;border-radius:12px;margin-bottom:12px}
+button{width:100%;padding:13px;border:0;border-radius:12px;background:#263d25;color:#fff;font-size:16px;font-weight:600}.e{color:#b3261e;margin-top:10px;font-size:14px}</style></head>
+<body><form method="post" action="/panel/login"><h1>Pedidos · Tramo San Rafael</h1><p>Escribe tu PIN</p><input name="pin" type="password" inputmode="numeric" autocomplete="current-password" autofocus><button>Entrar</button>${err ? `<div class="e">${err}</div>` : ''}</form></body></html>`;
+}
+
+const PANEL_HTML = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pedidos · Tramo</title><meta name="theme-color" content="#263d25">
+<style>
+:root{--g:#263d25;--g2:#6e9e58;--bg:#f6f1e6;--card:#fff;--line:#e4dccb;--mut:#6b7468;--txt:#1d2a1c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--txt)}
+header{position:sticky;top:0;z-index:5;background:var(--g);color:#fff;padding:14px 16px calc(10px);padding-top:max(14px,env(safe-area-inset-top))}
+header h1{margin:0;font-size:18px;display:flex;justify-content:space-between;align-items:center}
+header small{font-weight:400;opacity:.8;font-size:12px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:0;border-radius:999px;padding:7px 12px;background:rgba(255,255,255,.14);color:#fff;font-size:13.5px;font-weight:600}
+.tab.on{background:#fff;color:var(--g)}.tab b{margin-left:4px;opacity:.75}
+main{padding:12px 12px 40px;max-width:760px;margin:0 auto;display:grid;gap:10px}
+.o{background:var(--card);border-radius:16px;border:1px solid var(--line);overflow:hidden}
+.o__top{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;cursor:pointer}
+.o__main{flex:1;min-width:0}.o__name{font-weight:700;font-size:15.5px}.o__sub{color:var(--mut);font-size:13px;margin-top:2px}
+.o__tot{font-weight:800;font-size:16px;white-space:nowrap;text-align:right}.o__ago{color:var(--mut);font-size:12px;font-weight:400;margin-top:2px}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;margin-top:6px}
+.s-pago-pendiente{background:#fdf0d9;color:#8a5a10}.s-pagado{background:#e3eefc;color:#1d4f91}.s-preparando{background:#efe7fb;color:#5b3a99}
+.s-listo{background:#dff1dc;color:#24602a}.s-entregado{background:#eceee9;color:#4b5548}.s-cancelado{background:#f9e1df;color:#9b2c22}
+.when{display:inline-block;margin-left:6px;font-size:12px;color:var(--g);font-weight:600}
+.o__body{display:none;border-top:1px solid var(--line);padding:12px 14px;font-size:14px}.o.open .o__body{display:block}
+.items{margin:0 0 10px;padding:0;list-style:none}.items li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.items small{color:var(--mut)}.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:8px 0}.kv dt{color:var(--mut)}.kv dd{margin:0;word-break:break-word}
+.kv a{color:var(--g)}
+.st{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}.st button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600;color:var(--txt)}
+.st button.on{border-color:var(--g);background:var(--g);color:#fff}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}.acts a{flex:1 1 140px;text-align:center;text-decoration:none;padding:11px;border-radius:12px;font-weight:700;font-size:14px;background:#25d366;color:#08331a}
+.acts a.alt{background:#eef5ea;color:var(--g)}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+.new{animation:flash 1.6s ease 2}@keyframes flash{50%{box-shadow:0 0 0 3px var(--g2)}}
+</style></head><body>
+<header><h1>Pedidos · Tramo <small id="upd"></small></h1><div class="tabs" id="tabs"></div></header>
+<main id="list"><div class="empty">Cargando…</div></main>
+<script>
+const ST={'pago-pendiente':'Pago pendiente','pagado':'Pagado','preparando':'Preparando','listo':'Listo','entregado':'Entregado / enviado','cancelado':'Cancelado'};
+const MODE={pickup:'Retiro',delivery:'Uber Flash',courier:'Encomienda'};
+let orders=[],filter='activos',open={},known=null;
+const money=n=>'₡'+Math.round(n||0).toLocaleString('es-CR');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ago=t=>{const m=Math.round((Date.now()-t)/60000);if(m<1)return'ahora';if(m<60)return'hace '+m+' min';const h=Math.round(m/60);if(h<24)return'hace '+h+' h';return new Date(t).toLocaleDateString('es-CR',{day:'numeric',month:'short'})};
+const wa=(o,t)=>'https://wa.me/506'+String(o.phone).replace(/\\D/g,'').slice(-8)+'?text='+encodeURIComponent(t);
+function msgs(o){const n=o.name.split(' ')[0];return[
+ ['Pedir pago','alt','¡Hola '+n+'! Recibimos tu pedido '+o.code+' 🙌 El total es '+money(o.total)+(o.mode!=='pickup'?' + envío':'')+'. Puedes pagar por SINPE Móvil y nos avisas. ¡Gracias!'],
+ [o.mode==='pickup'?'Avisar: listo para recoger':o.mode==='delivery'?'Avisar: va en camino':'Avisar: encomienda enviada','',o.mode==='pickup'?'¡Hola '+n+'! Tu pedido '+o.code+' ya está listo ✅ Puedes pasar a recogerlo al Tramo San Rafael #1, Mercado Central (7:30 a. m. a 5:30 p. m.).':o.mode==='delivery'?'¡Hola '+n+'! Tu pedido '+o.code+' ya va en camino por Uber Flash 🛵 Por favor estate pendiente para recibirlo.':'¡Hola '+n+'! Tu pedido '+o.code+' ya fue enviado por encomienda 📦 Te llega en hasta 48 h.']
+]}
+function tabs(){const c={activos:0,todos:orders.length};orders.forEach(o=>{c[o.status]=(c[o.status]||0)+1;if(!['entregado','cancelado'].includes(o.status))c.activos++});
+ const list=[['activos','Activos'],['pago-pendiente','Pago pendiente'],['pagado','Pagados'],['preparando','Preparando'],['listo','Listos'],['entregado','Entregados'],['cancelado','Cancelados'],['todos','Todos']];
+ document.getElementById('tabs').innerHTML=list.map(([k,l])=>'<button class="tab'+(filter===k?' on':'')+'" data-f="'+k+'">'+l+'<b>'+(c[k]||0)+'</b></button>').join('')}
+function render(){tabs();const L=orders.filter(o=>filter==='todos'||(filter==='activos'?!['entregado','cancelado'].includes(o.status):o.status===filter));
+ const el=document.getElementById('list');if(!L.length){el.innerHTML='<div class="empty">No hay pedidos aquí.</div>';return}
+ el.innerHTML=L.map(o=>{const isNew=known&&!known.has(o.key);return '<article class="o'+(open[o.key]?' open':'')+(isNew?' new':'')+'" data-k="'+esc(o.key)+'">'+
+ '<div class="o__top" data-toggle><div class="o__main"><div class="o__name">'+esc(o.name)+' · '+esc(o.code)+'</div><div class="o__sub">'+esc(MODE[o.mode]||o.mode)+' · '+o.items.length+' producto'+(o.items.length>1?'s':'')+'</div>'+
+ '<span class="pill s-'+o.status+'">'+ST[o.status]+'</span>'+(o.eta?'<span class="when">'+esc(o.eta)+'</span>':'')+'</div>'+
+ '<div class="o__tot">'+money(o.total)+(o.mode!=='pickup'?'<div class="o__ago">+ envío</div>':'')+'<div class="o__ago">'+ago(o.created)+'</div></div></div>'+
+ '<div class="o__body"><ul class="items">'+o.items.map(i=>'<li><span>'+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
+ '<dl class="kv"><dt>Teléfono</dt><dd><a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a></dd>'+(o.payer?'<dt>SINPE de</dt><dd>'+esc(o.payer)+'</dd>':'')+
+ (o.location?'<dt>Ubicación</dt><dd><a href="'+esc(o.location)+'" target="_blank">Ver en el mapa</a></dd>':'')+(o.area?'<dt>Zona</dt><dd>'+esc(o.area)+'</dd>':'')+(o.address?'<dt>'+(o.mode==='courier'?'Dirección':'Señas')+'</dt><dd>'+esc(o.address)+'</dd>':'')+
+ (o.fe?'<dt>Factura</dt><dd>'+esc(o.fe)+'</dd>':'')+'<dt>Pedido</dt><dd>'+new Date(o.created).toLocaleString('es-CR',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+'</dd></dl>'+
+ '<div class="st">'+Object.keys(ST).map(s=>'<button data-s="'+s+'" class="'+(o.status===s?'on':'')+'">'+ST[s]+'</button>').join('')+'</div>'+
+ '<div class="acts">'+msgs(o).map(([l,c,t])=>'<a class="'+c+'" href="'+wa(o,t)+'" target="_blank">'+l+'</a>').join('')+'<a class="alt" href="'+wa(o,'')+'" target="_blank">WhatsApp</a></div></div></article>'}).join('')}
+async function load(){try{const r=await fetch('/panel/api/orders',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();
+ const fresh=d.orders||[];if(known&&fresh.some(o=>!known.has(o.key))){try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
+ orders=fresh;render();known=new Set(orders.map(o=>o.key));document.getElementById('upd').textContent='actualizado '+new Date().toLocaleTimeString('es-CR',{hour:'numeric',minute:'2-digit'})}catch(e){}}
+document.addEventListener('click',async e=>{const t=e.target.closest('[data-f]');if(t){filter=t.dataset.f;render();return}
+ const card=e.target.closest('.o');if(!card)return;const k=card.dataset.k;
+ if(e.target.closest('[data-toggle]')){open[k]=!open[k];card.classList.toggle('open');return}
+ const s=e.target.closest('[data-s]');if(s){const r=await fetch('/panel/api/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:k,status:s.dataset.s})});
+  if(r.ok){const d=await r.json();orders=orders.map(o=>o.key===k?d.order:o);render()}}});
+load();setInterval(load,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
+</script></body></html>`;
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     try {
+      if (url.pathname === '/panel' || url.pathname.startsWith('/panel/')) return await handlePanel(request, url, env);
       if (!(await verifyProxy(url, env.SHOPIFY_CLIENT_SECRET))) return json({ error: 'firma inválida' }, 401);
       if (url.pathname.endsWith('/orders') && request.method === 'GET') return await handleOrders(url, env);
       if (url.pathname.endsWith('/ai') && request.method === 'POST') return await handleAI(request, url, env);
