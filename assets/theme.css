@@ -2826,16 +2826,3 @@ body.is-locked { overscroll-behavior: none; }
 [data-product-root]:has(.var-note) .product-info__price .price__current::before { content: '≈ '; }
 .cart-line__warn--var { background: #eef3fb; color: #1f3b63; }
 .piece-note[hidden] { display: none; }
-
-/* Galería: si la foto casi llena el recuadro, que lo llene (sin bordecito difuminado) */
-.product-gallery__slide--blur.is-fill img, .product-gallery__slide--blur.is-fill video { object-fit: cover !important; filter: none; }
-.product-gallery__slide--blur.is-fill::before, .product-gallery__slide--blur.is-fill::after { display: none; }
-/* Fondo difuminado con movimiento lento y relajado */
-.product-gallery__slide--blur::before { animation: pg-drift 22s ease-in-out infinite alternate; will-change: transform; }
-@keyframes pg-drift {
-  0%   { transform: scale(1.15) translate(0, 0) rotate(0deg); }
-  33%  { transform: scale(1.28) translate(-3%, 2%) rotate(-2deg); }
-  66%  { transform: scale(1.22) translate(3%, -2%) rotate(2deg); }
-  100% { transform: scale(1.32) translate(-2%, -3%) rotate(-1deg); }
-}
-@media (prefers-reduced-motion: reduce) { .product-gallery__slide--blur::before { animation: none; } }

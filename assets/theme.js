@@ -2241,22 +2241,3 @@ document.addEventListener('change', function (e) {
   if ('MutationObserver' in window) new MutationObserver(function () { scan(); }).observe(document.body, { childList: true, subtree: true });
 })();
 
-/* Galería: si la foto tiene casi la misma forma que el recuadro, se ajusta para llenarlo (evita bordes finitos) */
-(function () {
-  function fit(img) {
-    var sl = img.closest('.product-gallery__slide--blur'); if (!sl || !img.naturalWidth) return;
-    var r = sl.getBoundingClientRect(); if (!r.width || !r.height) return;
-    var ir = img.naturalWidth / img.naturalHeight, sr = r.width / r.height;
-    sl.classList.toggle('is-fill', Math.abs(ir - sr) / sr < 0.16);
-  }
-  function scan() {
-    document.querySelectorAll('.product-gallery__slide--blur img').forEach(function (img) {
-      if (img.complete) fit(img);
-      if (!img._fitBound) { img._fitBound = true; img.addEventListener('load', function () { fit(img); }); }
-    });
-  }
-  scan();
-  window.addEventListener('resize', function () { clearTimeout(scan._t); scan._t = setTimeout(scan, 200); });
-  if ('MutationObserver' in window) new MutationObserver(function () { clearTimeout(scan._m); scan._m = setTimeout(scan, 120); }).observe(document.body, { childList: true, subtree: true });
-})();
-
