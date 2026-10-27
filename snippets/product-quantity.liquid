@@ -7,6 +7,8 @@
   assign bulk_min = product.metafields.custom.granel_min.value | default: settings.bulk_min_grams | default: 250
   assign bulk_step = settings.bulk_button_step | default: 50
   assign cup_g = product.metafields.custom.gramos_taza.value
+  assign piece_g = product.metafields.custom.pieza_gramos.value
+  assign piece_n = product.metafields.custom.pieza_nombre.value | default: 'pieza'
 -%}
 <div class="product-quantity" data-product-quantity>
   <div class="qty" data-qty-normal>
@@ -39,6 +41,9 @@
       Desde {{ bulk_min }} g · incrementos de {{ bulk_unit }} g<span data-bulk-kg></span>
     </p>
   </div>
+  {%- if piece_g and piece_g > 0 -%}
+    <p class="cup-note piece-note" data-piece-note data-piece-grams="{{ piece_g }}" data-piece-name="{{ piece_n | escape }}" hidden>{% render 'icon', name: 'scale' %}<span data-piece-text></span></p>
+  {%- endif -%}
   {%- if cup_g and cup_g > 0 -%}
     <p class="cup-note" data-cup-note data-cup-grams="{{ cup_g }}">{% render 'icon', name: 'cup' %}<span data-cup-text>1 taza ≈ {{ cup_g }} g</span></p>
   {%- endif -%}

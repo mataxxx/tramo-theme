@@ -1,13 +1,16 @@
 {%- comment -%} Datos del carrito para el pedido: productos que no se envían por encomienda (se pide con ?sections=order-flags) {%- endcomment -%}
-{%- assign names = '' -%}
+{%- assign names = '' -%}{%- assign vnames = '' -%}
 {%- for item in cart.items -%}
+  {%- if item.product.metafields.custom.peso_variable.value == true -%}
+    {%- unless vnames contains item.product.title -%}{%- assign vnames = vnames | append: item.product.title | append: '|' -%}{%- endunless -%}
+  {%- endif -%}
   {%- if item.product.metafields.custom.sin_encomienda.value == true -%}
     {%- unless names contains item.product.title -%}
       {%- assign names = names | append: item.product.title | append: '|' -%}
     {%- endunless -%}
   {%- endif -%}
 {%- endfor -%}
-<script type="application/json" data-order-flags>{"noCourier": {{ names | split: '|' | json }}}</script>
+<script type="application/json" data-order-flags>{"noCourier": {{ names | split: '|' | json }}, "variable": {{ vnames | split: '|' | json }}}</script>
 {% schema %}
 { "name": "Datos del pedido", "settings": [] }
 {% endschema %}

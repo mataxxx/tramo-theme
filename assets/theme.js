@@ -533,14 +533,31 @@
       var num = (whole ? String(whole) : '') + f;
       return num + (q > 1 ? ' tazas' : ' taza');
     }
+    var pieceNote = $('[data-piece-note]', root);
+    function pieceText(n, name) {
+      var q = Math.round(n * 2) / 2; if (q < 0.5) q = 0.5;
+      var whole = Math.floor(q), half = q - whole ? '½' : '';
+      var num = whole && half ? whole + half : (whole ? String(whole) : '½');
+      var plural = q > 1 ? (/[aeiouáéíóú]$/i.test(name) ? name + 's' : name + 'es') : name;
+      return num + ' ' + plural;
+    }
+    function updatePieces(variant, quantity) {
+      if (!pieceNote) return;
+      var per = parseFloat(pieceNote.getAttribute('data-piece-grams')), name = pieceNote.getAttribute('data-piece-name') || 'pieza';
+      var on = !!(variant && variant.bulk && per);
+      pieceNote.hidden = !on; if (!on) return;
+      var g = quantity * (BULK.unit || 10);
+      pieceNote.querySelector('[data-piece-text]').textContent = g + ' g ≈ ' + pieceText(g / per, name) + ' (aprox.)';
+    }
     function updateCups(variant, quantity) {
+      updatePieces(variant, quantity);
       if (!cupNote) return;
       var per = parseFloat(cupNote.getAttribute('data-cup-grams')); var txt = cupNote.querySelector('[data-cup-text]');
       if (!per || !txt) return;
       var grams = 0;
       if (variant && variant.bulk) grams = quantity * (BULK.unit || 10);
       else if (variant) {
-        var m = String(variant.title || '').replace(',', '.').match(/(\d+(?:\.\d+)?)\s*(kg|g)\b/i);
+        var m = /aprox/i.test(variant.title || '') ? null : String(variant.title || '').replace(',', '.').match(/(\d+(?:\.\d+)?)\s*(kg|g)\b/i);
         if (m) grams = parseFloat(m[1]) * (m[2].toLowerCase() === 'kg' ? 1000 : 1) * (quantity || 1);
       }
       txt.textContent = grams ? grams + ' g ≈ ' + cupText(grams / per) + '  ·  1 taza = ' + per + ' g' : '1 taza ≈ ' + per + ' g';

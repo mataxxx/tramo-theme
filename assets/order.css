@@ -200,3 +200,5 @@
 .ord-more span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .ord-more svg { width: 22px; height: 22px; }
 .ord-find-res__msg--soft { background: #f1f5ec; color: #3d5a36; }
+.ord-varnote { margin: 8px 0 0; padding: 9px 11px; border-radius: 10px; background: #eef3fb; border: 1px solid #cfdcf0; color: #1f3b63; font-size: 13.5px; line-height: 1.4; }
+.ord-varnote[hidden] { display: none; }

@@ -30,7 +30,7 @@
     }).catch(function () { $('[data-order-lines]', M).innerHTML = '<li class="ord-lines__load">No se pudo cargar el carrito. Intenta de nuevo.</li>'; });
   }
   /* Productos que no se envían por encomienda: se bloquea esa opción */
-  var noCourier = [];
+  var noCourier = [], variable = [];
   function loadFlags() {
     var root = (window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/';
     fetch(root + '?sections=order-flags', { headers: { Accept: 'application/json' } })
@@ -40,9 +40,16 @@
         var m = html.match(/<script[^>]*data-order-flags[^>]*>([\s\S]*?)<\/script>/);
         var data = m ? JSON.parse(m[1]) : {};
         noCourier = (data.noCourier || []).filter(Boolean);
+        variable = (data.variable || []).filter(Boolean);
         applyCourierBlock();
+        applyVariable();
       })
       .catch(function () {});
+  }
+  function applyVariable() {
+    var on = variable.length > 0, n = $('[data-order-varnote]', M), l = $('[data-order-sublabel]', M);
+    if (l) l.textContent = on ? 'Subtotal aproximado' : 'Subtotal';
+    if (n) { n.hidden = !on; if (on) n.innerHTML = '⚖️ <b>' + variable.map(esc).join(', ') + '</b> ' + (variable.length > 1 ? 'son' : 'es') + ' de peso variable. Lo pesamos al preparar tu pedido y te confirmamos el total exacto por WhatsApp antes de pagar.'; }
   }
   function applyCourierBlock() {
     var radio = $('input[data-order-mode][value="courier"]', M); if (!radio) return;
@@ -342,7 +349,8 @@
     cart.items.forEach(function (it) {
       L1.push('• ' + it.quantity + ' × ' + it.product_title + (variantLabel(it) ? ' (' + variantLabel(it) + ')' : '') + ' — ' + money(it.final_line_price));
     });
-    L1.push('', '*Subtotal:* ' + money(cart.total_price), '');
+    L1.push('', '*Subtotal' + (variable.length ? ' aproximado' : '') + ':* ' + money(cart.total_price), '');
+    if (variable.length) L1.push('⚖️ Peso variable (' + variable.join(', ') + '): espero el total exacto al pesar.', '');
     if (mode === 'pickup') {
       L1.push('*Entrega:* Recoger en ' + (D.pickup || 'el Mercado Central'));
     } else if (mode === 'courier') {
@@ -382,7 +390,7 @@
       var root = (window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/';
       var fe = wantsFE() ? ($('[data-order-fe-type]', M).value + ' ' + $('[data-order-fe-id]', M).value.trim() + ' · ' + $('[data-order-fe-name]', M).value.trim() + ' · ' + $('[data-order-fe-mail]', M).value.trim()) : '';
       var payload = {
-        code: c, mode: mode, eta: etaPlain(mode),
+        code: c, mode: mode, eta: etaPlain(mode), variable: variable,
         name: $('[data-order-name]', M).value.trim(), phone: $('[data-order-phone]', M).value.trim(),
         payer: (($('[data-order-payer]', M) || {}).value || '').trim(),
         location: mode === 'delivery' ? (loc && !waLoc ? 'https://maps.google.com/?q=' + loc.lat + ',' + loc.lng : 'La envía por WhatsApp') : '',

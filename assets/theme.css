@@ -2811,9 +2811,18 @@ body.is-locked { overscroll-behavior: none; }
 
 
 /* Galería: puntitos blancos estilo Instagram (sin flechas) y video */
-.product-gallery .gallery-arrow, .product-gallery .gallery-count { display: none !important; }
+@media (max-width: 749px) { .product-gallery .gallery-arrow, .product-gallery .gallery-count { display: none !important; } }
+@media (min-width: 750px) { .gallery-dots { display: none !important; } }
 .gallery-dots { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 3; display: flex; gap: 6px; padding: 5px 8px; border-radius: 999px; background: rgba(0,0,0,.18); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 .gallery-dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.55); cursor: pointer; transition: transform .2s ease, background-color .2s ease; }
 .gallery-dot.is-on { background: #fff; transform: scale(1.25); }
 .product-gallery__video { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; display: block; background: transparent; }
 #QuickView .product-gallery__thumbs { display: none !important; }
+
+/* Peso variable */
+.var-note { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: #eef3fb; border: 1px solid #cfdcf0; color: #1f3b63; font-size: 14px; line-height: 1.4; }
+.var-note .icon { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+[data-product-root]:has(.var-note) .quick-view__price .price__current::before,
+[data-product-root]:has(.var-note) .product-info__price .price__current::before { content: '≈ '; }
+.cart-line__warn--var { background: #eef3fb; color: #1f3b63; }
+.piece-note[hidden] { display: none; }

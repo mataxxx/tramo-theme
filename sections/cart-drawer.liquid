@@ -29,8 +29,9 @@
               <textarea id="CartDrawerNote" name="note" class="field" rows="2">{{ cart.note }}</textarea>
             {%- endif -%}
             {% render 'pay-step' %}
+            {%- assign has_var = false -%}{%- for it in cart.items -%}{%- if it.product.metafields.custom.peso_variable.value == true -%}{%- assign has_var = true -%}{%- endif -%}{%- endfor -%}
             <div class="cart-total">
-              <span>Subtotal</span>
+              <span>{% if has_var %}Subtotal aproximado{% else %}Subtotal{% endif %}</span>
               <strong data-cart-total>{{ cart.total_price | money }}</strong>
             </div>
             {% render 'cart-cashback' %}

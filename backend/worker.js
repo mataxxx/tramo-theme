@@ -330,12 +330,13 @@ async function handleNewOrder(request, env) {
     id: code || String(now), code, created: now, status: 'pago-pendiente',
     name, phone, mode, eta: clean(b.eta, 120),
     payer: clean(b.payer, 80), location: clean(b.location, 200), address: clean(b.address, 300), area: clean(b.area, 120),
-    fe: clean(b.fe, 300), items, total: Math.round(total * 100) / 100, message: clean(b.message, 4000), history: [{ s: 'pago-pendiente', t: now }]
+    fe: clean(b.fe, 300), items, total: Math.round(total * 100) / 100,
+    variable: (Array.isArray(b.variable) ? b.variable : []).slice(0, 20).map((x) => clean(x, 80)).filter(Boolean), message: clean(b.message, 4000), history: [{ s: 'pago-pendiente', t: now }]
   };
   const key = 'o:' + String(9999999999999 - now).padStart(13, '0') + ':' + order.id;
   order.key = key;
   await env.ORDERS.put(key, JSON.stringify(order));
-  const head = '🛒 Pedido nuevo ' + (code || '') + ' · ₡' + Math.round(order.total).toLocaleString('es-CR') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '');
+  const head = '🛒 Pedido nuevo ' + (code || '') + ' · ' + (order.variable.length ? '≈ ' : '') + '₡' + Math.round(order.total).toLocaleString('es-CR') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '') + (order.variable.length ? ' · ⚖️ pesar: ' + order.variable.join(', ') : '');
   const sent = await notifyOwner(env, head + '\n\n' + order.message);
   return json({ ok: true, notified: sent });
 }
@@ -370,10 +371,11 @@ async function handlePanel(request, url, env) {
   }
   if (p === '/panel/api/status' && request.method === 'POST') {
     const b = await request.json();
-    if (!STATUSES.includes(b.status) || !String(b.key || '').startsWith('o:')) return json({ error: 'datos' }, 400);
+    if ((b.status && !STATUSES.includes(b.status)) || !String(b.key || '').startsWith('o:')) return json({ error: 'datos' }, 400);
     const o = await env.ORDERS.get(b.key, 'json');
     if (!o) return json({ error: 'no existe' }, 404);
-    o.status = b.status; o.history = (o.history || []).concat({ s: b.status, t: Date.now() });
+    if (b.status) { o.status = b.status; o.history = (o.history || []).concat({ s: b.status, t: Date.now() }); }
+    if (b.finalTotal != null && isFinite(+b.finalTotal) && +b.finalTotal > 0) o.finalTotal = Math.round(+b.finalTotal);
     await env.ORDERS.put(b.key, JSON.stringify(o));
     return json({ ok: true, order: o });
   }
@@ -409,7 +411,7 @@ main{padding:12px 12px 40px;max-width:760px;margin:0 auto;display:grid;gap:10px}
 .o__tot{font-weight:800;font-size:16px;white-space:nowrap;text-align:right}.o__ago{color:var(--mut);font-size:12px;font-weight:400;margin-top:2px}
 .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;margin-top:6px}
 .s-pago-pendiente{background:#fdf0d9;color:#8a5a10}.s-pagado{background:#e3eefc;color:#1d4f91}.s-preparando{background:#efe7fb;color:#5b3a99}
-.s-listo{background:#dff1dc;color:#24602a}.s-entregado{background:#eceee9;color:#4b5548}.s-cancelado{background:#f9e1df;color:#9b2c22}
+.s-listo{background:#dff1dc;color:#24602a}.s-var{background:#eef3fb;color:#1f3b63;margin-left:4px}.s-entregado{background:#eceee9;color:#4b5548}.s-cancelado{background:#f9e1df;color:#9b2c22}
 .when{display:inline-block;margin-left:6px;font-size:12px;color:var(--g);font-weight:600}
 .o__body{display:none;border-top:1px solid var(--line);padding:12px 14px;font-size:14px}.o.open .o__body{display:block}
 .items{margin:0 0 10px;padding:0;list-style:none}.items li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
@@ -432,8 +434,9 @@ const money=n=>'₡'+Math.round(n||0).toLocaleString('es-CR');
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ago=t=>{const m=Math.round((Date.now()-t)/60000);if(m<1)return'ahora';if(m<60)return'hace '+m+' min';const h=Math.round(m/60);if(h<24)return'hace '+h+' h';return new Date(t).toLocaleDateString('es-CR',{day:'numeric',month:'short'})};
 const wa=(o,t)=>'https://wa.me/506'+String(o.phone).replace(/\\D/g,'').slice(-8)+'?text='+encodeURIComponent(t);
+const tot=o=>o.finalTotal||o.total;
 function msgs(o){const n=o.name.split(' ')[0];return[
- ['Pedir pago','alt','¡Hola '+n+'! Recibimos tu pedido '+o.code+' 🙌 El total es '+money(o.total)+(o.mode!=='pickup'?' + envío':'')+'. Puedes pagar por SINPE Móvil y nos avisas. ¡Gracias!'],
+ ['Pedir pago','alt pay','¡Hola '+n+'! Recibimos tu pedido '+o.code+' 🙌 '+(o.variable&&o.variable.length&&!o.finalTotal?'Ya lo pesamos: ':'')+'El total es '+money(tot(o))+(o.mode!=='pickup'?' + envío':'')+'. Puedes pagar por SINPE Móvil y nos avisas. ¡Gracias!'],
  [o.mode==='pickup'?'Avisar: listo para recoger':o.mode==='delivery'?'Avisar: va en camino':'Avisar: encomienda enviada','',o.mode==='pickup'?'¡Hola '+n+'! Tu pedido '+o.code+' ya está listo ✅ Puedes pasar a recogerlo al Tramo San Rafael #1, Mercado Central (7:30 a. m. a 5:30 p. m.).':o.mode==='delivery'?'¡Hola '+n+'! Tu pedido '+o.code+' ya va en camino por Uber Flash 🛵 Por favor estate pendiente para recibirlo.':'¡Hola '+n+'! Tu pedido '+o.code+' ya fue enviado por encomienda 📦 Te llega en hasta 48 h.']
 ]}
 function tabs(){const c={activos:0,todos:orders.length};orders.forEach(o=>{c[o.status]=(c[o.status]||0)+1;if(!['entregado','cancelado'].includes(o.status))c.activos++});
@@ -443,20 +446,23 @@ function render(){tabs();const L=orders.filter(o=>filter==='todos'||(filter==='a
  const el=document.getElementById('list');if(!L.length){el.innerHTML='<div class="empty">No hay pedidos aquí.</div>';return}
  el.innerHTML=L.map(o=>{const isNew=known&&!known.has(o.key);return '<article class="o'+(open[o.key]?' open':'')+(isNew?' new':'')+'" data-k="'+esc(o.key)+'">'+
  '<div class="o__top" data-toggle><div class="o__main"><div class="o__name">'+esc(o.name)+' · '+esc(o.code)+'</div><div class="o__sub">'+esc(MODE[o.mode]||o.mode)+' · '+o.items.length+' producto'+(o.items.length>1?'s':'')+'</div>'+
- '<span class="pill s-'+o.status+'">'+ST[o.status]+'</span>'+(o.eta?'<span class="when">'+esc(o.eta)+'</span>':'')+'</div>'+
- '<div class="o__tot">'+money(o.total)+(o.mode!=='pickup'?'<div class="o__ago">+ envío</div>':'')+'<div class="o__ago">'+ago(o.created)+'</div></div></div>'+
+ '<span class="pill s-'+o.status+'">'+ST[o.status]+'</span>'+(o.variable&&o.variable.length&&!o.finalTotal?'<span class="pill s-var">⚖️ Pesar</span>':'')+(o.eta?'<span class="when">'+esc(o.eta)+'</span>':'')+'</div>'+
+ '<div class="o__tot">'+(o.variable&&o.variable.length&&!o.finalTotal?'≈ ':'')+money(tot(o))+(o.mode!=='pickup'?'<div class="o__ago">+ envío</div>':'')+'<div class="o__ago">'+ago(o.created)+'</div></div></div>'+
  '<div class="o__body"><ul class="items">'+o.items.map(i=>'<li><span>'+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
  '<dl class="kv"><dt>Teléfono</dt><dd><a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a></dd>'+(o.payer?'<dt>SINPE de</dt><dd>'+esc(o.payer)+'</dd>':'')+
  (o.location?'<dt>Ubicación</dt><dd><a href="'+esc(o.location)+'" target="_blank">Ver en el mapa</a></dd>':'')+(o.area?'<dt>Zona</dt><dd>'+esc(o.area)+'</dd>':'')+(o.address?'<dt>'+(o.mode==='courier'?'Dirección':'Señas')+'</dt><dd>'+esc(o.address)+'</dd>':'')+
  (o.fe?'<dt>Factura</dt><dd>'+esc(o.fe)+'</dd>':'')+'<dt>Pedido</dt><dd>'+new Date(o.created).toLocaleString('es-CR',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+'</dd></dl>'+
  '<div class="st">'+Object.keys(ST).map(s=>'<button data-s="'+s+'" class="'+(o.status===s?'on':'')+'">'+ST[s]+'</button>').join('')+'</div>'+
- '<div class="acts">'+msgs(o).map(([l,c,t])=>'<a class="'+c+'" href="'+wa(o,t)+'" target="_blank">'+l+'</a>').join('')+'<a class="alt" href="'+wa(o,'')+'" target="_blank">WhatsApp</a></div></div></article>'}).join('')}
+ (o.variable&&o.variable.length?'<p style="margin:0 0 8px;font-size:13px;color:#1f3b63">⚖️ Peso variable: '+esc(o.variable.join(', '))+'. Al pesar, toca <b>Pedir pago</b> y escribe el total exacto.</p>':'')+'<div class="acts">'+msgs(o).map(([l,c,t])=>'<a class="'+c+'" href="'+wa(o,t)+'" target="_blank">'+l+'</a>').join('')+'<a class="alt" href="'+wa(o,'')+'" target="_blank">WhatsApp</a></div></div></article>'}).join('')}
 async function load(){try{const r=await fetch('/panel/api/orders',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();
  const fresh=d.orders||[];if(known&&fresh.some(o=>!known.has(o.key))){try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
  orders=fresh;render();known=new Set(orders.map(o=>o.key));document.getElementById('upd').textContent='actualizado '+new Date().toLocaleTimeString('es-CR',{hour:'numeric',minute:'2-digit'})}catch(e){}}
 document.addEventListener('click',async e=>{const t=e.target.closest('[data-f]');if(t){filter=t.dataset.f;render();return}
  const card=e.target.closest('.o');if(!card)return;const k=card.dataset.k;
  if(e.target.closest('[data-toggle]')){open[k]=!open[k];card.classList.toggle('open');return}
+ const pay=e.target.closest('a.pay');
+ if(pay){const o=orders.find(x=>x.key===k);if(o&&o.variable&&o.variable.length){e.preventDefault();const v=prompt('Total exacto después de pesar (sin envío), en colones:',Math.round(tot(o)));if(!v)return;const n=parseInt(String(v).replace(/\\D/g,''),10);if(!n)return;
+  const r=await fetch('/panel/api/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:k,finalTotal:n})});if(r.ok){const d=await r.json();orders=orders.map(x=>x.key===k?d.order:x);render();const no=orders.find(x=>x.key===k);window.open(wa(no,msgs(no)[0][2]),'_blank')}}return}
  const s=e.target.closest('[data-s]');if(s){const r=await fetch('/panel/api/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:k,status:s.dataset.s})});
   if(r.ok){const d=await r.json();orders=orders.map(o=>o.key===k?d.order:o);render()}}});
 load();setInterval(load,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
