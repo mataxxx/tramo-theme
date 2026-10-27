@@ -2,6 +2,9 @@
 {%- assign pg_ar = product.featured_media.preview_image.aspect_ratio | default: 1 -%}
 <div class="product-gallery" data-gallery style="--pg-ar: {{ pg_ar }}">
   <div class="product-gallery__frame">
+    {%- if product.metafields.custom.peso_variable.value == true -%}
+      <span class="var-badge" title="El precio es aproximado: lo pesamos al preparar tu pedido y te confirmamos el total exacto por WhatsApp antes de pagar.">{% render 'icon', name: 'scale' %}<span>Peso variable · precio aprox.</span></span>
+    {%- endif -%}
     <div class="product-gallery__strip" data-gallery-strip>
       {%- for media in product.media -%}
         <div class="product-gallery__slide product-gallery__slide--blur" data-media-id="{{ media.id }}" style="--pg-bg: url('{{ media.preview_image | image_url: width: 240 }}')">

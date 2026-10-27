@@ -13,9 +13,7 @@
   <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id {% unless current_variant.available %}disabled{% endunless %}>
   <input type="hidden" name="quantity" value="1" data-quantity-field>
   {% render 'product-spice', product: product %}
-  {%- if product.metafields.custom.peso_variable.value == true -%}
-    <p class="var-note">{% render 'icon', name: 'scale' %}<span><b>Peso variable:</b> el precio es aproximado. Lo pesamos al preparar tu pedido y te confirmamos el total exacto por WhatsApp antes de pagar.</span></p>
-  {%- endif -%}
+  
   {%- if settings.order_mode -%}
     {%- if product.metafields.custom.sin_encomienda.value == true -%}
     <p class="pay-order">{% render 'icon', name: 'phone' %}<span>Paga por <b>SINPE Móvil</b> y coordina el envío por <b>Uber Flash</b> o retira en el <b>Mercado Central</b>.</span></p>

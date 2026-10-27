@@ -391,7 +391,8 @@
     function render(html) {
       body.innerHTML = html;
       var panel = body.parentElement;
-      if (panel) panel.scrollTop = 0;
+      /* Al abrir otro producto desde la misma ficha (ej. "También te puede gustar"): volver arriba para que se vea la X */
+      [drawer, panel, body, $('.quick-view__content', body)].forEach(function (el) { if (el) el.scrollTop = 0; });
       initProducts(body);
       initRails(body);
       initPVideos(body);
