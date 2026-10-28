@@ -21,6 +21,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <meta name="theme-color" content="{{ settings.color_primary }}">
     <link rel="canonical" href="{{ canonical_url }}">
+    {%- liquid
+      assign seo_hide = false
+      if collection and collection.metafields.seo.hidden.value == 1
+        assign seo_hide = true
+      endif
+      if page and page.metafields.seo.hidden.value == 1
+        assign seo_hide = true
+      endif
+      if product and product.metafields.seo.hidden.value == 1
+        assign seo_hide = true
+      endif
+    -%}
+    {%- if seo_hide -%}<meta name="robots" content="noindex">{%- endif -%}
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
     {%- endif -%}
