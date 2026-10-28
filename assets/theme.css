@@ -2865,3 +2865,14 @@ body.is-locked { overscroll-behavior: none; }
 .cart-total::after { text-align: right; font-size: 12px; }
 .combo__prices { flex-wrap: wrap; }
 .product-info__price .price::after { font-size: 12.5px; margin-top: 2px; }
+
+/* Página 404 */
+.nf { display: grid; justify-items: center; text-align: center; gap: 12px; padding-top: 48px; padding-bottom: 72px; max-width: 560px; }
+.nf__logo { width: 120px; height: auto; }
+.nf__code { margin: 6px 0 0; font-size: 13px; font-weight: 700; letter-spacing: .2em; color: #a3362a; }
+.nf__title { margin: 0; font-size: clamp(26px, 6vw, 36px); line-height: 1.15; }
+.nf__text { margin: 0; color: rgba(29, 42, 28, .72); font-size: 16px; line-height: 1.5; }
+.nf__search { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
+.nf__search input[type=search] { flex: 1; min-width: 0; padding: 12px 14px; font-size: 16px; border: 1.5px solid #d9d0bd; border-radius: 12px; background: #fff; }
+.nf__acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+.nf__wa { background: #25d366 !important; color: #08331a !important; border-color: #25d366 !important; }
