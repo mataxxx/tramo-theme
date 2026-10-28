@@ -222,8 +222,33 @@
     validate();
   }
 
-  /* ---------- mapa (OpenStreetMap + Leaflet, sin llave) ---------- */
-  var leafletP = null;
+  /* ---------- mapa: Google (limpio, estilo Uber, pin fijo al centro) o OpenStreetMap si no hay llave ---------- */
+  var leafletP = null, googleP = null, kind = null, userMoved = false, cpin = null;
+  var GSTYLE = [
+    { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+    { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+    { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+    { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
+    { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#f2f0eb' }] },
+    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9dff0' }] },
+    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
+    { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#fbf6ea' }] },
+    { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#f3e3c3' }] },
+    { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#6b6b6b' }] }
+  ];
+  function loadGoogle() {
+    if (window.google && google.maps && google.maps.Map) return Promise.resolve();
+    if (googleP) return googleP;
+    googleP = new Promise(function (res, rej) {
+      window.__ordGm = function () { res(); };
+      window.gm_authFailure = function () { rej(new Error('auth')); if (kind === 'g') fallbackLeaflet(); };
+      var js = document.createElement('script');
+      js.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(D.gkey) + '&v=weekly&language=es&region=CR&loading=async&callback=__ordGm';
+      js.async = true; js.onerror = rej; document.head.appendChild(js);
+      setTimeout(function () { rej(new Error('timeout')); }, 8000);
+    });
+    return googleP;
+  }
   function loadLeaflet() {
     if (window.L) return Promise.resolve();
     if (leafletP) return leafletP;
@@ -233,14 +258,42 @@
     });
     return leafletP;
   }
+  function center0() { return { lat: parseFloat(D.lat) || 9.9349, lng: parseFloat(D.lng) || -84.0789 }; }
   function initMap() {
-    if (map) { setTimeout(function () { map.invalidateSize(); }, 60); return; }
+    if (map) { if (kind === 'l') setTimeout(function () { map.invalidateSize(); }, 60); return; }
     var el = $('[data-order-map]', M);
     el.classList.add('is-loading');
+    if (D.gkey) {
+      loadGoogle().then(function () { if (!map) initGoogle(el); }).catch(function () { if (!map || kind === 'g') fallbackLeaflet(); });
+    } else initLeaflet(el);
+  }
+  function fallbackLeaflet() {
+    var el = $('[data-order-map]', M); map = null; pin = null; accCircle = null; kind = null; cpin = null;
+    el.innerHTML = ''; el.classList.remove('is-google'); initLeaflet(el);
+  }
+  function initGoogle(el) {
+    el.classList.remove('is-loading'); el.classList.add('is-google'); kind = 'g';
+    var c = loc || center0();
+    map = new google.maps.Map(el, { center: c, zoom: loc ? 17 : 13, styles: GSTYLE, disableDefaultUI: true, zoomControl: true, clickableIcons: false, gestureHandling: 'greedy', keyboardShortcuts: false });
+    cpin = document.createElement('div'); cpin.className = 'ord-cpin'; cpin.innerHTML = '<span></span><i></i>'; el.appendChild(cpin);
+    map.addListener('dragstart', function () { userMoved = true; cpin.classList.add('is-lift'); });
+    map.addListener('click', function (e) { userMoved = true; map.panTo(e.latLng); });
+    map.addListener('idle', function () {
+      cpin.classList.remove('is-lift');
+      if (!userMoved) return; userMoved = false;
+      var p = map.getCenter(); setWaLoc(false);
+      loc = { lat: +p.lat().toFixed(6), lng: +p.lng().toFixed(6) };
+      if (accCircle) { accCircle.setMap(null); accCircle = null; } acc = null;
+      hint('moved'); validate();
+    });
+    if (loc) showAcc(loc.lat, loc.lng);
+    hint(loc ? 'gps' : null);
+  }
+  function initLeaflet(el) {
     loadLeaflet().then(function () {
-      el.classList.remove('is-loading');
-      var c = [parseFloat(D.lat) || 9.9349, parseFloat(D.lng) || -84.0789];
-      map = L.map(el, { zoomControl: true, attributionControl: true }).setView(c, 13);
+      el.classList.remove('is-loading'); kind = 'l';
+      var c = center0();
+      map = L.map(el, { zoomControl: true, attributionControl: true }).setView([c.lat, c.lng], 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
       map.on('click', function (e) { place(e.latlng.lat, e.latlng.lng); });
       if (loc) { place(loc.lat, loc.lng, acc && acc < 60 ? 18 : 17, acc ? 'gps' : null); showAcc(loc.lat, loc.lng); }
@@ -254,8 +307,10 @@
   function place(lat, lng, zoom, src) {
     setWaLoc(false);
     loc = { lat: +lat.toFixed(6), lng: +lng.toFixed(6) };
-    if (src !== 'gps' && accCircle) { map.removeLayer(accCircle); accCircle = null; acc = null; }
-    if (window.L && map) {
+    if (src !== 'gps' && accCircle) { if (kind === 'g') accCircle.setMap(null); else if (map) map.removeLayer(accCircle); accCircle = null; acc = null; }
+    if (kind === 'g' && map) {
+      userMoved = false; map.setCenter({ lat: lat, lng: lng }); map.setZoom(zoom || Math.max(map.getZoom(), 16));
+    } else if (kind === 'l' && window.L && map) {
       if (!pinIcon) pinIcon = L.divIcon({ className: 'ord-pin', html: '<span></span>', iconSize: [34, 44], iconAnchor: [17, 42] });
       if (!pin) {
         pin = L.marker([lat, lng], { draggable: true, icon: pinIcon }).addTo(map);
@@ -267,48 +322,49 @@
   }
   var acc = null, accCircle = null, gotAuto = false;
   function hint(state) {
-    var h = $('[data-order-maphint]', M);
+    var h = $('[data-order-maphint]', M); if (!h) return;
+    var g = kind === 'g';
     h.classList.toggle('is-ok', !!loc && state !== 'busy');
     h.classList.toggle('is-busy', state === 'busy');
-    if (state === 'busy') { h.textContent = 'Buscando tu ubicación exacta…'; return; }
-    if (!loc) { h.textContent = 'Toca el mapa o arrastra el pin hasta tu casa.'; return; }
-    h.textContent = acc && state === 'gps'
-      ? '✓ Te ubicamos con una precisión de ±' + Math.round(acc) + ' m. Si el pin no está justo en tu casa, arrástralo.'
-      : '✓ Ubicación marcada. Si no está justo en tu casa, arrastra el pin.';
+    if (state === 'busy') { h.textContent = 'Buscando tu ubicación…'; return; }
+    if (!loc) { h.textContent = g ? 'Mueve el mapa para poner el pin en tu casa.' : 'Toca el mapa o arrastra el pin hasta tu casa.'; return; }
+    h.textContent = (acc && state === 'gps' ? '✓ Te ubicamos (±' + Math.round(acc) + ' m). ' : '✓ Ubicación marcada. ') + (g ? 'Si no es justo tu casa, mueve el mapa.' : 'Si no es justo tu casa, arrastra el pin.');
   }
   function showAcc(lat, lng) {
-    if (!(window.L && map) || !acc) return;
-    if (accCircle) accCircle.setLatLng([lat, lng]).setRadius(acc);
-    else accCircle = L.circle([lat, lng], { radius: acc, color: '#2f7fd8', weight: 1, fillColor: '#2f7fd8', fillOpacity: .12, interactive: false }).addTo(map);
+    if (!map || !acc || acc > 400) return;
+    if (kind === 'g') {
+      if (accCircle) { accCircle.setCenter({ lat: lat, lng: lng }); accCircle.setRadius(acc); }
+      else accCircle = new google.maps.Circle({ map: map, center: { lat: lat, lng: lng }, radius: acc, strokeColor: '#2f7fd8', strokeWeight: 1, fillColor: '#2f7fd8', fillOpacity: .12, clickable: false });
+    } else if (window.L) {
+      if (accCircle) accCircle.setLatLng([lat, lng]).setRadius(acc);
+      else accCircle = L.circle([lat, lng], { radius: acc, color: '#2f7fd8', weight: 1, fillColor: '#2f7fd8', fillOpacity: .12, interactive: false }).addTo(map);
+    }
   }
-  /* GPS como Uber: se queda escuchando unos segundos y se queda con la lectura más precisa */
+  /* Ubicación rápida: primero la última conocida (al instante) y luego la va afinando sin bloquear el botón */
   function locate(btn, auto) {
     if (!navigator.geolocation) { if (!auto) err('Tu navegador no permite compartir la ubicación. Márcala en el mapa.'); return; }
-    if (btn) btn.classList.add('is-busy');
-    hint('busy');
-    var best = null, done = false, wid = null;
-    function finish() {
-      if (done) return; done = true;
-      if (wid != null) navigator.geolocation.clearWatch(wid);
-      if (btn) btn.classList.remove('is-busy');
-      if (!best) { hint(); if (!auto) err('No pudimos obtener tu ubicación. Revisa el permiso de ubicación del navegador o márcala en el mapa.'); return; }
-      acc = best.coords.accuracy;
-      place(best.coords.latitude, best.coords.longitude, acc < 60 ? 18 : 17, 'gps');
-      showAcc(best.coords.latitude, best.coords.longitude);
+    var got = false, best = null, wid = null, stopped = false, movedByUser = false, startLoc = loc;
+    if (btn && !auto) btn.classList.add('is-busy');
+    if (!auto) hint('busy');
+    function apply(p) {
+      if (loc !== startLoc && best === null && got) return;
+      best = p; acc = p.coords.accuracy;
+      place(p.coords.latitude, p.coords.longitude, acc < 60 ? 18 : 17, 'gps');
+      showAcc(p.coords.latitude, p.coords.longitude);
+      startLoc = loc;
     }
+    function firstFix(p) { if (btn) btn.classList.remove('is-busy'); if (!got) { got = true; apply(p); } }
+    function stop() { if (stopped) return; stopped = true; if (wid != null) navigator.geolocation.clearWatch(wid); if (btn) btn.classList.remove('is-busy'); if (!got) { hint(); if (!auto) err('No pudimos obtener tu ubicación. Revisa el permiso de ubicación o márcala en el mapa.'); } }
+    navigator.geolocation.getCurrentPosition(firstFix, function (e) { if (e && e.code === 1) stop(); }, { enableHighAccuracy: false, timeout: 4000, maximumAge: 300000 });
     wid = navigator.geolocation.watchPosition(function (p) {
-      if (!best || p.coords.accuracy < best.coords.accuracy) {
-        best = p; acc = p.coords.accuracy;
-        place(p.coords.latitude, p.coords.longitude, acc < 60 ? 18 : 17, 'gps');
-        showAcc(p.coords.latitude, p.coords.longitude);
-        hint('busy');
-      }
-      if (p.coords.accuracy <= 20) finish();
-    }, function (e) {
-      if (e && e.code === 1) { best = null; finish(); }
-    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-    setTimeout(finish, 9000);
+      if (!got) { firstFix(p); return; }
+      if (loc !== startLoc) { stop(); return; } /* el cliente ya movió el pin: no lo pisamos */
+      if (!best || p.coords.accuracy < best.coords.accuracy) apply(p);
+      if (p.coords.accuracy <= 20) stop();
+    }, function (e) { if (e && e.code === 1) stop(); }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    setTimeout(stop, 10000);
   }
+
   function findMsg(html) { var r = $('[data-order-find-res]', M); r.innerHTML = html; r.hidden = !html; }
   var findToken = 0, findTimer = null;
   var gSession = null;

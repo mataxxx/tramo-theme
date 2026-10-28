@@ -256,3 +256,13 @@
 .ord-paybox .ord-sinpe-box .ord-sinpe-box__num { display: flex; flex-direction: column; align-items: center; }
 .ord-paybox .ord-sinpe-box .ord-copy { margin: 8px auto 0; }
 .ord-switch__ui input { pointer-events: none; }
+
+/* Mapa estilo Uber: pin fijo al centro (con Google) */
+.ord-map { position: relative; }
+.ord-cpin { position: absolute; left: 50%; top: 50%; z-index: 5; width: 0; height: 0; pointer-events: none; }
+.ord-cpin span { position: absolute; left: -15px; top: -42px; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--color-primary, #263d25); box-shadow: 0 4px 10px rgba(0,0,0,.3); transition: transform .18s ease; }
+.ord-cpin span::after { content: ''; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #fff; }
+.ord-cpin i { position: absolute; left: -5px; top: -3px; width: 10px; height: 6px; border-radius: 50%; background: rgba(0,0,0,.25); transition: transform .18s ease, opacity .18s ease; }
+.ord-cpin.is-lift span { transform: translateY(-10px) rotate(-45deg); }
+.ord-cpin.is-lift i { transform: scale(.7); opacity: .6; }
+.ord-map.is-google .gm-style-cc, .ord-map.is-google .gmnoprint a { font-size: 9px; }
