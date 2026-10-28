@@ -80,6 +80,7 @@ td.r,th.r{text-align:right;white-space:nowrap}.tw{overflow-x:auto}
 <main id="sales" hidden></main>
 <div class="saved" id="toast">Guardado ✓</div>
 <script>
+const APPV='__APPV__';
 const ST={'incompleto':'Sin terminar','pago-pendiente':'Pago pendiente','pagado':'Pagado','preparando':'Preparando','listo':'Listo','entregado':'Entregado / enviado','cancelado':'Cancelado'};
 const MODE={pickup:'Retiro',delivery:'Uber Flash',courier:'Encomienda'};
 const INV={FE:'Factura electrónica',TN:'Tiquete de caja',TE:'Tiquete electrónico'};const INV_PICK=['FE','TN'];
@@ -228,13 +229,13 @@ function csv(){const H=['Fecha pago','Pedido','Cliente','Entrega','Productos','E
 
 /* ---------- Datos ---------- */
 async function load(force){try{
-  if(!force&&ver){const r=await fetch('/panel/api/ver',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();if(d.ver===ver){stamp();return}}
+  if(!force&&ver){const r=await fetch('/panel/api/ver',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();if(d.app&&d.app!==APPV){location.reload();return}if(d.ver===ver){stamp();return}}
   const r=await fetch('/panel/api/orders',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();
   const fresh=d.orders||[];if(known&&fresh.some(o=>!known.has(o.key))){try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
   orders=fresh;sums=d.summaries||[];cfg=d.cfg||{};ver=d.ver;render();known=new Set(orders.map(o=>o.key));stamp()}catch(e){}}
 function stamp(){$('#upd').textContent='actualizado '+new Date().toLocaleTimeString('es-CR',{hour:'numeric',minute:'2-digit'})}
 async function save(k,patch,silent){const r=await fetch('/panel/api/update',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:k,patch})});
-  if(!r.ok){alert('No se pudo guardar. Revisa tu internet.');return null}const d=await r.json();orders=orders.map(o=>o.key===k?d.order:o);
+  if(!r.ok){const er=await r.json().catch(()=>({}));toast('⚠️ '+(er.error||'No se pudo guardar. Revisa tu internet.'));if(r.status===401)location.reload();return null}const d=await r.json();orders=orders.map(o=>o.key===k?d.order:o);
   const i=sums.findIndex(s=>s.key===k);if(i>=0){const o=d.order,inv=(o.invoices||[]).filter(x=>!x.voided);sums[i]=Object.assign(sums[i],{s:o.status,p:Math.round(prod(o)),sh:Math.round(o.shipping||0),m:o.mode,r:o.sinpeRef||'',f:inv.map(x=>x.type+' '+x.num).join(', '),pd:o.paidAt||0})}
   if(!silent)toast();return d.order}
 function rerender(){const a=document.activeElement;if(a&&a.blur)a.blur();render()}

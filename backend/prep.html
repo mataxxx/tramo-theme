@@ -47,6 +47,7 @@ h2.sep{grid-column:1/-1;margin:10px 0 0;font-size:15px;color:var(--mut)}
 <main id="list"><div class="empty">Cargando…</div></main>
 <div class="toast" id="toast"></div>
 <script>
+const APPV='__APPV__';
 const MODE={pickup:'🏪 Retiro',delivery:'🛵 Uber Flash',courier:'📦 Encomienda'};
 let orders=[],ver=null;
 const $=s=>document.querySelector(s);
@@ -78,7 +79,7 @@ function render(){const a=document.activeElement;if(a&&a.dataset&&a.dataset.w!=n
   const todo=orders.filter(o=>o.status!=='listo').sort((x,y)=>(x.paidAt||x.created)-(y.paidAt||y.created)),done=orders.filter(o=>o.status==='listo');
   $('#list').innerHTML=(todo.length?todo.map(card).join(''):'<div class="empty">🎉 No hay pedidos por alistar.<br><small>Aquí aparecen los pedidos pagados.</small></div>')+(done.length?'<h2 class="sep">Alistados en las últimas 24 h</h2>'+done.map(card).join(''):'')}
 async function load(force){try{
-  if(!force&&ver){const r=await fetch('/panel/api/ver',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();if(d.ver===ver)return}
+  if(!force&&ver){const r=await fetch('/panel/api/ver',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();if(d.app&&d.app!==APPV){location.reload();return}if(d.ver===ver)return}
   const r=await fetch('/panel/api/prep',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();
   const had=new Set(orders.map(o=>o.key));if(ver&&(d.orders||[]).some(o=>!had.has(o.key)&&o.status!=='listo')){toast('🔔 Nuevo pedido para alistar');try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}}
   orders=d.orders||[];ver=d.ver;render();$('#upd').textContent='Actualizado '+new Date().toLocaleTimeString('es-CR',{hour:'numeric',minute:'2-digit'})}catch(e){}}

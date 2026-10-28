@@ -419,6 +419,8 @@ async function panelAuthed(request, env) {
   if (role === 'admin' && !env.PANEL_PIN) return null;
   return (await sign(env, role === 'prep' ? m[2] + '.prep' : m[2], role)) === m[1] ? role : null;
 }
+// Cambia con cada versión del panel: las pantallas abiertas se recargan solas
+const APP_V = '2026-10-28-1';
 const SOLD_ST = ['pagado', 'preparando', 'listo', 'entregado'];
 function setStatusOn(o, st, now) {
   if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (SOLD_ST.includes(st) && !o.paidAt) o.paidAt = now; }
@@ -505,8 +507,8 @@ async function handlePanel(request, url, env) {
   const role = await panelAuthed(request, env);
   if (!role) return p.startsWith('/panel/api') ? json({ error: 'login' }, 401) : html(loginPage(''));
   if (role === 'prep') {
-    if (p === '/panel') return html(PREP_HTML);
-    if (p === '/panel/api/ver') return json({ ver: (await env.ORDERS.get('ver')) || '0' });
+    if (p === '/panel') return html(PREP_HTML.replace('__APPV__', APP_V));
+    if (p === '/panel/api/ver') return json({ ver: (await env.ORDERS.get('ver')) || '0', app: APP_V });
     if (p.startsWith('/panel/api/prep')) return await handlePrep(request, url, env, p);
     return p.startsWith('/panel/api') ? json({ error: 'sin permiso' }, 403) : new Response(null, { status: 303, headers: { location: '/panel' } });
   }
@@ -515,7 +517,7 @@ async function handlePanel(request, url, env) {
     const n = env.TELEGRAM_TOKEN ? (await telegramChats(env)).length : 0;
     return html('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><body style="font:17px system-ui;padding:24px;line-height:1.5"><h2>' + (ok ? '✅ Aviso enviado' : '⚠️ No se pudo enviar') + '</h2><p>Teléfonos registrados en Telegram: <b>' + n + '</b></p>' + (ok ? '' : '<p>Revisa que agregaste TELEGRAM_TOKEN en Cloudflare y que cada teléfono le escribió tu PIN al bot.</p>') + '<p><a href="/panel">← Volver al panel</a></p></body>');
   }
-  if (p === '/panel/api/ver') return json({ ver: (await env.ORDERS.get('ver')) || '0' });
+  if (p === '/panel/api/ver') return json({ ver: (await env.ORDERS.get('ver')) || '0', app: APP_V });
   if (p === '/panel/api/orders' && request.method === 'GET') {
     // Todos los pedidos en resumen (para ventas) + los más recientes completos (para la lista)
     const keys = []; let cursor;
@@ -544,6 +546,7 @@ async function handlePanel(request, url, env) {
     if (!o) return json({ error: 'no existe' }, 404);
     const now = Date.now();
     const setStatus = (st) => setStatusOn(o, st, now);
+    if (P.status === 'cancelado' && o.status !== 'cancelado' && clean(P.cancelReason || '', 300).length < 3) return json({ error: 'Para cancelar hay que escribir el motivo.' }, 400);
     if (P.status != null) { if (!STATUSES.includes(P.status)) return json({ error: 'estado' }, 400); setStatus(P.status); }
     if (P.status === 'cancelado') { o.cancelReason = clean(P.cancelReason || '', 300); if (o.history && o.history.length) o.history[o.history.length - 1].note = o.cancelReason; }
     if (P.mode != null && MODE_LABEL[P.mode] && P.mode !== o.mode) { o.history = (o.history || []).concat({ s: 'cambio-entrega', t: now, from: o.mode, to: P.mode, note: clean(P.changeNote || '', 200) }); o.mode = P.mode; }
@@ -566,7 +569,7 @@ async function handlePanel(request, url, env) {
     await putOrder(env, b.key, o);
     return json({ ok: true, order: o });
   }
-  if (p === '/panel') return html(PANEL_HTML);
+  if (p === '/panel') return html(PANEL_HTML.replace('__APPV__', APP_V));
   return json({ error: 'no encontrado' }, 404);
 }
 
