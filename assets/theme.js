@@ -247,8 +247,8 @@
 
   function refreshCart() {
     return Promise.all([
-      fetch(T.routes.cartJson, { headers: { Accept: 'application/json' } }).then(parseJSON),
-      fetch(ROOT + '?sections=cart-drawer').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
+      fetch(T.routes.cartJson + (T.routes.cartJson.indexOf('?') > -1 ? '&' : '?') + '_=' + Date.now(), { cache: 'no-store', headers: { Accept: 'application/json' } }).then(parseJSON),
+      fetch(ROOT + '?sections=cart-drawer&_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
     ]).then(function (results) {
       var cart = results[0];
       var sections = results[1] || {};

@@ -586,9 +586,19 @@
   function clearCart() {
     var root = ((window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/').replace(/\/$/, '');
     return fetch(root + '/cart/clear.js', { method: 'POST', keepalive: true, headers: { Accept: 'application/json' } })
-      .then(function (r) { if (r.ok) { cartCleared = true; try { document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { silent: true } })); } catch (e) {} } })
+      .then(function (r) { if (r.ok) { cartCleared = true; emptyCartUI(); try { document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { silent: true } })); } catch (e) {} } })
       .catch(function () {});
   }
+  /* Mostrar el carrito vacío de inmediato (contador y cajón), sin esperar a recargar la página */
+  function emptyCartUI() {
+    try {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-cart-count]'), function (el) { el.textContent = '0'; el.hidden = true; });
+    } catch (e) {}
+  }
+  /* Al volver de WhatsApp a la pestaña, refrescar el carrito (mientras la pestaña estaba oculta el navegador pudo pausar la petición) */
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && cartCleared) { emptyCartUI(); try { document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { silent: true } })); } catch (e) {} }
+  });
   /* Si el cliente vuelve de WhatsApp con la página guardada en memoria, recargar el carrito */
   window.addEventListener('pageshow', function (e) { if (e.persisted && cartCleared) { try { document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { silent: true } })); } catch (x) {} } });
 
