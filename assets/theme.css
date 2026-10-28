@@ -2847,3 +2847,8 @@ body.is-locked { overscroll-behavior: none; }
 .cart-ship { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; grid-template-columns: none; }
 .cart-ship li { flex-direction: row; gap: 5px; padding: 5px 10px; border-radius: 999px; font-size: 12px; }
 .cart-ship .icon { width: 15px; height: 15px; }
+
+/* Ayuda: pasos numerados con circulitos */
+.help__content ol { list-style: none; counter-reset: paso; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
+.help__content ol li { counter-increment: paso; position: relative; padding-left: 40px; min-height: 28px; display: flex; align-items: center; line-height: 1.35; }
+.help__content ol li::before { content: counter(paso); position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary); color: #fff; font-weight: 700; font-size: 14px; display: grid; place-items: center; }

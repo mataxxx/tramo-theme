@@ -164,7 +164,7 @@
         "h2": {
           "type": "topic",
           "settings": {
-            "icon": "chat",
+            "icon": "whatsapp",
             "title": "Contáctanos",
             "summary": "Escríbenos por WhatsApp · 6260-9212",
             "card_link": "https://wa.me/50662609212"
@@ -176,7 +176,7 @@
             "icon": "cart",
             "title": "Cómo comprar",
             "summary": "Así de fácil",
-            "content": "<p><strong>1.</strong> Explora la tienda.</p><p><strong>2.</strong> Agrega al carrito.</p><p><strong>3.</strong> Elige envío por Uber Flash, retiro en tienda (Mercado Central de San José) o encomienda.</p><p><strong>4.</strong> Completa tus datos.</p><p><strong>5.</strong> Realiza el pago.</p><p><strong>¡Listo!</strong> Te contactamos por WhatsApp para los próximos pasos.</p>",
+            "content": "<ol><li>Explora la tienda.</li><li>Agrega al carrito.</li><li>Elige envío por Uber Flash, retiro en tienda (Mercado Central de San José) o encomienda.</li><li>Completa tus datos.</li><li>Realiza el pago.</li></ol><p><strong>¡Listo!</strong> Te contactamos por WhatsApp para los próximos pasos.</p>",
             "show_whatsapp": true
           }
         },
