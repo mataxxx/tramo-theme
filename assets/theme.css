@@ -2906,18 +2906,6 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .product-gallery__strip, .product-page .product-gallery__strip { border-radius: 0; }
 }
 
-/* Beneficios del producto debajo de la foto (solo computadora) */
-.pg-benefits { display: none; }
-@media (min-width: 750px) {
-  .pg-benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 0; list-style: none; margin: 0; padding: 14px 10px; background: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface)); border-top: 1px solid var(--color-line); }
-  .pg-benefit { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 7px; padding: 0 8px; font-size: 13px; line-height: 1.3; font-weight: 600; color: var(--color-text); }
-  .pg-benefit + .pg-benefit { border-left: 1px solid var(--color-line); }
-  .pg-benefit__icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--color-surface); color: var(--color-primary); box-shadow: 0 2px 8px rgba(38,61,37,.10); }
-  .pg-benefit__icon .icon { width: 21px; height: 21px; }
-  .product-page .pg-benefits { margin-top: 12px; border-radius: var(--radius-card); border-top: 0; }
-  .drawer--sheet .quick-view__media .pg-benefits { flex: 0 0 auto; }
-}
-
 /* Ronda 103: en celular el cuadro de la foto toma la forma real de cada foto (sin bordes ni recorte; solo las fotos verticales, como el combo, salen altas) */
 @media (max-width: 749px) {
   #QuickView .quick-view__media { aspect-ratio: auto !important; height: auto !important; min-height: 0 !important; background: transparent; }

@@ -45,18 +45,6 @@
       {%- endfor -%}
     </ul>
   {%- endif -%}
-  {%- comment -%} Beneficios (solo computadora). Metacampo custom.beneficios: lista de "icono|Texto" {%- endcomment -%}
-  {%- assign bens = product.metafields.custom.beneficios.value -%}
-  {%- if bens != blank -%}
-    <ul class="pg-benefits" role="list">
-      {%- for b in bens limit: 4 -%}
-        {%- assign bp = b | split: '|' -%}
-        {%- assign bi = bp[0] | strip -%}{%- assign bt = bp[1] | strip -%}
-        {%- if bt == blank -%}{%- assign bt = bi -%}{%- assign bi = 'leaf' -%}{%- endif -%}
-        <li class="pg-benefit"><span class="pg-benefit__icon">{% render 'icon', name: bi %}</span><span class="pg-benefit__text">{{ bt | escape }}</span></li>
-      {%- endfor -%}
-    </ul>
-  {%- endif -%}
   {%- assign rinde = product.metafields.custom.rinde.value -%}
   {%- if rinde != blank -%}
     <div class="pg-rinde">{% render 'icon', name: 'cake' %}<span>{{ rinde | escape | newline_to_br }}</span></div>
