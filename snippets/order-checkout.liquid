@@ -109,17 +109,11 @@
         </div>
 
         <div class="ord-page" data-order-page="4" hidden>
-<div class="ord-box ord-paybox">
-          <h3 class="ord-h">Pago</h3>
-          <p class="ord-paylater" data-order-paylater hidden>{% render 'icon', name: 'chat' %}<span>Te enviaremos por WhatsApp el <b>monto total</b> (productos + envío) para que realices el <b>SINPE Móvil</b>.</span></p>
-          {%- if settings.order_sinpe_number != blank -%}
-          <div class="ord-sinpe-box" data-order-sinpebox>
-            <p class="ord-sinpe-box__head"><img src="{{ 'sinpe-movil.png' | asset_url }}" alt="SINPE Móvil" width="360" height="262"><span data-order-sinpe-line>Deposita <b class="ord-sinpe-box__amt" data-order-amount></b> al <b>SINPE Móvil</b>:</span></p>
-            <p class="ord-sinpe-box__num"><b>{{ settings.order_sinpe_number }}</b>{%- if settings.order_sinpe_name != blank -%}<small>{{ settings.order_sinpe_name }}</small>{%- endif -%}</p>
-            <button type="button" class="ord-copy" data-order-copy="{{ settings.order_sinpe_number | remove: '-' | remove: ' ' | escape }}">Copiar número</button>
-            <p class="ord-sinpe-box__hint">No necesitas enviar comprobante: el sistema confirmará tu SINPE.</p>
-          </div>
-          {%- endif -%}
+        <div class="ord-box">
+          <h3 class="ord-h">Tu pedido</h3>
+          <ul class="ord-lines" data-order-lines></ul>
+          <div class="ord-sub"><span data-order-sublabel>Subtotal</span><b data-order-subtotal></b></div>
+          <p class="ord-varnote" data-order-varnote hidden></p>
         </div>
         <div class="ord-box">
           <label class="ord-switch ord-switch--fe">
@@ -140,16 +134,21 @@
             <label class="ord-field"><span>Correo para la factura</span><input type="email" data-order-fe-mail autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
           </div>
         </div>
-
-        <div class="ord-box">
-          <h3 class="ord-h">Tu pedido</h3>
-          <ul class="ord-lines" data-order-lines></ul>
-          <div class="ord-sub"><span data-order-sublabel>Subtotal</span><b data-order-subtotal></b></div>
-          <p class="ord-varnote" data-order-varnote hidden></p>
-        </div>
-        <div class="ord-box">
-          <h3 class="ord-h">¿A nombre de quién llega el SINPE?</h3>
-          <label class="ord-field"><span>Nombre del titular de la cuenta que paga</span><input type="text" data-order-payer autocomplete="name" placeholder="Como aparece en el SINPE"></label>
+        <div class="ord-box ord-paybox">
+          <h3 class="ord-h">Pago</h3>
+          <p class="ord-paylater" data-order-paylater hidden>{% render 'icon', name: 'chat' %}<span>Te enviaremos por WhatsApp el <b>monto total</b> (productos + envío) para que realices el <b>SINPE Móvil</b>.</span></p>
+          <p class="ord-paywith" data-order-paywith><img src="{{ 'sinpe-movil.png' | asset_url }}" alt="SINPE Móvil" width="360" height="262"><span>Pagas con <b>SINPE Móvil</b>. Toca <b>Realizar pago</b> y te mostramos el monto y el número.</span></p>
+          {%- if settings.order_sinpe_number != blank -%}
+          <div class="ord-sinpe-box" data-order-sinpebox hidden>
+            <p class="ord-sinpe-box__label">Deposita</p>
+            <p class="ord-sinpe-box__amount" data-order-amount></p>
+            <p class="ord-sinpe-box__label">al SINPE Móvil</p>
+            <p class="ord-sinpe-box__num"><b>{{ settings.order_sinpe_number }}</b>{%- if settings.order_sinpe_name != blank -%}<small>{{ settings.order_sinpe_name }}</small>{%- endif -%}</p>
+            <button type="button" class="ord-copy" data-order-copy="{{ settings.order_sinpe_number | remove: '-' | remove: ' ' | escape }}">Copiar número</button>
+            <p class="ord-sinpe-box__hint">Cuando hayas pagado, toca <b>Pago realizado</b>. No necesitas enviar comprobante.</p>
+          </div>
+          {%- endif -%}
+          <label class="ord-field ord-payer"><span>¿A nombre de quién llega el SINPE?</span><input type="text" data-order-payer autocomplete="name" placeholder="Como aparece en el SINPE"></label>
           <p class="ord-tip">Así identificamos tu pago sin que tengas que mandarnos el comprobante.</p>
         </div>
         </div>
@@ -170,7 +169,7 @@
     <footer class="ord__foot" data-order-foot>
       <button type="button" class="ord-backbtn" data-order-prev hidden>{% render 'icon', name: 'arrow-left' %}<span>Atrás</span></button>
       <button type="button" class="button ord-next" data-order-next disabled><span data-order-next-label>Continuar</span>{% render 'icon', name: 'chevron-right' %}</button>
-      <button type="button" class="button ord-send" data-order-send disabled hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.4L3 21Z"/></svg><span data-order-send-label>Confirmar pedido y pagar</span></button>
+      <button type="button" class="button ord-send" data-order-send disabled hidden><img class="ord-send__sinpe" src="{{ 'sinpe-movil.png' | asset_url }}" alt="" width="360" height="262"><svg class="ord-send__wa" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.4L3 21Z"/></svg><span data-order-send-label>Realizar pago</span></button>
     </footer>
   </section>
 </div>

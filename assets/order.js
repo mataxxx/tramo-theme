@@ -11,6 +11,7 @@
   var fmt = new Intl.NumberFormat('es-CR', { style: 'currency', currency: D.currency || 'CRC', maximumFractionDigits: 0 });
   function money(c) { return fmt.format(c / 100); }
   var LS = 'tramo.order.me';
+  var payShown = false;
   var cart = null, mode = null, map = null, pin = null, loc = null, last = null, page = 2, FIRST = 2, PAGES = 4, waLoc = false;
 
   /* ---------- abrir / cerrar ---------- */
@@ -178,6 +179,21 @@
   }
 
   /* ---------- modo de entrega ---------- */
+  /* Botón final: retiro → "Realizar pago" (muestra monto y SINPE) → "Pago realizado" (envía). Envíos → "Confirmar pedido" */
+  function sendLabel() {
+    var btn = $('[data-order-send]', M), lb = $('[data-order-send-label]', M); if (!btn || !lb) return;
+    var pick = mode === 'pickup';
+    lb.textContent = pick ? (payShown ? 'Pago realizado' : 'Realizar pago') : 'Confirmar pedido';
+    btn.classList.toggle('is-sinpe', pick && !payShown);
+    btn.classList.toggle('is-done', pick && payShown);
+  }
+  function showPay() {
+    payShown = true;
+    var sb = $('[data-order-sinpebox]', M), pw = $('[data-order-paywith]', M);
+    if (pw) pw.hidden = true;
+    if (sb) { sb.hidden = false; try { sb.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }
+    sendLabel();
+  }
   function setMode(m) {
     try { return setModeInner(m); } catch (ex) { err('No se pudo elegir la entrega (' + (ex && ex.message || ex) + '). Intenta de nuevo.'); }
   }
@@ -186,10 +202,12 @@
     $$('input[data-order-mode]', M).forEach(function (r) { r.checked = r.value === m; });
     $$('[data-order-pane]', M).forEach(function (p) { p.hidden = p.getAttribute('data-order-pane') !== m; });
     try { showEta(m); } catch (e2) {}
-    $('[data-order-send-label]', M).textContent = 'Confirmar pedido y pagar';
-    var sb = $('[data-order-sinpebox]', M), pl = $('[data-order-paylater]', M);
-    if (sb) sb.hidden = m !== 'pickup';
+    payShown = false;
+    var sb = $('[data-order-sinpebox]', M), pl = $('[data-order-paylater]', M), pw = $('[data-order-paywith]', M);
+    if (sb) sb.hidden = true;
     if (pl) pl.hidden = m === 'pickup';
+    if (pw) pw.hidden = m !== 'pickup';
+    sendLabel();
     var sl = $('[data-order-sinpe-line]', M);
     if (sl) sl.innerHTML = m === 'pickup'
       ? 'Deposita <b class="ord-sinpe-box__amt" data-order-amount>' + (cart ? money(cart.total_price) : '') + '</b> al <b>SINPE Móvil</b>:'
@@ -464,7 +482,7 @@
     if (cp && navigator.clipboard) { navigator.clipboard.writeText(cp.getAttribute('data-order-copy')).then(function () { var o = cp.textContent; cp.textContent = '¡Copiado!'; setTimeout(function () { cp.textContent = o; }, 1500); }); return; }
     if (t.closest('[data-order-next]')) { if (pageOk(page)) go(page + 1); return; }
     if (t.closest('[data-order-prev]')) { go(page - 1); return; }
-    if (t.closest('[data-order-send]')) send();
+    if (t.closest('[data-order-send]')) { if (mode === 'pickup' && !payShown && $('[data-order-sinpebox]', M)) { if (validate()) showPay(); return; } send(); }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !M.hidden) close(); });
   M.addEventListener('keydown', function (e) {

@@ -236,3 +236,17 @@
 .ord-paylater { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 12px; border-radius: 12px; background: #f1f5ec; border: 1px solid #d9e5cf; color: #24402a; font-size: 14.5px; line-height: 1.45; }
 .ord-paylater[hidden], .ord-sinpe-box[hidden] { display: none; }
 .ord-paylater svg, .ord-paylater .icon { width: 22px; height: 22px; flex-shrink: 0; color: var(--color-primary, #263d25); }
+
+/* Pago: primero "Realizar pago", luego se ve el monto grande y el SINPE */
+.ord-paywith { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 14.5px; line-height: 1.4; color: #24402a; }
+.ord-paywith[hidden] { display: none; }
+.ord-paywith img { width: 58px; height: auto; flex-shrink: 0; }
+.ord-sinpe-box { text-align: center; }
+.ord-sinpe-box__label { margin: 0; font-size: 13.5px; color: #5b6b58; }
+.ord-sinpe-box__amount { margin: 2px 0 4px; font-size: 34px; font-weight: 800; letter-spacing: -.5px; color: var(--color-primary, #263d25); line-height: 1.1; }
+.ord-sinpe-box .ord-sinpe-box__num { justify-content: center; }
+.ord-payer { margin-top: 14px; }
+.ord-send__sinpe { display: none; width: 34px; height: auto; background: #fff; border-radius: 6px; padding: 2px 3px; }
+.ord-send.is-sinpe .ord-send__sinpe { display: block; }
+.ord-send.is-sinpe .ord-send__wa { display: none; }
+.ord-send.is-done { background: #1fa855 !important; border-color: #1fa855 !important; }
