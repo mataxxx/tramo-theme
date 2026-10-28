@@ -267,3 +267,5 @@
 .ord-cpin.is-lift i { transform: scale(.7); opacity: .6; }
 .ord-map.is-google .gm-style-cc, .ord-map.is-google .gmnoprint a { font-size: 9px; }
 [data-order-send].is-loading { opacity: .65; pointer-events: none; cursor: progress; }
+.ord-sub { flex-wrap: wrap; }
+.ord-sub::after { content: 'IVA incluido'; flex-basis: 100%; text-align: right; font-size: 11.5px; color: #7a8076; margin-top: 1px; }

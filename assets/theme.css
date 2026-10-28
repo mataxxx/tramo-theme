@@ -2852,3 +2852,16 @@ body.is-locked { overscroll-behavior: none; }
 .help__content ol { list-style: none; counter-reset: paso; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
 .help__content ol li { counter-increment: paso; position: relative; padding-left: 40px; min-height: 28px; display: flex; align-items: center; line-height: 1.35; }
 .help__content ol li::before { content: counter(paso); position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary); color: #fff; font-weight: 700; font-size: 14px; display: grid; place-items: center; }
+
+/* IVA incluido: nota pequeña debajo de los precios (todos los precios ya incluyen el 13 %) */
+.price:not(:has(.price__soon))::after,
+.pmini__price::after,
+.combo__prices::after,
+.cart-total::after {
+  content: 'IVA incluido'; flex-basis: 100%; display: block; font-size: 11px; font-weight: 500; letter-spacing: 0;
+  color: #7a8076; line-height: 1.2; margin-top: 1px; font-style: normal; text-decoration: none;
+}
+.cart-total { flex-wrap: wrap; }
+.cart-total::after { text-align: right; font-size: 12px; }
+.combo__prices { flex-wrap: wrap; }
+.product-info__price .price::after { font-size: 12.5px; margin-top: 2px; }
