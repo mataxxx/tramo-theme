@@ -2916,3 +2916,14 @@ body.is-locked { overscroll-behavior: none; }
   .product-page .product-gallery__slide,
   .product-gallery__slide--blur { aspect-ratio: var(--pg-ar, 1) !important; height: auto !important; max-height: 82vh; max-height: 82dvh; }
 }
+
+/* Computadora: fotos se pasan arrastrando con el mouse o con las flechas */
+@media (min-width: 750px) {
+  .product-gallery__strip { cursor: grab; }
+  .product-gallery__strip.is-dragging { cursor: grabbing; user-select: none; }
+  .product-gallery__strip.is-dragging img { pointer-events: none; }
+  .product-gallery__frame .gallery-arrow[disabled] { opacity: 0; pointer-events: none; }
+  .product-gallery__frame .gallery-arrow { opacity: 0; }
+  .product-gallery__frame:hover .gallery-arrow:not([disabled]) { opacity: 1; }
+  .product-gallery__slide img { -webkit-user-drag: none; user-select: none; }
+}

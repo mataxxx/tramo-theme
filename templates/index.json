@@ -126,10 +126,20 @@
             "icon": "package",
             "search_noun": "producto"
           }
+        },
+        "s": {
+          "type": "category",
+          "settings": {
+            "collection": "semillas-y-frutas-secas",
+            "title": "Semillas y frutas secas",
+            "icon": "leaf",
+            "search_noun": "producto"
+          }
         }
       },
       "block_order": [
         "q",
+        "s",
         "t",
         "e",
         "c"
@@ -177,6 +187,16 @@
         "heading": "Conservas y dulces",
         "search_noun": "producto"
       }
+    },
+    "semillas": {
+      "type": "featured-collection",
+      "settings": {
+        "icon": "none",
+        "popup_search": "icon",
+        "collection": "semillas-y-frutas-secas",
+        "heading": "Semillas y frutas secas",
+        "search_noun": "producto"
+      }
     }
   },
   "order": [
@@ -184,6 +204,7 @@
     "hero",
     "circles",
     "queque",
+    "semillas",
     "tamales",
     "especias",
     "conservas"

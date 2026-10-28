@@ -1878,6 +1878,40 @@
     });
   }, true);
 
+  /* Computadora: arrastrar con el mouse para pasar las fotos (como deslizar en el celular) */
+  (function () {
+    var st = null;
+    document.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      var strip = e.target.closest && e.target.closest('[data-gallery-strip]');
+      if (!strip || strip.children.length < 2 || (e.target.closest && e.target.closest('video, button'))) return;
+      st = { strip: strip, x: e.clientX, left: strip.scrollLeft, moved: false };
+      e.preventDefault();
+    });
+    document.addEventListener('pointermove', function (e) {
+      if (!st) return;
+      var dx = e.clientX - st.x;
+      if (!st.moved && Math.abs(dx) > 5) { st.moved = true; st.strip.style.scrollSnapType = 'none'; st.strip.style.scrollBehavior = 'auto'; st.strip.classList.add('is-dragging'); }
+      if (st.moved) st.strip.scrollLeft = st.left - dx;
+    });
+    function end(e) {
+      if (!st) return;
+      var s = st; st = null;
+      s.strip.classList.remove('is-dragging');
+      if (!s.moved) return;
+      var w = Math.max(1, s.strip.clientWidth), dx = e.clientX - s.x;
+      var i = Math.round(s.left / w) + (Math.abs(dx) > w * 0.15 ? (dx < 0 ? 1 : -1) : 0);
+      i = Math.max(0, Math.min(s.strip.children.length - 1, i));
+      s.strip.style.scrollSnapType = ''; s.strip.style.scrollBehavior = '';
+      s.strip.scrollTo({ left: i * w, behavior: 'smooth' });
+      var stop = function (ev) { ev.stopPropagation(); ev.preventDefault(); };
+      document.addEventListener('click', stop, { capture: true, once: true });
+      setTimeout(function () { document.removeEventListener('click', stop, true); }, 50);
+    }
+    document.addEventListener('pointerup', end);
+    document.addEventListener('pointercancel', end);
+  })();
+
   /* Celular: "Pagos seguros · Entregas confiables" va justo arriba del footer (en computadora sigue arriba) */
   (function () {
     var src = $('.shopify-section .trust-bar:not(.trust-bar--sticky)'), foot = $('.site-footer');

@@ -29,6 +29,10 @@
       {%- endfor -%}
     </div>
     {%- if product.media.size > 1 -%}
+      <button type="button" class="gallery-arrow gallery-arrow--prev" data-gallery-prev aria-label="Foto anterior" disabled><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button type="button" class="gallery-arrow gallery-arrow--next" data-gallery-next aria-label="Foto siguiente"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    {%- endif -%}
+    {%- if product.media.size > 1 -%}
       <div class="gallery-dots" data-gallery-dots>
         {%- for media in product.media -%}<button type="button" class="gallery-dot{% if forloop.first %} is-on{% endif %}" data-gallery-dot="{{ forloop.index0 }}" aria-label="Ver {{ forloop.index }} de {{ product.media.size }}"></button>{%- endfor -%}
       </div>
