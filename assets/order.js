@@ -109,7 +109,7 @@
     if (n === 1) return !!(cart && cart.item_count);
     if (n === 2) return $('[data-order-name]', M).value.trim().length > 1 && digits($('[data-order-phone]', M).value).length >= 8;
     if (n === 3) return !!mode && (mode === 'pickup' || (mode === 'delivery' && (!!loc || waLoc)) || (mode === 'courier' && !noCourier.length && courierOk()));
-    if (n === 4) return ($('[data-order-payer]', M).value.trim().length > 2) && (!wantsFE() || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim())));
+    if (n === 4) return ($('[data-order-payer]', M).value.trim().length > 2) && (!wantsFE() || ($('[data-order-fe-id]', M).value.replace(/\D/g, '').length >= 9 && $('[data-order-fe-name]', M).value.trim().length > 1 && /.+@.+\..+/.test($('[data-order-fe-mail]', M).value.trim()) && $('[data-order-fe-act]', M).value.trim().length > 2));
     return true;
   }
   function courierArea() { var el = $('[data-order-courier-area]', M); return el ? el.value.trim() : ''; }
@@ -311,7 +311,34 @@
   }
   function findMsg(html) { var r = $('[data-order-find-res]', M); r.innerHTML = html; r.hidden = !html; }
   var findToken = 0, findTimer = null;
+  var gSession = null;
+  function gToken() { if (!gSession) gSession = (Date.now().toString(36) + Math.random().toString(36).slice(2)); return gSession; }
+  function googleSearch(q) {
+    var lat = parseFloat(D.lat) || 9.93, lng = parseFloat(D.lng) || -84.08;
+    return fetch('https://places.googleapis.com/v1/places:autocomplete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': D.gkey },
+      body: JSON.stringify({ input: q, includedRegionCodes: ['cr'], languageCode: 'es', sessionToken: gToken(),
+        locationBias: { circle: { center: { latitude: lat, longitude: lng }, radius: 50000 } } })
+    }).then(function (r) { if (!r.ok) throw new Error('google ' + r.status); return r.json(); })
+      .then(function (d) {
+        return ((d && d.suggestions) || []).filter(function (s) { return s.placePrediction; }).map(function (s) {
+          var p = s.placePrediction; return { placeId: p.placeId, name: (p.text && p.text.text) || '' };
+        });
+      });
+  }
+  function googlePlace(id) {
+    var tok = gToken(); gSession = null;
+    return fetch('https://places.googleapis.com/v1/places/' + encodeURIComponent(id) + '?languageCode=es&sessionToken=' + encodeURIComponent(tok), {
+      headers: { 'X-Goog-Api-Key': D.gkey, 'X-Goog-FieldMask': 'location' }
+    }).then(function (r) { if (!r.ok) throw new Error('google ' + r.status); return r.json(); })
+      .then(function (d) { return d && d.location ? { lat: d.location.latitude, lng: d.location.longitude } : null; });
+  }
   function geoSearch(q) {
+    if (D.gkey) return googleSearch(q).catch(function () { return []; }).then(function (list) { return list.length ? list : osmSearch(q); });
+    return osmSearch(q);
+  }
+  function osmSearch(q) {
     var photon = fetch('https://photon.komoot.io/api/?limit=8&lat=9.93&lon=-84.08&q=' + encodeURIComponent(q + ' Costa Rica'))
       .then(function (r) { if (!r.ok) throw new Error('photon ' + r.status); return r.json(); })
       .then(function (d) {
@@ -329,7 +356,7 @@
   }
   function find(q, live) {
     q = String(q || '').trim();
-    if (q.length < 3) { if (!live) findMsg('<p class="ord-find-res__msg">Escribe al menos 3 letras.</p>'); else findMsg(''); return; }
+    if (q.length < (D.gkey && live ? 4 : 3)) { if (!live) findMsg('<p class="ord-find-res__msg">Escribe al menos 3 letras.</p>'); else findMsg(''); return; }
     var mine = ++findToken;
     var b = $('[data-order-find-go]', M); if (b && !live) { b.disabled = true; b.textContent = '…'; }
     if (!live) findMsg('<p class="ord-find-res__msg ord-find-res__msg--soft">Buscando…</p>');
@@ -394,6 +421,7 @@
       L1.push('*Factura electrónica:* Sí');
       L1.push('Cédula ' + $('[data-order-fe-type]', M).value + ': ' + $('[data-order-fe-id]', M).value.trim());
       L1.push('Nombre: ' + $('[data-order-fe-name]', M).value.trim());
+      L1.push('Actividad económica: ' + $('[data-order-fe-act]', M).value.trim());
       L1.push('Correo: ' + $('[data-order-fe-mail]', M).value.trim());
     } else {
       L1.push('*Factura electrónica:* No');
@@ -413,7 +441,7 @@
     /* Copia automática del pedido a la tienda (no depende de que el cliente envíe el WhatsApp) */
     try {
       var root = (window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/';
-      var fe = wantsFE() ? ($('[data-order-fe-type]', M).value + ' ' + $('[data-order-fe-id]', M).value.trim() + ' · ' + $('[data-order-fe-name]', M).value.trim() + ' · ' + $('[data-order-fe-mail]', M).value.trim()) : '';
+      var fe = wantsFE() ? ($('[data-order-fe-type]', M).value + ' ' + $('[data-order-fe-id]', M).value.trim() + ' · ' + $('[data-order-fe-name]', M).value.trim() + ' · Act. ' + $('[data-order-fe-act]', M).value.trim() + ' · ' + $('[data-order-fe-mail]', M).value.trim()) : '';
       var payload = {
         code: c, mode: mode, eta: etaPlain(mode), variable: variable,
         name: $('[data-order-name]', M).value.trim(), phone: $('[data-order-phone]', M).value.trim(),
@@ -449,6 +477,23 @@
   }
 
   /* ---------- eventos ---------- */
+  /* Factura electrónica: el interruptor se activa con el toque en toda la fila (no depende del checkbox nativo) */
+  function setFE(on) {
+    var cb = $('[data-order-fe]', M), sw = $('[data-fe-switch]', M), f = $('[data-order-fe-fields]', M);
+    if (cb) cb.checked = !!on;
+    if (sw) sw.setAttribute('aria-checked', on ? 'true' : 'false');
+    if (f) f.hidden = !on;
+    if (on) { var n = $('[data-order-fe-name]', M); if (n && !n.value) n.value = $('[data-order-name]', M).value.trim(); }
+    validate(); moreCheck();
+  }
+  M.addEventListener('click', function (e) {
+    var sw = e.target.closest && e.target.closest('[data-fe-switch]'); if (!sw) return;
+    e.preventDefault(); e.stopPropagation();
+    setFE(!($('[data-order-fe]', M) || {}).checked);
+  }, true);
+  M.addEventListener('keydown', function (e) {
+    if ((e.key === ' ' || e.key === 'Enter') && e.target.matches && e.target.matches('[data-fe-switch]')) { e.preventDefault(); setFE(!($('[data-order-fe]', M) || {}).checked); }
+  });
   /* Opciones de entrega: se eligen con el toque en toda la tarjeta (no depende del radio, para iPhone) */
   M.addEventListener('click', function (e) {
     var opt = e.target.closest && e.target.closest('.ord-opt'); if (!opt) return;
@@ -465,7 +510,7 @@
   M.addEventListener('input', function (e) {
     if (!e.target.matches('[data-order-find-q]')) return;
     clearTimeout(findTimer); var v = e.target.value;
-    findTimer = setTimeout(function () { find(v, true); }, 450);
+    findTimer = setTimeout(function () { find(v, true); }, D.gkey ? 650 : 450);
   });
   M.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && e.target.matches('[data-order-find-q]')) { e.preventDefault(); clearTimeout(findTimer); find(e.target.value); e.target.blur(); }
@@ -476,7 +521,13 @@
     var lb = t.closest('[data-order-locate]'); if (lb) { setWaLoc(false); locate(lb); return; }
     if (t.closest('[data-order-find-go]')) { clearTimeout(findTimer); find($('[data-order-find-q]', M).value); return; }
     if (t.closest('[data-order-waloc]')) { setWaLoc(!waLoc); validate(); return; }
-    var fp = t.closest('[data-find-pick]'); if (fp && M._findList) { var x = M._findList[+fp.getAttribute('data-find-pick')]; findMsg(''); if (x) place(x.lat, x.lng, 17); return; }
+    var fp = t.closest('[data-find-pick]'); if (fp && M._findList) {
+      var x = M._findList[+fp.getAttribute('data-find-pick')]; if (!x) return;
+      var qi = $('[data-order-find-q]', M); if (qi && x.name) qi.value = x.name.split(',')[0];
+      if (x.placeId) { findMsg('<p class="ord-find-res__msg ord-find-res__msg--soft">Ubicando…</p>'); googlePlace(x.placeId).then(function (pt) { findMsg(''); if (pt) place(pt.lat, pt.lng, 18); else findMsg('<p class="ord-find-res__msg">No pudimos ubicar ese lugar. Toca el mapa.</p>'); }).catch(function () { findMsg('<p class="ord-find-res__msg">No pudimos ubicar ese lugar. Toca el mapa.</p>'); }); }
+      else { findMsg(''); place(x.lat, x.lng, 17); }
+      return;
+    }
     if (t.closest('[data-order-more]')) { var bd = $('[data-order-body]', M); bd.scrollBy({ top: bd.clientHeight * 0.7, behavior: 'smooth' }); return; }
     var cp = t.closest('[data-order-copy]');
     if (cp && navigator.clipboard) { navigator.clipboard.writeText(cp.getAttribute('data-order-copy')).then(function () { var o = cp.textContent; cp.textContent = '¡Copiado!'; setTimeout(function () { cp.textContent = o; }, 1500); }); return; }

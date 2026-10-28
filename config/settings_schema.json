@@ -827,6 +827,12 @@
       },
       {
         "type": "text",
+        "id": "order_google_key",
+        "label": "Llave de Google (Places API New) para buscar direcciones",
+        "info": "Opcional. Si la pones, el buscador del mapa usa Google. Restríngela a tramosanrafael.com/* y a Places API (New)."
+      },
+      {
+        "type": "text",
         "id": "order_map_lat",
         "label": "Mapa: latitud inicial",
         "default": "9.9349"

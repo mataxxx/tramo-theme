@@ -255,3 +255,4 @@
 .ord-paybox .ord-sinpe-box p.ord-sinpe-box__label { margin: 0; font-size: 14px; color: #5b6b58; }
 .ord-paybox .ord-sinpe-box .ord-sinpe-box__num { display: flex; flex-direction: column; align-items: center; }
 .ord-paybox .ord-sinpe-box .ord-copy { margin: 8px auto 0; }
+.ord-switch__ui input { pointer-events: none; }

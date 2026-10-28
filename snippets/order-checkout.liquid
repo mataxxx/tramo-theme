@@ -16,6 +16,7 @@
   data-courier-hours="{{ settings.order_courier_hours | default: '48' | escape }}"
   data-delivery="{{ settings.order_delivery_label | default: 'Envío por Uber Flash' | escape }}"
   data-courier="{{ settings.order_courier_label | default: 'Envío por encomienda' | escape }}"
+  data-gkey="{{ settings.order_google_key | escape }}"
   data-lat="{{ settings.order_map_lat | default: '9.9349' }}"
   data-lng="{{ settings.order_map_lng | default: '-84.0789' }}"
   data-currency="{{ cart.currency.iso_code }}">
@@ -116,9 +117,9 @@
           <p class="ord-varnote" data-order-varnote hidden></p>
         </div>
         <div class="ord-box">
-          <label class="ord-switch ord-switch--fe">
+          <label class="ord-switch ord-switch--fe" data-fe-switch role="switch" aria-checked="false" tabindex="0">
             <span class="ord-switch__txt"><b>Factura electrónica</b><small>Actívalo si la necesitas</small></span>
-            <span class="ord-switch__ui"><input type="checkbox" value="si" data-order-fe aria-label="Quiero factura electrónica"><i></i></span>
+            <span class="ord-switch__ui"><input type="checkbox" value="si" data-order-fe tabindex="-1" aria-hidden="true"><i></i></span>
           </label>
           <div class="ord-fe" data-order-fe-fields hidden>
             <label class="ord-field"><span>Tipo de cédula</span>
@@ -131,6 +132,7 @@
             </label>
             <label class="ord-field"><span>Número de cédula</span><input type="text" data-order-fe-id inputmode="numeric" placeholder="1-2345-6789"></label>
             <label class="ord-field"><span>Nombre o razón social</span><input type="text" data-order-fe-name autocomplete="organization" placeholder="Como aparece en Hacienda"></label>
+            <label class="ord-field"><span>Actividad económica <small>(código de Hacienda)</small></span><input type="text" data-order-fe-act inputmode="numeric" placeholder="Ej. 552004 · si no lo sabes, escribe a qué te dedicas"></label>
             <label class="ord-field"><span>Correo para la factura</span><input type="email" data-order-fe-mail autocomplete="email" inputmode="email" placeholder="correo@ejemplo.com"></label>
           </div>
         </div>
