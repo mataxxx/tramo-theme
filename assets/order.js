@@ -232,10 +232,10 @@
     { featureType: 'transit', stylers: [{ visibility: 'off' }] },
     { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
     { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
-    { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#e6e7ea' }] },
-    { featureType: 'landscape.man_made', elementType: 'geometry.fill', stylers: [{ color: '#f4f5f7' }] },
-    { featureType: 'landscape.man_made', elementType: 'geometry.stroke', stylers: [{ color: '#d9dbe0' }, { weight: 0.8 }] },
-    { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#e6e7ea' }] },
+    { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#d5d8de' }] },
+    { featureType: 'landscape.man_made', elementType: 'geometry.fill', stylers: [{ color: '#eceef1' }] },
+    { featureType: 'landscape.man_made', elementType: 'geometry.stroke', stylers: [{ color: '#b9bec7' }, { weight: 1 }] },
+    { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#d5d8de' }] },
     { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#cde8c9' }] },
     { featureType: 'poi.sports_complex', elementType: 'geometry', stylers: [{ color: '#d3ebcf' }] },
     { featureType: 'landscape.natural.landcover', elementType: 'geometry', stylers: [{ color: '#d9ebd4' }] },
@@ -341,7 +341,7 @@
     if (!loc) { h.textContent = g ? 'Mueve el mapa para poner el pin en tu casa.' : 'Toca el mapa o arrastra el pin hasta tu casa.'; return; }
     h.textContent = (acc && state === 'gps' ? '✓ Te ubicamos (±' + Math.round(acc) + ' m). ' : '✓ Ubicación marcada. ') + (g ? 'Si no es justo tu casa, mueve el mapa.' : 'Si no es justo tu casa, arrastra el pin.');
   }
-  function showAcc(lat, lng) {
+  function showAcc(lat, lng) { return; /* sin círculo azul: se usa el punto exacto */
     if (!map || !acc || acc > 400) return;
     if (kind === 'g') {
       if (accCircle) { accCircle.setCenter({ lat: lat, lng: lng }); accCircle.setRadius(acc); }
