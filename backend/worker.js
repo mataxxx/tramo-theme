@@ -470,7 +470,8 @@ async function handlePanel(request, url, env) {
     const now = Date.now();
     const setStatus = (st) => { if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (['pagado', 'preparando', 'listo', 'entregado'].includes(st) && !o.paidAt) o.paidAt = now; } };
     if (P.status != null) { if (!STATUSES.includes(P.status)) return json({ error: 'estado' }, 400); setStatus(P.status); }
-    if (P.mode != null && MODE_LABEL[P.mode] && P.mode !== o.mode) { o.history = (o.history || []).concat({ s: 'cambio-entrega', t: now, from: o.mode, to: P.mode }); o.mode = P.mode; }
+    if (P.status === 'cancelado') { o.cancelReason = clean(P.cancelReason || '', 300); if (o.history && o.history.length) o.history[o.history.length - 1].note = o.cancelReason; }
+    if (P.mode != null && MODE_LABEL[P.mode] && P.mode !== o.mode) { o.history = (o.history || []).concat({ s: 'cambio-entrega', t: now, from: o.mode, to: P.mode, note: clean(P.changeNote || '', 200) }); o.mode = P.mode; }
     if (P.location != null) o.location = clean(P.location, 300);
     if (P.address != null) o.address = clean(P.address, 300);
     if (P.area != null) o.area = clean(P.area, 120);
