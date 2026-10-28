@@ -2843,3 +2843,7 @@ body.is-locked { overscroll-behavior: none; }
 .checkout-row__pay { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 1; }
 .checkout-row__pay small { font-size: 10.5px; color: var(--color-muted); margin-bottom: 2px; }
 .checkout-row__pay img { width: 64px; height: auto; display: block; }
+/* Carrito: formas de entrega más pequeñas */
+.cart-ship { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; grid-template-columns: none; }
+.cart-ship li { flex-direction: row; gap: 5px; padding: 5px 10px; border-radius: 999px; font-size: 12px; }
+.cart-ship .icon { width: 15px; height: 15px; }

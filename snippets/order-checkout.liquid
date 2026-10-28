@@ -57,19 +57,19 @@
             <label class="ord-opt">
               <input type="radio" name="ord-delivery" value="delivery" data-order-mode>
               <span class="ord-opt__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 16V7h11v9"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span>
-              <span class="ord-opt__txt"><b>{{ settings.order_delivery_label | default: 'Envío por Uber Flash' }}</b><small>Elige tu ubicación en el mapa</small></span>
+              <span class="ord-opt__short">Uber Flash</span><span class="ord-opt__txt"><b>{{ settings.order_delivery_label | default: 'Envío por Uber Flash' }}</b><small>Elige tu ubicación en el mapa</small></span>
               <em class="ord-opt__tag ord-opt__tag--soft">Se cotiza</em>
             </label>
             <label class="ord-opt">
               <input type="radio" name="ord-delivery" value="pickup" data-order-mode>
               <span class="ord-opt__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10 5 4h14l2 6"/><path d="M4 10v10h16V10"/><path d="M3 10h18M9 20v-6h6v6"/></svg></span>
-              <span class="ord-opt__txt"><b>Recoger en el Mercado Central · San José</b><small>{{ settings.order_pickup_place }}</small></span>
+              <span class="ord-opt__short">Retiro en tienda</span><span class="ord-opt__txt"><b>Recoger en el Mercado Central · San José</b><small>{{ settings.order_pickup_place }}</small></span>
               <em class="ord-opt__tag">Gratis</em>
             </label>
             <label class="ord-opt">
               <input type="radio" name="ord-delivery" value="courier" data-order-mode>
               <span class="ord-opt__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/><path d="M7.5 5.5l9 5"/></svg></span>
-              <span class="ord-opt__txt"><b>{{ settings.order_courier_label | default: 'Envío por encomienda' }}</b><small data-courier-sub>A cualquier parte del país</small></span>
+              <span class="ord-opt__short">Encomienda</span><span class="ord-opt__txt"><b>{{ settings.order_courier_label | default: 'Envío por encomienda' }}</b><small data-courier-sub>A cualquier parte del país</small></span>
               <em class="ord-opt__tag ord-opt__tag--soft">Se cotiza</em>
             </label>
           </div>
@@ -111,8 +111,9 @@
         <div class="ord-page" data-order-page="4" hidden>
 <div class="ord-box ord-paybox">
           <h3 class="ord-h">Pago</h3>
+          <p class="ord-paylater" data-order-paylater hidden>{% render 'icon', name: 'chat' %}<span>Te enviaremos por WhatsApp el <b>monto total</b> (productos + envío) para que realices el <b>SINPE Móvil</b>.</span></p>
           {%- if settings.order_sinpe_number != blank -%}
-          <div class="ord-sinpe-box">
+          <div class="ord-sinpe-box" data-order-sinpebox>
             <p class="ord-sinpe-box__head"><img src="{{ 'sinpe-movil.png' | asset_url }}" alt="SINPE Móvil" width="360" height="262"><span data-order-sinpe-line>Deposita <b class="ord-sinpe-box__amt" data-order-amount></b> al <b>SINPE Móvil</b>:</span></p>
             <p class="ord-sinpe-box__num"><b>{{ settings.order_sinpe_number }}</b>{%- if settings.order_sinpe_name != blank -%}<small>{{ settings.order_sinpe_name }}</small>{%- endif -%}</p>
             <button type="button" class="ord-copy" data-order-copy="{{ settings.order_sinpe_number | remove: '-' | remove: ' ' | escape }}">Copiar número</button>
@@ -169,7 +170,7 @@
     <footer class="ord__foot" data-order-foot>
       <button type="button" class="ord-backbtn" data-order-prev hidden>{% render 'icon', name: 'arrow-left' %}<span>Atrás</span></button>
       <button type="button" class="button ord-next" data-order-next disabled><span data-order-next-label>Continuar</span>{% render 'icon', name: 'chevron-right' %}</button>
-      <button type="button" class="button ord-send" data-order-send disabled hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.4L3 21Z"/></svg><span data-order-send-label>Enviar pedido por WhatsApp</span></button>
+      <button type="button" class="button ord-send" data-order-send disabled hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.4L3 21Z"/></svg><span data-order-send-label>Confirmar pedido y pagar</span></button>
     </footer>
   </section>
 </div>

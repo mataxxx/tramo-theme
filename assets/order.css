@@ -222,3 +222,17 @@
 .ord-switch__ui input:checked + i::after { transform: translateX(22px); }
 .ord-switch__ui input:focus-visible + i { outline: 2px solid var(--color-primary, #263d25); outline-offset: 2px; }
 .ord-fe { margin-top: 12px; }
+
+/* Entrega como pestañas compactas */
+.ord-opts { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.ord-opt { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 6px; padding: 10px 6px; border-radius: 12px; }
+.ord-opt .ord-opt__txt, .ord-opt .ord-opt__tag { display: none; }
+.ord-opt__short { font-size: 13px; font-weight: 700; line-height: 1.15; color: #2b3a29; }
+.ord-opt__ico { width: 34px; height: 34px; border-radius: 10px; }
+.ord-opt__ico svg { width: 19px; height: 19px; }
+.ord-opt:has(input:checked) .ord-opt__short { color: var(--color-primary, #263d25); }
+.ord-opt.is-disabled .ord-opt__short::after { content: ' · no disponible'; font-weight: 500; font-size: 11px; display: block; color: #8a5a10; }
+/* Pago: aviso cuando el envío se cotiza */
+.ord-paylater { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 12px; border-radius: 12px; background: #f1f5ec; border: 1px solid #d9e5cf; color: #24402a; font-size: 14.5px; line-height: 1.45; }
+.ord-paylater[hidden], .ord-sinpe-box[hidden] { display: none; }
+.ord-paylater svg, .ord-paylater .icon { width: 22px; height: 22px; flex-shrink: 0; color: var(--color-primary, #263d25); }

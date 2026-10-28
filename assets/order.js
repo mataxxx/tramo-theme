@@ -186,7 +186,10 @@
     $$('input[data-order-mode]', M).forEach(function (r) { r.checked = r.value === m; });
     $$('[data-order-pane]', M).forEach(function (p) { p.hidden = p.getAttribute('data-order-pane') !== m; });
     try { showEta(m); } catch (e2) {}
-    $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
+    $('[data-order-send-label]', M).textContent = 'Confirmar pedido y pagar';
+    var sb = $('[data-order-sinpebox]', M), pl = $('[data-order-paylater]', M);
+    if (sb) sb.hidden = m !== 'pickup';
+    if (pl) pl.hidden = m === 'pickup';
     var sl = $('[data-order-sinpe-line]', M);
     if (sl) sl.innerHTML = m === 'pickup'
       ? 'Deposita <b class="ord-sinpe-box__amt" data-order-amount>' + (cart ? money(cart.total_price) : '') + '</b> al <b>SINPE Móvil</b>:'
