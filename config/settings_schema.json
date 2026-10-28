@@ -793,7 +793,7 @@
         "type": "text",
         "id": "order_pickup_place",
         "label": "Lugar de retiro",
-        "default": "San José · Tramo San Rafael #1"
+        "default": "Tramo San Rafael #1"
       },
       {
         "type": "textarea",
