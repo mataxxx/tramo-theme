@@ -41,7 +41,7 @@ async function verifyProxy(url, secret) {
 }
 
 const json = (data, status = 200) =>
-  new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
+  new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
 
 // Token de la API de Shopify (dura 24 h; se guarda en memoria y se renueva).
 let tokenCache = { value: null, exp: 0 };
@@ -350,6 +350,21 @@ async function notifyOwner(env, text) {
   return ok;
 }
 
+// Catálogo público (precios reales) leído de la tienda y guardado 10 minutos
+async function publicCatalog(env) {
+  try { const c = await env.ORDERS.get('cat:v1', 'json'); if (c) return c; } catch (e) {}
+  const out = {};
+  for (let page = 1; page <= 10; page++) {
+    let d;
+    try { const r = await fetch('https://' + (env.STORE_DOMAIN || 'tramosanrafael.com') + '/products.json?limit=250&page=' + page, { headers: { accept: 'application/json' } }); if (!r.ok) break; d = await r.json(); } catch (e) { break; }
+    const ps = d.products || [];
+    ps.forEach((p) => (p.variants || []).forEach((v) => { out[String(v.id)] = { id: 'gid://shopify/ProductVariant/' + v.id, price: v.price, title: v.title, product: { title: p.title } }; }));
+    if (ps.length < 250) break;
+  }
+  if (Object.keys(out).length) await env.ORDERS.put('cat:v1', JSON.stringify(out), { expirationTtl: 600 });
+  return out;
+}
+
 async function handleNewOrder(request, env, ctx) {
   if (!env.ORDERS) return json({ error: 'falta configurar ORDERS' }, 500);
   let b;
@@ -366,11 +381,24 @@ async function handleNewOrder(request, env, ctx) {
     const pv = await adminGraphql(env, `query ($ids: [ID!]!) { nodes(ids: $ids) { ... on ProductVariant { id price title product { title } } } }`, { ids });
     (pv.nodes || []).forEach((n) => { if (n && n.id) info[n.id] = n; });
   } catch (e) { info = {}; }
+  // Si no hay acceso al admin, se usa el catálogo público de la tienda (nunca el precio que manda el navegador)
+  let unverified = false;
+  if (!Object.keys(info).length) {
+    const cat = await publicCatalog(env);
+    if (Object.keys(cat).length) {
+      raw.forEach((it, i) => { const v = cat[String(parseInt(it.variant_id, 10))]; if (v) info[ids[i]] = v; });
+      for (let i = 0; i < raw.length; i++) if (!info[ids[i]]) return json({ error: 'producto no disponible' }, 400);
+    } else {
+      // Si la tienda no responde, el pedido no se pierde: se guarda marcado para revisar el precio a mano
+      unverified = true;
+      raw.forEach((it, i) => { info[ids[i]] = { price: it.unit, title: it.label, product: { title: it.title } }; });
+    }
+  }
   let total = 0;
   const items = raw.map((it, i) => {
     const n = info[ids[i]] || {};
     const qty = Math.min(10000, Math.max(1, parseInt(it.quantity, 10) || 1));
-    const unit = parseFloat(n.price || it.unit || 0) || 0;
+    const unit = parseFloat(n.price || 0) || 0;
     const line = Math.round(unit * qty * 100) / 100;
     total += line;
     return { title: clean(n.product ? n.product.title : it.title, 120), variant: clean(it.label || n.title || '', 80), qty, line };
@@ -386,7 +414,7 @@ async function handleNewOrder(request, env, ctx) {
     id: code || String(now), code, created: prev ? prev.created : now, status,
     name, phone, mode, eta: clean(b.eta, 120),
     payer: clean(b.payer, 80), location: clean(b.location, 200), address: clean(b.address, 300), area: clean(b.area, 120),
-    fe: clean(b.fe, 300), items, total: Math.round(total * 100) / 100,
+    fe: clean(b.fe, 300), items, total: Math.round(total * 100) / 100, unverified,
     variable: (Array.isArray(b.variable) ? b.variable : []).slice(0, 20).map((x) => clean(x, 80)).filter(Boolean), message: clean(b.message, 4000), history: [{ s: 'pago-pendiente', t: now }]
   };
   if (prev) order.history = (prev.history || []).concat(status !== prev.status ? [{ s: status, t: now }] : []);
@@ -405,8 +433,14 @@ async function handleNewOrder(request, env, ctx) {
 
 // ---------- Panel ----------
 // Dos niveles de acceso: administrador (PANEL_PIN) y alistador (PREP_PIN, solo prepara pedidos pagados)
+// Clave de sesión aleatoria (32 bytes, guardada en KV) + el PIN: no se puede falsificar una sesión adivinando el PIN
+async function sessionKey(env) {
+  let k = await env.ORDERS.get('sess:key');
+  if (!k) { const b = new Uint8Array(32); crypto.getRandomValues(b); k = hex(b.buffer); await env.ORDERS.put('sess:key', k); }
+  return k;
+}
 async function sign(env, val, role) {
-  const secret = role === 'prep' ? env.PREP_PIN + '|prep' : env.PANEL_PIN + '|tramo';
+  const secret = (await sessionKey(env)) + '|' + (role === 'prep' ? env.PREP_PIN + '|prep' : env.PANEL_PIN + '|tramo');
   const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   return hex(await crypto.subtle.sign('HMAC', key, enc.encode(val)));
 }
@@ -420,7 +454,7 @@ async function panelAuthed(request, env) {
   return (await sign(env, role === 'prep' ? m[2] + '.prep' : m[2], role)) === m[1] ? role : null;
 }
 // Cambia con cada versión del panel: las pantallas abiertas se recargan solas
-const APP_V = '2026-10-28-4';
+const APP_V = '2026-10-28-5';
 const SOLD_ST = ['pagado', 'preparando', 'listo', 'entregado'];
 function setStatusOn(o, st, now) {
   if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (SOLD_ST.includes(st) && !o.paidAt) o.paidAt = now; }
@@ -480,7 +514,8 @@ async function handlePrep(request, url, env, p) {
   await putOrder(env, b.key, o);
   return json({ ok: true, order: prepView(o) });
 }
-const html = (body, status = 200, headers = {}) => new Response(body, { status, headers: Object.assign({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }, headers) });
+const SEC_HEADERS = { 'x-frame-options': 'DENY', 'content-security-policy': "frame-ancestors 'none'; base-uri 'none'; form-action 'self'", 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'strict-transport-security': 'max-age=31536000' };
+const html = (body, status = 200, headers = {}) => new Response(body, { status, headers: Object.assign({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }, SEC_HEADERS, headers) });
 
 async function handlePanel(request, url, env) {
   const p = url.pathname.replace(/\/+$/, '');

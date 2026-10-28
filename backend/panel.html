@@ -148,7 +148,7 @@ function card(o){
   // Productos y total
   let b='<div class="sec"><h3>Pedido</h3><ul class="items">'+o.items.map((i,x)=>'<li><span>'+(o.prep&&(o.prep.checks||[])[x]?'<b style="color:#2f7d32">✓</b> ':'')+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+(o.prep&&(o.prep.weights||{})[x]?' <small style="color:#1f3b63">⚖️ pesó '+esc(o.prep.weights[x])+' g</small>':'')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
     '<div class="sum"><span>Productos'+(o.finalTotal?' (pesado)':pending(o)?' (aprox.)':'')+'</span><b>'+money(prod(o))+'</b>'+(o.mode!=='pickup'?'<span>Envío</span><b>'+(o.shipping?money(o.shipping):'—')+'</b>':'')+'<span class="big">Total</span><span class="big">'+money(grand(o))+'</span></div>'+
-    '<p class="hint">Precios con IVA incluido.</p>'+(((o.prep&&o.prep.issues)||[]).map(x=>'<p class="warn">⚠️ '+esc(x.by||'Alistador')+': '+esc(x.text)+'</p>').join(''))+
+    (o.unverified?'<p class="warn">⚠️ No se pudieron verificar los precios con la tienda: revisa el total antes de cobrar.</p>':'')+'<p class="hint">Precios con IVA incluido.</p>'+(((o.prep&&o.prep.issues)||[]).map(x=>'<p class="warn">⚠️ '+esc(x.by||'Alistador')+': '+esc(x.text)+'</p>').join(''))+
     '<div class="f"><label>Nota para quien alista (la ve en la pantalla de Alistar)</label><input data-field="prepNote" value="'+esc(o.prepNote||'')+'" placeholder="Ej. empacar el queso aparte"></div></div>';
   // Cliente
   b+='<div class="sec"><h3>Cliente</h3><dl class="kv"><dt>Teléfono</dt><dd><a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a> · <a href="'+wa(o,'')+'" target="_blank">WhatsApp</a></dd>'+(o.payer?'<dt>SINPE a nombre de</dt><dd>'+esc(o.payer)+'</dd>':'')+
