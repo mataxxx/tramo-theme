@@ -555,9 +555,13 @@
     /* 1) Guardar el pedido en el panel (te llega a tu WhatsApp). 2) Si se guardó, el cliente solo manda el número; si no, manda el pedido completo. */
     var done = false;
     function go(saved) {
-      if (done) return; done = true; sending = false; if (btn) btn.classList.remove('is-loading');
+      if (done) return; done = true;
       var url = saved ? 'https://wa.me/' + D.wa + '?text=' + encodeURIComponent(shortMessage(c)) : full;
-      finish(c, url, mobile, w);
+      /* Vaciar el carrito ANTES de salir a WhatsApp (si no, el celular corta la petición al cambiar de app) */
+      var cleared = false;
+      function next() { if (cleared) return; cleared = true; sending = false; if (btn) btn.classList.remove('is-loading'); finish(c, url, mobile, w); }
+      clearCart().then(next, next);
+      setTimeout(next, 1500);
     }
     postOrder(c, 'pago-pendiente').then(go);
     setTimeout(function () { go(false); }, 4000);
@@ -576,10 +580,17 @@
       : 'Solo falta tocar Enviar en WhatsApp.' + (waLoc ? ' Después envíanos tu ubicación en ese chat (📎 → Ubicación).' : '') + ' Te enviaremos por WhatsApp el monto total (productos + Uber Flash). Cuando confirmemos tu pago, te contactamos para coordinar el envío.';
     var rs = $('[data-order-resend]', M); rs.href = url; if (mobile) rs.removeAttribute('target');
     show('done');
-    fetch('/cart/clear.js', { method: 'POST', headers: { Accept: 'application/json' } })
-      .then(function () { document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { silent: true } })); })
+    if (!cartCleared) clearCart();
+  }
+  var cartCleared = false;
+  function clearCart() {
+    var root = ((window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/').replace(/\/$/, '');
+    return fetch(root + '/cart/clear.js', { method: 'POST', keepalive: true, headers: { Accept: 'application/json' } })
+      .then(function (r) { if (r.ok) { cartCleared = true; try { document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { silent: true } })); } catch (e) {} } })
       .catch(function () {});
   }
+  /* Si el cliente vuelve de WhatsApp con la página guardada en memoria, recargar el carrito */
+  window.addEventListener('pageshow', function (e) { if (e.persisted && cartCleared) { try { document.dispatchEvent(new CustomEvent('tramo:cart-changed', { detail: { silent: true } })); } catch (x) {} } });
 
   /* ---------- eventos ---------- */
   /* Factura electrónica: el interruptor se activa con el toque en toda la fila (no depende del checkbox nativo) */
