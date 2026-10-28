@@ -420,7 +420,7 @@ async function panelAuthed(request, env) {
   return (await sign(env, role === 'prep' ? m[2] + '.prep' : m[2], role)) === m[1] ? role : null;
 }
 // Cambia con cada versión del panel: las pantallas abiertas se recargan solas
-const APP_V = '2026-10-28-1';
+const APP_V = '2026-10-28-3';
 const SOLD_ST = ['pagado', 'preparando', 'listo', 'entregado'];
 function setStatusOn(o, st, now) {
   if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (SOLD_ST.includes(st) && !o.paidAt) o.paidAt = now; }
