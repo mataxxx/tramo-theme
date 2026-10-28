@@ -368,8 +368,18 @@ const html = (body, status = 200, headers = {}) => new Response(body, { status, 
 async function handlePanel(request, url, env) {
   const p = url.pathname.replace(/\/+$/, '');
   if (p === '/panel/login' && request.method === 'POST') {
+    // Bloqueo contra intentos repetidos: 5 fallos por conexión → 15 min; 20 fallos en total → 1 hora para todos
+    const ip = request.headers.get('cf-connecting-ip') || 'x';
+    const kIp = 'lf:' + ip, kAll = 'lf:all';
+    const nIp = +(await env.ORDERS.get(kIp) || 0), nAll = +(await env.ORDERS.get(kAll) || 0);
+    if (nIp >= 5 || nAll >= 20) return html(loginPage('Demasiados intentos. Probá de nuevo más tarde.'), 429);
     const form = await request.formData();
-    if (!env.PANEL_PIN || String(form.get('pin') || '') !== String(env.PANEL_PIN)) return html(loginPage('PIN incorrecto'), 401);
+    if (!env.PANEL_PIN || String(form.get('pin') || '') !== String(env.PANEL_PIN)) {
+      await env.ORDERS.put(kIp, String(nIp + 1), { expirationTtl: 900 });
+      await env.ORDERS.put(kAll, String(nAll + 1), { expirationTtl: 3600 });
+      return html(loginPage('PIN incorrecto'), 401);
+    }
+    await env.ORDERS.delete(kIp);
     const t = String(Date.now());
     return new Response(null, { status: 303, headers: { location: '/panel', 'set-cookie': `tp=${await sign(env, t)}.${t}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}` } });
   }
