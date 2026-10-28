@@ -2876,3 +2876,8 @@ body.is-locked { overscroll-behavior: none; }
 .nf__search input[type=search] { flex: 1; min-width: 0; padding: 12px 14px; font-size: 16px; border: 1.5px solid #d9d0bd; border-radius: 12px; background: #fff; }
 .nf__acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
 .nf__wa { background: #25d366 !important; color: #08331a !important; border-color: #25d366 !important; }
+
+/* Ficha: sin franja arriba de la foto (los botones flotantes no ocupan espacio) */
+#QuickView .quickview-back, #QuickView .close-button { width: 42px !important; height: 42px !important; min-height: 42px; box-sizing: border-box; }
+#QuickView .quickview-back { margin: 12px 0 -54px 12px !important; }
+#QuickView .close-button { margin: 12px 12px -54px 0 !important; }
