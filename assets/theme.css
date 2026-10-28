@@ -2927,3 +2927,6 @@ body.is-locked { overscroll-behavior: none; }
   .product-gallery__frame:hover .gallery-arrow:not([disabled]) { opacity: 1; }
   .product-gallery__slide img { -webkit-user-drag: none; user-select: none; }
 }
+
+/* Ícono del queque en categorías: 30 % más pequeño */
+.cats-tile__icoimg[src*="cat-queque"] { transform: scale(.7); transform-origin: center; }
