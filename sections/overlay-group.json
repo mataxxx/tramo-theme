@@ -175,8 +175,8 @@
           "settings": {
             "icon": "cart",
             "title": "Cómo comprar",
-            "summary": "3 pasos, muy fácil",
-            "content": "<p><strong>1. Elige tus productos.</strong> Toca un producto, escoge la presentación o <em>A granel</em> con los gramos que quieras, y agrégalo al carrito.</p><p><strong>2. Haz tu pedido.</strong> Abre el carrito, toca “Hacer pedido” y completa tus datos, cómo lo recibes (Uber Flash, retiro en el Mercado Central de San José o encomienda) y si quieres factura.</p><p><strong>3. Paga por SINPE Móvil.</strong> Si retiras, te mostramos el monto y el número al final. Si es envío, te mandamos por WhatsApp el total con el envío.</p><p><em>Atendemos de lunes a sábado, 7:30 a. m. a 5:30 p. m. Pedidos hasta las 4:30 p. m. salen el mismo día.</em></p>",
+            "summary": "Así de fácil",
+            "content": "<p><strong>1.</strong> Explora la tienda.</p><p><strong>2.</strong> Agrega al carrito.</p><p><strong>3.</strong> Elige envío por Uber Flash, retiro en tienda (Mercado Central de San José) o encomienda.</p><p><strong>4.</strong> Completa tus datos.</p><p><strong>5.</strong> Realiza el pago.</p><p><strong>¡Listo!</strong> Te contactamos por WhatsApp para los próximos pasos.</p>",
             "show_whatsapp": true
           }
         },
