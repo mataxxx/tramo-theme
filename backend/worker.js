@@ -404,7 +404,7 @@ async function handlePanel(request, url, env) {
 }
 
 function loginPage(err) {
-  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pedidos · Tramo</title>
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pedidos · Tramo</title><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Pedidos"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f6f1e6;font-family:system-ui,-apple-system,sans-serif;color:#1d2a1c}
 form{background:#fff;padding:28px 24px;border-radius:20px;box-shadow:0 10px 30px rgba(38,61,37,.12);width:min(340px,90vw);text-align:center}
 h1{font-size:20px;margin:0 0 4px}p{margin:0 0 18px;color:#6b7468;font-size:14px}
@@ -414,7 +414,7 @@ button{width:100%;padding:13px;border:0;border-radius:12px;background:#263d25;co
 }
 
 const PANEL_HTML = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Pedidos · Tramo</title><meta name="theme-color" content="#263d25">
+<title>Pedidos · Tramo</title><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Pedidos"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#263d25">
 <style>
 :root{--g:#263d25;--g2:#6e9e58;--bg:#f6f1e6;--card:#fff;--line:#e4dccb;--mut:#6b7468;--txt:#1d2a1c}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--txt)}
