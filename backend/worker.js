@@ -295,11 +295,45 @@ function clean(s, max) { return String(s == null ? '' : s).replace(/[\u0000-\u00
 
 const STORE_ORIGINS = ['https://tramosanrafael.com', 'https://www.tramosanrafael.com', 'https://7gpmsb-un.myshopify.com'];
 
+// Avisos al dueño: Telegram (TELEGRAM_TOKEN) y/o WhatsApp con CallMeBot (OWNER_PHONE + CALLMEBOT_KEY)
+// Telegram: cada teléfono le escribe tu PIN del panel al bot una vez y queda registrado.
+async function telegramChats(env) {
+  let chats = [];
+  try { chats = JSON.parse(await env.ORDERS.get('tg:chats') || '[]'); } catch (e) { chats = []; }
+  try {
+    const r = await fetch('https://api.telegram.org/bot' + env.TELEGRAM_TOKEN + '/getUpdates?allowed_updates=%5B%22message%22%5D');
+    const d = await r.json();
+    let changed = false;
+    for (const u of (d.result || [])) {
+      const m = u.message; if (!m || !m.chat) continue;
+      if (env.PANEL_PIN && String(m.text || '').trim() === String(env.PANEL_PIN) && !chats.includes(m.chat.id)) {
+        chats.push(m.chat.id); changed = true;
+        await fetch('https://api.telegram.org/bot' + env.TELEGRAM_TOKEN + '/sendMessage', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ chat_id: m.chat.id, text: '✅ Listo. Aquí te van a llegar los pedidos de Tramo San Rafael. Puedes borrar el mensaje con tu PIN.' }) });
+      }
+    }
+    const last = (d.result || []).slice(-1)[0];
+    if (last) await fetch('https://api.telegram.org/bot' + env.TELEGRAM_TOKEN + '/getUpdates?offset=' + (last.update_id + 1));
+    if (changed) await env.ORDERS.put('tg:chats', JSON.stringify(chats));
+  } catch (e) {}
+  return chats;
+}
 async function notifyOwner(env, text) {
-  if (!env.OWNER_PHONE || !env.CALLMEBOT_KEY) return false;
-  const u = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(env.OWNER_PHONE) +
-    '&text=' + encodeURIComponent(text.slice(0, 3500)) + '&apikey=' + encodeURIComponent(env.CALLMEBOT_KEY);
-  try { const r = await fetch(u); return r.ok; } catch (e) { return false; }
+  let ok = false;
+  if (env.TELEGRAM_TOKEN && env.ORDERS) {
+    const chats = await telegramChats(env);
+    for (const id of chats) {
+      try {
+        const r = await fetch('https://api.telegram.org/bot' + env.TELEGRAM_TOKEN + '/sendMessage', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ chat_id: id, text: text.slice(0, 4000), disable_web_page_preview: true }) });
+        if (r.ok) ok = true;
+      } catch (e) {}
+    }
+  }
+  if (env.OWNER_PHONE && env.CALLMEBOT_KEY) {
+    const u = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(env.OWNER_PHONE) +
+      '&text=' + encodeURIComponent(text.slice(0, 3500)) + '&apikey=' + encodeURIComponent(env.CALLMEBOT_KEY);
+    try { const r = await fetch(u); if (r.ok) ok = true; } catch (e) {}
+  }
+  return ok;
 }
 
 async function handleNewOrder(request, env, ctx) {
@@ -388,6 +422,11 @@ async function handlePanel(request, url, env) {
     return new Response(null, { status: 303, headers: { location: '/panel', 'set-cookie': `tp=${await sign(env, t)}.${t}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}` } });
   }
   if (!(await panelAuthed(request, env))) return p.startsWith('/panel/api') ? json({ error: 'login' }, 401) : html(loginPage(''));
+  if (p === '/panel/probar-aviso') {
+    const ok = await notifyOwner(env, '🔔 Prueba de aviso: así te van a llegar los pedidos nuevos de la tienda.');
+    const n = env.TELEGRAM_TOKEN ? (await telegramChats(env)).length : 0;
+    return html('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><body style="font:17px system-ui;padding:24px;line-height:1.5"><h2>' + (ok ? '✅ Aviso enviado' : '⚠️ No se pudo enviar') + '</h2><p>Teléfonos registrados en Telegram: <b>' + n + '</b></p>' + (ok ? '' : '<p>Revisa que agregaste TELEGRAM_TOKEN en Cloudflare y que cada teléfono le escribió tu PIN al bot.</p>') + '<p><a href="/panel">← Volver al panel</a></p></body>');
+  }
   if (p === '/panel/api/orders' && request.method === 'GET') {
     const list = await env.ORDERS.list({ prefix: 'o:', limit: 150 });
     const out = await Promise.all(list.keys.map((k) => env.ORDERS.get(k.name, 'json')));
