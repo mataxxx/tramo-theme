@@ -101,7 +101,7 @@
     $('[data-order-next-label]', M).textContent = 'Continuar';
     $('[data-order-body]', M).scrollTop = 0;
     if (page === 3 && mode === 'delivery') initMap();
-    if (page === 4) { var py = $('[data-order-payer]', M); if (py && !py.value) py.value = $('[data-order-name]', M).value.trim(); renderReview(); }
+    if (page === 4) { var py = $('[data-order-payer]', M); if (py && !py.value) py.value = $('[data-order-name]', M).value.trim(); renderReview(); saveDraft(); }
     if (page === 2) setTimeout(function () { var n = $('[data-order-name]', M); if (!n.value) n.focus(); }, 320);
     validate();
   }
@@ -399,7 +399,8 @@
     var name = $('[data-order-name]', M).value.trim(), phone = $('[data-order-phone]', M).value.trim();
     var L1 = ['*Pedido ' + c + '* · ' + (D.shop || ''), '', '*Nombre:* ' + name, '*Teléfono:* ' + phone, ''];
     cart.items.forEach(function (it) {
-      L1.push('• ' + it.quantity + ' × ' + it.product_title + (variantLabel(it) ? ' (' + variantLabel(it) + ')' : '') + ' — ' + money(it.final_line_price));
+      var bulkIt = /granel/i.test(it.variant_title || '');
+      L1.push('• ' + (bulkIt ? '' : it.quantity + ' × ') + it.product_title + (bulkIt ? ' (A granel · ' + (it.quantity * 10) + ' g)' : (variantLabel(it) ? ' (' + variantLabel(it) + ')' : '')) + ' — ' + money(it.final_line_price));
     });
     L1.push('', '*Subtotal' + (variable.length ? ' aproximado' : '') + ':* ' + money(cart.total_price), '');
     if (variable.length) L1.push('⚖️ Peso variable (' + variable.join(', ') + '): espero el total exacto al pesar.', '');
@@ -432,33 +433,46 @@
     if (payer) L1.push('*SINPE a nombre de:* ' + payer);
     return L1.join('\n');
   }
+  /* Copia del pedido a tu panel: borrador al llegar a Pago ("sin terminar") y definitivo al confirmar */
+  var draftCode = null;
+  function buildPayload(c, status) {
+    var fe = wantsFE() ? ($('[data-order-fe-type]', M).value + ' ' + $('[data-order-fe-id]', M).value.trim() + ' · ' + $('[data-order-fe-name]', M).value.trim() + ' · Act. ' + $('[data-order-fe-act]', M).value.trim() + ' · ' + $('[data-order-fe-mail]', M).value.trim()) : '';
+    return {
+      code: c, status: status, mode: mode, eta: mode ? etaPlain(mode) : '', variable: variable,
+      name: $('[data-order-name]', M).value.trim(), phone: $('[data-order-phone]', M).value.trim(),
+      payer: (($('[data-order-payer]', M) || {}).value || '').trim(),
+      location: mode === 'delivery' ? (loc && !waLoc ? 'https://maps.google.com/?q=' + loc.lat + ',' + loc.lng : (waLoc ? 'La envía por WhatsApp' : '')) : '',
+      address: mode === 'courier' ? courierAddr() : (mode === 'delivery' ? (($('[data-order-notes]', M) || {}).value || '').trim() : ''),
+      area: mode === 'courier' ? courierArea() : '',
+      fe: fe,
+      items: (cart && cart.items || []).map(function (it) {
+        var bulk = /granel/i.test(it.variant_title || '');
+        return { variant_id: it.variant_id, quantity: it.quantity, title: it.product_title, unit: it.price / 100,
+          label: bulk ? 'A granel · ' + (it.quantity * 10) + ' g' : variantLabel(it) };
+      }),
+      message: message(c)
+    };
+  }
+  function postOrder(c, status) {
+    try {
+      var root = (window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/';
+      fetch(root.replace(/\/$/, '') + '/apps/tramo/order', { method: 'POST', keepalive: true, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(buildPayload(c, status)) }).catch(function () {});
+    } catch (e) {}
+  }
+  function saveDraft() {
+    if (!cart || !cart.item_count || !mode) return;
+    if (!draftCode) draftCode = code();
+    postOrder(draftCode, 'incompleto');
+  }
   function send() {
     if (!validate()) return;
     if (!D.wa) { err('Falta configurar el WhatsApp de la tienda.'); return; }
-    var c = code(), url = 'https://wa.me/' + D.wa + '?text=' + encodeURIComponent(message(c));
+    var c = draftCode || code(); draftCode = null;
+    var url = 'https://wa.me/' + D.wa + '?text=' + encodeURIComponent(message(c));
     try { localStorage.setItem(LS, JSON.stringify({ n: $('[data-order-name]', M).value.trim(), p: $('[data-order-phone]', M).value.trim() })); } catch (e) {}
     last = { code: c, url: url, mode: mode };
     /* Copia automática del pedido a la tienda (no depende de que el cliente envíe el WhatsApp) */
-    try {
-      var root = (window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/';
-      var fe = wantsFE() ? ($('[data-order-fe-type]', M).value + ' ' + $('[data-order-fe-id]', M).value.trim() + ' · ' + $('[data-order-fe-name]', M).value.trim() + ' · Act. ' + $('[data-order-fe-act]', M).value.trim() + ' · ' + $('[data-order-fe-mail]', M).value.trim()) : '';
-      var payload = {
-        code: c, mode: mode, eta: etaPlain(mode), variable: variable,
-        name: $('[data-order-name]', M).value.trim(), phone: $('[data-order-phone]', M).value.trim(),
-        payer: (($('[data-order-payer]', M) || {}).value || '').trim(),
-        location: mode === 'delivery' ? (loc && !waLoc ? 'https://maps.google.com/?q=' + loc.lat + ',' + loc.lng : 'La envía por WhatsApp') : '',
-        address: mode === 'courier' ? courierAddr() : (mode === 'delivery' ? (($('[data-order-notes]', M) || {}).value || '').trim() : ''),
-        area: mode === 'courier' ? courierArea() : '',
-        fe: fe,
-        items: cart.items.map(function (it) {
-          var bulk = /granel/i.test(it.variant_title || '');
-          return { variant_id: it.variant_id, quantity: it.quantity, title: it.product_title, unit: it.price / 100,
-            label: bulk ? 'A granel · ' + (it.quantity * 10) + ' g' : variantLabel(it) };
-        }),
-        message: message(c)
-      };
-      fetch(root.replace(/\/$/, '') + '/apps/tramo/order', { method: 'POST', keepalive: true, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) }).catch(function () {});
-    } catch (e) {}
+    postOrder(c, 'pago-pendiente');
     /* Celular: abrir WhatsApp en la misma pestaña (la app se abre sola). Computadora: pestaña nueva (WhatsApp Web). */
     var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
     if (mobile) { setTimeout(function () { location.href = url; }, 60); }

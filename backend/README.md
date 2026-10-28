@@ -62,7 +62,7 @@ En Shopify abre el pedido y agrega la etiqueta de la etapa: `estado-preparando`,
 
 ## Panel de pedidos (propio, fuera de Shopify)
 
-Cuando el cliente toca "Enviar pedido", la página guarda una copia en tu panel, aunque el cliente no mande el WhatsApp. Shopify no crea pedidos ni cobra comisión: solo hospeda la tienda.
+Cuando el cliente llega al paso de Pago, la página guarda el pedido en tu panel como **"Sin terminar"**; cuando confirma, pasa a **"Pago pendiente"** y te llega por WhatsApp, aunque el cliente nunca envíe su mensaje. Si se queda más de 10 minutos sin terminar, te llega un aviso para que le escribas. Shopify no crea pedidos ni cobra comisión: solo hospeda la tienda.
 
 **Panel:** `https://tramo-backend.TU-USUARIO.workers.dev/panel` (entras con tu PIN). Guárdalo en la pantalla de inicio del celular.
 Estados: Pago pendiente → Pagado → Preparando → Listo → Entregado / enviado (o Cancelado). Botones para escribirle al cliente por WhatsApp: pedir el pago, avisar que está listo / en camino / enviado.
@@ -72,5 +72,6 @@ Configuración en Cloudflare (una sola vez):
 2. En el Worker → **Settings → Bindings → Add → KV namespace**: nombre de variable exacto `ORDERS`, namespace `tramo-pedidos`.
 3. **Settings → Variables and Secrets**: secreto `PANEL_PIN` = el PIN que quieras (ej. 6 números).
 4. **Edit code** → pega el `worker.js` nuevo → **Deploy**.
+5. **Settings → Triggers → Cron Triggers → Add**: `*/5 * * * *` (cada 5 minutos). Sirve para avisarte de pedidos que se quedaron "sin terminar".
 
 Aviso a tu WhatsApp (opcional): activa CallMeBot desde el 7017-0518 (https://www.callmebot.com/blog/free-api-whatsapp-messages/, te responde con tu apikey) y agrega `OWNER_PHONE` = `50670170518` y el secreto `CALLMEBOT_KEY`.

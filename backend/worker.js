@@ -288,7 +288,7 @@ async function handleAI(request, url, env) {
 // Panel: https://<tu-worker>.workers.dev/panel  (PIN en la variable secreta PANEL_PIN)
 
 const MODE_LABEL = { pickup: 'Retiro en el Mercado Central', delivery: 'Uber Flash', courier: 'Encomienda' };
-const STATUSES = ['pago-pendiente', 'pagado', 'preparando', 'listo', 'entregado', 'cancelado'];
+const STATUSES = ['incompleto', 'pago-pendiente', 'pagado', 'preparando', 'listo', 'entregado', 'cancelado'];
 
 function clean(s, max) { return String(s == null ? '' : s).replace(/[\u0000-\u0008\u000b-\u001f]/g, ' ').trim().slice(0, max || 200); }
 
@@ -326,17 +326,27 @@ async function handleNewOrder(request, env) {
   });
 
   const now = Date.now();
+  const status = b.status === 'incompleto' ? 'incompleto' : 'pago-pendiente';
+  // Si ya existe este pedido (borrador "sin terminar"), se actualiza en vez de duplicarlo
+  let prev = null, prevKey = code ? await env.ORDERS.get('c:' + code) : null;
+  if (prevKey) prev = await env.ORDERS.get(prevKey, 'json');
+  if (prev && prev.status !== 'incompleto' && status === 'incompleto') return json({ ok: true, kept: true });
   const order = {
-    id: code || String(now), code, created: now, status: 'pago-pendiente',
+    id: code || String(now), code, created: prev ? prev.created : now, status,
     name, phone, mode, eta: clean(b.eta, 120),
     payer: clean(b.payer, 80), location: clean(b.location, 200), address: clean(b.address, 300), area: clean(b.area, 120),
     fe: clean(b.fe, 300), items, total: Math.round(total * 100) / 100,
     variable: (Array.isArray(b.variable) ? b.variable : []).slice(0, 20).map((x) => clean(x, 80)).filter(Boolean), message: clean(b.message, 4000), history: [{ s: 'pago-pendiente', t: now }]
   };
-  const key = 'o:' + String(9999999999999 - now).padStart(13, '0') + ':' + order.id;
+  if (prev) order.history = (prev.history || []).concat(status !== prev.status ? [{ s: status, t: now }] : []);
+  else order.history = [{ s: status, t: now }];
+  if (prev && prev.notifiedDraft) order.notifiedDraft = true;
+  const key = prevKey || ('o:' + String(9999999999999 - now).padStart(13, '0') + ':' + order.id);
   order.key = key;
   await env.ORDERS.put(key, JSON.stringify(order));
-  const head = '🛒 Pedido nuevo ' + (code || '') + ' · ' + (order.variable.length ? '≈ ' : '') + '₡' + Math.round(order.total).toLocaleString('es-CR') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '') + (order.variable.length ? ' · ⚖️ pesar: ' + order.variable.join(', ') : '');
+  if (code) await env.ORDERS.put('c:' + code, key, { expirationTtl: 60 * 60 * 24 * 30 });
+  if (status === 'incompleto') return json({ ok: true, draft: true });
+  const head = (prev && prev.notifiedDraft ? '✅ Se completó el pedido ' : '🛒 Pedido nuevo ') + (code || '') + ' · ' + (order.variable.length ? '≈ ' : '') + '₡' + Math.round(order.total).toLocaleString('es-CR') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '') + (order.variable.length ? ' · ⚖️ pesar: ' + order.variable.join(', ') : '');
   const sent = await notifyOwner(env, head + '\n\n' + order.message);
   return json({ ok: true, notified: sent });
 }
@@ -410,7 +420,7 @@ main{padding:12px 12px 40px;max-width:760px;margin:0 auto;display:grid;gap:10px}
 .o__main{flex:1;min-width:0}.o__name{font-weight:700;font-size:15.5px}.o__sub{color:var(--mut);font-size:13px;margin-top:2px}
 .o__tot{font-weight:800;font-size:16px;white-space:nowrap;text-align:right}.o__ago{color:var(--mut);font-size:12px;font-weight:400;margin-top:2px}
 .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;margin-top:6px}
-.s-pago-pendiente{background:#fdf0d9;color:#8a5a10}.s-pagado{background:#e3eefc;color:#1d4f91}.s-preparando{background:#efe7fb;color:#5b3a99}
+.s-incompleto{background:#f3e6e6;color:#8a2a2a}.s-pago-pendiente{background:#fdf0d9;color:#8a5a10}.s-pagado{background:#e3eefc;color:#1d4f91}.s-preparando{background:#efe7fb;color:#5b3a99}
 .s-listo{background:#dff1dc;color:#24602a}.s-var{background:#eef3fb;color:#1f3b63;margin-left:4px}.s-entregado{background:#eceee9;color:#4b5548}.s-cancelado{background:#f9e1df;color:#9b2c22}
 .when{display:inline-block;margin-left:6px;font-size:12px;color:var(--g);font-weight:600}
 .o__body{display:none;border-top:1px solid var(--line);padding:12px 14px;font-size:14px}.o.open .o__body{display:block}
@@ -427,7 +437,7 @@ main{padding:12px 12px 40px;max-width:760px;margin:0 auto;display:grid;gap:10px}
 <header><h1>Pedidos · Tramo <small id="upd"></small></h1><div class="tabs" id="tabs"></div></header>
 <main id="list"><div class="empty">Cargando…</div></main>
 <script>
-const ST={'pago-pendiente':'Pago pendiente','pagado':'Pagado','preparando':'Preparando','listo':'Listo','entregado':'Entregado / enviado','cancelado':'Cancelado'};
+const ST={'incompleto':'Sin terminar','pago-pendiente':'Pago pendiente','pagado':'Pagado','preparando':'Preparando','listo':'Listo','entregado':'Entregado / enviado','cancelado':'Cancelado'};
 const MODE={pickup:'Retiro',delivery:'Uber Flash',courier:'Encomienda'};
 let orders=[],filter='activos',open={},known=null;
 const money=n=>'₡'+Math.round(n||0).toLocaleString('es-CR');
@@ -440,7 +450,7 @@ function msgs(o){const n=o.name.split(' ')[0];return[
  [o.mode==='pickup'?'Avisar: listo para recoger':o.mode==='delivery'?'Avisar: va en camino':'Avisar: encomienda enviada','',o.mode==='pickup'?'¡Hola '+n+'! Tu pedido '+o.code+' ya está listo ✅ Puedes pasar a recogerlo al Tramo San Rafael #1, Mercado Central (7:30 a. m. a 5:30 p. m.).':o.mode==='delivery'?'¡Hola '+n+'! Tu pedido '+o.code+' ya va en camino por Uber Flash 🛵 Por favor estate pendiente para recibirlo.':'¡Hola '+n+'! Tu pedido '+o.code+' ya fue enviado por encomienda 📦 Te llega en hasta 48 h.']
 ]}
 function tabs(){const c={activos:0,todos:orders.length};orders.forEach(o=>{c[o.status]=(c[o.status]||0)+1;if(!['entregado','cancelado'].includes(o.status))c.activos++});
- const list=[['activos','Activos'],['pago-pendiente','Pago pendiente'],['pagado','Pagados'],['preparando','Preparando'],['listo','Listos'],['entregado','Entregados'],['cancelado','Cancelados'],['todos','Todos']];
+ const list=[['activos','Activos'],['incompleto','Sin terminar'],['pago-pendiente','Pago pendiente'],['pagado','Pagados'],['preparando','Preparando'],['listo','Listos'],['entregado','Entregados'],['cancelado','Cancelados'],['todos','Todos']];
  document.getElementById('tabs').innerHTML=list.map(([k,l])=>'<button class="tab'+(filter===k?' on':'')+'" data-f="'+k+'">'+l+'<b>'+(c[k]||0)+'</b></button>').join('')}
 function render(){tabs();const L=orders.filter(o=>filter==='todos'||(filter==='activos'?!['entregado','cancelado'].includes(o.status):o.status===filter));
  const el=document.getElementById('list');if(!L.length){el.innerHTML='<div class="empty">No hay pedidos aquí.</div>';return}
@@ -468,7 +478,22 @@ document.addEventListener('click',async e=>{const t=e.target.closest('[data-f]')
 load();setInterval(load,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 </script></body></html>`;
 
+// Cada 5 minutos (Cron Trigger en Cloudflare): avisa de pedidos que se quedaron "sin terminar" más de 10 minutos
+async function checkDrafts(env) {
+  if (!env.ORDERS) return;
+  const list = await env.ORDERS.list({ prefix: 'o:', limit: 40 });
+  for (const k of list.keys) {
+    const o = await env.ORDERS.get(k.name, 'json');
+    if (!o || o.status !== 'incompleto' || o.notifiedDraft) continue;
+    if (Date.now() - o.created < 10 * 60 * 1000) continue;
+    const ok = await notifyOwner(env, '⚠️ Pedido SIN TERMINAR ' + (o.code || '') + ' · ' + o.name + ' · ' + o.phone + '\nLlegó hasta el pago pero no lo confirmó. Escríbele para ayudarle.\n\n' + (o.message || ''));
+    o.notifiedDraft = true; if (!ok) o.notifyFailed = true;
+    await env.ORDERS.put(k.name, JSON.stringify(o));
+  }
+}
+
 export default {
+  async scheduled(event, env, ctx) { ctx.waitUntil(checkDrafts(env)); },
   async fetch(request, env) {
     const url = new URL(request.url);
     try {
