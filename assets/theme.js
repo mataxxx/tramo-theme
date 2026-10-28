@@ -597,7 +597,7 @@
       if (addButton) addButton.disabled = false;
       if (addLabel) addLabel.textContent = defaultLabel;
       if (addPrice) addPrice.textContent = '· ' + formatMoney(variant.price * quantity);
-      if (bulkKg) bulkKg.textContent = '';
+      syncKilos(variant && variant.bulk ? quantity * (BULK.unit || 10) : 0);
       renderPrice(variant);
       updateCups(variant, quantity);
 
@@ -611,8 +611,30 @@
       }
     }
 
+    /* Kilos: botones 1/2/5/10/15 kg y campo "Otro" sincronizados con los gramos */
+    var kgInput = $('[data-bulk-kg-input]', root);
+    function fmtKg(g) { var k = Math.round(g / 10) / 100; return String(k).replace('.', ','); }
+    function syncKilos(grams) {
+      if (bulkKg) bulkKg.textContent = grams >= 1000 ? ' · = ' + fmtKg(grams) + ' kg' : '';
+      $$('[data-bulk-kg-set]', root).forEach(function (c) {
+        c.classList.toggle('is-active', grams > 0 && parseFloat(c.getAttribute('data-bulk-kg-set')) * 1000 === grams);
+      });
+      if (kgInput && document.activeElement !== kgInput) {
+        var preset = [1, 2, 5, 10, 15].some(function (k) { return k * 1000 === grams; });
+        kgInput.value = grams >= 1000 && !preset ? Math.round(grams / 10) / 100 : '';
+      }
+    }
+    function setKilos(kg) {
+      kg = parseFloat(String(kg).replace(',', '.'));
+      if (!bulkInput || !(kg > 0)) return;
+      bulkInput.value = roundToUnit(Math.round(kg * 1000), bulkInput.min);
+      update(false);
+    }
+    if (kgInput) kgInput.addEventListener('input', function () { if (kgInput.value) setKilos(kgInput.value); });
+
     root.addEventListener('change', function (event) {
       if (event.target.matches('[data-option-value]')) update(true);
+      else if (event.target === kgInput) { if (kgInput.value) setKilos(kgInput.value); }
       else if (event.target === qtyInput) {
         qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) || 1);
         update(false);
@@ -629,6 +651,9 @@
         qtyInput.value = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1); update(false);
       } else if (btn.hasAttribute('data-qty-plus')) {
         qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1; update(false);
+      } else if (btn.hasAttribute('data-bulk-kg-set')) {
+        if (kgInput) kgInput.value = '';
+        setKilos(btn.getAttribute('data-bulk-kg-set'));
       } else if (btn.hasAttribute('data-bulk-minus')) {
         bulkInput.value = roundToUnit((parseInt(bulkInput.value, 10) || BULK.min) - BULK.step, bulkInput.min); update(false);
       } else if (btn.hasAttribute('data-bulk-plus')) {

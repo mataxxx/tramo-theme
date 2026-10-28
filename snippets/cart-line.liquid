@@ -21,7 +21,8 @@
     <a href="{{ item.product.url }}" class="cart-line__title" data-quick-view="{{ item.product.url }}">{{ item.product.title }}</a>
     {%- unless item.product.has_only_default_variant -%}
       {%- if is_bulk -%}
-        <p class="cart-line__variant">{{ settings.bulk_variant_name }} · {{ item.quantity | times: bulk_unit }} g</p>
+        {%- assign line_g = item.quantity | times: bulk_unit -%}
+        <p class="cart-line__variant">{{ settings.bulk_variant_name }} · {% if line_g >= 1000 %}{% assign kg_mod = line_g | modulo: 1000 %}{% if kg_mod == 0 %}{{ line_g | divided_by: 1000 }}{% else %}{{ line_g | divided_by: 1000.0 | round: 2 | replace: '.', ',' }}{% endif %} kg ({{ line_g }} g){% else %}{{ line_g }} g{% endif %}</p>
       {%- else -%}
         <p class="cart-line__variant">{{ item.variant.title }}</p>
       {%- endif -%}

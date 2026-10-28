@@ -37,6 +37,20 @@
       <span class="qty__unit">g</span>
       <button type="button" class="qty__btn" data-bulk-plus aria-label="Aumentar gramos" data-step="{{ bulk_step }}">{% render 'icon', name: 'plus' %}</button>
     </div>
+    <div class="bulk-kilos" data-bulk-kilos>
+      <span class="bulk-kilos__label">O por kilo:</span>
+      <div class="bulk-kilos__chips">
+        {%- for kg in (1..15) -%}
+          {%- if kg == 1 or kg == 2 or kg == 5 or kg == 10 or kg == 15 -%}
+            <button type="button" class="bulk-kilos__chip" data-bulk-kg-set="{{ kg }}">{{ kg }} kg</button>
+          {%- endif -%}
+        {%- endfor -%}
+        <label class="bulk-kilos__custom">
+          <input type="number" data-bulk-kg-input min="0.25" step="0.25" inputmode="decimal" placeholder="Otro" aria-label="Kilos a granel">
+          <span>kg</span>
+        </label>
+      </div>
+    </div>
     <p class="bulk-note" data-bulk-note>
       Desde {{ bulk_min }} g · incrementos de {{ bulk_unit }} g<span data-bulk-kg></span>
     </p>

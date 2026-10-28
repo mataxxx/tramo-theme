@@ -1,6 +1,7 @@
 /* Pedido por WhatsApp + SINPE Móvil: envío por Uber Flash (ubicación en el mapa), retiro en el Mercado Central o encomienda */
 (function () {
   'use strict';
+  function gramsLabel(g) { return g >= 1000 ? String(Math.round(g / 10) / 100).replace('.', ',') + ' kg' : g + ' g'; }
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -467,7 +468,7 @@
     var L1 = ['*Pedido ' + c + '* · ' + (D.shop || ''), '', '*Nombre:* ' + name, '*Teléfono:* ' + phone, ''];
     cart.items.forEach(function (it) {
       var bulkIt = /granel/i.test(it.variant_title || '');
-      L1.push('• ' + (bulkIt ? '' : it.quantity + ' × ') + it.product_title + (bulkIt ? ' (A granel · ' + (it.quantity * 10) + ' g)' : (variantLabel(it) ? ' (' + variantLabel(it) + ')' : '')) + ' — ' + money(it.final_line_price));
+      L1.push('• ' + (bulkIt ? '' : it.quantity + ' × ') + it.product_title + (bulkIt ? ' (A granel · ' + gramsLabel(it.quantity * 10) + ')' : (variantLabel(it) ? ' (' + variantLabel(it) + ')' : '')) + ' — ' + money(it.final_line_price));
     });
     L1.push('', '*Subtotal' + (variable.length ? ' aproximado' : '') + ':* ' + money(cart.total_price), '');
     if (variable.length) L1.push('⚖️ Peso variable (' + variable.join(', ') + '): espero el total exacto al pesar.', '');
@@ -515,7 +516,7 @@
       items: (cart && cart.items || []).map(function (it) {
         var bulk = /granel/i.test(it.variant_title || '');
         return { variant_id: it.variant_id, quantity: it.quantity, title: it.product_title, unit: it.price / 100,
-          label: bulk ? 'A granel · ' + (it.quantity * 10) + ' g' : variantLabel(it) };
+          label: bulk ? 'A granel · ' + gramsLabel(it.quantity * 10) : variantLabel(it) };
       }),
       message: message(c)
     };
