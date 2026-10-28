@@ -1,6 +1,8 @@
 name = "tramo-backend"
 main = "worker.js"
 compatibility_date = "2025-10-01"
+# Conserva las variables agregadas desde el panel de Cloudflare (OWNER_PHONE, etc.)
+keep_vars = true
 
 # Las claves NO van aquí. Se guardan con: npx wrangler secret put NOMBRE
 [ai]
@@ -9,3 +11,12 @@ binding = "AI"
 [vars]
 SHOPIFY_SHOP = "tramo-san-rafael-1"
 STORE_INFO = "Tienda en San Rafael, Costa Rica. Envíos a todo el país. Venta por presentaciones y a granel."
+
+# Base de pedidos del panel
+[[kv_namespaces]]
+binding = "ORDERS"
+id = "0305c4c521e54ec9ae7420d3fcfb1eb7"
+
+# Revisa cada 5 minutos los pedidos que se quedaron sin terminar
+[triggers]
+crons = ["*/5 * * * *"]
