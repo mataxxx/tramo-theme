@@ -128,8 +128,9 @@
       {%- if section.settings.copyright != blank -%}{{ section.settings.copyright }}{%- else -%}&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}{%- endif -%}
     </p>
     <div class="site-footer__legal">
-      {%- if shop.privacy_policy.url != blank -%}<a href="{{ shop.privacy_policy.url }}">Privacidad</a>{%- endif -%}
-      {%- if shop.terms_of_service.url != blank -%}<a href="{{ shop.terms_of_service.url }}">Términos y condiciones</a>{%- endif -%}
+      {%- if pages['privacidad'].url != blank -%}<a href="{{ pages['privacidad'].url }}">Privacidad</a>{%- elsif shop.privacy_policy.url != blank -%}<a href="{{ shop.privacy_policy.url }}">Privacidad</a>{%- endif -%}
+      {%- if pages['terminos'].url != blank -%}<a href="{{ pages['terminos'].url }}">Términos y condiciones</a>{%- elsif shop.terms_of_service.url != blank -%}<a href="{{ shop.terms_of_service.url }}">Términos y condiciones</a>{%- endif -%}
+      {%- if pages['aviso-legal'].url != blank -%}<a href="{{ pages['aviso-legal'].url }}">Aviso legal</a>{%- endif -%}
       {%- if section.settings.credit != blank -%}
         <span class="site-footer__credit">
           {%- if section.settings.credit_url != blank -%}<a href="{{ section.settings.credit_url }}" target="_blank" rel="noopener">{{ section.settings.credit }}</a>{%- else -%}{{ section.settings.credit }}{%- endif -%}
