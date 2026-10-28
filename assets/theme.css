@@ -2881,3 +2881,12 @@ body.is-locked { overscroll-behavior: none; }
 #QuickView .quickview-back, #QuickView .close-button { width: 42px !important; height: 42px !important; min-height: 42px; box-sizing: border-box; }
 #QuickView .quickview-back { margin: 12px 0 -54px 12px !important; }
 #QuickView .close-button { margin: 12px 12px -54px 0 !important; }
+
+/* Banner con el texto dentro de la imagen (se ve completo, toda la imagen es un enlace) */
+.hero--banner { background: #f5f1e6; }
+.hero--banner .hero__media img { object-fit: cover; object-position: left center; }
+.hero__banner-link { position: absolute; inset: 0; z-index: 2; }
+@media (min-width: 750px) {
+  .hero-track > .hero--banner { aspect-ratio: 1866 / 749; min-height: 0; height: auto; }
+  .hero--banner .hero__media img { object-fit: contain; object-position: center; }
+}

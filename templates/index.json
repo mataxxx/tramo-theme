@@ -36,8 +36,8 @@
     "hero": {
       "type": "hero",
       "settings": {
-        "heading": "TODO PARA\nTU NAVIDAD",
-        "text": "Ingredientes para tu queque,\ntus tamales y la pierna.",
+        "heading": "Comprá en línea. Recibí como querás.",
+        "text": "",
         "tile1_kicker": "Hecho a mano en Costa Rica",
         "tile1_heading": "Arma tu especiero",
         "tile1_text": "Elige el modelo y llénalo con tus especias.",
@@ -51,7 +51,11 @@
         "hide_tiles": true,
         "show_tv": false,
         "show_tile2": false,
-        "image_asset": "xmas-queque.jpg"
+        "image_asset": "banner-compra-en-linea.jpg",
+        "banner": true,
+        "banner_alt": "Comprá en línea. Recibí como querás. Pagá por SINPE Móvil y elegí la entrega: a domicilio por Uber Flash, retiro en tienda en el Mercado Central o encomienda a todo Costa Rica.",
+        "button_link": "/collections/all",
+        "button_label": "Comprar ahora"
       },
       "blocks": {
         "s1": {

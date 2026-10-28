@@ -35,18 +35,21 @@
           assign sl_shopify = blk.shopify_attributes
         endif
       -%}
-      <section class="hero hero--{{ section.settings.text_align }}{% if i > 0 %} hero--slide{% endif %}" aria-label="{{ sl.heading | strip_newlines | escape }}" {% if i > 0 %}style="--hero-overlay: {{ sl.overlay_color | default: '#000000' }}; --hero-overlay-opacity: {{ sl.overlay_opacity | default: 70 | divided_by: 100.0 }}"{% endif %} {{ sl_shopify }}>
+      <section class="hero hero--{{ section.settings.text_align }}{% if i > 0 %} hero--slide{% endif %}{% if sl.banner %} hero--banner{% endif %}" aria-label="{{ sl.heading | strip_newlines | escape }}" {% if i > 0 %}style="--hero-overlay: {{ sl.overlay_color | default: '#000000' }}; --hero-overlay-opacity: {{ sl.overlay_opacity | default: 70 | divided_by: 100.0 }}"{% endif %} {{ sl_shopify }}>
         <div class="hero__media">
           {%- if sl.image != blank -%}
             {{ sl.image | image_url: width: 2000 | image_tag: widths: '750, 1100, 1500, 2000', sizes: '(min-width: 1440px) 1440px, 100vw', loading: 'eager', alt: sl.image.alt }}
           {%- elsif sl.image_asset != blank -%}
-            <img src="{{ sl.image_asset | asset_url }}" alt="" width="1254" height="1254" loading="{% if i == 0 %}eager{% else %}lazy{% endif %}"{% if i == 0 %} fetchpriority="high"{% endif %}>
+            <img src="{{ sl.image_asset | asset_url }}" alt="{% if sl.banner %}{{ sl.banner_alt | escape }}{% endif %}" width="{% if sl.banner %}1866{% else %}1254{% endif %}" height="{% if sl.banner %}749{% else %}1254{% endif %}" loading="{% if i == 0 %}eager{% else %}lazy{% endif %}"{% if i == 0 %} fetchpriority="high"{% endif %}>
           {%- elsif i == 0 -%}
             <img src="{{ 'hero-default.jpg' | asset_url }}" alt="" width="1584" height="672" loading="eager" fetchpriority="high">
           {%- else -%}
             <img src="{{ 'history-default.svg' | asset_url }}" alt="" width="1584" height="672" loading="lazy">
           {%- endif -%}
         </div>
+        {%- if sl.banner -%}
+          {%- if sl.button_link != blank -%}<a class="hero__banner-link" href="{{ sl.button_link }}" aria-label="{{ sl.banner_alt | default: sl.button_label | escape }}"></a>{%- endif -%}
+        {%- else -%}
         <div class="hero__overlay" aria-hidden="true"></div>
         <div class="hero__copy">
           {%- if sl.kicker != blank -%}<small class="hero__kicker">{{ sl.kicker }}</small>{%- endif -%}
@@ -60,6 +63,7 @@
             <a href="{{ sl.button_link }}" class="button button--light">{{ sl.button_label }}</a>
           {%- endif -%}
         </div>
+        {%- endif -%}
       </section>
     {%- endfor -%}
   </div>
@@ -154,6 +158,8 @@
       "info": "Si la dejas vacía se usa la foto de especias incluida en el tema."
     },
     { "type": "text", "id": "image_asset", "label": "O imagen del tema (nombre de archivo)", "info": "Ej: xmas-queque.jpg. Solo si no eliges una imagen arriba." },
+    { "type": "checkbox", "id": "banner", "label": "Banner con texto en la imagen", "info": "Muestra la imagen completa, sin texto encima. Toda la imagen lleva al enlace del botón.", "default": false },
+    { "type": "text", "id": "banner_alt", "label": "Texto del banner (para Google y lectores de pantalla)" },
     {
       "type": "textarea",
       "id": "heading",
@@ -368,6 +374,8 @@
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Imagen" },
         { "type": "text", "id": "image_asset", "label": "O imagen del tema (nombre de archivo)", "info": "Ej: xmas-tamales.jpg. Solo si no eliges una imagen arriba." },
+        { "type": "checkbox", "id": "banner", "label": "Banner con texto en la imagen", "default": false },
+        { "type": "text", "id": "banner_alt", "label": "Texto del banner (para Google y lectores de pantalla)" },
         { "type": "color", "id": "overlay_color", "label": "Color del sombreado", "default": "#000000" },
         { "type": "range", "id": "overlay_opacity", "label": "Intensidad del sombreado", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 70 },
         { "type": "text", "id": "kicker", "label": "Texto pequeño" },
