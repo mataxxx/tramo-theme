@@ -2890,3 +2890,8 @@ body.is-locked { overscroll-behavior: none; }
   .hero-track > .hero--banner { aspect-ratio: 1866 / 749; min-height: 0; height: auto; }
   .hero--banner .hero__media img { object-fit: contain; object-position: center; }
 }
+
+/* Rendimiento del producto debajo de la foto (ej. combo de queque) */
+.pg-rinde { display: flex; align-items: center; gap: 10px; margin: 10px 0 0; padding: 11px 14px; border-radius: 14px; background: #f3ede0; color: var(--color-primary, #263d25); font-size: 14.5px; font-weight: 600; line-height: 1.35; }
+.pg-rinde .icon { width: 22px; height: 22px; flex: 0 0 auto; }
+#QuickView .pg-rinde { margin: 0; border-radius: 0; }

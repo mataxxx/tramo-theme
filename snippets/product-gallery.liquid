@@ -45,4 +45,8 @@
       {%- endfor -%}
     </ul>
   {%- endif -%}
+  {%- assign rinde = product.metafields.custom.rinde.value -%}
+  {%- if rinde != blank -%}
+    <div class="pg-rinde">{% render 'icon', name: 'cake' %}<span>{{ rinde | escape | newline_to_br }}</span></div>
+  {%- endif -%}
 </div>
