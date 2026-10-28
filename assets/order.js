@@ -520,11 +520,20 @@
       message: message(c)
     };
   }
+  /* Guarda el pedido en el panel. Devuelve una promesa: true si quedó guardado */
   function postOrder(c, status) {
     try {
-      var root = (window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/';
-      fetch(root.replace(/\/$/, '') + '/apps/tramo/order', { method: 'POST', keepalive: true, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(buildPayload(c, status)) }).catch(function () {});
-    } catch (e) {}
+      var base = (D.backend || '').replace(/\/$/, '');
+      var url = base ? base + '/order' : ((window.TRAMO && TRAMO.routes && TRAMO.routes.root) || '/').replace(/\/$/, '') + '/apps/tramo/order';
+      return fetch(url, { method: 'POST', keepalive: true, mode: base ? 'cors' : 'same-origin', credentials: base ? 'omit' : 'same-origin', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify(buildPayload(c, status)) })
+        .then(function (r) { return r.ok ? r.json().then(function (j) { return !!(j && j.ok); }, function () { return false; }) : false; })
+        .catch(function () { return false; });
+    } catch (e) { return Promise.resolve(false); }
+  }
+  /* Mensaje corto para el cliente cuando el pedido ya quedó guardado en el panel */
+  function shortMessage(c) {
+    var name = $('[data-order-name]', M).value.trim();
+    return 'Hola 👋 Soy ' + name + '. Acabo de hacer el pedido *' + c + '* en la tienda en línea.' + (mode === 'delivery' && waLoc ? ' Les envío mi ubicación aquí 📍' : '');
   }
   function saveDraft() {
     if (!cart || !cart.item_count || !mode) return;
@@ -534,16 +543,31 @@
   function send() {
     if (!validate()) return;
     if (!D.wa) { err('Falta configurar el WhatsApp de la tienda.'); return; }
+    if (sending) return;
     var c = draftCode || code(); draftCode = null;
-    var url = 'https://wa.me/' + D.wa + '?text=' + encodeURIComponent(message(c));
     try { localStorage.setItem(LS, JSON.stringify({ n: $('[data-order-name]', M).value.trim(), p: $('[data-order-phone]', M).value.trim() })); } catch (e) {}
-    last = { code: c, url: url, mode: mode };
-    /* Copia automática del pedido a la tienda (no depende de que el cliente envíe el WhatsApp) */
-    postOrder(c, 'pago-pendiente');
-    /* Celular: abrir WhatsApp en la misma pestaña (la app se abre sola). Computadora: pestaña nueva (WhatsApp Web). */
+    var full = 'https://wa.me/' + D.wa + '?text=' + encodeURIComponent(message(c));
     var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-    if (mobile) { setTimeout(function () { location.href = url; }, 60); }
-    else { var w = null; try { w = window.open(url, '_blank'); if (w) { try { w.opener = null; } catch (e2) {} } } catch (e) {} if (!w) setTimeout(function () { location.href = url; }, 300); }
+    /* Computadora: abrir la pestaña ya (si no, el navegador la bloquea) y ponerle la dirección después */
+    var w = null;
+    if (!mobile) { try { w = window.open('', '_blank'); } catch (e) {} }
+    var btn = $('[data-order-send]', M); sending = true; if (btn) btn.classList.add('is-loading');
+    /* 1) Guardar el pedido en el panel (te llega a tu WhatsApp). 2) Si se guardó, el cliente solo manda el número; si no, manda el pedido completo. */
+    var done = false;
+    function go(saved) {
+      if (done) return; done = true; sending = false; if (btn) btn.classList.remove('is-loading');
+      var url = saved ? 'https://wa.me/' + D.wa + '?text=' + encodeURIComponent(shortMessage(c)) : full;
+      finish(c, url, mobile, w);
+    }
+    postOrder(c, 'pago-pendiente').then(go);
+    setTimeout(function () { go(false); }, 4000);
+  }
+  var sending = false;
+  function finish(c, url, mobile, w) {
+    last = { code: c, url: url, mode: mode };
+    if (mobile) { location.href = url; }
+    else if (w) { try { w.opener = null; w.location.href = url; } catch (e) { location.href = url; } }
+    else { setTimeout(function () { location.href = url; }, 300); }
     $('[data-order-code]', M).textContent = c;
     $('[data-order-done-text]', M).textContent = mode === 'pickup'
       ? 'Solo falta tocar Enviar en WhatsApp. Deposita ' + money(cart.total_price) + (D.sinpe ? ' al SINPE ' + D.sinpe + (D.sinpeName ? ' a nombre de ' + D.sinpeName : '') : '') + '. No necesitas enviar comprobante: el sistema confirmará tu SINPE y te contactaremos por WhatsApp para coordinar el retiro.'

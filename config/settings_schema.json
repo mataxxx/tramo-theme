@@ -827,6 +827,13 @@
       },
       {
         "type": "text",
+        "id": "order_backend",
+        "label": "Dirección del servidor de pedidos (Cloudflare)",
+        "default": "https://tramo-backend.jeangaritamata.workers.dev",
+        "info": "Cada pedido se guarda en tu panel y te llega por WhatsApp. El cliente solo envía el número de pedido."
+      },
+      {
+        "type": "text",
         "id": "order_google_key",
         "label": "Llave de Google (Places API New) para buscar direcciones",
         "info": "Opcional. Si la pones, el buscador del mapa usa Google. Restríngela a tramosanrafael.com/* y a Places API (New)."

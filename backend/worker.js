@@ -20,6 +20,7 @@ function hex(buf) {
 
 // Verifica que la petición venga realmente de Shopify (firma del App Proxy).
 async function verifyProxy(url, secret) {
+  if (!secret) return false;
   const params = new URLSearchParams(url.search);
   const signature = params.get('signature');
   if (!signature) return false;
@@ -292,6 +293,8 @@ const STATUSES = ['incompleto', 'pago-pendiente', 'pagado', 'preparando', 'listo
 
 function clean(s, max) { return String(s == null ? '' : s).replace(/[\u0000-\u0008\u000b-\u001f]/g, ' ').trim().slice(0, max || 200); }
 
+const STORE_ORIGINS = ['https://tramosanrafael.com', 'https://www.tramosanrafael.com', 'https://7gpmsb-un.myshopify.com'];
+
 async function notifyOwner(env, text) {
   if (!env.OWNER_PHONE || !env.CALLMEBOT_KEY) return false;
   const u = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(env.OWNER_PHONE) +
@@ -299,10 +302,10 @@ async function notifyOwner(env, text) {
   try { const r = await fetch(u); return r.ok; } catch (e) { return false; }
 }
 
-async function handleNewOrder(request, env) {
+async function handleNewOrder(request, env, ctx) {
   if (!env.ORDERS) return json({ error: 'falta configurar ORDERS' }, 500);
   let b;
-  try { b = await request.json(); } catch (e) { return json({ error: 'datos inválidos' }, 400); }
+  try { b = JSON.parse(await request.text()); } catch (e) { return json({ error: 'datos inválidos' }, 400); }
   const raw = Array.isArray(b.items) ? b.items.slice(0, 60) : [];
   const name = clean(b.name, 80), phone = clean(b.phone, 30), code = clean(b.code, 20);
   const mode = MODE_LABEL[b.mode] ? b.mode : 'pickup';
@@ -347,8 +350,9 @@ async function handleNewOrder(request, env) {
   if (code) await env.ORDERS.put('c:' + code, key, { expirationTtl: 60 * 60 * 24 * 30 });
   if (status === 'incompleto') return json({ ok: true, draft: true });
   const head = (prev && prev.notifiedDraft ? '✅ Se completó el pedido ' : '🛒 Pedido nuevo ') + (code || '') + ' · ' + (order.variable.length ? '≈ ' : '') + '₡' + Math.round(order.total).toLocaleString('es-CR') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '') + (order.variable.length ? ' · ⚖️ pesar: ' + order.variable.join(', ') : '');
-  const sent = await notifyOwner(env, head + '\n\n' + order.message);
-  return json({ ok: true, notified: sent });
+  const note = notifyOwner(env, head + '\n\n' + order.message);
+  if (ctx) ctx.waitUntil(note); else await note;
+  return json({ ok: true });
 }
 
 // ---------- Panel ----------
@@ -504,16 +508,31 @@ async function checkDrafts(env) {
 
 export default {
   async scheduled(event, env, ctx) { ctx.waitUntil(checkDrafts(env)); },
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     try {
       if (url.pathname === '/panel' || url.pathname.startsWith('/panel/')) return await handlePanel(request, url, env);
+      // Pedidos enviados directo desde la tienda (sin App Proxy): solo desde los dominios de la tienda
+      if (url.pathname === '/order') {
+        const origin = request.headers.get('origin') || '';
+        const okOrigin = STORE_ORIGINS.includes(origin) || origin === 'https://' + env.SHOPIFY_SHOP + '.myshopify.com';
+        const cors = { 'access-control-allow-origin': okOrigin ? origin : 'null', 'access-control-allow-methods': 'POST, OPTIONS', 'access-control-allow-headers': 'content-type', vary: 'origin' };
+        if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+        if (!okOrigin || request.method !== 'POST') return json({ error: 'no permitido' }, 403);
+        const ip = request.headers.get('cf-connecting-ip') || 'x', kr = 'rl:' + ip;
+        const n = env.ORDERS ? +(await env.ORDERS.get(kr) || 0) : 0;
+        if (n >= 40) return json({ error: 'demasiados pedidos' }, 429);
+        if (env.ORDERS) await env.ORDERS.put(kr, String(n + 1), { expirationTtl: 3600 });
+        const r = await handleNewOrder(request, env, ctx);
+        const h = new Headers(r.headers); Object.keys(cors).forEach((k) => h.set(k, cors[k]));
+        return new Response(r.body, { status: r.status, headers: h });
+      }
       if (!(await verifyProxy(url, env.SHOPIFY_CLIENT_SECRET))) return json({ error: 'firma inválida' }, 401);
       if (url.pathname.endsWith('/orders') && request.method === 'GET') return await handleOrders(url, env);
       if (url.pathname.endsWith('/ai') && request.method === 'POST') return await handleAI(request, url, env);
       if (url.pathname.endsWith('/cashback') && request.method === 'GET') return await handleCashback(url, env);
       if (url.pathname.endsWith('/cashback/redeem') && request.method === 'POST') return await handleRedeem(request, url, env);
-      if (url.pathname.endsWith('/order') && request.method === 'POST') return await handleNewOrder(request, env);
+      if (url.pathname.endsWith('/order') && request.method === 'POST') return await handleNewOrder(request, env, ctx);
       return json({ ok: true, service: 'tramo' });
     } catch (e) {
       return json({ error: 'error interno' }, 500);

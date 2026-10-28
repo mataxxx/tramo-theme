@@ -266,3 +266,4 @@
 .ord-cpin.is-lift span { transform: translateY(-10px) rotate(-45deg); }
 .ord-cpin.is-lift i { transform: scale(.7); opacity: .6; }
 .ord-map.is-google .gm-style-cc, .ord-map.is-google .gmnoprint a { font-size: 9px; }
+[data-order-send].is-loading { opacity: .65; pointer-events: none; cursor: progress; }

@@ -9,7 +9,7 @@ keep_vars = true
 binding = "AI"
 
 [vars]
-SHOPIFY_SHOP = "tramo-san-rafael-1"
+SHOPIFY_SHOP = "7gpmsb-un"
 STORE_INFO = "Tienda en San Rafael, Costa Rica. Envíos a todo el país. Venta por presentaciones y a granel."
 
 # Base de pedidos del panel

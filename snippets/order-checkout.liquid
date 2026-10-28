@@ -17,6 +17,7 @@
   data-delivery="{{ settings.order_delivery_label | default: 'Envío por Uber Flash' | escape }}"
   data-courier="{{ settings.order_courier_label | default: 'Envío por encomienda' | escape }}"
   data-gkey="{{ settings.order_google_key | escape }}"
+  data-backend="{{ settings.order_backend | default: 'https://tramo-backend.jeangaritamata.workers.dev' | escape }}"
   data-lat="{{ settings.order_map_lat | default: '9.9349' }}"
   data-lng="{{ settings.order_map_lng | default: '-84.0789' }}"
   data-currency="{{ cart.currency.iso_code }}">
