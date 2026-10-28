@@ -2917,3 +2917,14 @@ body.is-locked { overscroll-behavior: none; }
   .product-page .pg-benefits { margin-top: 12px; border-radius: var(--radius-card); border-top: 0; }
   .drawer--sheet .quick-view__media .pg-benefits { flex: 0 0 auto; }
 }
+
+/* Ronda 103: en celular el cuadro de la foto toma la forma real de cada foto (sin bordes ni recorte; solo las fotos verticales, como el combo, salen altas) */
+@media (max-width: 749px) {
+  #QuickView .quick-view__media { aspect-ratio: auto !important; height: auto !important; min-height: 0 !important; background: transparent; }
+  #QuickView .quick-view__media .product-gallery,
+  #QuickView .quick-view__media .product-gallery__frame,
+  #QuickView .quick-view__media .product-gallery__strip { height: auto !important; }
+  #QuickView .quick-view__media .product-gallery__slide,
+  .product-page .product-gallery__slide,
+  .product-gallery__slide--blur { aspect-ratio: var(--pg-ar, 1) !important; height: auto !important; max-height: 82vh; max-height: 82dvh; }
+}
