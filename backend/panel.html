@@ -140,12 +140,13 @@ function inFilter(o){if(filter==='todos')return true;if(filter==='activos')retur
 function card(o){
   const isNew=known&&!known.has(o.key), loc=coords(o.location), uber=uberUrl(o);
   const top='<div class="o__top" data-toggle><div class="o__main"><div class="o__name">'+esc(o.name)+' · '+esc(o.code)+'</div><div class="o__sub">'+esc(MODE[o.mode]||o.mode)+' · '+o.items.length+' producto'+(o.items.length>1?'s':'')+'</div>'+
-    '<span class="pill s-'+o.status+'">'+ST[o.status]+'</span>'+(pending(o)?'<span class="pill p-var">⚖️ Pesar</span>':'')+(o.mode!=='pickup'&&!o.shipping&&!['entregado','cancelado'].includes(o.status)?'<span class="pill p-ship">Cotizar envío</span>':'')+(SOLD.includes(o.status)&&!hasInv(o)?'<span class="pill p-nofac">Sin factura</span>':'')+(o.eta?'<div class="when">'+esc(o.eta)+'</div>':'')+'</div>'+
+    '<span class="pill s-'+o.status+'">'+ST[o.status]+'</span>'+(pending(o)?'<span class="pill p-var">⚖️ Pesar</span>':'')+(o.mode!=='pickup'&&!o.shipping&&!['entregado','cancelado'].includes(o.status)?'<span class="pill p-ship">Cotizar envío</span>':'')+(SOLD.includes(o.status)&&!hasInv(o)?'<span class="pill p-nofac">Sin factura</span>':'')+prepPill(o)+(o.eta?'<div class="when">'+esc(o.eta)+'</div>':'')+'</div>'+
     '<div class="o__tot">'+(pending(o)?'≈ ':'')+money(grand(o))+(o.mode!=='pickup'&&!o.shipping?'<div class="o__ago">+ envío</div>':'')+'<div class="o__ago">'+ago(o.created)+'</div></div></div>';
   // Productos y total
-  let b='<div class="sec"><h3>Pedido</h3><ul class="items">'+o.items.map(i=>'<li><span>'+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
+  let b='<div class="sec"><h3>Pedido</h3><ul class="items">'+o.items.map((i,x)=>'<li><span>'+(o.prep&&(o.prep.checks||[])[x]?'<b style="color:#2f7d32">✓</b> ':'')+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+(o.prep&&(o.prep.weights||{})[x]?' <small style="color:#1f3b63">⚖️ pesó '+esc(o.prep.weights[x])+' g</small>':'')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
     '<div class="sum"><span>Productos'+(o.finalTotal?' (pesado)':pending(o)?' (aprox.)':'')+'</span><b>'+money(prod(o))+'</b>'+(o.mode!=='pickup'?'<span>Envío</span><b>'+(o.shipping?money(o.shipping):'—')+'</b>':'')+'<span class="big">Total</span><span class="big">'+money(grand(o))+'</span></div>'+
-    '<p class="hint">Precios con IVA incluido.</p></div>';
+    '<p class="hint">Precios con IVA incluido.</p>'+(((o.prep&&o.prep.issues)||[]).map(x=>'<p class="warn">⚠️ '+esc(x.by||'Alistador')+': '+esc(x.text)+'</p>').join(''))+
+    '<div class="f"><label>Nota para quien alista (la ve en la pantalla de Alistar)</label><input data-field="prepNote" value="'+esc(o.prepNote||'')+'" placeholder="Ej. empacar el queso aparte"></div></div>';
   // Cliente
   b+='<div class="sec"><h3>Cliente</h3><dl class="kv"><dt>Teléfono</dt><dd><a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a> · <a href="'+wa(o,'')+'" target="_blank">WhatsApp</a></dd>'+(o.payer?'<dt>SINPE a nombre de</dt><dd>'+esc(o.payer)+'</dd>':'')+
     (o.fe?'<dt>Pidió factura</dt><dd>'+esc(o.fe)+'</dd>':'<dt>Factura</dt><dd>No pidió factura electrónica</dd>')+
@@ -179,6 +180,9 @@ function card(o){
     (o.mode==='courier'?'<p class="hint">Después de enviar el mensaje, mándale la foto de la guía en ese mismo chat.</p>':'')+
     '<div class="f"><label>Nota interna (solo la ves vos)</label><textarea data-field="note">'+esc(o.note||'')+'</textarea></div></div>';
   return '<article class="o'+(open[o.key]?' open':'')+(isNew?' new':'')+'" data-k="'+esc(o.key)+'">'+top+'<div class="o__body">'+b+'</div></article>'}
+function prepPill(o){const p=o.prep;if(!p)return '';const n=o.items.length,k=o.items.filter((_,i)=>(p.checks||[])[i]).length;
+  if(p.doneAt)return '<span class="pill s-listo">📦 Alistado'+(p.doneBy?' · '+esc(p.doneBy):'')+'</span>'+((p.issues||[]).length?'<span class="pill p-nofac">⚠️ Problema</span>':'');
+  return (k?'<span class="pill s-preparando">Alistando '+k+'/'+n+(p.by?' · '+esc(p.by):'')+'</span>':'')+((p.issues||[]).length?'<span class="pill p-nofac">⚠️ Problema</span>':'')}
 function render(){
   if(view==='ventas'){renderSales();return}
   tabs();const L=orders.filter(o=>inFilter(o)&&match(o));const el=$('#list');

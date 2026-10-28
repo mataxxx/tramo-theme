@@ -1,3 +1,4 @@
+import PREP_HTML from './prep.html';
 import PANEL_HTML from './panel.html';
 // Servidor de Tramo (Cloudflare Worker).
 // Atiende dos rutas que Shopify reenvía desde la tienda (App Proxy):
@@ -403,16 +404,79 @@ async function handleNewOrder(request, env, ctx) {
 }
 
 // ---------- Panel ----------
-async function sign(env, val) {
-  const key = await crypto.subtle.importKey('raw', enc.encode(env.PANEL_PIN + '|tramo'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+// Dos niveles de acceso: administrador (PANEL_PIN) y alistador (PREP_PIN, solo prepara pedidos pagados)
+async function sign(env, val, role) {
+  const secret = role === 'prep' ? env.PREP_PIN + '|prep' : env.PANEL_PIN + '|tramo';
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   return hex(await crypto.subtle.sign('HMAC', key, enc.encode(val)));
 }
 async function panelAuthed(request, env) {
-  if (!env.PANEL_PIN) return false;
-  const m = (request.headers.get('cookie') || '').match(/tp=([a-f0-9]+)\.(\d+)/);
-  if (!m) return false;
-  if (Date.now() - parseInt(m[2], 10) > 1000 * 60 * 60 * 24 * 60) return false;
-  return (await sign(env, m[2])) === m[1];
+  const m = (request.headers.get('cookie') || '').match(/tp=([a-f0-9]+)\.(\d+)(?:\.(prep))?/);
+  if (!m) return null;
+  if (Date.now() - parseInt(m[2], 10) > 1000 * 60 * 60 * 24 * 60) return null;
+  const role = m[3] === 'prep' ? 'prep' : 'admin';
+  if (role === 'prep' && !env.PREP_PIN) return null;
+  if (role === 'admin' && !env.PANEL_PIN) return null;
+  return (await sign(env, role === 'prep' ? m[2] + '.prep' : m[2], role)) === m[1] ? role : null;
+}
+const SOLD_ST = ['pagado', 'preparando', 'listo', 'entregado'];
+function setStatusOn(o, st, now) {
+  if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (SOLD_ST.includes(st) && !o.paidAt) o.paidAt = now; }
+}
+// API del alistador: solo ve pedidos pagados / preparando (y los listos de las últimas 24 h), sin teléfonos ni montos
+function prepView(o) {
+  return { key: o.key, code: o.code, name: String(o.name || '').trim().split(/\s+/)[0] || '', mode: o.mode, eta: o.eta || '', status: o.status,
+    created: o.created, paidAt: o.paidAt || 0, variable: o.variable || [], prepNote: o.prepNote || '',
+    items: (o.items || []).map((i) => ({ title: i.title, variant: i.variant, qty: i.qty })), prep: o.prep || {} };
+}
+async function handlePrep(request, url, env, p) {
+  if (p === '/panel/api/prep' && request.method === 'GET') {
+    const keys = []; let cursor;
+    do { const l = await env.ORDERS.list({ prefix: 'o:', cursor, limit: 1000 }); keys.push(...l.keys); cursor = l.list_complete ? null : l.cursor; } while (cursor && keys.length < 5000);
+    const day = Date.now() - 864e5;
+    const want = keys.filter((k) => !k.metadata || ['pagado', 'preparando'].includes(k.metadata.s) || (k.metadata.s === 'listo' && (k.metadata.pd || k.metadata.t) > day - 6 * 864e5));
+    const full = (await Promise.all(want.slice(0, 120).map((k) => env.ORDERS.get(k.name, 'json')))).filter(Boolean);
+    const out = full.filter((o) => ['pagado', 'preparando'].includes(o.status) || (o.status === 'listo' && o.prep && o.prep.doneAt > day)).map(prepView);
+    return json({ ver: (await env.ORDERS.get('ver')) || '0', orders: out });
+  }
+  if (request.method !== 'POST' || !p.startsWith('/panel/api/prep/')) return json({ error: 'sin permiso' }, 403);
+  const b = await request.json().catch(() => ({}));
+  if (!String(b.key || '').startsWith('o:')) return json({ error: 'datos' }, 400);
+  const o = await env.ORDERS.get(b.key, 'json');
+  if (!o) return json({ error: 'no existe' }, 404);
+  const now = Date.now(), by = clean(b.by || '', 40);
+  if (!['pagado', 'preparando'].includes(o.status) && !p.endsWith('/issue')) return json({ error: 'Este pedido ya no está para alistar.' }, 409);
+  o.prep = o.prep || { checks: [], weights: {}, issues: [] };
+  o.prep.checks = o.prep.checks || []; o.prep.weights = o.prep.weights || {}; o.prep.issues = o.prep.issues || [];
+  if (by) o.prep.by = by;
+  const i = parseInt(b.i, 10);
+  if (p === '/panel/api/prep/check') {
+    if (!(i >= 0 && i < (o.items || []).length)) return json({ error: 'datos' }, 400);
+    o.prep.checks[i] = !!b.on;
+    if (!o.prep.start) o.prep.start = now;
+    if (o.status === 'pagado') setStatusOn(o, 'preparando', now);
+  } else if (p === '/panel/api/prep/weight') {
+    if (!(i >= 0 && i < (o.items || []).length)) return json({ error: 'datos' }, 400);
+    o.prep.weights[i] = clean(b.w, 20);
+  } else if (p === '/panel/api/prep/done') {
+    const n = (o.items || []).length;
+    for (let j = 0; j < n; j++) if (!o.prep.checks[j]) return json({ error: 'Faltan productos por revisar.' }, 400);
+    o.prep.doneAt = now; o.prep.doneBy = by || o.prep.by || '';
+    setStatusOn(o, 'listo', now);
+    const w = Object.keys(o.prep.weights).filter((j) => o.prep.weights[j]).map((j) => '⚖️ ' + o.items[j].title + ': ' + o.prep.weights[j] + ' g');
+    await putOrder(env, b.key, o);
+    await notifyOwner(env, '📦 Pedido ' + o.code + ' (' + o.name + ') ALISTADO por ' + (o.prep.doneBy || 'colaborador') + '. Revísalo en el panel y avísale al cliente.' + (w.length ? '\n' + w.join('\n') : ''));
+    return json({ ok: true, order: prepView(o) });
+  } else if (p === '/panel/api/prep/issue') {
+    const text = clean(b.text, 300);
+    if (text.length < 3) return json({ error: 'Escribe qué pasó.' }, 400);
+    o.prep.issues.push({ t: now, by, text, item: i >= 0 ? (o.items[i] || {}).title : '' });
+    await putOrder(env, b.key, o);
+    await notifyOwner(env, '⚠️ Problema alistando ' + o.code + ' (' + o.name + ')' + (by ? ' — ' + by : '') + ':\n' + text);
+    return json({ ok: true, order: prepView(o) });
+  } else return json({ error: 'no encontrado' }, 404);
+  await putOrder(env, b.key, o);
+  return json({ ok: true, order: prepView(o) });
 }
 const html = (body, status = 200, headers = {}) => new Response(body, { status, headers: Object.assign({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }, headers) });
 
@@ -425,16 +489,27 @@ async function handlePanel(request, url, env) {
     const nIp = +(await env.ORDERS.get(kIp) || 0), nAll = +(await env.ORDERS.get(kAll) || 0);
     if (nIp >= 5 || nAll >= 20) return html(loginPage('Demasiados intentos. Probá de nuevo más tarde.'), 429);
     const form = await request.formData();
-    if (!env.PANEL_PIN || String(form.get('pin') || '') !== String(env.PANEL_PIN)) {
+    const pin = String(form.get('pin') || '');
+    const role = env.PANEL_PIN && pin === String(env.PANEL_PIN) ? 'admin' : (env.PREP_PIN && pin === String(env.PREP_PIN) ? 'prep' : null);
+    if (!role) {
       await env.ORDERS.put(kIp, String(nIp + 1), { expirationTtl: 900 });
       await env.ORDERS.put(kAll, String(nAll + 1), { expirationTtl: 3600 });
       return html(loginPage('PIN incorrecto'), 401);
     }
     await env.ORDERS.delete(kIp);
     const t = String(Date.now());
-    return new Response(null, { status: 303, headers: { location: '/panel', 'set-cookie': `tp=${await sign(env, t)}.${t}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}` } });
+    const val = role === 'prep' ? t + '.prep' : t;
+    return new Response(null, { status: 303, headers: { location: '/panel', 'set-cookie': `tp=${await sign(env, val, role)}.${val}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}` } });
   }
-  if (!(await panelAuthed(request, env))) return p.startsWith('/panel/api') ? json({ error: 'login' }, 401) : html(loginPage(''));
+  if (p === '/panel/salir') return new Response(null, { status: 303, headers: { location: '/panel', 'set-cookie': 'tp=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } });
+  const role = await panelAuthed(request, env);
+  if (!role) return p.startsWith('/panel/api') ? json({ error: 'login' }, 401) : html(loginPage(''));
+  if (role === 'prep') {
+    if (p === '/panel') return html(PREP_HTML);
+    if (p === '/panel/api/ver') return json({ ver: (await env.ORDERS.get('ver')) || '0' });
+    if (p.startsWith('/panel/api/prep')) return await handlePrep(request, url, env, p);
+    return p.startsWith('/panel/api') ? json({ error: 'sin permiso' }, 403) : new Response(null, { status: 303, headers: { location: '/panel' } });
+  }
   if (p === '/panel/probar-aviso') {
     const ok = await notifyOwner(env, '🔔 Prueba de aviso: así te van a llegar los pedidos nuevos de la tienda.');
     const n = env.TELEGRAM_TOKEN ? (await telegramChats(env)).length : 0;
@@ -468,7 +543,7 @@ async function handlePanel(request, url, env) {
     const o = await env.ORDERS.get(b.key, 'json');
     if (!o) return json({ error: 'no existe' }, 404);
     const now = Date.now();
-    const setStatus = (st) => { if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (['pagado', 'preparando', 'listo', 'entregado'].includes(st) && !o.paidAt) o.paidAt = now; } };
+    const setStatus = (st) => setStatusOn(o, st, now);
     if (P.status != null) { if (!STATUSES.includes(P.status)) return json({ error: 'estado' }, 400); setStatus(P.status); }
     if (P.status === 'cancelado') { o.cancelReason = clean(P.cancelReason || '', 300); if (o.history && o.history.length) o.history[o.history.length - 1].note = o.cancelReason; }
     if (P.mode != null && MODE_LABEL[P.mode] && P.mode !== o.mode) { o.history = (o.history || []).concat({ s: 'cambio-entrega', t: now, from: o.mode, to: P.mode, note: clean(P.changeNote || '', 200) }); o.mode = P.mode; }
@@ -476,6 +551,7 @@ async function handlePanel(request, url, env) {
     if (P.address != null) o.address = clean(P.address, 300);
     if (P.area != null) o.area = clean(P.area, 120);
     if (P.note != null) o.note = clean(P.note, 1000);
+    if (P.prepNote != null) o.prepNote = clean(P.prepNote, 300);
     const num = (v) => { const n = Math.round(+String(v).replace(/[^\d.]/g, '')); return isFinite(n) && n >= 0 ? n : null; };
     if (P.finalTotal != null) { const n = num(P.finalTotal); o.finalTotal = n || undefined; }
     if (P.shipping != null) { const n = num(P.shipping); o.shipping = n || 0; }
