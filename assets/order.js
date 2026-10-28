@@ -225,30 +225,27 @@
   /* ---------- mapa: Google (limpio, estilo Uber, pin fijo al centro) o OpenStreetMap si no hay llave ---------- */
   var leafletP = null, googleP = null, kind = null, userMoved = false, cpin = null;
   var GSTYLE = [
-    /* Sin negocios, buses ni íconos */
+    /* Estilo Uber: fondo gris, calles blancas, casas más claras que el fondo, sin íconos */
     { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
     { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
     { featureType: 'poi.attraction', stylers: [{ visibility: 'off' }] },
-    { featureType: 'poi.place_of_worship', elementType: 'labels', stylers: [{ visibility: 'off' }] },
     { featureType: 'transit', stylers: [{ visibility: 'off' }] },
     { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-    /* Fondo claro y casas como cajitas (como Uber) */
-    { featureType: 'landscape.natural', elementType: 'geometry', stylers: [{ color: '#f1efe9' }] },
-    { featureType: 'landscape.man_made', elementType: 'geometry.fill', stylers: [{ color: '#e7e3da' }] },
-    { featureType: 'landscape.man_made', elementType: 'geometry.stroke', stylers: [{ color: '#d3cdbf' }, { weight: 0.6 }] },
-    /* Parques y zonas verdes */
-    { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#cfe6c3' }, { visibility: 'on' }] },
-    { featureType: 'poi.sports_complex', elementType: 'geometry', stylers: [{ color: '#d6ebcb' }] },
-    { featureType: 'landscape.natural.landcover', elementType: 'geometry', stylers: [{ color: '#dcecd2' }] },
-    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c4dcef' }] },
-    /* Calles blancas con nombres nítidos */
+    { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
+    { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#e6e7ea' }] },
+    { featureType: 'landscape.man_made', elementType: 'geometry.fill', stylers: [{ color: '#f4f5f7' }] },
+    { featureType: 'landscape.man_made', elementType: 'geometry.stroke', stylers: [{ color: '#d9dbe0' }, { weight: 0.8 }] },
+    { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#e6e7ea' }] },
+    { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#cde8c9' }] },
+    { featureType: 'poi.sports_complex', elementType: 'geometry', stylers: [{ color: '#d3ebcf' }] },
+    { featureType: 'landscape.natural.landcover', elementType: 'geometry', stylers: [{ color: '#d9ebd4' }] },
+    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c3dcf2' }] },
     { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#ffffff' }] },
-    { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#e2ddd2' }] },
-    { featureType: 'road.highway', elementType: 'geometry.fill', stylers: [{ color: '#fbe7b5' }] },
-    { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#efd38f' }] },
-    { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#505a50' }] },
-    { featureType: 'road', elementType: 'labels.text.stroke', stylers: [{ color: '#ffffff' }, { weight: 3 }] },
-    { featureType: 'administrative', elementType: 'labels.text.fill', stylers: [{ color: '#6b6b6b' }] }
+    { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ visibility: 'off' }] },
+    { featureType: 'road.highway', elementType: 'geometry.fill', stylers: [{ color: '#ffffff' }] },
+    { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#545b66' }] },
+    { featureType: 'road', elementType: 'labels.text.stroke', stylers: [{ color: '#ffffff' }, { weight: 2.5 }] },
+    { featureType: 'administrative', elementType: 'labels.text.fill', stylers: [{ color: '#7a808a' }] }
   ];
   function loadGoogle() {
     if (window.google && google.maps && google.maps.Map) return Promise.resolve();
@@ -288,7 +285,7 @@
   function initGoogle(el) {
     el.classList.remove('is-loading'); el.classList.add('is-google'); kind = 'g';
     var c = loc || center0();
-    map = new google.maps.Map(el, { center: c, zoom: loc ? 17 : 13, styles: GSTYLE, disableDefaultUI: true, zoomControl: true, clickableIcons: false, gestureHandling: 'greedy', keyboardShortcuts: false });
+    map = new google.maps.Map(el, { center: c, zoom: loc ? 18 : 14, styles: GSTYLE, disableDefaultUI: true, zoomControl: true, clickableIcons: false, gestureHandling: 'greedy', keyboardShortcuts: false });
     cpin = document.createElement('div'); cpin.className = 'ord-cpin'; cpin.innerHTML = '<span></span><i></i>'; el.appendChild(cpin);
     map.addListener('dragstart', function () { userMoved = true; cpin.classList.add('is-lift'); });
     map.addListener('click', function (e) { userMoved = true; map.panTo(e.latLng); });
