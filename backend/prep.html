@@ -1,0 +1,99 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Alistar · Tramo</title><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Alistar"><meta name="theme-color" content="#263d25">
+<style>
+:root{--g:#263d25;--g2:#6e9e58;--bg:#f6f1e6;--line:#e4dccb;--mut:#6b7468;--txt:#1d2a1c;--red:#b3261e;--ok:#2f7d32}
+[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--txt)}
+button,input,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;background:var(--g);color:#fff;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-size:19px;flex:1}header small{display:block;font-size:12px;opacity:.75;font-weight:400}
+.who{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border-radius:999px;padding:5px 6px 5px 12px;font-size:14px}
+.who input{border:0;border-radius:999px;padding:6px 10px;width:130px;font-size:15px;color:var(--txt)}
+.out{color:#fff;opacity:.8;font-size:13px;text-decoration:none}
+main{max-width:1100px;margin:0 auto;padding:14px 14px 60px;display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));align-items:start}
+.empty{grid-column:1/-1;text-align:center;color:var(--mut);padding:60px 10px;font-size:17px}
+.o{background:#fff;border:2px solid var(--line);border-radius:18px;overflow:hidden}
+.o.go{border-color:var(--g2)}.o.done{opacity:.6}
+.o__h{padding:14px 16px 10px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.o__code{font-size:24px;font-weight:800;letter-spacing:.02em}.o__name{font-size:15px;color:var(--mut);margin-top:2px}
+.mode{display:inline-block;padding:5px 10px;border-radius:999px;font-weight:800;font-size:13px;white-space:nowrap}
+.m-pickup{background:#e3eefc;color:#1d4f91}.m-delivery{background:#111;color:#fff}.m-courier{background:#fff1d6;color:#7a5600}
+.eta{font-size:13px;color:var(--g);font-weight:700;margin-top:6px;text-align:right}
+.bar{height:6px;background:#eee8da;margin:0 16px;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g2);transition:width .2s}
+.cnt{font-size:13px;color:var(--mut);padding:6px 16px 0;font-weight:600}
+.note{margin:10px 16px 0;padding:10px 12px;background:#fff8e6;border-radius:10px;font-size:14px}
+ul{list-style:none;margin:8px 0 0;padding:0}
+.it{display:flex;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.it:hover{background:#faf7f0}
+.box{flex:0 0 34px;height:34px;border-radius:10px;border:2.5px solid #c9c0ad;display:grid;place-items:center;font-size:20px;color:#fff;transition:.12s}
+.it.on .box{background:var(--ok);border-color:var(--ok)}
+.it__t{flex:1;min-width:0}.it__n{font-size:17px;font-weight:700;line-height:1.25}.it__v{font-size:14px;color:var(--mut);margin-top:2px}
+.it.on .it__n{text-decoration:line-through;text-decoration-color:rgba(0,0,0,.35);color:#5d6a5a}
+.qty{flex:0 0 auto;font-size:20px;font-weight:800;background:#f1ece0;border-radius:10px;padding:6px 10px;min-width:48px;text-align:center}
+.w{display:flex;align-items:center;gap:8px;margin-top:8px}.w input{width:110px;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:16px}.w span{font-size:13px;color:#1f3b63;font-weight:600}
+.acts{display:grid;grid-template-columns:1fr auto;gap:8px;padding:14px 16px 16px;border-top:1px solid var(--line)}
+.b{border:0;border-radius:14px;padding:15px 14px;font-weight:800;font-size:16px;cursor:pointer;background:#eef5ea;color:var(--g)}
+.b.main{background:var(--g);color:#fff}.b.main:disabled{background:#d8d2c4;color:#8a8576;cursor:not-allowed}.b.warn{background:#fde8e6;color:var(--red);font-size:14px}
+.iss{margin:0 16px 10px;font-size:13px;color:var(--red);font-weight:600}
+h2.sep{grid-column:1/-1;margin:10px 0 0;font-size:15px;color:var(--mut)}
+.ask{position:fixed;inset:0;z-index:20;background:rgba(20,28,19,.5);display:flex;align-items:center;justify-content:center;padding:16px}
+.ask__box{background:#fff;border-radius:20px;padding:20px;width:min(440px,100%)}
+.ask h3{margin:0 0 6px;font-size:20px}.ask p{margin:0;color:var(--mut)}
+.ask textarea,.ask input{width:100%;margin-top:12px;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:17px}
+.ask textarea{min-height:90px}.ask__btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;opacity:0;transition:.2s;pointer-events:none;z-index:30}.toast.on{opacity:1}
+</style></head><body>
+<header><h1>Alistar pedidos<small id="upd">Marca cada producto cuando lo metas al paquete</small></h1>
+  <label class="who">Alistando: <input id="who" placeholder="Tu nombre" autocomplete="name"></label><a class="out" href="/panel/salir">Salir</a></header>
+<main id="list"><div class="empty">Cargando…</div></main>
+<div class="toast" id="toast"></div>
+<script>
+const MODE={pickup:'🏪 Retiro',delivery:'🛵 Uber Flash',courier:'📦 Encomienda'};
+let orders=[],ver=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isBulk=i=>/granel/i.test(i.variant||'');
+const isVar=(o,i)=>(o.variable||[]).some(v=>String(i.title).toLowerCase().includes(String(v).toLowerCase())||String(v).toLowerCase().includes(String(i.title).toLowerCase()));
+function who(){try{return localStorage.getItem('tramo-who')||''}catch(e){return''}}
+$('#who').value=who();$('#who').addEventListener('input',e=>{try{localStorage.setItem('tramo-who',e.target.value.trim())}catch(x){}});
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1600)}
+function ask(o){return new Promise(res=>{const d=document.createElement('div');d.className='ask';
+  d.innerHTML='<div class="ask__box"><h3>'+o.title+'</h3><p>'+(o.text||'')+'</p>'+(o.input?'<'+(o.area?'textarea':'input')+' placeholder="'+esc(o.input)+'"'+(o.area?'></textarea>':'>'):'')+'<div class="ask__btns"><button class="b" data-a="no">Volver</button><button class="b main" data-a="ok">'+(o.ok||'Listo')+'</button></div></div>';
+  document.body.appendChild(d);const f=d.querySelector('textarea,input');if(f)setTimeout(()=>f.focus(),50);
+  d.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(e.target===d||(b&&b.dataset.a==='no')){d.remove();res(null);return}
+    if(b){const v=f?f.value.trim():'';if(o.required&&v.length<2){f.style.borderColor='#b3261e';f.focus();return}d.remove();res(v)}})})}
+function card(o){
+  const p=o.prep||{},ch=p.checks||[],n=o.items.length,k=o.items.filter((_,i)=>ch[i]).length,done=o.status==='listo';
+  const age=Math.round((Date.now()-(o.paidAt||o.created))/60000);
+  return '<article class="o'+(k&&!done?' go':'')+(done?' done':'')+'" data-k="'+esc(o.key)+'">'+
+   '<div class="o__h"><div><div class="o__code">'+esc(o.code)+'</div><div class="o__name">'+esc(o.name)+(done?' · ✅ alistado por '+esc(p.doneBy||'—'):(age<60?' · pagado hace '+age+' min':''))+'</div></div>'+
+   '<div><span class="mode m-'+o.mode+'">'+(MODE[o.mode]||o.mode)+'</span>'+(o.eta?'<div class="eta">'+esc(o.eta)+'</div>':'')+'</div></div>'+
+   '<div class="bar"><i style="width:'+(n?k/n*100:0)+'%"></i></div><div class="cnt">'+k+' de '+n+' productos'+(p.by&&!done?' · '+esc(p.by):'')+'</div>'+
+   (o.prepNote?'<div class="note">📝 '+esc(o.prepNote)+'</div>':'')+
+   '<ul>'+o.items.map((i,x)=>'<li class="it'+(ch[x]?' on':'')+'" data-i="'+x+'"><span class="box">'+(ch[x]?'✓':'')+'</span><div class="it__t"><div class="it__n">'+esc(i.title)+'</div>'+(i.variant?'<div class="it__v">'+esc(i.variant)+'</div>':'')+
+     (isVar(o,i)?'<div class="w" data-stop><input data-w="'+x+'" inputmode="numeric" placeholder="gramos" value="'+esc((p.weights||{})[x]||'')+'"><span>⚖️ Pesa y anota los gramos</span></div>':'')+'</div>'+
+     '<span class="qty">'+(isBulk(i)?'⚖️':'× '+i.qty)+'</span></li>').join('')+'</ul>'+
+   ((p.issues||[]).length?'<div class="iss">⚠️ '+p.issues.map(x=>esc(x.text)).join(' · ')+'</div>':'')+
+   (done?'':'<div class="acts"><button class="b main" data-done'+(k<n?' disabled':'')+'>'+(k<n?'Faltan '+(n-k)+' por marcar':'✅ Pedido alistado')+'</button><button class="b warn" data-issue>Falta algo</button></div>')+'</article>'}
+function render(){const a=document.activeElement;if(a&&a.dataset&&a.dataset.w!=null)return;
+  const todo=orders.filter(o=>o.status!=='listo').sort((x,y)=>(x.paidAt||x.created)-(y.paidAt||y.created)),done=orders.filter(o=>o.status==='listo');
+  $('#list').innerHTML=(todo.length?todo.map(card).join(''):'<div class="empty">🎉 No hay pedidos por alistar.<br><small>Aquí aparecen los pedidos pagados.</small></div>')+(done.length?'<h2 class="sep">Alistados en las últimas 24 h</h2>'+done.map(card).join(''):'')}
+async function load(force){try{
+  if(!force&&ver){const r=await fetch('/panel/api/ver',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();if(d.ver===ver)return}
+  const r=await fetch('/panel/api/prep',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();
+  const had=new Set(orders.map(o=>o.key));if(ver&&(d.orders||[]).some(o=>!had.has(o.key)&&o.status!=='listo')){toast('🔔 Nuevo pedido para alistar');try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}}
+  orders=d.orders||[];ver=d.ver;render();$('#upd').textContent='Actualizado '+new Date().toLocaleTimeString('es-CR',{hour:'numeric',minute:'2-digit'})}catch(e){}}
+async function post(path,body){const r=await fetch('/panel/api/prep/'+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.assign({by:who()},body))});
+  const d=await r.json().catch(()=>({}));if(!r.ok){toast(d.error||'No se pudo guardar');if(r.status===409)load(true);return null}orders=orders.map(o=>o.key===d.order.key?d.order:o);render();return d.order}
+async function needName(){if(who())return true;const v=await ask({title:'¿Quién está alistando?',text:'Escribe tu nombre para que quede registrado.',input:'Tu nombre',required:true,ok:'Guardar'});if(!v)return false;try{localStorage.setItem('tramo-who',v)}catch(e){}$('#who').value=v;return true}
+document.addEventListener('click',async e=>{const c=e.target.closest('.o');if(!c)return;const k=c.dataset.k,o=orders.find(x=>x.key===k);if(!o||o.status==='listo')return;
+  if(e.target.closest('[data-stop]'))return;
+  const it=e.target.closest('.it');if(it){if(!(await needName()))return;const i=+it.dataset.i,on=!((o.prep||{}).checks||[])[i];
+    if(on&&isVar(o,o.items[i])&&!((o.prep||{}).weights||{})[i]){toast('Primero anota los gramos ⚖️');const f=it.querySelector('[data-w]');if(f)f.focus();return}
+    it.classList.toggle('on',on);await post('check',{key:k,i,on});return}
+  if(e.target.closest('[data-done]')){const v=await ask({title:'¿Pedido '+esc(o.code)+' completo?',text:'Confirma que todos los productos están en el paquete y bien cerrado. El administrador revisa y le avisa al cliente.',ok:'Sí, está listo'});if(v===null)return;
+    if(await post('done',{key:k}))toast('✅ '+o.code+' alistado');return}
+  if(e.target.closest('[data-issue]')){const v=await ask({title:'¿Qué falta o qué pasó?',text:'Le llega un aviso al administrador.',input:'Ej. no hay suficiente nuez, solo 200 g',area:true,required:true,ok:'Avisar'});if(!v)return;
+    if(await post('issue',{key:k,text:v}))toast('Aviso enviado');return}});
+document.addEventListener('change',async e=>{const f=e.target.closest('[data-w]');if(!f)return;const c=f.closest('.o');await post('weight',{key:c.dataset.k,i:+f.dataset.w,w:f.value.replace(/[^\d.]/g,'')});toast('Peso guardado')});
+load(true);setInterval(()=>load(false),15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load(false)});
+</script></body></html>
