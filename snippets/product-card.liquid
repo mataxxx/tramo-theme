@@ -57,7 +57,7 @@
   endif
 -%}
 <article class="product-card{% unless product.available %} product-card--sold-out{% endunless %}" data-product-card>
-  <a href="{{ product.url }}" class="product-card__media" data-quick-view="{{ product.url }}" aria-label="{{ product.title | escape }}">
+  <a href="{{ product.url }}" class="product-card__media" data-quick-view="{{ product.url }}" aria-label="{{ product.title | escape }}"{% if product.metafields.custom.img_scale.value %} style="--img-scale: {{ product.metafields.custom.img_scale.value }}"{% endif %}>
     {%- if product.featured_media -%}
       {{
         product.featured_media

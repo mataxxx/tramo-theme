@@ -2928,5 +2928,14 @@ body.is-locked { overscroll-behavior: none; }
   .product-gallery__slide img { -webkit-user-drag: none; user-select: none; }
 }
 
-/* Ícono del queque en categorías: 30 % más pequeño */
-.cats-tile__icoimg[src*="cat-queque"] { transform: scale(.7); transform-origin: center; }
+/* Escala de la foto por producto (metacampo custom.img_scale, ej. 0.7 = 30 % más pequeña) */
+.product-gallery__slide--blur img, .product-card__media img { transform: scale(var(--img-scale, 1)); }
+
+/* Categorías sin íconos: solo el nombre, como botones */
+.cats-section .cats-tile__media, .cats-panel .cats-tile__media { display: none !important; }
+.cats-section .product-rail { flex-wrap: wrap !important; justify-content: center !important; gap: 8px !important; overflow: visible !important; padding: 2px 16px 6px; }
+.cats-section .product-rail > .product-rail__item { flex: 0 0 auto !important; max-width: none !important; width: auto !important; }
+.cats-section .cats-tile, .cats-panel .cats-tile { display: inline-flex; align-items: center; justify-content: center; width: auto; padding: 10px 16px; border-radius: 999px; background: var(--color-primary, #263d25); color: #fff; box-shadow: 0 3px 10px rgba(38,61,37,.18); cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.cats-section .cats-tile:hover, .cats-panel .cats-tile:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(38,61,37,.24); }
+.cats-section .cats-tile__title, .cats-panel .cats-tile__title { font-size: 14px !important; font-weight: 700; color: #fff; white-space: nowrap; }
+@media (min-width: 750px) { .cats-section .cats-tile { padding: 12px 22px; } .cats-section .cats-tile__title { font-size: 15.5px !important; } }
