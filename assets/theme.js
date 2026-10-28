@@ -2124,10 +2124,16 @@
     var body = box.querySelector('[data-desc-body]');
     var btn = box.querySelector('[data-desc-toggle]');
     if (!body || !btn) return;
-    box.classList.add('is-clamped');
+    /* Solo recortar si lo escondido vale la pena: al menos 2 líneas más y unas 20 palabras.
+       Si es poquito texto extra, se muestra completo y sin botón. */
     requestAnimationFrame(function () {
-      if (body.scrollHeight - body.clientHeight > 4) { btn.hidden = false; }
-      else { box.classList.remove('is-clamped'); }
+      var full = body.scrollHeight;
+      box.classList.add('is-clamped');
+      var shown = body.clientHeight;
+      var lh = parseFloat(getComputedStyle(body).lineHeight) || 22;
+      var words = (body.textContent || '').trim().split(/\s+/).length;
+      if (full - shown >= lh * 2 && words > 28) { btn.hidden = false; }
+      else { box.classList.remove('is-clamped'); btn.hidden = true; }
     });
     btn.addEventListener('click', function () {
       var open = box.classList.toggle('is-open');
