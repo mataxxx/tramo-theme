@@ -156,7 +156,9 @@
         "f1",
         "f2"
       ],
-      "settings": {}
+      "settings": {
+        "show_whatsapp": false
+      }
     },
     "help-panel": {
       "type": "help-panel",
@@ -177,7 +179,7 @@
             "title": "Cómo comprar",
             "summary": "Así de fácil",
             "content": "<ol><li>Explora la tienda.</li><li>Agrega al carrito.</li><li>Elige envío por Uber Flash, retiro en tienda (Mercado Central de San José) o encomienda.</li><li>Completa tus datos.</li><li>Realiza el pago.</li></ol><p><strong>¡Listo!</strong> Te contactamos por WhatsApp para los próximos pasos.</p>",
-            "show_whatsapp": true
+            "show_whatsapp": false
           }
         },
         "h5": {
@@ -196,7 +198,7 @@
             "title": "Términos y condiciones",
             "summary": "Pedidos, pagos y envíos",
             "content": "<p><strong>Horario.</strong> Atendemos de lunes a sábado, de 7:30 a. m. a 5:30 p. m. Los pedidos hechos entre las 7:30 a. m. y las 4:30 p. m. se envían o se pueden recoger el mismo día; los que entren después de las 4:30 p. m. quedan para el siguiente día de atención. Las encomiendas llegan en hasta 48 horas.</p><p><strong>Pedidos.</strong> Tu pedido queda confirmado cuando te respondemos por WhatsApp. Los precios están en colones y pueden cambiar sin previo aviso; la disponibilidad está sujeta a inventario.</p><p><strong>Pagos.</strong> Todos los pedidos, tanto de retiro como de envío, se pagan por SINPE Móvil por adelantado. En los envíos, el pago incluye el costo del Uber Flash o de la encomienda.</p><p><strong>Envíos por Uber Flash.</strong> El costo del envío lo paga el cliente y se cotiza según la ubicación. Es responsabilidad del cliente estar disponible para recibir el pedido en la ubicación indicada. <strong>Solo hay un intento de entrega.</strong> Si el pedido no se puede entregar y el cliente desea que se envíe de nuevo, deberá pagar todo nuevamente.</p><p><strong>Envíos por encomienda.</strong> Enviamos a todo el país. El costo lo paga el cliente y se cotiza según el destino. Los tiempos de entrega dependen de la empresa de encomiendas; es responsabilidad del cliente dar una dirección completa y correcta.</p><p><strong>Productos a granel.</strong> El peso final puede variar levemente según la cantidad solicitada.</p><p><strong>Cambios y devoluciones.</strong> Por tratarse de alimentos, solo aceptamos cambios por producto dañado o error en el pedido, reportado dentro de las 48 horas posteriores a la entrega o retiro.</p><p><strong>Factura electrónica.</strong> Si la solicitas, se emite con los datos que nos indiques en el pedido.</p>",
-            "show_whatsapp": true
+            "show_whatsapp": false
           }
         }
       },
@@ -209,7 +211,7 @@
       "settings": {
         "title": "¿En qué te ayudamos?",
         "subtitle": "Aquí estamos para que compres con tranquilidad.",
-        "show_whatsapp": true
+        "show_whatsapp": false
       }
     },
     "likes-panel": {
