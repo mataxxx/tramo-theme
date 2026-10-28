@@ -1,3 +1,4 @@
+import PANEL_HTML from './panel.html';
 // Servidor de Tramo (Cloudflare Worker).
 // Atiende dos rutas que Shopify reenvía desde la tienda (App Proxy):
 //   GET  /apps/tramo/orders  -> pedidos del cliente que inició sesión (con etiquetas de estado)
@@ -290,6 +291,18 @@ async function handleAI(request, url, env) {
 
 const MODE_LABEL = { pickup: 'Retiro en el Mercado Central', delivery: 'Uber Flash', courier: 'Encomienda' };
 const STATUSES = ['incompleto', 'pago-pendiente', 'pagado', 'preparando', 'listo', 'entregado', 'cancelado'];
+const INV_TYPES = ['FE', 'TE', 'TN'];
+// Resumen corto guardado junto a cada pedido (KV metadata): sirve para el tablero de ventas sin leer cada pedido
+function orderMeta(o) {
+  const inv = (o.invoices || []).filter((i) => !i.voided);
+  return { s: o.status, t: o.created, p: Math.round(o.finalTotal || o.total || 0), sh: Math.round(o.shipping || 0), m: o.mode,
+    n: String(o.name || '').slice(0, 40), c: String(o.code || '').slice(0, 20), f: inv.length ? inv.map((i) => i.type + ' ' + i.num).join(', ').slice(0, 120) : '',
+    r: String(o.sinpeRef || '').slice(0, 40), pd: o.paidAt || 0 };
+}
+async function putOrder(env, key, o) {
+  await env.ORDERS.put(key, JSON.stringify(o), { metadata: orderMeta(o) });
+  await env.ORDERS.put('ver', String(Date.now()));
+}
 
 function clean(s, max) { return String(s == null ? '' : s).replace(/[\u0000-\u0008\u000b-\u001f]/g, ' ').trim().slice(0, max || 200); }
 
@@ -380,7 +393,7 @@ async function handleNewOrder(request, env, ctx) {
   if (prev && prev.notifiedDraft) order.notifiedDraft = true;
   const key = prevKey || ('o:' + String(9999999999999 - now).padStart(13, '0') + ':' + order.id);
   order.key = key;
-  await env.ORDERS.put(key, JSON.stringify(order));
+  await putOrder(env, key, order);
   if (code) await env.ORDERS.put('c:' + code, key, { expirationTtl: 60 * 60 * 24 * 30 });
   if (status === 'incompleto') return json({ ok: true, draft: true });
   const head = (prev && prev.notifiedDraft ? '✅ Se completó el pedido ' : '🛒 Pedido nuevo ') + (code || '') + ' · ' + (order.variable.length ? '≈ ' : '') + '₡' + Math.round(order.total).toLocaleString('es-CR') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '') + (order.variable.length ? ' · ⚖️ pesar: ' + order.variable.join(', ') : '');
@@ -427,19 +440,53 @@ async function handlePanel(request, url, env) {
     const n = env.TELEGRAM_TOKEN ? (await telegramChats(env)).length : 0;
     return html('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><body style="font:17px system-ui;padding:24px;line-height:1.5"><h2>' + (ok ? '✅ Aviso enviado' : '⚠️ No se pudo enviar') + '</h2><p>Teléfonos registrados en Telegram: <b>' + n + '</b></p>' + (ok ? '' : '<p>Revisa que agregaste TELEGRAM_TOKEN en Cloudflare y que cada teléfono le escribió tu PIN al bot.</p>') + '<p><a href="/panel">← Volver al panel</a></p></body>');
   }
+  if (p === '/panel/api/ver') return json({ ver: (await env.ORDERS.get('ver')) || '0' });
   if (p === '/panel/api/orders' && request.method === 'GET') {
-    const list = await env.ORDERS.list({ prefix: 'o:', limit: 150 });
-    const out = await Promise.all(list.keys.map((k) => env.ORDERS.get(k.name, 'json')));
-    return json({ orders: out.filter(Boolean) });
+    // Todos los pedidos en resumen (para ventas) + los más recientes completos (para la lista)
+    const keys = []; let cursor;
+    do { const l = await env.ORDERS.list({ prefix: 'o:', cursor, limit: 1000 }); keys.push(...l.keys); cursor = l.list_complete ? null : l.cursor; } while (cursor && keys.length < 20000);
+    const nFull = Math.min(200, Math.max(1, parseInt(url.searchParams.get('full') || '80', 10)));
+    const full = await Promise.all(keys.slice(0, nFull).map((k) => env.ORDERS.get(k.name, 'json')));
+    const summaries = await Promise.all(keys.map(async (k) => {
+      if (k.metadata && k.metadata.s) return Object.assign({ key: k.name }, k.metadata);
+      const o = await env.ORDERS.get(k.name, 'json'); return o ? Object.assign({ key: k.name }, orderMeta(o)) : null;
+    }));
+    return json({ ver: (await env.ORDERS.get('ver')) || '0', orders: full.filter(Boolean), summaries: summaries.filter(Boolean),
+      cfg: { sinpe: env.SINPE_NUMBER || '7095-5061', sinpeName: env.SINPE_NAME || 'Carlos Garita Rojas', lat: +(env.STORE_LAT || 9.9349), lng: +(env.STORE_LNG || -84.0789),
+        pickup: env.PICKUP_TEXT || 'Tramo San Rafael #1, Mercado Central de San José', hours: env.STORE_HOURS || '7:30 a. m. a 5:30 p. m.' } });
   }
-  if (p === '/panel/api/status' && request.method === 'POST') {
+  if (p === '/panel/api/order' && request.method === 'GET') {
+    const k = url.searchParams.get('key') || '';
+    if (!k.startsWith('o:')) return json({ error: 'datos' }, 400);
+    const o = await env.ORDERS.get(k, 'json');
+    return o ? json({ order: o }) : json({ error: 'no existe' }, 404);
+  }
+  if ((p === '/panel/api/status' || p === '/panel/api/update') && request.method === 'POST') {
     const b = await request.json();
-    if ((b.status && !STATUSES.includes(b.status)) || !String(b.key || '').startsWith('o:')) return json({ error: 'datos' }, 400);
+    const P = b.patch || b;
+    if (!String(b.key || '').startsWith('o:')) return json({ error: 'datos' }, 400);
     const o = await env.ORDERS.get(b.key, 'json');
     if (!o) return json({ error: 'no existe' }, 404);
-    if (b.status) { o.status = b.status; o.history = (o.history || []).concat({ s: b.status, t: Date.now() }); }
-    if (b.finalTotal != null && isFinite(+b.finalTotal) && +b.finalTotal > 0) o.finalTotal = Math.round(+b.finalTotal);
-    await env.ORDERS.put(b.key, JSON.stringify(o));
+    const now = Date.now();
+    const setStatus = (st) => { if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (['pagado', 'preparando', 'listo', 'entregado'].includes(st) && !o.paidAt) o.paidAt = now; } };
+    if (P.status != null) { if (!STATUSES.includes(P.status)) return json({ error: 'estado' }, 400); setStatus(P.status); }
+    if (P.mode != null && MODE_LABEL[P.mode] && P.mode !== o.mode) { o.history = (o.history || []).concat({ s: 'cambio-entrega', t: now, from: o.mode, to: P.mode }); o.mode = P.mode; }
+    if (P.location != null) o.location = clean(P.location, 300);
+    if (P.address != null) o.address = clean(P.address, 300);
+    if (P.area != null) o.area = clean(P.area, 120);
+    if (P.note != null) o.note = clean(P.note, 1000);
+    const num = (v) => { const n = Math.round(+String(v).replace(/[^\d.]/g, '')); return isFinite(n) && n >= 0 ? n : null; };
+    if (P.finalTotal != null) { const n = num(P.finalTotal); o.finalTotal = n || undefined; }
+    if (P.shipping != null) { const n = num(P.shipping); o.shipping = n || 0; }
+    if (P.sinpeRef != null) {
+      o.sinpeRef = clean(P.sinpeRef, 40);
+      if (o.sinpeRef && ['incompleto', 'pago-pendiente'].includes(o.status)) setStatus('pagado');
+      if (o.sinpeRef && !o.paidAt) o.paidAt = now;
+    }
+    if (Array.isArray(P.invoices)) {
+      o.invoices = P.invoices.slice(0, 10).map((i) => ({ type: INV_TYPES.includes(i.type) ? i.type : 'TE', num: clean(i.num, 60), voided: !!i.voided, note: clean(i.note || '', 120), t: +i.t || now, vt: i.voided ? (+i.vt || now) : undefined })).filter((i) => i.num);
+    }
+    await putOrder(env, b.key, o);
     return json({ ok: true, order: o });
   }
   if (p === '/panel') return html(PANEL_HTML);
@@ -456,92 +503,19 @@ button{width:100%;padding:13px;border:0;border-radius:12px;background:#263d25;co
 <body><form method="post" action="/panel/login"><h1>Pedidos · Tramo San Rafael</h1><p>Escribe tu PIN</p><input name="pin" type="password" inputmode="numeric" autocomplete="current-password" autofocus><button>Entrar</button>${err ? `<div class="e">${err}</div>` : ''}</form></body></html>`;
 }
 
-const PANEL_HTML = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Pedidos · Tramo</title><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Pedidos"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#263d25">
-<style>
-:root{--g:#263d25;--g2:#6e9e58;--bg:#f6f1e6;--card:#fff;--line:#e4dccb;--mut:#6b7468;--txt:#1d2a1c}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--txt)}
-header{position:sticky;top:0;z-index:5;background:var(--g);color:#fff;padding:14px 16px calc(10px);padding-top:max(14px,env(safe-area-inset-top))}
-header h1{margin:0;font-size:18px;display:flex;justify-content:space-between;align-items:center}
-header small{font-weight:400;opacity:.8;font-size:12px}
-.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;border:0;border-radius:999px;padding:7px 12px;background:rgba(255,255,255,.14);color:#fff;font-size:13.5px;font-weight:600}
-.tab.on{background:#fff;color:var(--g)}.tab b{margin-left:4px;opacity:.75}
-main{padding:12px 12px 40px;max-width:760px;margin:0 auto;display:grid;gap:10px}
-.o{background:var(--card);border-radius:16px;border:1px solid var(--line);overflow:hidden}
-.o__top{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;cursor:pointer}
-.o__main{flex:1;min-width:0}.o__name{font-weight:700;font-size:15.5px}.o__sub{color:var(--mut);font-size:13px;margin-top:2px}
-.o__tot{font-weight:800;font-size:16px;white-space:nowrap;text-align:right}.o__ago{color:var(--mut);font-size:12px;font-weight:400;margin-top:2px}
-.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;margin-top:6px}
-.s-incompleto{background:#f3e6e6;color:#8a2a2a}.s-pago-pendiente{background:#fdf0d9;color:#8a5a10}.s-pagado{background:#e3eefc;color:#1d4f91}.s-preparando{background:#efe7fb;color:#5b3a99}
-.s-listo{background:#dff1dc;color:#24602a}.s-var{background:#eef3fb;color:#1f3b63;margin-left:4px}.s-entregado{background:#eceee9;color:#4b5548}.s-cancelado{background:#f9e1df;color:#9b2c22}
-.when{display:inline-block;margin-left:6px;font-size:12px;color:var(--g);font-weight:600}
-.o__body{display:none;border-top:1px solid var(--line);padding:12px 14px;font-size:14px}.o.open .o__body{display:block}
-.items{margin:0 0 10px;padding:0;list-style:none}.items li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
-.items small{color:var(--mut)}.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:8px 0}.kv dt{color:var(--mut)}.kv dd{margin:0;word-break:break-word}
-.kv a{color:var(--g)}
-.st{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}.st button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600;color:var(--txt)}
-.st button.on{border-color:var(--g);background:var(--g);color:#fff}
-.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}.acts a{flex:1 1 140px;text-align:center;text-decoration:none;padding:11px;border-radius:12px;font-weight:700;font-size:14px;background:#25d366;color:#08331a}
-.acts a.alt{background:#eef5ea;color:var(--g)}
-.empty{text-align:center;color:var(--mut);padding:40px 10px}
-.new{animation:flash 1.6s ease 2}@keyframes flash{50%{box-shadow:0 0 0 3px var(--g2)}}
-</style></head><body>
-<header><h1>Pedidos · Tramo <small id="upd"></small></h1><div class="tabs" id="tabs"></div></header>
-<main id="list"><div class="empty">Cargando…</div></main>
-<script>
-const ST={'incompleto':'Sin terminar','pago-pendiente':'Pago pendiente','pagado':'Pagado','preparando':'Preparando','listo':'Listo','entregado':'Entregado / enviado','cancelado':'Cancelado'};
-const MODE={pickup:'Retiro',delivery:'Uber Flash',courier:'Encomienda'};
-let orders=[],filter='activos',open={},known=null;
-const money=n=>'₡'+Math.round(n||0).toLocaleString('es-CR');
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ago=t=>{const m=Math.round((Date.now()-t)/60000);if(m<1)return'ahora';if(m<60)return'hace '+m+' min';const h=Math.round(m/60);if(h<24)return'hace '+h+' h';return new Date(t).toLocaleDateString('es-CR',{day:'numeric',month:'short'})};
-const wa=(o,t)=>'https://wa.me/506'+String(o.phone).replace(/\\D/g,'').slice(-8)+'?text='+encodeURIComponent(t);
-const tot=o=>o.finalTotal||o.total;
-function msgs(o){const n=o.name.split(' ')[0];return[
- ['Pedir pago','alt pay','¡Hola '+n+'! Recibimos tu pedido '+o.code+' 🙌 '+(o.variable&&o.variable.length&&!o.finalTotal?'Ya lo pesamos: ':'')+'El total es '+money(tot(o))+(o.mode!=='pickup'?' + envío':'')+'. Puedes pagar por SINPE Móvil y nos avisas. ¡Gracias!'],
- [o.mode==='pickup'?'Avisar: listo para recoger':o.mode==='delivery'?'Avisar: va en camino':'Avisar: encomienda enviada','',o.mode==='pickup'?'¡Hola '+n+'! Tu pedido '+o.code+' ya está listo ✅ Puedes pasar a recogerlo al Tramo San Rafael #1, Mercado Central (7:30 a. m. a 5:30 p. m.).':o.mode==='delivery'?'¡Hola '+n+'! Tu pedido '+o.code+' ya va en camino por Uber Flash 🛵 Por favor estate pendiente para recibirlo.':'¡Hola '+n+'! Tu pedido '+o.code+' ya fue enviado por encomienda 📦 Te llega en hasta 48 h.']
-]}
-function tabs(){const c={activos:0,todos:orders.length};orders.forEach(o=>{c[o.status]=(c[o.status]||0)+1;if(!['entregado','cancelado'].includes(o.status))c.activos++});
- const list=[['activos','Activos'],['incompleto','Sin terminar'],['pago-pendiente','Pago pendiente'],['pagado','Pagados'],['preparando','Preparando'],['listo','Listos'],['entregado','Entregados'],['cancelado','Cancelados'],['todos','Todos']];
- document.getElementById('tabs').innerHTML=list.map(([k,l])=>'<button class="tab'+(filter===k?' on':'')+'" data-f="'+k+'">'+l+'<b>'+(c[k]||0)+'</b></button>').join('')}
-function render(){tabs();const L=orders.filter(o=>filter==='todos'||(filter==='activos'?!['entregado','cancelado'].includes(o.status):o.status===filter));
- const el=document.getElementById('list');if(!L.length){el.innerHTML='<div class="empty">No hay pedidos aquí.</div>';return}
- el.innerHTML=L.map(o=>{const isNew=known&&!known.has(o.key);return '<article class="o'+(open[o.key]?' open':'')+(isNew?' new':'')+'" data-k="'+esc(o.key)+'">'+
- '<div class="o__top" data-toggle><div class="o__main"><div class="o__name">'+esc(o.name)+' · '+esc(o.code)+'</div><div class="o__sub">'+esc(MODE[o.mode]||o.mode)+' · '+o.items.length+' producto'+(o.items.length>1?'s':'')+'</div>'+
- '<span class="pill s-'+o.status+'">'+ST[o.status]+'</span>'+(o.variable&&o.variable.length&&!o.finalTotal?'<span class="pill s-var">⚖️ Pesar</span>':'')+(o.eta?'<span class="when">'+esc(o.eta)+'</span>':'')+'</div>'+
- '<div class="o__tot">'+(o.variable&&o.variable.length&&!o.finalTotal?'≈ ':'')+money(tot(o))+(o.mode!=='pickup'?'<div class="o__ago">+ envío</div>':'')+'<div class="o__ago">'+ago(o.created)+'</div></div></div>'+
- '<div class="o__body"><ul class="items">'+o.items.map(i=>'<li><span>'+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
- '<dl class="kv"><dt>Teléfono</dt><dd><a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a></dd>'+(o.payer?'<dt>SINPE de</dt><dd>'+esc(o.payer)+'</dd>':'')+
- (o.location?'<dt>Ubicación</dt><dd><a href="'+esc(o.location)+'" target="_blank">Ver en el mapa</a></dd>':'')+(o.area?'<dt>Zona</dt><dd>'+esc(o.area)+'</dd>':'')+(o.address?'<dt>'+(o.mode==='courier'?'Dirección':'Señas')+'</dt><dd>'+esc(o.address)+'</dd>':'')+
- (o.fe?'<dt>Factura</dt><dd>'+esc(o.fe)+'</dd>':'')+'<dt>Pedido</dt><dd>'+new Date(o.created).toLocaleString('es-CR',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+'</dd></dl>'+
- '<div class="st">'+Object.keys(ST).map(s=>'<button data-s="'+s+'" class="'+(o.status===s?'on':'')+'">'+ST[s]+'</button>').join('')+'</div>'+
- (o.variable&&o.variable.length?'<p style="margin:0 0 8px;font-size:13px;color:#1f3b63">⚖️ Peso variable: '+esc(o.variable.join(', '))+'. Al pesar, toca <b>Pedir pago</b> y escribe el total exacto.</p>':'')+'<div class="acts">'+msgs(o).map(([l,c,t])=>'<a class="'+c+'" href="'+wa(o,t)+'" target="_blank">'+l+'</a>').join('')+'<a class="alt" href="'+wa(o,'')+'" target="_blank">WhatsApp</a></div></div></article>'}).join('')}
-async function load(){try{const r=await fetch('/panel/api/orders',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();
- const fresh=d.orders||[];if(known&&fresh.some(o=>!known.has(o.key))){try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
- orders=fresh;render();known=new Set(orders.map(o=>o.key));document.getElementById('upd').textContent='actualizado '+new Date().toLocaleTimeString('es-CR',{hour:'numeric',minute:'2-digit'})}catch(e){}}
-document.addEventListener('click',async e=>{const t=e.target.closest('[data-f]');if(t){filter=t.dataset.f;render();return}
- const card=e.target.closest('.o');if(!card)return;const k=card.dataset.k;
- if(e.target.closest('[data-toggle]')){open[k]=!open[k];card.classList.toggle('open');return}
- const pay=e.target.closest('a.pay');
- if(pay){const o=orders.find(x=>x.key===k);if(o&&o.variable&&o.variable.length){e.preventDefault();const v=prompt('Total exacto después de pesar (sin envío), en colones:',Math.round(tot(o)));if(!v)return;const n=parseInt(String(v).replace(/\\D/g,''),10);if(!n)return;
-  const r=await fetch('/panel/api/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:k,finalTotal:n})});if(r.ok){const d=await r.json();orders=orders.map(x=>x.key===k?d.order:x);render();const no=orders.find(x=>x.key===k);window.open(wa(no,msgs(no)[0][2]),'_blank')}}return}
- const s=e.target.closest('[data-s]');if(s){const r=await fetch('/panel/api/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:k,status:s.dataset.s})});
-  if(r.ok){const d=await r.json();orders=orders.map(o=>o.key===k?d.order:o);render()}}});
-load();setInterval(load,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
-</script></body></html>`;
 
 // Cada 5 minutos (Cron Trigger en Cloudflare): avisa de pedidos que se quedaron "sin terminar" más de 10 minutos
 async function checkDrafts(env) {
   if (!env.ORDERS) return;
   const list = await env.ORDERS.list({ prefix: 'o:', limit: 40 });
   for (const k of list.keys) {
+    if (k.metadata && k.metadata.s !== 'incompleto') continue;
     const o = await env.ORDERS.get(k.name, 'json');
     if (!o || o.status !== 'incompleto' || o.notifiedDraft) continue;
     if (Date.now() - o.created < 10 * 60 * 1000) continue;
     const ok = await notifyOwner(env, '⚠️ Pedido SIN TERMINAR ' + (o.code || '') + ' · ' + o.name + ' · ' + o.phone + '\nLlegó hasta el pago pero no lo confirmó. Escríbele para ayudarle.\n\n' + (o.message || ''));
     o.notifiedDraft = true; if (!ok) o.notifyFailed = true;
-    await env.ORDERS.put(k.name, JSON.stringify(o));
+    await putOrder(env, k.name, o);
   }
 }
 

@@ -1,0 +1,250 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pedidos · Tramo</title><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Pedidos"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#263d25">
+<style>
+:root{--g:#263d25;--g2:#6e9e58;--bg:#f6f1e6;--card:#fff;--line:#e4dccb;--mut:#6b7468;--txt:#1d2a1c;--red:#b3261e;--wa:#25d366}
+[hidden]{display:none!important}*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--txt)}
+button,input,select,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;background:var(--g);color:#fff;padding:12px 14px 8px;padding-top:max(12px,env(safe-area-inset-top))}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+header h1{margin:0;font-size:17px}header small{font-weight:400;opacity:.75;font-size:11.5px;display:block}
+.views{display:flex;background:rgba(255,255,255,.14);border-radius:999px;padding:3px}
+.views button{border:0;background:none;color:#fff;font-weight:700;font-size:13.5px;padding:7px 13px;border-radius:999px}
+.views button.on{background:#fff;color:var(--g)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:0;border-radius:999px;padding:7px 12px;background:rgba(255,255,255,.14);color:#fff;font-size:13.5px;font-weight:600}
+.tab.on{background:#fff;color:var(--g)}.tab b{margin-left:5px;opacity:.75}
+.search{margin-top:8px;width:100%;border:0;border-radius:10px;padding:9px 12px;font-size:15px;color:var(--txt)}
+main{padding:12px 12px 60px;max-width:780px;margin:0 auto;display:grid;gap:10px}main>*{min-width:0}td:nth-child(2){white-space:nowrap}
+.o{background:var(--card);border-radius:16px;border:1px solid var(--line);overflow:hidden}
+.o__top{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;cursor:pointer}
+.o__main{flex:1;min-width:0}.o__name{font-weight:700;font-size:15.5px}.o__sub{color:var(--mut);font-size:13px;margin-top:2px}
+.o__tot{font-weight:800;font-size:16px;white-space:nowrap;text-align:right}.o__ago{color:var(--mut);font-size:12px;font-weight:400;margin-top:2px}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;margin:6px 4px 0 0}
+.s-incompleto{background:#f3e6e6;color:#8a2a2a}.s-pago-pendiente{background:#fdf0d9;color:#8a5a10}.s-pagado{background:#e3eefc;color:#1d4f91}.s-preparando{background:#efe7fb;color:#5b3a99}
+.s-listo{background:#dff1dc;color:#24602a}.s-entregado{background:#eceee9;color:#4b5548}.s-cancelado{background:#f9e1df;color:#9b2c22}
+.p-var{background:#eef3fb;color:#1f3b63}.p-nofac{background:#fde8e6;color:var(--red)}.p-ship{background:#fff4d6;color:#7a5600}
+.when{display:inline-block;font-size:12px;color:var(--g);font-weight:600;margin-top:6px}
+.o__body{display:none;border-top:1px solid var(--line);font-size:14px}.o.open .o__body{display:block}
+.sec{padding:12px 14px;border-bottom:1px solid var(--line)}.sec:last-child{border-bottom:0}
+.sec h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.items{margin:0;padding:0;list-style:none}.items li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.items small{color:var(--mut)}.sum{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin-top:8px}.sum .big{font-weight:800;font-size:16px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0}.kv dt{color:var(--mut)}.kv dd{margin:0;word-break:break-word}.kv a{color:var(--g);font-weight:600}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{flex:1 1 0;min-width:90px;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 6px;font-size:13.5px;font-weight:700}
+.seg button.on{border-color:var(--g);background:var(--g);color:#fff}
+.st{display:flex;flex-wrap:wrap;gap:6px}.st button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600}
+.st button.on{border-color:var(--g);background:var(--g);color:#fff}
+.f{display:grid;gap:4px;margin-top:10px}.f label{font-size:12.5px;color:var(--mut);font-weight:600}
+.f input,.f select,.f textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 11px;font-size:16px;background:#fff}
+.f textarea{min-height:64px;resize:vertical}
+.row{display:flex;gap:8px;align-items:flex-end}.row>*{flex:1;min-width:0}.row>.shrink{flex:0 0 auto}
+.b{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:12px;padding:11px 14px;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;background:#eef5ea;color:var(--g);text-align:center}
+.b.wa{background:var(--wa);color:#08331a}.b.dark{background:var(--g);color:#fff}.b.uber{background:#000;color:#fff}.b.sm{padding:8px 11px;font-size:13px;border-radius:10px}.b.red{background:#fde8e6;color:var(--red)}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.hint{font-size:12.5px;color:var(--mut);margin:6px 0 0}.warn{font-size:13px;color:var(--red);margin:6px 0 0;font-weight:600}
+.inv{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+.inv.void{opacity:.6}.inv.void b{text-decoration:line-through}.inv small{color:var(--mut);display:block}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+.new{animation:flash 1.6s ease 2}@keyframes flash{50%{box-shadow:0 0 0 3px var(--g2)}}
+.saved{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--g);color:#fff;padding:10px 16px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.saved.on{opacity:1}
+/* Ventas */
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+.periods{display:flex;gap:6px;flex-wrap:wrap}.periods button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:700}
+.periods button.on{background:var(--g);border-color:var(--g);color:#fff}
+.range{display:flex;gap:8px;margin-top:10px}.range input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:10px;padding:8px;font-size:15px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:640px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.kpi span{display:block;font-size:12px;color:var(--mut);font-weight:600}.kpi b{display:block;font-size:20px;margin-top:4px}.kpi small{color:var(--mut);font-size:12px}
+.kpi.alert{border-color:#f1b9b3;background:#fff6f5}.kpi.alert b{color:var(--red)}
+.bars{display:grid;gap:6px}.bar{display:grid;grid-template-columns:78px 1fr auto;gap:8px;align-items:center;font-size:13px}
+.bar i{display:block;height:14px;border-radius:4px;background:var(--g2);min-width:2px}.bar em{font-style:normal;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mut);font-size:12px;font-weight:600}
+td.r,th.r{text-align:right;white-space:nowrap}.tw{overflow-x:auto}
+.miss{color:var(--red);font-weight:700}
+</style></head><body>
+<header>
+  <div class="hrow"><h1>Tramo · Panel<small id="upd"></small></h1>
+    <div class="views"><button data-view="pedidos" class="on">Pedidos</button><button data-view="ventas">Ventas</button></div></div>
+  <div id="ptabs"><div class="tabs" id="tabs"></div><input class="search" id="q" type="search" placeholder="Buscar nombre, # pedido, teléfono, SINPE o factura"></div>
+</header>
+<main id="list"><div class="empty">Cargando…</div></main>
+<main id="sales" hidden></main>
+<div class="saved" id="toast">Guardado ✓</div>
+<script>
+const ST={'incompleto':'Sin terminar','pago-pendiente':'Pago pendiente','pagado':'Pagado','preparando':'Preparando','listo':'Listo','entregado':'Entregado / enviado','cancelado':'Cancelado'};
+const MODE={pickup:'Retiro',delivery:'Uber Flash',courier:'Encomienda'};
+const INV={FE:'Factura electrónica',TE:'Tiquete electrónico',TN:'Tiquete normal'};
+const SOLD=['pagado','preparando','listo','entregado'];
+let orders=[],sums=[],cfg={},filter='activos',open={},known=null,ver=null,view='pedidos',q='',period='hoy',from='',to='';
+const $=s=>document.querySelector(s);
+const money=n=>'₡'+Math.round(n||0).toLocaleString('es-CR');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ago=t=>{const m=Math.round((Date.now()-t)/60000);if(m<1)return'ahora';if(m<60)return'hace '+m+' min';const h=Math.round(m/60);if(h<24)return'hace '+h+' h';return new Date(t).toLocaleDateString('es-CR',{day:'numeric',month:'short'})};
+const phone8=o=>String(o.phone||'').replace(/\D/g,'').slice(-8);
+const wa=(o,t)=>'https://wa.me/506'+phone8(o)+(t?'?text='+encodeURIComponent(t):'');
+const prod=o=>o.finalTotal||o.total||0;
+const grand=o=>prod(o)+(o.shipping||0);
+const first=o=>String(o.name||'').trim().split(/\s+/)[0]||'';
+const pending=o=>o.variable&&o.variable.length&&!o.finalTotal;
+const hasInv=o=>(o.invoices||[]).some(i=>!i.voided);
+const coords=s=>{const m=String(s||'').match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/);return m?{lat:+m[1],lng:+m[2]}:null};
+function toast(t){const e=$('#toast');e.textContent=t||'Guardado ✓';e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1400)}
+
+/* ---------- Mensajes de WhatsApp ---------- */
+function msgTotal(o){
+  const L=['¡Hola '+first(o)+'! 👋','Este es el total de tu pedido *'+o.code+'*:',''];
+  L.push('🛒 Productos: '+money(prod(o))+(pending(o)?' (aprox.)':''));
+  if(o.mode==='delivery')L.push('🛵 Envío Uber Flash: '+(o.shipping?money(o.shipping):'por confirmar'));
+  if(o.mode==='courier')L.push('📦 Envío por encomienda: '+(o.shipping?money(o.shipping):'por confirmar'));
+  L.push('━━━━━━━━━━━━','💰 *Total a pagar: '+money(grand(o))+'*','');
+  L.push('Paga por *SINPE Móvil*:','📱 Número: *'+cfg.sinpe+'*','👤 A nombre de: *'+cfg.sinpeName+'*','');
+  L.push(o.mode==='pickup'?'Cuando pagues, avísanos por aquí y te confirmamos cuando esté listo para recoger. ¡Gracias! 🙌':o.mode==='delivery'?'Cuando pagues, avísanos por aquí y enviamos tu pedido por Uber Flash. ¡Gracias! 🙌':'Cuando pagues, avísanos por aquí y despachamos tu encomienda. ¡Gracias! 🙌');
+  return L.join('\n')}
+function msgReady(o){
+  if(o.mode==='pickup')return '¡Hola '+first(o)+'! ✅ Tu pedido *'+o.code+'* ya está *listo para recoger*.\n\n📍 '+cfg.pickup+'\n🕗 Horario: '+cfg.hours+'\n\nSolo menciona tu número de pedido al llegar. ¡Te esperamos!';
+  if(o.mode==='delivery')return '¡Hola '+first(o)+'! 🛵 Tu pedido *'+o.code+'* ya va en camino por Uber Flash.\n\nPor favor estate pendiente para recibirlo. ¡Gracias por tu compra!';
+  return '¡Hola '+first(o)+'! 📦 Tu pedido *'+o.code+'* ya fue enviado por encomienda.\n\nTe enviamos aquí la foto de la guía para que le des seguimiento. ¡Gracias por tu compra!'}
+const readyLabel=o=>o.mode==='pickup'?'✅ Listo para recoger':o.mode==='delivery'?'🛵 Va en camino':'📦 Encomienda lista (foto de guía)';
+const readyStatus=o=>o.mode==='pickup'?'listo':'entregado';
+function uberUrl(o){const c=coords(o.location);if(!c)return '';
+  const P={action:'setPickup','pickup[latitude]':cfg.lat,'pickup[longitude]':cfg.lng,'pickup[nickname]':'Tramo San Rafael','dropoff[latitude]':c.lat,'dropoff[longitude]':c.lng,'dropoff[nickname]':o.name+' '+o.code};
+  return 'https://m.uber.com/ul/?'+Object.keys(P).map(k=>k+'='+encodeURIComponent(P[k])).join('&')}
+
+/* ---------- Lista de pedidos ---------- */
+function match(o){if(!q)return true;const h=[o.name,o.code,o.phone,o.sinpeRef,(o.invoices||[]).map(i=>i.num).join(' ')].join(' ').toLowerCase();return h.includes(q)}
+function tabs(){const c={activos:0,todos:orders.length,nofac:0};orders.forEach(o=>{c[o.status]=(c[o.status]||0)+1;if(!['entregado','cancelado'].includes(o.status))c.activos++;if(SOLD.includes(o.status)&&!hasInv(o))c.nofac++});
+  const list=[['activos','Activos'],['pago-pendiente','Pago pendiente'],['pagado','Pagados'],['preparando','Preparando'],['listo','Listos'],['nofac','Sin factura'],['incompleto','Sin terminar'],['entregado','Entregados'],['cancelado','Cancelados'],['todos','Todos']];
+  $('#tabs').innerHTML=list.map(([k,l])=>'<button class="tab'+(filter===k?' on':'')+'" data-f="'+k+'">'+l+'<b>'+(c[k]||0)+'</b></button>').join('')}
+function inFilter(o){if(filter==='todos')return true;if(filter==='activos')return!['entregado','cancelado'].includes(o.status);if(filter==='nofac')return SOLD.includes(o.status)&&!hasInv(o);return o.status===filter}
+function card(o){
+  const isNew=known&&!known.has(o.key), loc=coords(o.location), uber=uberUrl(o);
+  const top='<div class="o__top" data-toggle><div class="o__main"><div class="o__name">'+esc(o.name)+' · '+esc(o.code)+'</div><div class="o__sub">'+esc(MODE[o.mode]||o.mode)+' · '+o.items.length+' producto'+(o.items.length>1?'s':'')+'</div>'+
+    '<span class="pill s-'+o.status+'">'+ST[o.status]+'</span>'+(pending(o)?'<span class="pill p-var">⚖️ Pesar</span>':'')+(o.mode!=='pickup'&&!o.shipping&&!['entregado','cancelado'].includes(o.status)?'<span class="pill p-ship">Cotizar envío</span>':'')+(SOLD.includes(o.status)&&!hasInv(o)?'<span class="pill p-nofac">Sin factura</span>':'')+(o.eta?'<div class="when">'+esc(o.eta)+'</div>':'')+'</div>'+
+    '<div class="o__tot">'+(pending(o)?'≈ ':'')+money(grand(o))+(o.mode!=='pickup'&&!o.shipping?'<div class="o__ago">+ envío</div>':'')+'<div class="o__ago">'+ago(o.created)+'</div></div></div>';
+  // Productos y total
+  let b='<div class="sec"><h3>Pedido</h3><ul class="items">'+o.items.map(i=>'<li><span>'+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
+    '<div class="sum"><span>Productos'+(o.finalTotal?' (pesado)':pending(o)?' (aprox.)':'')+'</span><b>'+money(prod(o))+'</b>'+(o.mode!=='pickup'?'<span>Envío</span><b>'+(o.shipping?money(o.shipping):'—')+'</b>':'')+'<span class="big">Total</span><span class="big">'+money(grand(o))+'</span></div>'+
+    '<p class="hint">Precios con IVA incluido.</p></div>';
+  // Cliente
+  b+='<div class="sec"><h3>Cliente</h3><dl class="kv"><dt>Teléfono</dt><dd><a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a> · <a href="'+wa(o,'')+'" target="_blank">WhatsApp</a></dd>'+(o.payer?'<dt>SINPE a nombre de</dt><dd>'+esc(o.payer)+'</dd>':'')+
+    (o.fe?'<dt>Pidió factura</dt><dd>'+esc(o.fe)+'</dd>':'<dt>Factura</dt><dd>No pidió factura electrónica</dd>')+
+    '<dt>Fecha</dt><dd>'+new Date(o.created).toLocaleString('es-CR',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+'</dd></dl></div>';
+  // Entrega (editable)
+  b+='<div class="sec"><h3>Entrega</h3><div class="seg">'+Object.keys(MODE).map(m=>'<button data-mode="'+m+'" class="'+(o.mode===m?'on':'')+'">'+MODE[m]+'</button>').join('')+'</div>';
+  if(o.mode==='pickup')b+='<p class="hint">Recoge en '+esc(cfg.pickup)+'.</p>';
+  if(o.mode==='delivery'){
+    b+=(loc?'<div class="acts"><a class="b uber" href="'+uber+'" target="_blank">Cotizar en Uber</a><a class="b" href="https://maps.google.com/?q='+loc.lat+','+loc.lng+'" target="_blank">Ver en mapa</a></div>':'<p class="warn">Sin ubicación exacta'+(o.location?' ('+esc(o.location)+')':'')+'. Pega abajo el link o las coordenadas que te mande el cliente.</p>')+
+      '<div class="f"><label>Ubicación (link de Google Maps o coordenadas)</label><input data-field="location" value="'+esc(loc?loc.lat+','+loc.lng:'')+'" placeholder="9.9349,-84.0789"></div>'+
+      '<div class="f"><label>Señas</label><input data-field="address" value="'+esc(o.address)+'"></div>';
+  }
+  if(o.mode==='courier')b+='<div class="f"><label>Zona</label><input data-field="area" value="'+esc(o.area)+'"></div><div class="f"><label>Dirección para la encomienda</label><textarea data-field="address">'+esc(o.address)+'</textarea></div>';
+  b+='</div>';
+  // Cobro
+  b+='<div class="sec"><h3>Cobro</h3>'+
+    (o.variable&&o.variable.length?'<div class="f"><label>⚖️ Total de productos ya pesado ('+esc(o.variable.join(', '))+')</label><input data-field="finalTotal" inputmode="numeric" value="'+(o.finalTotal||'')+'" placeholder="'+Math.round(o.total)+'"></div>':'')+
+    (o.mode!=='pickup'?'<div class="f"><label>Costo de envío ('+(o.mode==='delivery'?'Uber Flash':'encomienda')+')</label><input data-field="shipping" inputmode="numeric" value="'+(o.shipping||'')+'" placeholder="₡"></div>':'')+
+    '<div class="acts"><a class="b wa" data-send="total" href="#">Enviar total y SINPE</a></div><p class="hint">Le llega el desglose, el total y el SINPE '+esc(cfg.sinpe)+' a nombre de '+esc(cfg.sinpeName)+'.</p></div>';
+  // Pago y factura
+  const invs=o.invoices||[];
+  b+='<div class="sec"><h3>Pago y factura</h3><div class="f"><label># de comprobante SINPE Móvil</label><input data-field="sinpeRef" inputmode="numeric" value="'+esc(o.sinpeRef||'')+'" placeholder="Ej. 2026102712345678"></div>'+
+    (SOLD.includes(o.status)&&!o.sinpeRef?'<p class="warn">Falta el # de SINPE.</p>':'')+
+    '<div class="f"><label>Factura de este pedido</label><div class="row"><select data-inv-type>'+Object.keys(INV).map(k=>'<option value="'+k+'"'+((o.fe&&k==='FE')||(!o.fe&&k==='TE')?' selected':'')+'>'+INV[k]+'</option>').join('')+'</select></div>'+
+    '<div class="row" style="margin-top:6px"><input data-inv-num placeholder="Número / consecutivo"><button class="b dark shrink" data-inv-add>Agregar</button></div></div>'+
+    invs.map((i,n)=>'<div class="inv'+(i.voided?' void':'')+'"><div><b>'+INV[i.type]+' '+esc(i.num)+'</b><small>'+new Date(i.t).toLocaleDateString('es-CR',{day:'numeric',month:'short',year:'numeric'})+(i.voided?' · ANULADA':'')+'</small></div><button class="b sm '+(i.voided?'':'red')+'" data-inv-void="'+n+'">'+(i.voided?'Reactivar':'Anular')+'</button></div>').join('')+
+    (SOLD.includes(o.status)&&!hasInv(o)?'<p class="warn">Este pedido está pagado y todavía no tiene factura.</p>':'')+'</div>';
+  // Estado y avisos
+  b+='<div class="sec"><h3>Estado</h3><div class="st">'+Object.keys(ST).map(s=>'<button data-s="'+s+'" class="'+(o.status===s?'on':'')+'">'+ST[s]+'</button>').join('')+'</div>'+
+    '<div class="acts"><a class="b wa" data-send="ready" href="#">'+readyLabel(o)+'</a><a class="b" href="'+wa(o,'')+'" target="_blank">Abrir chat</a></div>'+
+    (o.mode==='courier'?'<p class="hint">Después de enviar el mensaje, mándale la foto de la guía en ese mismo chat.</p>':'')+
+    '<div class="f"><label>Nota interna (solo la ves vos)</label><textarea data-field="note">'+esc(o.note||'')+'</textarea></div></div>';
+  return '<article class="o'+(open[o.key]?' open':'')+(isNew?' new':'')+'" data-k="'+esc(o.key)+'">'+top+'<div class="o__body">'+b+'</div></article>'}
+function render(){
+  if(view==='ventas'){renderSales();return}
+  tabs();const L=orders.filter(o=>inFilter(o)&&match(o));const el=$('#list');
+  if(!L.length){el.innerHTML='<div class="empty">No hay pedidos aquí.</div>';return}
+  // No redibujar si estás escribiendo en un campo
+  const a=document.activeElement;if(a&&a.closest&&a.closest('.o')&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;
+  el.innerHTML=L.map(card).join('')}
+
+/* ---------- Ventas ---------- */
+function dayStart(d){const x=new Date(d);x.setHours(0,0,0,0);return x}
+function range(){const now=new Date(),t0=dayStart(now);let a,b=new Date(t0.getTime()+864e5);
+  if(period==='hoy')a=t0;else if(period==='ayer'){a=new Date(t0.getTime()-864e5);b=t0}
+  else if(period==='semana'){const wd=(t0.getDay()+6)%7;a=new Date(t0.getTime()-wd*864e5)}
+  else if(period==='mes')a=new Date(t0.getFullYear(),t0.getMonth(),1);
+  else if(period==='mesant'){a=new Date(t0.getFullYear(),t0.getMonth()-1,1);b=new Date(t0.getFullYear(),t0.getMonth(),1)}
+  else{a=from?new Date(from+'T00:00'):new Date(t0.getFullYear(),t0.getMonth(),1);b=to?new Date(new Date(to+'T00:00').getTime()+864e5):b}
+  return [a.getTime(),b.getTime()]}
+function renderSales(){
+  const [a,b]=range();const S=sums.filter(s=>SOLD.includes(s.s)&&(s.pd||s.t)>=a&&(s.pd||s.t)<b);
+  const tp=S.reduce((x,s)=>x+s.p,0),ts=S.reduce((x,s)=>x+s.sh,0),n=S.length;
+  const nofac=S.filter(s=>!s.f).length,noref=S.filter(s=>!s.r).length;
+  const pendAll=sums.filter(s=>s.s==='pago-pendiente');
+  const byMode={};S.forEach(s=>{byMode[s.m]=(byMode[s.m]||0)+s.p});
+  const days={};S.forEach(s=>{const d=dayStart(s.pd||s.t).getTime();days[d]=(days[d]||0)+s.p});
+  const dk=Object.keys(days).map(Number).sort((x,y)=>x-y),mx=Math.max(1,...dk.map(d=>days[d]));
+  const P=[['hoy','Hoy'],['ayer','Ayer'],['semana','Esta semana'],['mes','Este mes'],['mesant','Mes pasado'],['rango','Fechas…']];
+  $('#sales').innerHTML='<div class="card"><div class="periods">'+P.map(([k,l])=>'<button data-p="'+k+'" class="'+(period===k?'on':'')+'">'+l+'</button>').join('')+'</div>'+
+    (period==='rango'?'<div class="range"><input type="date" id="from" value="'+from+'"><input type="date" id="to" value="'+to+'"></div>':'')+'</div>'+
+    '<div class="kpis"><div class="kpi"><span>Ventas (productos)</span><b>'+money(tp)+'</b><small>IVA incluido</small></div><div class="kpi"><span>Pedidos pagados</span><b>'+n+'</b><small>Promedio '+money(n?tp/n:0)+'</small></div>'+
+    '<div class="kpi"><span>Envíos cobrados</span><b>'+money(ts)+'</b><small>Total con envío '+money(tp+ts)+'</small></div><div class="kpi'+(pendAll.length?' alert':'')+'"><span>Pago pendiente (todos)</span><b>'+pendAll.length+'</b><small>'+money(pendAll.reduce((x,s)=>x+s.p+s.sh,0))+'</small></div>'+
+    '<div class="kpi'+(nofac?' alert':'')+'"><span>Sin factura</span><b>'+nofac+'</b><small>en este período</small></div><div class="kpi'+(noref?' alert':'')+'"><span>Sin # de SINPE</span><b>'+noref+'</b><small>en este período</small></div>'+
+    Object.keys(MODE).map(m=>'<div class="kpi"><span>'+MODE[m]+'</span><b>'+money(byMode[m]||0)+'</b><small>'+S.filter(s=>s.m===m).length+' pedidos</small></div>').join('')+'</div>'+
+    (dk.length>1?'<div class="card"><h3 style="margin:0 0 10px;font-size:14px">Por día</h3><div class="bars">'+dk.map(d=>'<div class="bar"><em>'+new Date(d).toLocaleDateString('es-CR',{weekday:'short',day:'numeric',month:'short'})+'</em><i style="width:'+(days[d]/mx*100)+'%"></i><b>'+money(days[d])+'</b></div>').join('')+'</div></div>':'')+
+    '<div class="card"><div class="hrow" style="margin-bottom:8px"><h3 style="margin:0;font-size:14px">Detalle para Hacienda</h3><button class="b sm" id="csv">Descargar Excel (CSV)</button></div><div class="tw"><table><thead><tr><th>Fecha</th><th>Pedido</th><th>Cliente</th><th>SINPE</th><th>Factura</th><th class="r">Total</th></tr></thead><tbody>'+
+    (S.length?S.slice().sort((x,y)=>(x.pd||x.t)-(y.pd||y.t)).map(s=>'<tr data-open="'+esc(s.key)+'"><td>'+new Date(s.pd||s.t).toLocaleDateString('es-CR',{day:'numeric',month:'short'})+'</td><td>'+esc(s.c)+'</td><td>'+esc(s.n)+'</td><td>'+(s.r?esc(s.r):'<span class="miss">Falta</span>')+'</td><td>'+(s.f?esc(s.f):'<span class="miss">Falta</span>')+'</td><td class="r">'+money(s.p+s.sh)+'</td></tr>').join(''):'<tr><td colspan="6" style="text-align:center;color:var(--mut);padding:20px">Sin ventas pagadas en este período.</td></tr>')+
+    '</tbody></table></div><p class="hint">Cuenta los pedidos en Pagado, Preparando, Listo y Entregado, según la fecha de pago.</p></div>';
+  salesRows=S}
+let salesRows=[];
+function csv(){const H=['Fecha pago','Pedido','Cliente','Entrega','Productos','Envio','Total','SINPE','Factura','Estado'];
+  const rows=salesRows.map(s=>[new Date(s.pd||s.t).toLocaleString('es-CR'),s.c,s.n,MODE[s.m]||s.m,s.p,s.sh,s.p+s.sh,s.r,s.f,ST[s.s]]);
+  const txt='﻿'+[H].concat(rows).map(r=>r.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/csv;charset=utf-8'}));a.download='ventas-tramo.csv';document.body.appendChild(a);a.click();a.remove()}
+
+/* ---------- Datos ---------- */
+async function load(force){try{
+  if(!force&&ver){const r=await fetch('/panel/api/ver',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();if(d.ver===ver){stamp();return}}
+  const r=await fetch('/panel/api/orders',{cache:'no-store'});if(r.status===401){location.reload();return}const d=await r.json();
+  const fresh=d.orders||[];if(known&&fresh.some(o=>!known.has(o.key))){try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
+  orders=fresh;sums=d.summaries||[];cfg=d.cfg||{};ver=d.ver;render();known=new Set(orders.map(o=>o.key));stamp()}catch(e){}}
+function stamp(){$('#upd').textContent='actualizado '+new Date().toLocaleTimeString('es-CR',{hour:'numeric',minute:'2-digit'})}
+async function save(k,patch,silent){const r=await fetch('/panel/api/update',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:k,patch})});
+  if(!r.ok){alert('No se pudo guardar. Revisa tu internet.');return null}const d=await r.json();orders=orders.map(o=>o.key===k?d.order:o);
+  const i=sums.findIndex(s=>s.key===k);if(i>=0){const o=d.order,inv=(o.invoices||[]).filter(x=>!x.voided);sums[i]=Object.assign(sums[i],{s:o.status,p:Math.round(prod(o)),sh:Math.round(o.shipping||0),m:o.mode,r:o.sinpeRef||'',f:inv.map(x=>x.type+' '+x.num).join(', '),pd:o.paidAt||0})}
+  if(!silent)toast();return d.order}
+function rerender(){const a=document.activeElement;if(a&&a.blur)a.blur();render()}
+
+/* ---------- Eventos ---------- */
+document.addEventListener('click',async e=>{
+  const v=e.target.closest('[data-view]');if(v){view=v.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('on',x===v));$('#ptabs').hidden=view!=='pedidos';$('#list').hidden=view!=='pedidos';$('#sales').hidden=view!=='ventas';render();return}
+  const pp=e.target.closest('[data-p]');if(pp){period=pp.dataset.p;renderSales();return}
+  if(e.target.closest('#csv')){csv();return}
+  const tr=e.target.closest('[data-open]');if(tr){const k=tr.dataset.open;if(!orders.some(o=>o.key===k)){const r=await fetch('/panel/api/order?key='+encodeURIComponent(k));if(r.ok){const d=await r.json();orders.push(d.order)}}
+    open[k]=true;filter='todos';q='';$('#q').value='';$('[data-view="pedidos"]').click();setTimeout(()=>{const c=document.querySelector('.o[data-k="'+CSS.escape(k)+'"]');if(c)c.scrollIntoView({block:'start',behavior:'smooth'})},50);return}
+  const t=e.target.closest('[data-f]');if(t){filter=t.dataset.f;render();return}
+  const c=e.target.closest('.o');if(!c)return;const k=c.dataset.k;const o=orders.find(x=>x.key===k);if(!o)return;
+  if(e.target.closest('[data-toggle]')){open[k]=!open[k];c.classList.toggle('open');return}
+  const m=e.target.closest('[data-mode]');if(m){if(m.dataset.mode===o.mode)return;if(!confirm('¿Cambiar la entrega de '+MODE[o.mode]+' a '+MODE[m.dataset.mode]+'?'))return;await save(k,{mode:m.dataset.mode});rerender();return}
+  const s=e.target.closest('[data-s]');if(s){await save(k,{status:s.dataset.s});rerender();return}
+  const snd=e.target.closest('[data-send]');if(snd){e.preventDefault();
+    // Guardar lo que esté escrito antes de mandar el mensaje
+    const patch={};c.querySelectorAll('[data-field]').forEach(f=>{patch[f.dataset.field]=f.value});
+    const w=window.open('','_blank');
+    const no=await save(k,patch,true);if(!no){if(w)w.close();return}
+    if(snd.dataset.send==='total'){if(no.mode!=='pickup'&&!no.shipping&&!confirm('Todavía no pusiste el costo del envío. ¿Enviar igual?')){if(w)w.close();rerender();return}}
+    const url=wa(no,snd.dataset.send==='total'?msgTotal(no):msgReady(no));
+    if(w)w.location.href=url;else location.href=url;
+    if(snd.dataset.send==='ready'&&!['entregado','cancelado'].includes(no.status))await save(k,{status:readyStatus(no)},true);
+    rerender();return}
+  if(e.target.closest('[data-inv-add]')){const num=c.querySelector('[data-inv-num]').value.trim();if(!num){c.querySelector('[data-inv-num]').focus();return}
+    const type=c.querySelector('[data-inv-type]').value;await save(k,{invoices:(o.invoices||[]).concat({type,num,t:Date.now()})});rerender();return}
+  const iv=e.target.closest('[data-inv-void]');if(iv){const n=+iv.dataset.invVoid,list=(o.invoices||[]).map(x=>Object.assign({},x));
+    if(!list[n].voided&&!confirm('¿Marcar '+INV[list[n].type]+' '+list[n].num+' como ANULADA?'))return;list[n].voided=!list[n].voided;await save(k,{invoices:list});rerender();return}
+});
+// Guardar campos al salir de ellos
+document.addEventListener('change',async e=>{const f=e.target.closest('[data-field]');if(f){const c=f.closest('.o');const k=c.dataset.k;const val=f.dataset.field==='location'?(coords(f.value)?coords(f.value).lat+','+coords(f.value).lng:f.value):f.value;
+  const no=await save(k,{[f.dataset.field]:f.dataset.field==='location'&&coords(f.value)?'https://maps.google.com/?q='+val:val});if(no&&['location','shipping','finalTotal','sinpeRef'].includes(f.dataset.field))setTimeout(rerender,10);return}
+  if(e.target.id==='from'||e.target.id==='to'){from=$('#from').value;to=$('#to').value;renderSales()}});
+$('#q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render()});
+load(true);setInterval(()=>load(false),20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load(false)});
+</script></body></html>
