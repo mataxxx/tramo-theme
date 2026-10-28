@@ -122,12 +122,12 @@ function msgTotal(o){
   L.push('Paga por *SINPE Móvil*:','📱 Número: *'+cfg.sinpe+'*','👤 A nombre de: *'+cfg.sinpeName+'*','');
   L.push('✅ *No necesitas enviar foto del comprobante.* Solo respóndenos con el *nombre del titular* de la cuenta desde donde haces el SINPE, para identificar tu pago.','');
   L.push(o.mode==='pickup'?'Al confirmar tu pago te avisamos cuando esté listo para recoger.':o.mode==='delivery'?'Al confirmar tu pago enviamos tu pedido por Uber Flash.':'Al confirmar tu pago despachamos tu encomienda y te mandamos la guía.');
-  L.push('','¡Gracias por tu compra! 🙌','','—','Tramo San Rafael #1 · Mercado Central','tramosanrafael.com');
+  L.push('','¡Gracias por tu compra! 🙌','','tramosanrafael.com');
   return L.join('\n')}
 function msgReady(o){
-  if(o.mode==='pickup')return '¡Hola '+first(o)+'! ✅ Tu pedido *'+o.code+'* ya está *listo para recoger*.\n\n📍 '+cfg.pickup+'\n🕗 Horario: '+cfg.hours+'\n\nSolo menciona tu número de pedido al llegar. ¡Te esperamos!\n\n—\nTramo San Rafael #1 · tramosanrafael.com';
-  if(o.mode==='delivery')return '¡Hola '+first(o)+'! 🛵 Tu pedido *'+o.code+'* ya va en camino por Uber Flash.\n\nPor favor estate pendiente para recibirlo. ¡Gracias por tu compra!\n\n—\nTramo San Rafael #1 · tramosanrafael.com';
-  return '¡Hola '+first(o)+'! 📦 Tu pedido *'+o.code+'* ya fue enviado por encomienda.\n\nTe enviamos aquí la foto de la guía para que le des seguimiento. ¡Gracias por tu compra!\n\n—\nTramo San Rafael #1 · tramosanrafael.com'}
+  if(o.mode==='pickup')return '¡Hola '+first(o)+'! ✅ Tu pedido *'+o.code+'* ya está *listo para recoger*.\n\n📍 '+cfg.pickup+'\n🕗 Horario: '+cfg.hours+'\n\nSolo menciona tu número de pedido al llegar. ¡Te esperamos!\n\ntramosanrafael.com';
+  if(o.mode==='delivery')return '¡Hola '+first(o)+'! 🛵 Tu pedido *'+o.code+'* ya va en camino por Uber Flash.\n\nPor favor estate pendiente para recibirlo. ¡Gracias por tu compra!\n\ntramosanrafael.com';
+  return '¡Hola '+first(o)+'! 📦 Tu pedido *'+o.code+'* ya fue enviado por encomienda.\n\nTe enviamos aquí la foto de la guía para que le des seguimiento. ¡Gracias por tu compra!\n\ntramosanrafael.com'}
 const readyLabel=o=>o.mode==='pickup'?'✅ Listo para recoger':o.mode==='delivery'?'🛵 Va en camino':'📦 Encomienda lista (foto de guía)';
 const readyStatus=o=>o.mode==='pickup'?'listo':'entregado';
 function uberUrl(o){const c=coords(o.location);if(!c)return '';
