@@ -250,3 +250,8 @@
 .ord-send.is-sinpe .ord-send__sinpe { display: block; }
 .ord-send.is-sinpe .ord-send__wa { display: none; }
 .ord-send.is-done { background: #1fa855 !important; border-color: #1fa855 !important; }
+.ord-paybox .ord-sinpe-box { text-align: center !important; }
+.ord-paybox .ord-sinpe-box p.ord-sinpe-box__amount { margin: 2px 0 6px; font-size: 36px !important; font-weight: 800; letter-spacing: -.5px; color: var(--color-primary, #263d25); line-height: 1.1; }
+.ord-paybox .ord-sinpe-box p.ord-sinpe-box__label { margin: 0; font-size: 14px; color: #5b6b58; }
+.ord-paybox .ord-sinpe-box .ord-sinpe-box__num { display: flex; flex-direction: column; align-items: center; }
+.ord-paybox .ord-sinpe-box .ord-copy { margin: 8px auto 0; }
