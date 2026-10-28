@@ -63,7 +63,7 @@
             <label class="ord-opt">
               <input type="radio" name="ord-delivery" value="pickup" data-order-mode>
               <span class="ord-opt__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10 5 4h14l2 6"/><path d="M4 10v10h16V10"/><path d="M3 10h18M9 20v-6h6v6"/></svg></span>
-              <span class="ord-opt__txt"><b>Recoger en el Mercado Central</b><small>{{ settings.order_pickup_place }}</small></span>
+              <span class="ord-opt__txt"><b>Recoger en el Mercado Central · San José</b><small>{{ settings.order_pickup_place }}</small></span>
               <em class="ord-opt__tag">Gratis</em>
             </label>
             <label class="ord-opt">
@@ -75,14 +75,7 @@
           </div>
 
           <div class="ord-pane" data-order-pane="pickup" hidden>
-            {%- if settings.order_sinpe_number != blank -%}
-            <div class="ord-sinpe-box">
-              <p>Deposita <b class="ord-sinpe-box__amt" data-order-amount></b> al <b>SINPE Móvil</b>:</p>
-              <p class="ord-sinpe-box__num"><b>{{ settings.order_sinpe_number }}</b>{%- if settings.order_sinpe_name != blank -%}<small>{{ settings.order_sinpe_name }}</small>{%- endif -%}</p>
-              <button type="button" class="ord-copy" data-order-copy="{{ settings.order_sinpe_number | remove: '-' | remove: ' ' | escape }}">Copiar número</button>
-              <p class="ord-sinpe-box__hint">No necesitas enviar comprobante: el sistema confirmará tu SINPE.</p>
-            </div>
-            {%- endif -%}
+
             <p class="ord-note">{{ settings.order_pickup_note }}</p>
           </div>
 
@@ -116,13 +109,23 @@
         </div>
 
         <div class="ord-page" data-order-page="4" hidden>
-        <p class="ord-paynote ord-paynote--top">{% render 'icon', name: 'phone' %}<span data-order-paytext>Pagas por <b>SINPE Móvil</b> antes de retirar o de enviar tu pedido. Confirmaremos tu pago y te contactaremos por WhatsApp para coordinar el retiro o el envío.</span></p>
-        <div class="ord-box">
-          <h3 class="ord-h">¿Deseas factura electrónica?</h3>
-          <div class="ord-yn" role="radiogroup">
-            <label><input type="radio" name="ord-fe" value="no" data-order-fe checked><span>No</span></label>
-            <label><input type="radio" name="ord-fe" value="si" data-order-fe><span>Sí, con factura</span></label>
+<div class="ord-box ord-paybox">
+          <h3 class="ord-h">Pago</h3>
+          {%- if settings.order_sinpe_number != blank -%}
+          <div class="ord-sinpe-box">
+            <p class="ord-sinpe-box__head"><img src="{{ 'sinpe-movil.png' | asset_url }}" alt="SINPE Móvil" width="360" height="262"><span data-order-sinpe-line>Deposita <b class="ord-sinpe-box__amt" data-order-amount></b> al <b>SINPE Móvil</b>:</span></p>
+            <p class="ord-sinpe-box__num"><b>{{ settings.order_sinpe_number }}</b>{%- if settings.order_sinpe_name != blank -%}<small>{{ settings.order_sinpe_name }}</small>{%- endif -%}</p>
+            <button type="button" class="ord-copy" data-order-copy="{{ settings.order_sinpe_number | remove: '-' | remove: ' ' | escape }}">Copiar número</button>
+            <p class="ord-sinpe-box__hint">No necesitas enviar comprobante: el sistema confirmará tu SINPE.</p>
           </div>
+          {%- endif -%}
+          <p class="ord-paynote ord-paynote--in">{% render 'icon', name: 'phone' %}<span data-order-paytext>Pagas por <b>SINPE Móvil</b> antes de retirar o de enviar tu pedido. Confirmaremos tu pago y te contactaremos por WhatsApp para coordinar el retiro o el envío.</span></p>
+        </div>
+        <div class="ord-box">
+          <label class="ord-switch ord-switch--fe">
+            <span class="ord-switch__txt"><b>Factura electrónica</b><small>Actívalo si la necesitas</small></span>
+            <span class="ord-switch__ui"><input type="checkbox" value="si" data-order-fe aria-label="Quiero factura electrónica"><i></i></span>
+          </label>
           <div class="ord-fe" data-order-fe-fields hidden>
             <label class="ord-field"><span>Tipo de cédula</span>
               <select data-order-fe-type>
@@ -149,7 +152,6 @@
           <label class="ord-field"><span>Nombre del titular de la cuenta que paga</span><input type="text" data-order-payer autocomplete="name" placeholder="Como aparece en el SINPE"></label>
           <p class="ord-tip">Así identificamos tu pago sin que tengas que mandarnos el comprobante.</p>
         </div>
-        <div class="ord-box ord-review" data-order-review></div>
         </div>
         <button type="button" class="ord-more" data-order-more hidden aria-label="Ver más abajo"><span>Desliza para ver más</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <p class="ord-err" data-order-err role="alert" hidden></p>

@@ -187,6 +187,10 @@
     $$('[data-order-pane]', M).forEach(function (p) { p.hidden = p.getAttribute('data-order-pane') !== m; });
     try { showEta(m); } catch (e2) {}
     $('[data-order-send-label]', M).textContent = m === 'delivery' ? 'Enviar pedido y ubicación' : 'Enviar pedido por WhatsApp';
+    var sl = $('[data-order-sinpe-line]', M);
+    if (sl) sl.innerHTML = m === 'pickup'
+      ? 'Deposita <b class="ord-sinpe-box__amt" data-order-amount>' + (cart ? money(cart.total_price) : '') + '</b> al <b>SINPE Móvil</b>:'
+      : 'Te enviamos por WhatsApp el total con el envío y lo pagas al <b>SINPE Móvil</b>:';
     var pt = $('[data-order-paytext]', M);
     if (pt) pt.innerHTML = m === 'pickup'
       ? 'Deposita <b>' + (cart ? money(cart.total_price) : 'el total') + '</b> por <b>SINPE Móvil</b>' + (D.sinpe ? ' al <b>' + esc(D.sinpe) + '</b>' + (D.sinpeName ? ' a nombre de ' + esc(D.sinpeName) : '') : '') + '. El sistema confirmará tu SINPE y te contactaremos por WhatsApp para coordinar el retiro.'

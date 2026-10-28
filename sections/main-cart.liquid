@@ -29,11 +29,8 @@
           <strong>{{ cart.total_price | money }}</strong>
         </div>
         {% render 'cart-cashback' %}
-{%- if settings.order_mode -%}<ul class="cart-howto" role="list">
-              <li>{% render 'icon', name: 'phone' %}<span><b>Pagas por SINPE Móvil</b> antes de retirar o de enviar tu pedido.</span></li>
-              <li>{% render 'icon', name: 'map-pin' %}<span>Te lo enviamos por <b>Uber Flash</b>, recoges en el <b>Mercado Central</b> o va por <b>encomienda</b> a todo el país <small>(el envío se cotiza aparte)</small></span></li>
-            </ul>{%- else -%}<p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>{%- endif -%}
-        <button type="{% if settings.order_mode %}button{% else %}submit{% endif %}"{% unless settings.order_mode %} name="checkout"{% endunless %} class="button button--full" data-checkout-button{% if settings.order_mode %} data-order-open{% endif %}{% if settings.show_pay_methods and settings.require_pay_choice and settings.pay_methods != blank and cart.attributes['Método de pago'] == blank %} disabled{% endif %}>{{ section.settings.checkout_label }}</button>
+{%- if settings.order_mode -%}<ul class="cart-ship" role="list" aria-label="Formas de entrega"><li>{% render 'icon', name: 'scooter' %}<span>Uber Flash</span></li><li>{% render 'icon', name: 'store' %}<span>Retiro en tienda</span></li><li>{% render 'icon', name: 'package' %}<span>Encomienda</span></li></ul>{%- else -%}<p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>{%- endif -%}
+        <div class="checkout-row"><button type="{% if settings.order_mode %}button{% else %}submit{% endif %}"{% unless settings.order_mode %} name="checkout"{% endunless %} class="button button--full" data-checkout-button{% if settings.order_mode %} data-order-open{% endif %}{% if settings.show_pay_methods and settings.require_pay_choice and settings.pay_methods != blank and cart.attributes['Método de pago'] == blank %} disabled{% endif %}>{{ section.settings.checkout_label }}</button>{%- if settings.order_mode -%}<span class="checkout-row__pay" title="Pagás con SINPE Móvil"><small>Pagas con</small><img src="{{ 'sinpe-movil.png' | asset_url }}" alt="SINPE Móvil" width="360" height="262" loading="lazy"></span>{%- endif -%}</div>
         {%- if section.settings.show_secure and settings.order_mode != true -%}
           {% render 'secure-pay', part: 'bottom', text: section.settings.secure_text %}
         {%- endif -%}

@@ -793,13 +793,13 @@
         "type": "text",
         "id": "order_pickup_place",
         "label": "Lugar de retiro",
-        "default": "Mercado Central de San José · Tramo San Rafael #1"
+        "default": "San José · Tramo San Rafael #1"
       },
       {
         "type": "textarea",
         "id": "order_pickup_note",
         "label": "Nota de retiro",
-        "default": "Te enviamos por WhatsApp la ubicación exacta de nuestro local en el Mercado Central y te avisamos cuando tu pedido esté listo para recoger."
+        "default": "📍 Mercado Central, San José · Tramo San Rafael #1. Te avisamos por WhatsApp cuando tu pedido esté listo para recoger."
       },
       {
         "type": "text",

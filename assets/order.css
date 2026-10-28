@@ -202,3 +202,23 @@
 .ord-find-res__msg--soft { background: #f1f5ec; color: #3d5a36; }
 .ord-varnote { margin: 8px 0 0; padding: 9px 11px; border-radius: 10px; background: #eef3fb; border: 1px solid #cfdcf0; color: #1f3b63; font-size: 13.5px; line-height: 1.4; }
 .ord-varnote[hidden] { display: none; }
+
+/* Paso Pago: SINPE con logo */
+.ord-paybox .ord-sinpe-box { margin-top: 4px; }
+.ord-sinpe-box__head { display: flex; align-items: center; gap: 10px; }
+.ord-sinpe-box__head img { width: 54px; height: auto; flex-shrink: 0; }
+.ord-paynote--in { margin: 10px 0 0; }
+
+/* Factura electrónica: interruptor (apagado por defecto) */
+.ord-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+.ord-switch__txt { display: grid; }
+.ord-switch__txt b { font-size: 15px; }
+.ord-switch__txt small { font-size: 12.5px; color: #6b7468; }
+.ord-switch__ui { position: relative; flex-shrink: 0; width: 52px; height: 30px; }
+.ord-switch__ui input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; z-index: 2; cursor: pointer; }
+.ord-switch__ui i { position: absolute; inset: 0; border-radius: 999px; background: #d9d3c4; transition: background-color .2s ease; }
+.ord-switch__ui i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.2); transition: transform .2s ease; }
+.ord-switch__ui input:checked + i { background: var(--color-primary, #263d25); }
+.ord-switch__ui input:checked + i::after { transform: translateX(22px); }
+.ord-switch__ui input:focus-visible + i { outline: 2px solid var(--color-primary, #263d25); outline-offset: 2px; }
+.ord-fe { margin-top: 12px; }
