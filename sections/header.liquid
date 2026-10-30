@@ -73,6 +73,12 @@
     {%- endif -%}
   </a>
 
+  {%- if s.show_search -%}
+    <button type="button" class="header__searchpill" data-open="search" aria-label="Buscar productos">
+      {% render 'icon', name: 'search' %}<span>{{ s.search_placeholder | default: 'Buscar productos...' }}</span>
+    </button>
+  {%- endif -%}
+
   <div class="header__actions">
     {%- if s.show_search -%}
       <button type="button" class="icon-button header__search" data-open="search" aria-label="Buscar">

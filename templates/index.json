@@ -145,7 +145,7 @@
         "c"
       ],
       "settings": {
-        "heading": "Ingredientes para…"
+        "heading": ""
       }
     },
     "queque": {
@@ -200,9 +200,9 @@
     }
   },
   "order": [
+    "circles",
     "trust",
     "hero",
-    "circles",
     "queque",
     "semillas",
     "tamales",

@@ -86,7 +86,8 @@
         "show_videos": false,
         "label_videos": "Vlog",
         "label_cart": "Carrito"
-      }
+      },
+      "disabled": true
     },
     "account-panel": {
       "type": "account-panel",
