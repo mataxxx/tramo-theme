@@ -225,7 +225,7 @@
   }
 
   /* ---------- mapa: Google (limpio, estilo Uber, pin fijo al centro) o OpenStreetMap si no hay llave ---------- */
-  var leafletP = null, googleP = null, kind = null, userMoved = false, cpin = null;
+  var leafletP = null, googleP = null, kind = null, userMoved = false, cpin = null, locked = false;
   var GSTYLE = [
     /* Estilo Uber: fondo gris, calles blancas, casas más claras que el fondo, sin íconos */
     { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
@@ -287,29 +287,31 @@
   function initGoogle(el) {
     el.classList.remove('is-loading'); el.classList.add('is-google'); kind = 'g';
     var c = loc || center0();
-    map = new google.maps.Map(el, { center: c, zoom: loc ? 18 : 14, styles: GSTYLE, disableDefaultUI: true, zoomControl: true, clickableIcons: false, gestureHandling: 'greedy', keyboardShortcuts: false });
+    map = new google.maps.Map(el, { center: c, zoom: loc ? 18 : 14, styles: GSTYLE, disableDefaultUI: true, zoomControl: false, clickableIcons: false, gestureHandling: locked ? 'none' : 'greedy', keyboardShortcuts: false });
     cpin = document.createElement('div'); cpin.className = 'ord-cpin'; cpin.innerHTML = '<span></span><i></i>'; el.appendChild(cpin);
     map.addListener('dragstart', function () { userMoved = true; cpin.classList.add('is-lift'); });
-    map.addListener('click', function (e) { userMoved = true; map.panTo(e.latLng); });
+    map.addListener('click', function (e) { if (locked) return; userMoved = true; map.panTo(e.latLng); });
     map.addListener('idle', function () {
       cpin.classList.remove('is-lift');
-      if (!userMoved) return; userMoved = false;
+      if (!userMoved || locked) { userMoved = false; return; } userMoved = false;
       var p = map.getCenter(); setWaLoc(false);
       loc = { lat: +p.lat().toFixed(6), lng: +p.lng().toFixed(6) };
       if (accCircle) { accCircle.setMap(null); accCircle = null; } acc = null;
       hint('moved'); validate();
     });
     if (loc) showAcc(loc.lat, loc.lng);
+    setLock(locked);
     hint(loc ? 'gps' : null);
   }
   function initLeaflet(el) {
     loadLeaflet().then(function () {
       el.classList.remove('is-loading'); kind = 'l';
       var c = center0();
-      map = L.map(el, { zoomControl: true, attributionControl: true }).setView([c.lat, c.lng], 13);
+      map = L.map(el, { zoomControl: false, attributionControl: true }).setView([c.lat, c.lng], 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
-      map.on('click', function (e) { place(e.latlng.lat, e.latlng.lng); });
+      map.on('click', function (e) { if (!locked) place(e.latlng.lat, e.latlng.lng); });
       if (loc) { place(loc.lat, loc.lng, acc && acc < 60 ? 18 : 17, acc ? 'gps' : null); showAcc(loc.lat, loc.lng); }
+      setLock(locked);
       setTimeout(function () { map.invalidateSize(); }, 80);
     }).catch(function () {
       el.classList.remove('is-loading');
@@ -318,6 +320,7 @@
   }
   var pinIcon = null;
   function place(lat, lng, zoom, src) {
+    if (locked) { if (src === 'gps') return; setLock(false); }
     setWaLoc(false);
     loc = { lat: +lat.toFixed(6), lng: +lng.toFixed(6) };
     if (src !== 'gps' && accCircle) { if (kind === 'g') accCircle.setMap(null); else if (map) map.removeLayer(accCircle); accCircle = null; acc = null; }
@@ -335,13 +338,50 @@
   }
   var acc = null, accCircle = null, gotAuto = false;
   function hint(state) {
+    lockBtn();
     var h = $('[data-order-maphint]', M); if (!h) return;
     var g = kind === 'g';
     h.classList.toggle('is-ok', !!loc && state !== 'busy');
     h.classList.toggle('is-busy', state === 'busy');
     if (state === 'busy') { h.textContent = 'Buscando tu ubicación…'; return; }
     if (!loc) { h.textContent = g ? 'Mueve el mapa para poner el pin en tu casa.' : 'Toca el mapa o arrastra el pin hasta tu casa.'; return; }
-    h.textContent = (acc && state === 'gps' ? '✓ Te ubicamos (±' + Math.round(acc) + ' m). ' : '✓ Ubicación marcada. ') + (g ? 'Si no es justo tu casa, mueve el mapa.' : 'Si no es justo tu casa, arrastra el pin.');
+    if (locked) { h.textContent = '✓ Ubicación confirmada. Si necesitas moverla, toca Cambiar.'; return; }
+    h.textContent = (acc && state === 'gps' ? '✓ Te ubicamos (±' + Math.round(acc) + ' m). ' : '✓ Ubicación marcada. ') + (g ? 'Ajusta moviendo el mapa y toca Confirmar.' : 'Ajusta arrastrando el pin y toca Confirmar.');
+  }
+  /* Bloqueo: una vez confirmada la ubicación el mapa no se mueve al hacer scroll; "Cambiar" lo libera */
+  function setLock(on) {
+    locked = !!on && !!loc;
+    var w = $('[data-order-mapwrap]', M); if (w) w.classList.toggle('is-locked', locked);
+    if (map && kind === 'g') map.setOptions({ gestureHandling: locked ? 'none' : 'greedy' });
+    if (map && kind === 'l') {
+      ['dragging', 'touchZoom', 'scrollWheelZoom', 'doubleClickZoom', 'boxZoom'].forEach(function (k) { if (map[k]) map[k][locked ? 'disable' : 'enable'](); });
+      if (pin && pin.dragging) pin.dragging[locked ? 'disable' : 'enable']();
+    }
+    lockBtn(); hint();
+  }
+  function lockBtn() {
+    var b = $('[data-map-lock]', M); if (!b) return;
+    b.hidden = !loc || waLoc;
+    b.classList.toggle('is-change', locked);
+    b.innerHTML = locked
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/></svg>Cambiar ubicación'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Confirmar ubicación';
+  }
+  function zoomBy(d) {
+    if (!map) return;
+    if (kind === 'g') map.setZoom(Math.max(3, Math.min(21, map.getZoom() + d)));
+    else if (kind === 'l') { if (pin && locked) map.setView(pin.getLatLng(), map.getZoom() + d); else map.setZoom(map.getZoom() + d); }
+  }
+  function toggleBig() {
+    var w = $('[data-order-mapwrap]', M); if (!w) return;
+    var big = w.classList.toggle('is-big');
+    var b = $('[data-map-big]', M); if (b) b.setAttribute('aria-label', big ? 'Achicar mapa' : 'Agrandar mapa');
+    var keep = kind === 'g' && map ? map.getCenter() : null;
+    setTimeout(function () {
+      if (kind === 'l' && map) { map.invalidateSize(); if (pin) map.panTo(pin.getLatLng()); }
+      if (kind === 'g' && map && keep) map.setCenter(keep);
+      if (big) w.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 260);
   }
   function showAcc(lat, lng) { return; /* sin círculo azul: se usa el punto exacto */
     if (!map || !acc || acc > 400) return;
@@ -445,6 +485,7 @@
     var btn = $('[data-order-waloc]', M); if (btn) btn.classList.toggle('is-on', waLoc);
     var h = $('[data-order-maphint]', M); if (h) h.hidden = waLoc;
     var mp = $('[data-order-map]', M); if (mp) mp.classList.toggle('is-dim', waLoc);
+    lockBtn();
   }
 
   /* ---------- validar y enviar ---------- */
@@ -646,7 +687,11 @@
   M.addEventListener('click', function (e) {
     var t = e.target;
     if (t.closest('[data-order-close]')) { close(); return; }
-    var lb = t.closest('[data-order-locate]'); if (lb) { setWaLoc(false); locate(lb); return; }
+    if (t.closest('[data-map-lock]')) { setLock(!locked); return; }
+    if (t.closest('[data-map-zin]')) { zoomBy(1); return; }
+    if (t.closest('[data-map-zout]')) { zoomBy(-1); return; }
+    if (t.closest('[data-map-big]')) { toggleBig(); return; }
+    var lb = t.closest('[data-order-locate]'); if (lb) { setWaLoc(false); if (locked) setLock(false); locate(lb); return; }
     if (t.closest('[data-order-find-go]')) { clearTimeout(findTimer); find($('[data-order-find-q]', M).value); return; }
     if (t.closest('[data-order-waloc]')) { setWaLoc(!waLoc); validate(); return; }
     var fp = t.closest('[data-find-pick]'); if (fp && M._findList) {
@@ -659,7 +704,7 @@
     if (t.closest('[data-order-more]')) { var bd = $('[data-order-body]', M); bd.scrollBy({ top: bd.clientHeight * 0.7, behavior: 'smooth' }); return; }
     var cp = t.closest('[data-order-copy]');
     if (cp && navigator.clipboard) { navigator.clipboard.writeText(cp.getAttribute('data-order-copy')).then(function () { var o = cp.textContent; cp.textContent = '¡Copiado!'; setTimeout(function () { cp.textContent = o; }, 1500); }); return; }
-    if (t.closest('[data-order-next]')) { if (pageOk(page)) go(page + 1); return; }
+    if (t.closest('[data-order-next]')) { if (pageOk(page)) { if (page === 3 && mode === 'delivery' && loc && !locked && !waLoc) setLock(true); go(page + 1); } return; }
     if (t.closest('[data-order-prev]')) { go(page - 1); return; }
     if (t.closest('[data-order-send]')) { if (mode === 'pickup' && !payShown && $('[data-order-sinpebox]', M)) { if (validate()) showPay(); return; } send(); }
   });

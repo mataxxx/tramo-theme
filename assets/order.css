@@ -310,3 +310,24 @@
 .ord-prog__steps li.is-on, .ord-prog__steps li.is-done { color: #111; }
 .ord-eta { background: #f7f7f7; border-color: #e6e6e6; color: #222; }
 .ord-eta small { color: #6b6b6b; }
+
+/* Mapa: controles propios (agrandar, + / −) y bloqueo al confirmar */
+.ord-mapwrap { position: relative; border-radius: 14px; }
+.ord-mapwrap .ord-map { transition: height .25s ease; }
+.ord-mapwrap.is-big .ord-map { height: min(68vh, 560px); }
+.ord-mapctl { position: absolute; right: 10px; top: 10px; z-index: 6; display: flex; flex-direction: column; background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.18); overflow: hidden; }
+.ord-mapctl button { width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: #fff; color: #1d1d1d; cursor: pointer; padding: 0; -webkit-tap-highlight-color: transparent; }
+.ord-mapctl button + button { border-top: 1px solid #ececec; }
+.ord-mapctl button:active { background: #f2f2f2; }
+.ord-mapctl svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.ord-mapctl .i-close { display: none; }
+.ord-mapwrap.is-big .ord-mapctl .i-open { display: none; }
+.ord-mapwrap.is-big .ord-mapctl .i-close { display: inline; }
+.ord-maplock { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 6; display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; border: 0; border-radius: 999px; background: #1d1d1d; color: #fff; font: 600 14px/1 inherit; font-family: inherit; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,.25); cursor: pointer; }
+.ord-maplock svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ord-maplock.is-change { background: #fff; color: #1d1d1d; box-shadow: 0 2px 10px rgba(0,0,0,.2); }
+.ord-maplock[hidden] { display: none; }
+.ord-mapwrap.is-locked .ord-map { cursor: default; }
+.ord-mapwrap.is-locked .ord-cpin span { background: #1d1d1d; }
+.ord-mapwrap.is-locked::after { content: ''; position: absolute; inset: 0; border-radius: 14px; box-shadow: inset 0 0 0 2px #1d1d1d; pointer-events: none; z-index: 4; }
+.ord-mapwrap .leaflet-control-container .leaflet-top.leaflet-left { display: none; }
