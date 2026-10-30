@@ -88,7 +88,7 @@
     <script>
       document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
       window.TRAMO = {
-        moneyFormat: {{ shop.money_format | replace: 'amount_with_comma_separator', 'amount_no_decimals_with_comma_separator' | replace: 'amount_with_space_separator', 'amount_no_decimals_with_space_separator' | replace: '{{amount}}', '{{amount_no_decimals}}' | replace: '₡ ', '₡' | json }},
+        moneyFormat: {{ shop.money_format | replace: 'amount_with_comma_separator', 'amount_no_decimals_with_comma_separator' | replace: 'amount_with_space_separator', 'amount_no_decimals_with_space_separator' | replace: '₡ ', '₡' | json }},
         cartDrawer: {{ settings.cart_type | default: 'drawer' | json }},
         cartPopup: {{ settings.cart_popup | json }},
         loggedIn: {% if customer %}true{% else %}false{% endif %},
