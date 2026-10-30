@@ -3077,3 +3077,7 @@ body.is-locked { overscroll-behavior: none; }
 .cm-filterpop__opts { display: grid; gap: 4px; }
 .cm-filterpop__opts button { text-align: left; border: 0; background: none; padding: 11px 12px; border-radius: 10px; font: inherit; font-size: 15px; color: #1d2a1c; cursor: pointer; }
 .cm-filterpop__opts button.is-active { background: #eef3ea; color: #1f3b22; font-weight: 700; }
+
+/* Tarjetas de producto: foto 10 % más alta y sin "IVA incluido" (la ficha y el carrito lo siguen mostrando) */
+.product-card__media { aspect-ratio: 1 / 0.935 !important; }
+.product-card .price::after { content: none !important; display: none !important; }
