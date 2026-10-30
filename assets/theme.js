@@ -1638,11 +1638,11 @@
     e.chips.innerHTML = '';
     e.chips.hidden = tags.length === 0;
     if (tags.length) {
-      ['Todos'].concat(tags).forEach(function (t, i) {
+      tags.forEach(function (t) {
         var b = document.createElement('button');
-        b.type = 'button'; b.className = 'category-chip' + (i === 0 ? ' is-active' : '');
-        b.setAttribute('data-ctag', i === 0 ? '' : t);
-        var rk = i === 0 ? 'todas' : normText(t).replace(/\s+/g, '-');
+        b.type = 'button'; b.className = 'category-chip';
+        b.setAttribute('data-ctag', t);
+        var rk = normText(t).replace(/\s+/g, '-');
         b.setAttribute('data-region', rk);
         b.innerHTML = (REGION_ICONS[rk] || '') + '<span>' + esc(t) + '</span>';
         e.chips.appendChild(b);
@@ -1784,8 +1784,10 @@
     }
     var chip = t.closest('[data-ctag]');
     if (chip) {
-      cat.tag = chip.getAttribute('data-ctag');
-      $$('[data-ctag]', chip.parentNode).forEach(function (b) { b.classList.toggle('is-active', b === chip); });
+      /* Tocar el botón activo lo apaga y vuelve a mostrar todo */
+      var off = chip.classList.contains('is-active') && chip.getAttribute('data-ctag');
+      cat.tag = off ? '' : chip.getAttribute('data-ctag');
+      $$('[data-ctag]', chip.parentNode).forEach(function (b) { b.classList.toggle('is-active', !off && b === chip); });
       catApply();
     }
   });

@@ -3129,13 +3129,15 @@ body.is-locked { overscroll-behavior: none; }
 .rail-pull__count { font-size: 11px; color: var(--color-muted, #6b7468); line-height: 1.1; text-align: center; }
 @media (min-width: 750px) { .product-rail__item--end { flex-basis: 120px !important; } .rail-pull__ring { width: 60px; height: 60px; } .rail-pull__label { font-size: 15px; } }
 
-/* Botones de filtro de la categoría sobre la foto */
-.category-modal .cm-top .category-modal__chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 18px 12px; }
-.category-modal .cm-top .category-modal__chips::-webkit-scrollbar { display: none; }
-.category-modal .cm-top .category-modal__chips[hidden] { display: none; }
-.category-modal .cm-top .category-chip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; border: 0; border-radius: 999px; background: rgba(255,255,255,.92); color: #1d2a1c; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
-.category-modal .cm-top .category-chip.is-active { background: #1f3b22; color: #fff; }
-.category-modal .cm-top .category-chip .ccicon { display: none; }
+/* Botones de filtro: una fila horizontal debajo de la foto, encima de "X productos" */
+.category-modal .cm-filters--below { padding: 14px 18px 0; background: transparent; }
+.category-modal .cm-filters--below .category-modal__chips { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 0; margin: 0; }
+.category-modal .cm-filters--below .category-modal__chips::-webkit-scrollbar { display: none; }
+.category-modal .cm-filters--below .category-modal__chips[hidden] { display: none; }
+.category-modal .cm-filters--below .category-chip { flex: 0 0 auto; display: inline-flex; align-items: center; padding: 8px 16px; border: 1.5px solid #ddd5c3; border-radius: 999px; background: #fff; color: #1d2a1c; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; box-shadow: none; }
+.category-modal .cm-filters--below .category-chip.is-active { background: #1f3b22; border-color: #1f3b22; color: #fff; }
+.category-modal .cm-filters--below .category-chip .ccicon { display: none; }
+.category-modal .cm-filters--below + .cm-bar { padding-top: 10px; }
 
 /* Ventana de categoría: sin rebote que deje ver un hueco arriba */
 .drawer--category, .drawer--category .category-modal, .drawer--category .drawer__panel { overscroll-behavior: none; }

@@ -32,9 +32,6 @@
         <button type="button" class="close-button close-button--static" data-drawer-close aria-label="Cerrar">{% render 'icon', name: 'close' %}</button>
       </div>
     </header>
-    <div class="category-modal__filters cm-filters" data-category-filters>
-      <div class="category-modal__chips" data-category-chips hidden></div>
-    </div>
     <div class="category-modal__searchwrap" data-category-searchwrap>
       <div class="search-field category-modal__field">
         {% render 'icon', name: 'search' %}
@@ -51,6 +48,9 @@
         </div>
       </div>
     </div>
+    </div>
+    <div class="category-modal__filters cm-filters cm-filters--below" data-category-filters>
+      <div class="category-modal__chips" data-category-chips hidden></div>
     </div>
     <div class="cm-bar">
       <span class="cm-count" data-category-count></span>
