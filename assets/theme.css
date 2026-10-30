@@ -3039,7 +3039,6 @@ body.is-locked { overscroll-behavior: none; }
 /* Celular: en la ventana de categoría también 3 por línea, con tarjetas compactas */
 @media (max-width: 749px) {
   .category-modal__grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px 8px !important; }
-  .category-modal__grid .product-card__media { aspect-ratio: 1 / 1; }
   .category-modal__grid .product-card__info { padding: 7px 8px 9px; }
   .category-modal__grid .product-card__title { font-size: 12.5px !important; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .category-modal__grid .product-card__subtitle { display: none; }
@@ -3051,7 +3050,6 @@ body.is-locked { overscroll-behavior: none; }
   .category-modal__grid .quick-add { width: 28px !important; height: 28px !important; min-width: 28px; flex: 0 0 28px; padding: 0 !important; }
   .category-modal__grid .quick-add .icon { width: 14px !important; height: 14px !important; }
   .category-modal__grid .like-btn { transform: scale(.8); transform-origin: top right; }
-  /* Carruseles: foto cuadrada y título en máximo 2 líneas para que la tarjeta no quede larga */
-  .category-section:not(.cats-section) .product-card__media { aspect-ratio: 1 / 1; }
+  /* Carruseles: título en máximo 2 líneas para que la tarjeta no quede larga */
   .category-section:not(.cats-section) .product-card__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 }
