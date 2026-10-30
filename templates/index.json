@@ -118,7 +118,8 @@
             "title": "Condimentos",
             "icon": "mortar",
             "search_noun": "especia",
-            "icon_asset": "cat-condimentos.png"
+            "icon_asset": "cat-condimentos.png",
+            "filters": "De temporada, Parrilla, Tradicionales, Dulces"
           }
         },
         "c": {
@@ -127,7 +128,8 @@
             "collection": "conservas-y-dulces",
             "title": "Conservas y dulces",
             "icon": "package",
-            "search_noun": "producto"
+            "search_noun": "producto",
+            "filters": "Antojos dulces, Encurtidos artesanales"
           }
         },
         "s": {
@@ -136,7 +138,28 @@
             "collection": "semillas-y-frutas-secas",
             "title": "Semillas y frutas secas",
             "icon": "leaf",
-            "search_noun": "producto"
+            "search_noun": "producto",
+            "filters": "Semillas, Frutas secas"
+          }
+        },
+        "x": {
+          "type": "category",
+          "settings": {
+            "collection": "especias",
+            "title": "Especias",
+            "icon": "mortar",
+            "search_noun": "especia",
+            "filters": "Picantes, Dulces"
+          }
+        },
+        "h": {
+          "type": "category",
+          "settings": {
+            "collection": "hierbas-y-chiles-secos",
+            "title": "Hierbas y chiles secos",
+            "icon": "leaf",
+            "search_noun": "producto",
+            "filters": "Hierbas, Chiles secos"
           }
         }
       },
@@ -145,6 +168,8 @@
         "s",
         "t",
         "e",
+        "x",
+        "h",
         "c"
       ],
       "settings": {
@@ -179,7 +204,8 @@
         "popup_search": "icon",
         "collection": "especias-navidenas",
         "heading": "Condimentos",
-        "search_noun": "especia"
+        "search_noun": "especia",
+        "filter_tags": "De temporada, Parrilla, Tradicionales, Dulces"
       }
     },
     "conservas": {
@@ -189,7 +215,8 @@
         "popup_search": "icon",
         "collection": "conservas-y-dulces",
         "heading": "Conservas y dulces",
-        "search_noun": "producto"
+        "search_noun": "producto",
+        "filter_tags": "Antojos dulces, Encurtidos artesanales"
       }
     },
     "semillas": {
@@ -199,7 +226,8 @@
         "popup_search": "icon",
         "collection": "semillas-y-frutas-secas",
         "heading": "Semillas y frutas secas",
-        "search_noun": "producto"
+        "search_noun": "producto",
+        "filter_tags": "Semillas, Frutas secas"
       }
     }
   },
