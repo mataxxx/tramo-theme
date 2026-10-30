@@ -31,7 +31,8 @@
         "t1",
         "t2"
       ],
-      "settings": {}
+      "settings": {},
+      "disabled": true
     },
     "hero": {
       "type": "hero",
@@ -92,7 +93,7 @@
           "type": "category",
           "settings": {
             "collection": "queque-navideno",
-            "title": "Queque navideño",
+            "title": "Navidad",
             "icon": "cake",
             "search_noun": "producto",
             "icon_asset": "cat-queque.png"

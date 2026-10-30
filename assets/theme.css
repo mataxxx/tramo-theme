@@ -2958,7 +2958,7 @@ body.is-locked { overscroll-behavior: none; }
 
 /* Celular: encabezado verde (como el pie), espacio del logo reservado, buscador a lo ancho para escribir ahí mismo */
 @media (max-width: 749px) {
-  .site-header { background: #1f3b22 !important; padding: 12px 14px 30px !important; }
+  .site-header { background: #1f3b22 !important; padding: 12px 14px 40px !important; }
   .site-header .header__actions { display: contents !important; }
   .site-header .header__right { grid-column: 3; grid-row: 1; justify-self: end; display: flex; align-items: center; gap: 2px; }
   .site-header .brand-mark { visibility: hidden; }
@@ -3003,3 +3003,14 @@ body.is-locked { overscroll-behavior: none; }
 /* Categorías arriba, sin título */
 .cats-section .cats-heading { display: none; }
 
+/* Portada: círculos solo con foto, categorías y banner más arriba, banner redondeado con márgenes */
+.cats-circle__icon { display: none !important; }
+.cats-circle::after { display: none !important; }
+.cats-section { margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 4px !important; }
+.hero-wrap { margin-bottom: 30px !important; }
+.hero-wrap .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin: 4px 16px 0 !important; border-radius: 20px !important; overflow: hidden; }
+.hero-wrap .hero { margin: 0 !important; }
+@media (min-width: 750px) {
+  .hero-wrap .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin: 8px var(--page-pad) 0 !important; border-radius: 24px !important; }
+  .hero-wrap { margin-bottom: 40px !important; }
+}
