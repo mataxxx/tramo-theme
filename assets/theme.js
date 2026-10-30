@@ -402,16 +402,34 @@
     if (quickCache[url]) { render(quickCache[url]); return; }
 
     body.innerHTML = '<p class="quick-view__loading">Cargando…</p>';
+    prefetchQuick(url)
+      .then(function (html) { if (!html) throw new Error('quick view'); render(html); })
+      .catch(function () { window.location.href = url; });
+  }
+  /* Precarga de la ficha: empieza a descargar apenas el dedo toca la tarjeta (o el mouse pasa encima),
+     así al soltar ya está lista */
+  var quickPending = {};
+  function prefetchQuick(url) {
+    if (!url) return Promise.resolve(null);
+    if (quickCache[url]) return Promise.resolve(quickCache[url]);
+    if (quickPending[url]) return quickPending[url];
     var join = url.indexOf('?') > -1 ? '&' : '?';
-    fetch(url + join + 'view=quick')
+    quickPending[url] = fetch(url + join + 'view=quick')
       .then(function (r) { if (!r.ok) throw new Error('quick view'); return r.text(); })
       .then(function (html) {
         if (html.indexOf('data-product-root') === -1) throw new Error('quick view');
-        quickCache[url] = html;
-        render(html);
+        quickCache[url] = html; return html;
       })
-      .catch(function () { window.location.href = url; });
+      .catch(function (e) { delete quickPending[url]; throw e; });
+    return quickPending[url];
   }
+  function warmQuick(e) {
+    var a = e.target && e.target.closest && e.target.closest('[data-quick-view]');
+    if (a) { prefetchQuick(a.getAttribute('data-quick-view')).catch(function () {}); }
+  }
+  document.addEventListener('pointerdown', warmQuick, { passive: true });
+  document.addEventListener('touchstart', warmQuick, { passive: true });
+  document.addEventListener('mouseover', function (e) { if (window.matchMedia && window.matchMedia('(hover: hover)').matches) warmQuick(e); }, { passive: true });
 
   /* ---------- Producto: variantes, granel y compra -------------------- */
   function initProducts(scope) {
