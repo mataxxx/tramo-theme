@@ -184,7 +184,8 @@
         "collection": "queque-navideno",
         "heading": "Queque navideño",
         "search_noun": "producto",
-        "filter_tags": "Frutas, Semillas, Especias y más"
+        "filter_tags": "Frutas, Semillas, Especias y más",
+        "products_to_show": 6
       }
     },
     "tamales": {
@@ -194,7 +195,8 @@
         "popup_search": "icon",
         "collection": "tamales",
         "heading": "Ingredientes para tamal",
-        "search_noun": "producto"
+        "search_noun": "producto",
+        "products_to_show": 6
       }
     },
     "especias": {
@@ -205,7 +207,8 @@
         "collection": "especias-navidenas",
         "heading": "Condimentos",
         "search_noun": "especia",
-        "filter_tags": "De temporada, Parrilla, Tradicionales, Dulces"
+        "filter_tags": "De temporada, Parrilla, Tradicionales, Dulces",
+        "products_to_show": 6
       }
     },
     "conservas": {
@@ -216,7 +219,8 @@
         "collection": "conservas-y-dulces",
         "heading": "Conservas y dulces",
         "search_noun": "producto",
-        "filter_tags": "Antojos dulces, Encurtidos artesanales"
+        "filter_tags": "Antojos dulces, Encurtidos artesanales",
+        "products_to_show": 6
       }
     },
     "semillas": {
@@ -227,7 +231,8 @@
         "collection": "semillas-y-frutas-secas",
         "heading": "Semillas y frutas secas",
         "search_noun": "producto",
-        "filter_tags": "Semillas, Frutas secas"
+        "filter_tags": "Semillas, Frutas secas",
+        "products_to_show": 6
       }
     }
   },
