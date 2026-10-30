@@ -3128,3 +3128,11 @@ body.is-locked { overscroll-behavior: none; }
 .rail-pull__label { font-weight: 700; font-size: 13.5px; line-height: 1.1; }
 .rail-pull__count { font-size: 11px; color: var(--color-muted, #6b7468); line-height: 1.1; text-align: center; }
 @media (min-width: 750px) { .product-rail__item--end { flex-basis: 120px !important; } .rail-pull__ring { width: 60px; height: 60px; } .rail-pull__label { font-size: 15px; } }
+
+/* Botones de filtro de la categoría sobre la foto */
+.category-modal .cm-top .category-modal__chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 18px 12px; }
+.category-modal .cm-top .category-modal__chips::-webkit-scrollbar { display: none; }
+.category-modal .cm-top .category-modal__chips[hidden] { display: none; }
+.category-modal .cm-top .category-chip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; border: 0; border-radius: 999px; background: rgba(255,255,255,.92); color: #1d2a1c; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.category-modal .cm-top .category-chip.is-active { background: #1f3b22; color: #fff; }
+.category-modal .cm-top .category-chip .ccicon { display: none; }
