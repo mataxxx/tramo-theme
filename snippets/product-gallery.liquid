@@ -24,7 +24,7 @@
         </div>
       {%- else -%}
         <div class="product-gallery__slide">
-          <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+          <div class="product-card__placeholder">{% render 'product-placeholder' %}</div>
         </div>
       {%- endfor -%}
     </div>

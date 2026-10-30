@@ -72,7 +72,7 @@
         {{ product.media[1].preview_image | image_url: width: 600 | image_tag: widths: '240, 360, 480, 600', sizes: '(min-width: 750px) 290px, 45vw', loading: 'lazy', alt: '', class: 'product-card__alt' }}
       {%- endif -%}
     {%- else -%}
-      <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+      <div class="product-card__placeholder">{% render 'product-placeholder' %}</div>
     {%- endif -%}
     {%- unless product.available -%}
       <span class="badge">Agotado</span>

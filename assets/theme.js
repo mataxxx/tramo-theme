@@ -1638,11 +1638,11 @@
     e.chips.innerHTML = '';
     e.chips.hidden = tags.length === 0;
     if (tags.length) {
-      tags.forEach(function (t) {
+      ['Todo'].concat(tags).forEach(function (t, i) {
         var b = document.createElement('button');
-        b.type = 'button'; b.className = 'category-chip';
-        b.setAttribute('data-ctag', t);
-        var rk = normText(t).replace(/\s+/g, '-');
+        b.type = 'button'; b.className = 'category-chip' + (i === 0 ? ' is-active' : '');
+        b.setAttribute('data-ctag', i === 0 ? '' : t);
+        var rk = i === 0 ? 'todo' : normText(t).replace(/\s+/g, '-');
         b.setAttribute('data-region', rk);
         b.innerHTML = (REGION_ICONS[rk] || '') + '<span>' + esc(t) + '</span>';
         e.chips.appendChild(b);
@@ -1714,6 +1714,11 @@
     catFill(tmp.innerHTML);
     openDrawer('category');
   }
+  /* Al abrir una categoría siempre empieza arriba, sin búsqueda ni filtros de la vez anterior */
+  function catResetScroll() {
+    function top() { ['[data-drawer="category"]', '[data-drawer="category"] .drawer__panel', '.category-modal', '.category-modal__body', '[data-category-grid]'].forEach(function (sel) { var el = $(sel); if (el) el.scrollTop = 0; }); }
+    top(); requestAnimationFrame(top); setTimeout(top, 60);
+  }
   function openCategoryByHandle(handle, title, question, extraFilters) {
     var scope = document.querySelector('[data-category-scope][data-category-handle="' + handle + '"]');
     var tpl = scope && $('[data-category-template]', scope);
@@ -1724,10 +1729,12 @@
       tmp.appendChild(tpl.content.cloneNode(true));
       catFill(tmp.innerHTML);
       openDrawer('category');
+      catResetScroll();
       return;
     }
     catEls().grid.innerHTML = '<p class="category-modal__empty">Cargando…</p>';
     openDrawer('category');
+    catResetScroll();
     fetch(ROOT + 'collections/' + encodeURIComponent(handle) + '?view=popup')
       .then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); })
       .then(function (html) { catFill(html); })
@@ -1787,7 +1794,7 @@
       /* Tocar el botón activo lo apaga y vuelve a mostrar todo */
       var off = chip.classList.contains('is-active') && chip.getAttribute('data-ctag');
       cat.tag = off ? '' : chip.getAttribute('data-ctag');
-      $$('[data-ctag]', chip.parentNode).forEach(function (b) { b.classList.toggle('is-active', !off && b === chip); });
+      $$('[data-ctag]', chip.parentNode).forEach(function (b) { b.classList.toggle('is-active', off ? b.getAttribute('data-ctag') === '' : b === chip); });
       catApply();
     }
   });

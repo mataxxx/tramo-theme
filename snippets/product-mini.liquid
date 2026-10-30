@@ -24,7 +24,7 @@
     {%- if product.featured_media -%}
       {{ product.featured_media | image_url: width: 240 | image_tag: loading: 'lazy', alt: product.title, sizes: '120px', widths: '120, 240' }}
     {%- else -%}
-      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% render 'product-placeholder' %}
     {%- endif -%}
   </span>
   <span class="pmini__title">{{ product.title }}</span>
