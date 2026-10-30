@@ -2174,13 +2174,16 @@
       var visible = rail.scrollLeft + rail.clientWidth - item.offsetLeft;
       return Math.max(0, Math.min(1, visible / item.offsetWidth));
     }
-    function paint() {
+    var userScrolled = false;
+    function paint(ev) {
       var p = progress();
+      /* Solo abre si la persona deslizó el carrusel (nunca al cargar la página ni en carruseles cortos que no se deslizan) */
+      var canPull = userScrolled && rail.scrollWidth > rail.clientWidth + 20 && rail.scrollLeft > 20;
       btn.style.setProperty('--pull', (p * 0.7).toFixed(3));
       btn.classList.toggle('is-near', p > 0.92);
       clearTimeout(timer);
       btn.classList.remove('is-loading');
-      if (p > 0.92 && !opened) {
+      if (p > 0.92 && !opened && canPull) {
         /* el dedo se detuvo al final: completar el círculo y abrir */
         timer = setTimeout(function () {
           if (progress() < 0.92) return;
@@ -2198,6 +2201,7 @@
         }, 180);
       }
     }
+    ['touchstart', 'pointerdown', 'wheel'].forEach(function (t) { rail.addEventListener(t, function () { userScrolled = true; }, { passive: true }); });
     rail.addEventListener('scroll', paint, { passive: true });
     paint();
   });
