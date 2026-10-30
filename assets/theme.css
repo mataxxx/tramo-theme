@@ -3035,3 +3035,4 @@ body.is-locked { overscroll-behavior: none; }
   .category-section:not(.cats-section) .quick-add .icon { width: 15px !important; height: 15px !important; }
   .category-section:not(.cats-section) .like-btn { transform: scale(.85); transform-origin: top right; }
 }
+
