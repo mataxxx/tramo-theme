@@ -87,7 +87,7 @@ const INV={FE:'Factura electrónica',TN:'Tiquete de caja',TE:'Tiquete electróni
 const SOLD=['pagado','preparando','listo','entregado'];
 let orders=[],sums=[],cfg={},filter='activos',open={},known=null,ver=null,view='pedidos',q='',period='hoy',from='',to='';
 const $=s=>document.querySelector(s);
-const money=n=>'₡'+String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const money=n=>'₡'+String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'\u202f');
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ago=t=>{const m=Math.round((Date.now()-t)/60000);if(m<1)return'ahora';if(m<60)return'hace '+m+' min';const h=Math.round(m/60);if(h<24)return'hace '+h+' h';return new Date(t).toLocaleDateString('es-CR',{day:'numeric',month:'short'})};
 const phone8=o=>String(o.phone||'').replace(/\D/g,'').slice(-8);
