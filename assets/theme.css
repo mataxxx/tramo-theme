@@ -3008,7 +3008,8 @@ body.is-locked { overscroll-behavior: none; }
 .cats-circle::after { display: none !important; }
 .cats-section { margin-top: 0 !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 4px !important; }
 .hero-wrap { margin-bottom: 30px !important; }
-.hero-wrap .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin: 4px 16px 0 !important; border-radius: 20px !important; overflow: hidden; }
+.hero-wrap .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin: 4px 16px 0 !important; width: auto !important; max-width: none !important; border-radius: 20px !important; overflow: hidden !important; isolation: isolate; }
+.hero-wrap .hero-track > .hero { border-radius: 0 !important; }
 .hero-wrap .hero { margin: 0 !important; }
 @media (min-width: 750px) {
   .hero-wrap .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { margin: 8px var(--page-pad) 0 !important; border-radius: 24px !important; }
