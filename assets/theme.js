@@ -1621,6 +1621,9 @@
     if (fv && fv.closest('label')) fv.closest('label').hidden = getLikes().length === 0;
     var fl = $('[data-category-filters]'); if (fl) fl.hidden = false;
     e.empty.hidden = true;
+    $$('[data-cm-filterpop] [data-csort]').forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-csort') === 'default'); });
+    var cmfb = $('[data-cm-filter]'); if (cmfb) cmfb.classList.remove('is-on');
+    var cmpop = $('[data-cm-filterpop]'); if (cmpop) cmpop.hidden = true;
     $$('[data-csort]', e.sort).forEach(function (b) {
       b.classList.toggle('is-active', b.getAttribute('data-csort') === 'default');
       if (b.hasAttribute('data-label-asc')) b.textContent = b.getAttribute('data-label-asc');
@@ -1629,7 +1632,7 @@
     e.chips.innerHTML = '';
     e.chips.hidden = tags.length === 0;
     if (tags.length) {
-      ['Todas'].concat(tags).forEach(function (t, i) {
+      ['Todos'].concat(tags).forEach(function (t, i) {
         var b = document.createElement('button');
         b.type = 'button'; b.className = 'category-chip' + (i === 0 ? ' is-active' : '');
         b.setAttribute('data-ctag', i === 0 ? '' : t);
@@ -1753,6 +1756,15 @@
     if (cmf) { var pop = $('[data-cm-filterpop]'); if (pop) { pop.hidden = !pop.hidden; cmf.setAttribute('aria-expanded', pop.hidden ? 'false' : 'true'); cmf.classList.toggle('is-on', !pop.hidden); } return; }
     var sb = t.closest('[data-csort]');
     if (sb && sb.closest('[data-cm-filterpop]')) { setTimeout(function () { var pop2 = $('[data-cm-filterpop]'); if (pop2) pop2.hidden = true; var fb = $('[data-cm-filter]'); if (fb) { fb.classList.toggle('is-on', sb.getAttribute('data-csort') !== 'default'); fb.setAttribute('aria-expanded', 'false'); } }, 120); }
+    if (sb && sb.closest('[data-cm-filterpop]')) {
+      var k2 = sb.getAttribute('data-csort');
+      cat.sort = k2 === 'price-desc' ? 'price' : k2;
+      cat.desc = k2 === 'price-desc';
+      $$('[data-csort]', sb.parentNode).forEach(function (b) { b.classList.toggle('is-active', b === sb); });
+      if (k2 === 'default') catRestoreOrder();
+      catApply();
+      return;
+    }
     if (sb) {
       var kind = sb.getAttribute('data-csort');
       if (kind === 'price' && cat.sort === 'price') cat.desc = !cat.desc; else cat.desc = false;

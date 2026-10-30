@@ -94,11 +94,11 @@
           "type": "category",
           "settings": {
             "collection": "queque-navideno",
-            "title": "Navidad",
+            "title": "Queque navideño",
             "icon": "cake",
             "search_noun": "producto",
             "icon_asset": "cat-queque.png",
-            "panel_title": "Queque navideño"
+            "filters": "Fruta picada, Fruta seca, Semillas, Para hornear"
           }
         },
         "t": {
@@ -158,7 +158,8 @@
         "popup_search": "icon",
         "collection": "queque-navideno",
         "heading": "Queque navideño",
-        "search_noun": "producto"
+        "search_noun": "producto",
+        "filter_tags": "Fruta picada, Fruta seca, Semillas, Para hornear"
       }
     },
     "tamales": {
