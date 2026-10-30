@@ -33,7 +33,7 @@
       {%- if prop.last != blank and prop.first.first != '_' -%}<p class="cart-line__variant cart-line__prop">{{ prop.first }}: {{ prop.last }}</p>{%- endif -%}
     {%- endfor -%}
     {%- for discount in item.line_level_discount_allocations -%}
-      <p class="cart-line__discount">{{ discount.discount_application.title }} (-{{ discount.amount | money }})</p>
+      <p class="cart-line__discount">{{ discount.discount_application.title }} (-{{ discount.amount | money_without_trailing_zeros | replace: '₡ ', '₡' }})</p>
     {%- endfor -%}
 
     <div class="cart-line__row">
@@ -60,9 +60,9 @@
       </div>
       <div class="cart-line__price">
         {%- if item.original_line_price > item.final_line_price -%}
-          <s>{{ item.original_line_price | money }}</s>
+          <s>{{ item.original_line_price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</s>
         {%- endif -%}
-        <strong>{%- if item.product.metafields.custom.peso_variable.value == true -%}≈ {% endif -%}{{ item.final_line_price | money }}</strong>
+        <strong>{%- if item.product.metafields.custom.peso_variable.value == true -%}≈ {% endif -%}{{ item.final_line_price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</strong>
       </div>
       <button type="button" class="icon-button" data-line-remove aria-label="Quitar {{ item.product.title | escape }}">{% render 'icon', name: 'trash' %}</button>
     </div>

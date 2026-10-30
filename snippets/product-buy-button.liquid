@@ -37,7 +37,7 @@
         Agotado
       {%- endif -%}
     </span>
-    <span class="button__price" data-add-price>{% if current_variant.available and current_variant.price > 0 %}· {{ current_variant.price | money }}{% endif %}</span>
+    <span class="button__price" data-add-price>{% if current_variant.available and current_variant.price > 0 %}· {{ current_variant.price | money_without_trailing_zeros | replace: '₡ ', '₡' }}{% endif %}</span>
   </button>
   <p class="form-error" data-form-error role="alert" hidden></p>
 {% endform %}

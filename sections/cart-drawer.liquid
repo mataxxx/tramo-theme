@@ -32,7 +32,7 @@
             {%- assign has_var = false -%}{%- for it in cart.items -%}{%- if it.product.metafields.custom.peso_variable.value == true -%}{%- assign has_var = true -%}{%- endif -%}{%- endfor -%}
             <div class="cart-total">
               <span>{% if has_var %}Subtotal aproximado{% else %}Subtotal{% endif %}</span>
-              <strong data-cart-total>{{ cart.total_price | money }}</strong>
+              <strong data-cart-total>{{ cart.total_price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</strong>
             </div>
             {% render 'cart-cashback' %}
 {%- if settings.order_mode -%}<ul class="cart-ship" role="list" aria-label="Formas de entrega"><li>{% render 'icon', name: 'scooter' %}<span>Uber Flash</span></li><li>{% render 'icon', name: 'store' %}<span>Retiro en tienda</span></li><li>{% render 'icon', name: 'package' %}<span>Encomienda</span></li></ul>{%- else -%}<p class="muted small">Impuestos y envío se calculan al finalizar la compra.</p>{%- endif -%}

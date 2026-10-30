@@ -20,7 +20,7 @@
   function set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function del(k) { try { localStorage.removeItem(k); } catch (e) {} }
   function ses(k, v) { try { if (v === undefined) return JSON.parse(sessionStorage.getItem(k) || 'null'); sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
-  function money(m) { try { return new Intl.NumberFormat('es-CR', { style: 'currency', currency: m.currencyCode, maximumFractionDigits: 0 }).format(Number(m.amount)); } catch (e) { return m.amount + ' ' + m.currencyCode; } }
+  function money(m) { var n = Math.round(Number(m.amount) || 0); return (m.currencyCode === 'CRC' || !m.currencyCode ? '₡' : m.currencyCode + ' ') + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function fdate(d) { try { return new Date(d).toLocaleDateString('es-CR', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return d; } }
   function redirectUri() { return location.origin + (host.dataset.callback || location.pathname); }
 

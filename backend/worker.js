@@ -425,7 +425,7 @@ async function handleNewOrder(request, env, ctx) {
   await putOrder(env, key, order);
   if (code) await env.ORDERS.put('c:' + code, key, { expirationTtl: 60 * 60 * 24 * 30 });
   if (status === 'incompleto') return json({ ok: true, draft: true });
-  const head = (prev && prev.notifiedDraft ? '✅ Se completó el pedido ' : '🛒 Pedido nuevo ') + (code || '') + ' · ' + (order.variable.length ? '≈ ' : '') + '₡' + Math.round(order.total).toLocaleString('es-CR') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '') + (order.variable.length ? ' · ⚖️ pesar: ' + order.variable.join(', ') : '');
+  const head = (prev && prev.notifiedDraft ? '✅ Se completó el pedido ' : '🛒 Pedido nuevo ') + (code || '') + ' · ' + (order.variable.length ? '≈ ' : '') + '₡' + String(Math.round(order.total)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' · ' + MODE_LABEL[mode] + (order.eta ? ' · ' + order.eta : '') + (order.variable.length ? ' · ⚖️ pesar: ' + order.variable.join(', ') : '');
   const note = notifyOwner(env, head + '\n\n' + order.message);
   if (ctx) ctx.waitUntil(note); else await note;
   return json({ ok: true });
@@ -454,7 +454,7 @@ async function panelAuthed(request, env) {
   return (await sign(env, role === 'prep' ? m[2] + '.prep' : m[2], role)) === m[1] ? role : null;
 }
 // Cambia con cada versión del panel: las pantallas abiertas se recargan solas
-const APP_V = '2026-10-28-5';
+const APP_V = '2026-10-29-1';
 const SOLD_ST = ['pagado', 'preparando', 'listo', 'entregado'];
 function setStatusOn(o, st, now) {
   if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (SOLD_ST.includes(st) && !o.paidAt) o.paidAt = now; }

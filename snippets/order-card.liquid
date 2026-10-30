@@ -35,7 +35,7 @@
       <strong class="order-card__number">{% if order != blank %}{{ order.name }}{% else %}#1001{% endif %}</strong>
       <small class="order-card__date">{% if order != blank %}{{ order.created_at | date: '%d/%m/%Y' }}{% else %}Ejemplo{% endif %}</small>
     </div>
-    <span class="order-card__total">{% if order != blank %}{{ order.total_price | money }}{% else %}{{ 12500 | times: 100 | money }}{% endif %}</span>
+    <span class="order-card__total">{% if order != blank %}{{ order.total_price | money_without_trailing_zeros | replace: '₡ ', '₡' }}{% else %}{{ 12500 | times: 100 | money_without_trailing_zeros | replace: '₡ ', '₡' }}{% endif %}</span>
   </header>
 
   {%- if order != blank -%}

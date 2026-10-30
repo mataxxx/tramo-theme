@@ -43,8 +43,8 @@
     </ul>
     <div class="combo__total">
       <span class="combo__prices">
-        {%- if combo_final < combo_total -%}<s>{{ combo_total | money }}</s>{%- endif -%}
-        <strong>{{ combo_final | money }}</strong>
+        {%- if combo_final < combo_total -%}<s>{{ combo_total | money_without_trailing_zeros | replace: '₡ ', '₡' }}</s>{%- endif -%}
+        <strong>{{ combo_final | money_without_trailing_zeros | replace: '₡ ', '₡' }}</strong>
         {%- if combo_final < combo_total -%}<em class="combo__badge">-{{ combo_pct }}%</em>{%- endif -%}
       </span>
       <button type="button" class="button" data-combo-add>{{ button_label }}</button>

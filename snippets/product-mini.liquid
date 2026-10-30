@@ -30,11 +30,11 @@
   <span class="pmini__title">{{ product.title }}</span>
   <span class="pmini__price">
     {%- if bulk != nil -%}
-      {{ bulk.price | times: per_kg | money }}<small> / kg</small>
+      {{ bulk.price | times: per_kg | money_without_trailing_zeros | replace: '₡ ', '₡' }}<small> / kg</small>
     {%- elsif min_p != nil -%}
-      {%- if max_p > min_p -%}<small>Desde </small>{%- endif -%}{{ min_p | money }}
+      {%- if max_p > min_p -%}<small>Desde </small>{%- endif -%}{{ min_p | money_without_trailing_zeros | replace: '₡ ', '₡' }}
     {%- else -%}
-      {{ product.price | money }}
+      {{ product.price | money_without_trailing_zeros | replace: '₡ ', '₡' }}
     {%- endif -%}
   </span>
 </a>
