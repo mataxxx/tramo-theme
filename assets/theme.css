@@ -2958,7 +2958,7 @@ body.is-locked { overscroll-behavior: none; }
 
 /* Celular: encabezado verde (como el pie), espacio del logo reservado, buscador a lo ancho para escribir ahí mismo */
 @media (max-width: 749px) {
-  .site-header { background: #1f3b22 !important; padding: 12px 14px 40px !important; }
+  .site-header { background: #1f3b22 !important; padding: 12px 14px 19px !important; }
   .site-header .header__actions { display: contents !important; }
   .site-header .header__right { grid-column: 3; grid-row: 1; justify-self: end; display: flex; align-items: center; gap: 2px; }
   .site-header .brand-mark { visibility: hidden; }
@@ -2998,7 +2998,8 @@ body.is-locked { overscroll-behavior: none; }
   /* Contenido en tarjeta blanca redondeada que sube sobre el rojo */
   /* Borde redondeado crema al final del verde, como tarjeta que sube */
   .site-header { position: relative; }
-  .site-header::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 22px; background: var(--color-bg, #f6f1e6); border-radius: 22px 22px 0 0; pointer-events: none; }
+  /* Esquinas verdes curvas debajo del header (no tapa el contenido al hacer scroll: el centro es transparente) */
+  .site-header::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 22px; margin-top: -1px; pointer-events: none; background: radial-gradient(circle at 100% 100%, transparent 21.5px, #1f3b22 22px) left top / 22px 22px no-repeat, radial-gradient(circle at 0 100%, transparent 21.5px, #1f3b22 22px) right top / 22px 22px no-repeat; }
 }
 /* Categorías arriba, sin título */
 .cats-section .cats-heading { display: none; }
