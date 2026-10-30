@@ -418,7 +418,13 @@
       .then(function (r) { if (!r.ok) throw new Error('quick view'); return r.text(); })
       .then(function (html) {
         if (html.indexOf('data-product-root') === -1) throw new Error('quick view');
-        quickCache[url] = html; return html;
+        quickCache[url] = html;
+        /* Precargar también la foto principal para que aparezca de una vez */
+        try {
+          var m = html.match(/<img[^>]+srcset="([^"]+)"[^>]*>/);
+          if (m) { var im = new Image(); im.sizes = '(min-width: 750px) 50vw, 100vw'; im.srcset = m[1].replace(/&amp;/g, '&'); }
+        } catch (e) {}
+        return html;
       })
       .catch(function (e) { delete quickPending[url]; throw e; });
     return quickPending[url];
