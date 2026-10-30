@@ -2160,15 +2160,47 @@
   })();
 })();
 
-/* Final del carrusel: animar "Ver todo" cuando aparece */
+/* Final del carrusel: "Ver más" con un círculo que se llena al deslizar.
+   Si llegas al final y sueltas, el círculo se completa y se abre la categoría completa. */
 (function () {
-  var ends = document.querySelectorAll('[data-rail-end]');
-  if (!ends.length) return;
-  if (!('IntersectionObserver' in window)) { ends.forEach(function (el) { el.classList.add('is-visible'); }); return; }
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
-  }, { threshold: 0.35 });
-  ends.forEach(function (el) { io.observe(el); });
+  var items = document.querySelectorAll('[data-rail-pull]');
+  if (!items.length) return;
+  items.forEach(function (btn) {
+    var item = btn.closest('.product-rail__item');
+    var rail = btn.closest('.product-rail');
+    if (!item || !rail) return;
+    var timer = null, opened = false, lastOpen = 0;
+    function progress() {
+      var visible = rail.scrollLeft + rail.clientWidth - item.offsetLeft;
+      return Math.max(0, Math.min(1, visible / item.offsetWidth));
+    }
+    function paint() {
+      var p = progress();
+      btn.style.setProperty('--pull', (p * 0.7).toFixed(3));
+      btn.classList.toggle('is-near', p > 0.92);
+      clearTimeout(timer);
+      btn.classList.remove('is-loading');
+      if (p > 0.92 && !opened) {
+        /* el dedo se detuvo al final: completar el círculo y abrir */
+        timer = setTimeout(function () {
+          if (progress() < 0.92) return;
+          btn.classList.add('is-loading');
+          timer = setTimeout(function () {
+            if (progress() < 0.92 || Date.now() - lastOpen < 1500) { btn.classList.remove('is-loading'); return; }
+            opened = true; lastOpen = Date.now();
+            btn.click();
+            setTimeout(function () {
+              btn.classList.remove('is-loading');
+              rail.scrollTo({ left: Math.max(0, item.offsetLeft - rail.clientWidth - 40), behavior: 'smooth' });
+              setTimeout(function () { opened = false; }, 600);
+            }, 400);
+          }, 650);
+        }, 180);
+      }
+    }
+    rail.addEventListener('scroll', paint, { passive: true });
+    paint();
+  });
 })();
 
 /* Descripción del producto: recortar a 2 líneas con flechita si es larga */

@@ -41,19 +41,13 @@
       {%- endfor -%}
       {%- if section.settings.show_expand -%}
         <div class="product-rail__item product-rail__item--end">
-          <button type="button" class="rail-end" data-category-open data-rail-end data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?">
-            <span class="rail-end__fan" aria-hidden="true">
-              {%- assign fan = 0 -%}
-              {%- for product in coll.products -%}
-                {%- if product.featured_image != blank and fan < 3 -%}
-                  {%- assign fan = fan | plus: 1 -%}
-                  <span class="rail-end__thumb rail-end__thumb--{{ fan }}">{{ product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: '' }}</span>
-                {%- endif -%}
-              {%- endfor -%}
-              <span class="rail-end__tap"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-1.5a1.5 1.5 0 0 1 3 0V11m0-1a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1-6 6h-.6a5.5 5.5 0 0 1-4.3-2.1L5 15.4a1.5 1.5 0 0 1 2.3-2L9 15"/></svg></span>
+          <button type="button" class="rail-pull" data-category-open data-rail-pull data-category-title="{{ heading | escape }}" data-category-question="¿Cuál {{ section.settings.search_noun | default: 'producto' | escape }} buscas?" aria-label="Ver todos los productos de {{ heading | escape }}">
+            <span class="rail-pull__ring" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><circle class="rail-pull__track" cx="24" cy="24" r="21"/><circle class="rail-pull__bar" cx="24" cy="24" r="21" pathLength="100"/></svg>
+              <svg class="rail-pull__arrow" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
             </span>
-            <span class="rail-end__label">Ver todo</span>
-            <span class="rail-end__count">{{ coll.products_count }} productos</span>
+            <span class="rail-pull__label" data-rail-pull-label>Ver más</span>
+            <span class="rail-pull__count">{{ coll.products_count }} productos</span>
           </button>
         </div>
       {%- endif -%}
