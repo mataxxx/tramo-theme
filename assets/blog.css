@@ -1,5 +1,5 @@
 /* ===== Blog de recetas y vlog ===== */
-.blg, .rcp { --b-ink: #1f2a1e; --b-green: var(--color-primary, #263d25); --b-cream: #f7f3e9; --b-line: #e4dfd2; --b-muted: #6b6f66; --b-wood: #8a4a26; --b-ease: cubic-bezier(.22,.61,.36,1); color: var(--b-ink); }
+.blg, .rcp { --b-ink: #1f2a1e; --b-green: var(--color-primary, #1a4f3b); --b-cream: #fff8e9; --b-line: #e4dfd2; --b-muted: #6b6f66; --b-wood: #8a4a26; --b-ease: cubic-bezier(.22,.61,.36,1); color: var(--b-ink); }
 
 /* Encabezado */
 .blg { max-width: 1240px; margin: 0 auto; padding: 26px var(--page-pad, 16px) 50px; }
@@ -211,7 +211,7 @@
 .bmodal__body .rcp-ing { top: 12px; }
 .bmodal__body .pagination { display: none; }
 .bmodal__loading { display: flex; justify-content: center; gap: 8px; padding: 90px 0; }
-.bmodal__loading span { width: 10px; height: 10px; border-radius: 50%; background: #263d25; animation: bm-dot 1s ease-in-out infinite; }
+.bmodal__loading span { width: 10px; height: 10px; border-radius: 50%; background: #1a4f3b; animation: bm-dot 1s ease-in-out infinite; }
 .bmodal__loading span:nth-child(2) { animation-delay: .15s; }
 .bmodal__loading span:nth-child(3) { animation-delay: .3s; }
 @keyframes bm-dot { 0%, 100% { opacity: .25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-6px); } }

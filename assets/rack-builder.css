@@ -1,5 +1,5 @@
 /* ===== Arma tu especiero ===== */
-:root { --rb-wood: #7a4a2a; --rb-wood-d: #5a341c; --rb-wood-l: #a06a42; --rb-cream: #f7f3e9; --rb-ink: #1f2a1e; --rb-green: #263d25; --rb-line: #e4dfd2; --rb-ease: cubic-bezier(.22,.61,.36,1); }
+:root { --rb-wood: #7a4a2a; --rb-wood-d: #5a341c; --rb-wood-l: #a06a42; --rb-cream: #fff8e9; --rb-ink: #1f2a1e; --rb-green: #1a4f3b; --rb-line: #e4dfd2; --rb-ease: cubic-bezier(.22,.61,.36,1); }
 
 /* --- Caja en la portada --- */
 .rbt { padding: 34px var(--page-pad, 16px) 46px; }
@@ -21,7 +21,7 @@
 .rbt__from { margin: 0; display: flex; align-items: baseline; gap: 8px; color: #55594f; }
 .rbt__from span { font-family: var(--font-heading, Georgia, serif); font-size: 16px; }
 .rbt__from b { font-family: var(--font-heading, Georgia, serif); font-weight: 400; font-size: clamp(30px, 3vw, 38px); letter-spacing: -.5px; color: #8a4a26; line-height: 1; }
-.rbt__cta { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 26px; border-radius: 10px; background: #263d25; color: #fff; font-family: var(--font-heading, Georgia, serif); font-size: 19px; letter-spacing: .1px; box-shadow: 0 8px 20px rgba(38,61,37,.22); transition: background-color .2s, transform .2s var(--rb-ease), box-shadow .2s; }
+.rbt__cta { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 26px; border-radius: 10px; background: #1a4f3b; color: #fff; font-family: var(--font-heading, Georgia, serif); font-size: 19px; letter-spacing: .1px; box-shadow: 0 8px 20px rgba(38,61,37,.22); transition: background-color .2s, transform .2s var(--rb-ease), box-shadow .2s; }
 .rbt__cta svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s var(--rb-ease); }
 .rbt__cta:hover { background: #1c2e1b; box-shadow: 0 10px 24px rgba(38,61,37,.28); }
 .rbt__cta:hover svg { transform: translateX(3px); }
