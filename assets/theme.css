@@ -3188,12 +3188,12 @@ body.is-locked { overscroll-behavior: none; }
   .site-header .icon-button, .site-header .header__account-desk { color: #fff !important; }
   .site-header .icon-button:hover { background: rgba(255,255,255,.12) !important; }
   .site-header .count-bubble { background: #fff !important; color: #1a4f3b !important; }
-  .site-header::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 28px; margin-top: -1px; pointer-events: none; background: radial-gradient(circle at 100% 100%, transparent 27.5px, #1a4f3b 28px) left top / 28px 28px no-repeat, radial-gradient(circle at 0 100%, transparent 27.5px, #1a4f3b 28px) right top / 28px 28px no-repeat; }
+  .site-header::after { content: none !important; display: none !important; }
 
   /* Portada: banner arriba (20% más pequeño) y los círculos debajo */
   body.template-index #MainContent { display: flex; flex-direction: column; }
   body.template-index #MainContent > .shopify-section:has(.hero-wrap) { order: -1; }
-  .hero-wrap .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { width: min(1188px, calc(100% - 152px)) !important; max-width: none !important; margin: 36px auto 0 !important; }
+  .hero-wrap .hero-slider, .hero-wrap:not(.hero-wrap--tiles) .hero-slider { width: min(1188px, calc(100% - 152px)) !important; max-width: none !important; margin: 28px auto 0 !important; }
   .hero-wrap { margin-bottom: 26px !important; }
   body.template-index .cats-section { padding-top: 0 !important; padding-bottom: 18px !important; }
 
@@ -3241,4 +3241,12 @@ body.is-locked { overscroll-behavior: none; }
   .category-modal .cm-tools .close-button { background: rgba(255,255,255,.92); }
   .category-modal .category-modal__searchwrap { padding: 10px 28px 20px !important; max-width: none !important; width: auto !important; }
   .category-modal .cm-top .category-modal__field { max-width: none !important; width: 100% !important; }
+}
+
+/* Computadora: banner más bajo (360 px). La foto se pega a la derecha y el crema de fondo completa la izquierda */
+@media (min-width: 750px) {
+  .hero-wrap .hero { --hero-height: 360px !important; }
+  .hero-track > .hero--banner { aspect-ratio: auto !important; height: 360px !important; min-height: 360px !important; }
+  .hero--banner { background: #f5f1e6 !important; }
+  .hero--banner .hero__media img { object-fit: contain !important; object-position: right center !important; }
 }
