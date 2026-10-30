@@ -454,7 +454,7 @@ async function panelAuthed(request, env) {
   return (await sign(env, role === 'prep' ? m[2] + '.prep' : m[2], role)) === m[1] ? role : null;
 }
 // Cambia con cada versión del panel: las pantallas abiertas se recargan solas
-const APP_V = '2026-10-29-2';
+const APP_V = '2026-10-30-1';
 const SOLD_ST = ['pagado', 'preparando', 'listo', 'entregado'];
 function setStatusOn(o, st, now) {
   if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (SOLD_ST.includes(st) && !o.paidAt) o.paidAt = now; }
@@ -603,6 +603,28 @@ async function handlePanel(request, url, env) {
     }
     await putOrder(env, b.key, o);
     return json({ ok: true, order: o });
+  }
+  // Borrar varios pedidos: se guardan 30 días en la papelera (del:) para poder deshacer
+  if ((p === '/panel/api/delete' || p === '/panel/api/restore') && request.method === 'POST') {
+    const b = await request.json().catch(() => ({}));
+    const keys = (Array.isArray(b.keys) ? b.keys : []).map(String).filter((k) => /^o:[\w:.\-]{1,120}$/.test(k)).slice(0, 200);
+    if (!keys.length) return json({ error: 'datos' }, 400);
+    let n = 0;
+    for (const k of keys) {
+      if (p === '/panel/api/delete') {
+        const o = await env.ORDERS.get(k, 'json'); if (!o) continue;
+        o.deletedAt = Date.now();
+        await env.ORDERS.put('del:' + k, JSON.stringify(o), { expirationTtl: 60 * 60 * 24 * 30 });
+        await env.ORDERS.delete(k); n++;
+      } else {
+        const o = await env.ORDERS.get('del:' + k, 'json'); if (!o) continue;
+        delete o.deletedAt;
+        await env.ORDERS.put(k, JSON.stringify(o), { metadata: orderMeta(o) });
+        await env.ORDERS.delete('del:' + k); n++;
+      }
+    }
+    await env.ORDERS.put('ver', String(Date.now()));
+    return json({ ok: true, n });
   }
   if (p === '/panel') return html(PANEL_HTML.replace('__APPV__', APP_V));
   return json({ error: 'no encontrado' }, 404);
