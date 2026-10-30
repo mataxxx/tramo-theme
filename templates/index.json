@@ -97,7 +97,8 @@
             "title": "Navidad",
             "icon": "cake",
             "search_noun": "producto",
-            "icon_asset": "cat-queque.png"
+            "icon_asset": "cat-queque.png",
+            "panel_title": "Queque navideño"
           }
         },
         "t": {

@@ -1731,7 +1731,10 @@
       if (open) e.input.focus();
       return;
     }
+    var cmf = t.closest('[data-cm-filter]');
+    if (cmf) { var pop = $('[data-cm-filterpop]'); if (pop) { pop.hidden = !pop.hidden; cmf.setAttribute('aria-expanded', pop.hidden ? 'false' : 'true'); cmf.classList.toggle('is-on', !pop.hidden); } return; }
     var sb = t.closest('[data-csort]');
+    if (sb && sb.closest('[data-cm-filterpop]')) { setTimeout(function () { var pop2 = $('[data-cm-filterpop]'); if (pop2) pop2.hidden = true; var fb = $('[data-cm-filter]'); if (fb) { fb.classList.toggle('is-on', sb.getAttribute('data-csort') !== 'default'); fb.setAttribute('aria-expanded', 'false'); } }, 120); }
     if (sb) {
       var kind = sb.getAttribute('data-csort');
       if (kind === 'price' && cat.sort === 'price') cat.desc = !cat.desc; else cat.desc = false;

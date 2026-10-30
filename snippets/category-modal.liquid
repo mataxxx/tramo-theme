@@ -38,7 +38,16 @@
     <div class="category-modal__searchwrap" data-category-searchwrap>
       <div class="search-field category-modal__field">
         {% render 'icon', name: 'search' %}
-        <input type="search" data-category-filter autocomplete="off" placeholder="Buscar..." aria-label="Buscar en la categoría">
+        <input type="search" data-category-filter autocomplete="off" placeholder="Buscar productos..." aria-label="Buscar en la categoría">
+        <button type="button" class="cm-filterbtn" data-cm-filter aria-label="Ordenar" aria-expanded="false">{% render 'icon', name: 'filter' %}</button>
+      </div>
+      <div class="cm-filterpop" data-cm-filterpop hidden>
+        <p class="cm-filterpop__title">Ordenar por</p>
+        <div class="cm-filterpop__opts">
+          <button type="button" class="is-active" data-csort="default">Destacados</button>
+          <button type="button" data-csort="title">A–Z</button>
+          <button type="button" data-csort="price" data-label-asc="Precio: menor a mayor" data-label-desc="Precio: mayor a menor">Precio: menor a mayor</button>
+        </div>
       </div>
     </div>
     </div>

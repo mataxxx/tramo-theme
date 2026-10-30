@@ -21,7 +21,7 @@
         {%- if block.settings.link != blank -%}
           <a class="cats-tile cats-tile--link" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>{{ inner }}</a>
         {%- elsif coll != blank -%}
-          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?"{% if block.settings.filters != blank %} data-category-filters="{{ block.settings.filters | escape }}"{% endif %} {{ block.shopify_attributes }}>{{ inner }}</button>
+          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ block.settings.panel_title | default: t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?"{% if block.settings.filters != blank %} data-category-filters="{{ block.settings.filters | escape }}"{% endif %} {{ block.shopify_attributes }}>{{ inner }}</button>
         {%- else -%}
           <span class="cats-tile" {{ block.shopify_attributes }}>{{ inner }}</span>
         {%- endif -%}
@@ -54,7 +54,7 @@
         {%- if block.settings.link != blank -%}
           <a class="cats-tile cats-tile--link" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>{{ inner }}</a>
         {%- elsif coll != blank -%}
-          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?"{% if block.settings.filters != blank %} data-category-filters="{{ block.settings.filters | escape }}"{% endif %} {{ block.shopify_attributes }}>{{ inner }}</button>
+          <button type="button" class="cats-tile" data-search-collection="{{ coll.handle }}" data-search-title="{{ block.settings.panel_title | default: t | escape }}" data-search-question="¿Cuál {{ block.settings.search_noun | default: 'producto' | escape }} buscas?"{% if block.settings.filters != blank %} data-category-filters="{{ block.settings.filters | escape }}"{% endif %} {{ block.shopify_attributes }}>{{ inner }}</button>
         {%- else -%}
           <span class="cats-tile" {{ block.shopify_attributes }}>{{ inner }}</span>
         {%- endif -%}
@@ -86,6 +86,7 @@
         { "type": "collection", "id": "collection", "label": "Colección" },
         { "type": "url", "id": "link", "label": "O un enlace", "info": "Para llevar al banner del especiero usa #arma-tu-especiero" },
         { "type": "text", "id": "title", "label": "Nombre (opcional)", "info": "Si lo dejas vacío usa el de la colección." },
+        { "type": "text", "id": "panel_title", "label": "Título al abrir la categoría (opcional)", "info": "Ej: el círculo dice Navidad y la ventana dice Queque navideño." },
         { "type": "image_picker", "id": "image", "label": "Foto (opcional)", "info": "Sube un PNG con fondo transparente (producto recortado). Sin foto se muestra el ícono." },
         { "type": "text", "id": "icon_asset", "label": "O ícono ilustrado del tema (nombre de archivo)", "info": "PNG transparente que se muestra sobre fondo claro. Ej: cat-queque.png" },
         { "type": "text", "id": "image_asset", "label": "O foto del tema (nombre de archivo)", "info": "Foto completa que llena el círculo. Ej: xmas-tamales-sm.jpg" },
