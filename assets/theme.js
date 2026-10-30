@@ -2160,8 +2160,9 @@
   })();
 })();
 
-/* Final del carrusel: "Ver más" con un círculo que se llena al deslizar.
-   Si llegas al final y sueltas, el círculo se completa y se abre la categoría completa. */
+/* Final del carrusel: "Ver más" con un círculo que se llena con el dedo.
+   Al deslizar hasta el final el círculo se va llenando; si sigues jalando más allá del final se completa,
+   y al soltar con el círculo lleno se abre la categoría. Nunca se abre solo. */
 (function () {
   var items = document.querySelectorAll('[data-rail-pull]');
   if (!items.length) return;
@@ -2169,40 +2170,41 @@
     var item = btn.closest('.product-rail__item');
     var rail = btn.closest('.product-rail');
     if (!item || !rail) return;
-    var timer = null, opened = false, lastOpen = 0;
+    var extra = 0, endX = null, lastX = null;
+    function maxScroll() { return rail.scrollWidth - rail.clientWidth; }
+    function atEnd() { return maxScroll() > 4 && rail.scrollLeft >= maxScroll() - 3; }
     function progress() {
       var visible = rail.scrollLeft + rail.clientWidth - item.offsetLeft;
       return Math.max(0, Math.min(1, visible / item.offsetWidth));
     }
-    var userScrolled = false;
-    function paint(ev) {
-      var p = progress();
-      /* Solo abre si la persona deslizó el carrusel (nunca al cargar la página ni en carruseles cortos que no se deslizan) */
-      var canPull = userScrolled && rail.scrollWidth > rail.clientWidth + 20 && rail.scrollLeft > 20;
-      btn.style.setProperty('--pull', (p * 0.7).toFixed(3));
-      btn.classList.toggle('is-near', p > 0.92);
-      clearTimeout(timer);
-      btn.classList.remove('is-loading');
-      if (p > 0.92 && !opened && canPull) {
-        /* el dedo se detuvo al final: completar el círculo y abrir */
-        timer = setTimeout(function () {
-          if (progress() < 0.92) return;
-          btn.classList.add('is-loading');
-          timer = setTimeout(function () {
-            if (progress() < 0.92 || Date.now() - lastOpen < 1500) { btn.classList.remove('is-loading'); return; }
-            opened = true; lastOpen = Date.now();
-            btn.click();
-            setTimeout(function () {
-              btn.classList.remove('is-loading');
-              rail.scrollTo({ left: Math.max(0, item.offsetLeft - rail.clientWidth - 40), behavior: 'smooth' });
-              setTimeout(function () { opened = false; }, 600);
-            }, 400);
-          }, 650);
-        }, 180);
-      }
+    function paint() {
+      var base = maxScroll() > 4 ? progress() * 0.7 : 0;
+      var pull = Math.min(1, base + extra * 0.3);
+      btn.style.setProperty('--pull', pull.toFixed(3));
+      btn.style.setProperty('--tug', (extra * 14).toFixed(1) + 'px');
+      btn.classList.toggle('is-full', extra >= 1);
     }
-    ['touchstart', 'pointerdown', 'wheel'].forEach(function (t) { rail.addEventListener(t, function () { userScrolled = true; }, { passive: true }); });
     rail.addEventListener('scroll', paint, { passive: true });
+    rail.addEventListener('touchstart', function (e) { endX = null; extra = 0; lastX = e.touches[0].clientX; paint(); }, { passive: true });
+    rail.addEventListener('touchmove', function (e) {
+      var x = e.touches[0].clientX; lastX = x;
+      if (!atEnd()) { endX = null; extra = 0; paint(); return; }
+      if (endX === null) endX = x;
+      extra = Math.max(0, Math.min(1, (endX - x) / 80));
+      paint();
+    }, { passive: true });
+    function release() {
+      var open = extra >= 1;
+      extra = 0; endX = null;
+      if (open) {
+        btn.classList.add('is-open');
+        btn.style.setProperty('--pull', '1');
+        btn.click();
+        setTimeout(function () { btn.classList.remove('is-open'); paint(); }, 500);
+      } else paint();
+    }
+    rail.addEventListener('touchend', release, { passive: true });
+    rail.addEventListener('touchcancel', function () { extra = 0; endX = null; paint(); }, { passive: true });
     paint();
   });
 })();

@@ -3119,10 +3119,11 @@ body.is-locked { overscroll-behavior: none; }
 .rail-pull__ring svg:first-child { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .rail-pull__track { fill: #fff; stroke: #e4ddcc; stroke-width: 3; }
 .rail-pull__bar { fill: none; stroke: currentColor; stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: calc(100 - var(--pull) * 100); transition: stroke-dashoffset .12s linear; }
-.rail-pull.is-loading .rail-pull__bar { stroke-dashoffset: 0; transition: stroke-dashoffset .6s cubic-bezier(.4,0,.2,1); }
 .rail-pull__arrow { position: relative; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s; }
-.rail-pull.is-near .rail-pull__arrow { transform: translateX(3px); }
-.rail-pull.is-loading .rail-pull__ring { animation: railPulse .6s ease; }
+.rail-pull__ring { transform: translateX(calc(var(--tug, 0px) * -1)); transition: transform .15s ease-out; }
+.rail-pull.is-full .rail-pull__arrow { transform: translateX(3px); }
+.rail-pull.is-full .rail-pull__ring { transform: translateX(calc(var(--tug, 0px) * -1)) scale(1.08); }
+.rail-pull.is-open .rail-pull__ring { animation: railPulse .5s ease; }
 @keyframes railPulse { 50% { transform: scale(1.08); } }
 .rail-pull__label { font-weight: 700; font-size: 13.5px; line-height: 1.1; }
 .rail-pull__count { font-size: 11px; color: var(--color-muted, #6b7468); line-height: 1.1; text-align: center; }
