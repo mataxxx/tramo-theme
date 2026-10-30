@@ -3029,6 +3029,9 @@ body.is-locked { overscroll-behavior: none; }
   .category-section:not(.cats-section) .price__current { font-size: 13.5px !important; }
   .category-section:not(.cats-section) .price__unit, .category-section:not(.cats-section) .price__from { font-size: 11px !important; }
   .category-section:not(.cats-section) .price::after { font-size: 9.5px !important; }
-  .category-section:not(.cats-section) .quick-add { transform: scale(.85); transform-origin: bottom right; }
+  .category-section:not(.cats-section) .price__current { white-space: nowrap; }
+  .category-section:not(.cats-section) .product-card__row { gap: 4px; align-items: flex-end; }
+  .category-section:not(.cats-section) .quick-add { width: 30px !important; height: 30px !important; min-width: 30px; flex: 0 0 30px; padding: 0 !important; }
+  .category-section:not(.cats-section) .quick-add .icon { width: 15px !important; height: 15px !important; }
   .category-section:not(.cats-section) .like-btn { transform: scale(.85); transform-origin: top right; }
 }
