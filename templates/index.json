@@ -56,7 +56,8 @@
         "banner": true,
         "banner_alt": "Comprá en línea. Recibí como querás. Pagá por SINPE Móvil y elegí la entrega: a domicilio por Uber Flash, retiro en tienda en el Mercado Central o encomienda a todo Costa Rica.",
         "button_link": "/collections/all",
-        "button_label": "Comprar ahora"
+        "button_label": "Comprar ahora",
+        "height_mobile": 160
       },
       "blocks": {
         "s1": {
