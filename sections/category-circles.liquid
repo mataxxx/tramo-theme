@@ -10,16 +10,10 @@
       {%- if t == blank and coll != blank -%}{%- assign t = coll.title -%}{%- endif -%}
       {%- assign img = block.settings.image -%}
       {%- capture inner -%}
-        <span class="cats-tile__media">
-          {%- if img != blank -%}
-            {{ img | image_url: width: 400 | image_tag: widths: '200, 400', sizes: '225px', loading: 'lazy', alt: t }}
-          {%- elsif block.settings.icon_asset != blank -%}
-            <img class="cats-tile__icoimg" src="{{ block.settings.icon_asset | asset_url }}" alt="" width="360" height="360" loading="lazy">
-          {%- elsif block.settings.image_asset != blank -%}
-            <img class="cats-tile__photo" src="{{ block.settings.image_asset | asset_url }}" alt="{{ t | escape }}" width="480" height="480" loading="lazy">
-          {%- else -%}
-            {% render 'icon', name: block.settings.icon %}
-          {%- endif -%}
+        <span class="cats-tile__media cats-circle">
+          {%- assign bg = img -%}{%- if bg == blank and coll != blank -%}{%- assign bg = coll.featured_image -%}{%- endif -%}
+          {%- if bg != blank -%}{{ bg | image_url: width: 300 | image_tag: widths: '150, 300', sizes: '140px', loading: 'lazy', alt: '', class: 'cats-circle__bg' }}{%- endif -%}
+          <span class="cats-circle__icon">{% render 'icon', name: block.settings.icon %}</span>
         </span>
         <span class="cats-tile__title">{{ t }}</span>
       {%- endcapture -%}
@@ -50,18 +44,12 @@
         {%- if t == blank and coll != blank -%}{%- assign t = coll.title -%}{%- endif -%}
         {%- assign img = block.settings.image -%}
         {%- capture inner -%}
-          <span class="cats-tile__media">
-            {%- if img != blank -%}
-              {{ img | image_url: width: 400 | image_tag: widths: '200, 400', sizes: '180px', loading: 'lazy', alt: t }}
-            {%- elsif block.settings.icon_asset != blank -%}
-            <img class="cats-tile__icoimg" src="{{ block.settings.icon_asset | asset_url }}" alt="" width="360" height="360" loading="lazy">
-          {%- elsif block.settings.image_asset != blank -%}
-              <img class="cats-tile__photo" src="{{ block.settings.image_asset | asset_url }}" alt="{{ t | escape }}" width="480" height="480" loading="lazy">
-            {%- else -%}
-              {% render 'icon', name: block.settings.icon %}
-            {%- endif -%}
-          </span>
-          <span class="cats-tile__title">{{ t }}</span>
+          <span class="cats-tile__media cats-circle">
+          {%- assign bg = img -%}{%- if bg == blank and coll != blank -%}{%- assign bg = coll.featured_image -%}{%- endif -%}
+          {%- if bg != blank -%}{{ bg | image_url: width: 300 | image_tag: widths: '150, 300', sizes: '140px', loading: 'lazy', alt: '', class: 'cats-circle__bg' }}{%- endif -%}
+          <span class="cats-circle__icon">{% render 'icon', name: block.settings.icon %}</span>
+        </span>
+        <span class="cats-tile__title">{{ t }}</span>
         {%- endcapture -%}
         {%- if block.settings.link != blank -%}
           <a class="cats-tile cats-tile--link" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>{{ inner }}</a>
