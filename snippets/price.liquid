@@ -18,16 +18,16 @@
     <span class="price__from">Desde</span>
   {%- endif -%}
   {%- if target.compare_at_price > target.price -%}
-    <s class="price__compare" data-price-compare>{{ target.compare_at_price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</s>
+    <s class="price__compare" data-price-compare>{{ target.compare_at_price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</s>
   {%- endif -%}
   <strong class="price__current" data-price-current>
     {%- if variant == blank and product.price_varies and prefix_from -%}
-      {{ product.price_min | money_without_trailing_zeros | replace: '₡ ', '₡' }}
+      {{ product.price_min | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}
     {%- elsif is_bulk -%}
       {%- assign per_kg = 1000 | divided_by: settings.bulk_unit_grams | default: 100 -%}
-      {{ target.price | times: per_kg | money_without_trailing_zeros | replace: '₡ ', '₡' }}
+      {{ target.price | times: per_kg | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}
     {%- else -%}
-      {{ target.price | money_without_trailing_zeros | replace: '₡ ', '₡' }}
+      {{ target.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}
     {%- endif -%}
   </strong>
   {%- if is_bulk and variant != blank -%}

@@ -11,16 +11,16 @@
       assign min_price = p.price
     endif
     if p.tags contains 'slots-6'
-      assign p6 = p.price | money_without_trailing_zeros | replace: '₡ ', '₡'
+      assign p6 = p.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' '
     elsif p.tags contains 'slots-12'
-      assign p12 = p.price | money_without_trailing_zeros | replace: '₡ ', '₡'
+      assign p12 = p.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' '
     elsif p.tags contains 'slots-18'
-      assign p18 = p.price | money_without_trailing_zeros | replace: '₡ ', '₡'
+      assign p18 = p.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' '
     endif
   endfor
   assign desde = section.settings.from_price
   if desde == blank and min_price > 0
-    assign desde = min_price | money_without_trailing_zeros | replace: '₡ ', '₡'
+    assign desde = min_price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' '
   endif
 -%}
 <section class="rbt" id="arma-tu-especiero">

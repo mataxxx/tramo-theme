@@ -11,7 +11,7 @@
   var D = M.dataset;
   var fmt = new Intl.NumberFormat('es-CR', { style: 'currency', currency: D.currency || 'CRC', maximumFractionDigits: 0 });
   /* ₡8.000: sin decimales y con punto de miles */
-  function money(c) { return '₡' + String(Math.round((c || 0) / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function money(c) { return '₡' + String(Math.round((c || 0) / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f'); }
   var LS = 'tramo.order.me';
   var payShown = false;
   var cart = null, mode = null, map = null, pin = null, loc = null, last = null, page = 2, FIRST = 2, PAGES = 4, waLoc = false;

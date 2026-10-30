@@ -60,7 +60,7 @@
             </span>
             <span class="rb-model__name">{{ slots }} frascos</span>
             {%- if d.size == 3 -%}<span class="rb-model__dims">{{ d[0] }} × {{ d[1] }} × {{ d[2] }} cm</span>{%- endif -%}
-            <span class="rb-model__price">{{ p.price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</span>
+            <span class="rb-model__price">{{ p.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</span>
           </button>
         {%- else -%}
           <p class="rb__empty">Agrega productos a la colección «Especieros» con la etiqueta slots-6, slots-12 o slots-18.</p>
@@ -76,7 +76,7 @@
     <section class="rb__step" data-rb-step="2" hidden>
       <button type="button" class="rb__back" data-rb-go="1">{% render 'icon', name: 'arrow-left' %}<span>Cambiar modelo</span></button>
       <h2 class="rb__title">Llena tus frascos</h2>
-      <p class="rb__hint">Toca un espacio vacío para elegir. Las clásicas van incluidas; las mezclas de la casa y especias del mundo suman <b>+{{ rb_extra_price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</b> por frasco.</p>
+      <p class="rb__hint">Toca un espacio vacío para elegir. Las clásicas van incluidas; las mezclas de la casa y especias del mundo suman <b>+{{ rb_extra_price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</b> por frasco.</p>
       <div class="rb-rack" data-rb-rack>
         <div class="rb-rack__shelves" data-rb-slots></div>
         <div class="rb-rack__base"><span>TRAMO<br>SAN RAFAEL</span><svg viewBox="0 0 60 12" aria-hidden="true"><path d="M2 6h56M14 6c-3-4-7-4-9-2M14 6c-3 4-7 4-9 2M30 6c-3-4-7-4-9-2M30 6c-3 4-7 4-9 2M46 6c-3-4-7-4-9-2M46 6c-3 4-7 4-9 2"/></svg></div>
@@ -94,7 +94,7 @@
       <div class="rb-sum" data-rb-summary></div>
       {%- if rb_engrave != blank -%}
         <div class="rb-eng">
-          <label class="rb-eng__check"><input type="checkbox" data-rb-eng> Grabar un nombre en la madera <b>+{{ rb_engrave.price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</b></label>
+          <label class="rb-eng__check"><input type="checkbox" data-rb-eng> Grabar un nombre en la madera <b>+{{ rb_engrave.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</b></label>
           <input type="text" class="field" data-rb-eng-text maxlength="14" placeholder="Ej: Familia Mora" hidden>
         </div>
       {%- endif -%}
@@ -115,8 +115,8 @@
       </header>
       <div class="rb-pick__tabs" role="tablist">
         <button type="button" class="is-on" data-rb-tab="classic" role="tab">Clásicas<small>Incluidas</small></button>
-        <button type="button" data-rb-tab="house" role="tab">De la casa<small>+{{ rb_extra_price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</small></button>
-        <button type="button" data-rb-tab="world" role="tab">Del mundo<small>+{{ rb_extra_price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</small></button>
+        <button type="button" data-rb-tab="house" role="tab">De la casa<small>+{{ rb_extra_price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</small></button>
+        <button type="button" data-rb-tab="world" role="tab">Del mundo<small>+{{ rb_extra_price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</small></button>
       </div>
       <div class="search-field rb-pick__search">{% render 'icon', name: 'search' %}<input type="search" data-rb-search placeholder="Buscar especia…" autocomplete="off" aria-label="Buscar especia"></div>
       <div class="rb-pick__grid" data-rb-grid></div>

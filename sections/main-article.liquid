@@ -95,7 +95,7 @@
                       <input type="checkbox" checked value="{{ pv.id }}" data-shop-item data-price="{{ pv.price }}">
                       <span class="rcp-shop__img">{%- if p.featured_image -%}{{ p.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}{%- else -%}{% render 'icon', name: 'leaf' %}{%- endif -%}</span>
                       <span class="rcp-shop__name"><b>{{ p.title }}</b>{% unless pv.title == 'Default Title' %}<small>{{ pv.title }}</small>{% endunless %}</span>
-                      <span class="rcp-shop__price">{{ pv.price | money_without_trailing_zeros | replace: '₡ ', '₡' }}</span>
+                      <span class="rcp-shop__price">{{ pv.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</span>
                     </label>
                   </li>
                 {%- endif -%}

@@ -53,7 +53,7 @@
       case 'amount_no_decimals': value = withDelimiters(cents, 0); break;
       case 'amount_with_comma_separator': value = withDelimiters(cents, 2, '.', ','); break;
       case 'amount_no_decimals_with_comma_separator': value = withDelimiters(cents, 0, '.', ','); break;
-      case 'amount_no_decimals_with_space_separator': value = withDelimiters(cents, 0, ' '); break;
+      case 'amount_no_decimals_with_space_separator': value = withDelimiters(cents, 0, '\u202f'); break;
       case 'amount_with_space_separator': value = withDelimiters(cents, 2, ' ', ','); break;
       case 'amount_with_apostrophe_separator': value = withDelimiters(cents, 2, "'", '.'); break;
       default: value = withDelimiters(cents, 2);
