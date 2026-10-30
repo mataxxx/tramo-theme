@@ -70,21 +70,51 @@ main{padding:12px 12px 60px;max-width:780px;margin:0 auto;display:grid;gap:10px}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mut);font-size:12px;font-weight:600}
 td.r,th.r{text-align:right;white-space:nowrap}.tw{overflow-x:auto}
 .miss{color:var(--red);font-weight:700}
+/* Secciones plegables */
+details.sec{padding:0}details.sec>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary h3{margin:0;flex:0 0 auto}
+.sec__meta{flex:1;min-width:0;text-align:right;font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec__meta em{font-style:normal;font-weight:700}.m-bad{color:var(--red)}.m-ok{color:#2f7d32}
+.sec__chev{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:var(--mut);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+details.sec[open]>summary .sec__chev{transform:rotate(180deg)}
+details.sec[open]>summary{padding-bottom:4px}
+.sec__in{padding:4px 14px 14px}
+/* Selección múltiple */
+.srow{display:flex;gap:8px;align-items:center;margin-top:8px}.srow .search{margin-top:0;flex:1;min-width:0}
+.selbtn{flex:0 0 auto;border:0;border-radius:10px;padding:9px 12px;background:rgba(255,255,255,.14);color:#fff;font-weight:700;font-size:13.5px}
+.selbtn.on{background:#fff;color:var(--g)}
+.o__chk{display:none;flex:0 0 auto;width:24px;height:24px;margin-top:1px;border:2px solid #b9b2a2;border-radius:7px;background:#fff;place-items:center}
+.o__chk svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+body.selecting .o__chk{display:grid}body.selecting .o .o__body{display:none}
+.o.is-sel{border-color:var(--g);box-shadow:0 0 0 2px var(--g) inset}.o.is-sel .o__chk{background:var(--g);border-color:var(--g)}.o.is-sel .o__chk svg{opacity:1}
+body.selecting main{padding-bottom:120px}
+.bulk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));z-index:8;width:min(560px,calc(100% - 20px));background:#fff;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.22);padding:10px;display:grid;gap:8px}
+.bulk__top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700;font-size:14px;padding:0 4px}
+.bulk__top button{border:0;background:none;color:var(--g);font-weight:700;font-size:13.5px;padding:4px}
+.bulk__acts{display:grid;grid-template-columns:1fr auto;gap:8px}.bulk select{border:1.5px solid var(--line);border-radius:12px;padding:10px;font-size:15px;background:#fff;min-width:0}
+.bulk .b[disabled],.bulk select[disabled]{opacity:.45;pointer-events:none}
+.undo{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:9;background:#1d2a1c;color:#fff;border-radius:999px;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:12px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.undo button{border:0;border-radius:999px;background:#fff;color:#1d2a1c;font-weight:700;padding:7px 12px;font-size:13.5px}
 </style></head><body>
 <header>
   <div class="hrow"><h1>Tramo · Panel<small id="upd"></small></h1>
     <div class="views"><button data-view="pedidos" class="on">Pedidos</button><button data-view="ventas">Ventas</button></div></div>
-  <div id="ptabs"><div class="tabs" id="tabs"></div><input class="search" id="q" type="search" placeholder="Buscar nombre, # pedido, teléfono, SINPE o factura"></div>
+  <div id="ptabs"><div class="tabs" id="tabs"></div><div class="srow"><input class="search" id="q" type="search" placeholder="Buscar nombre, # pedido, teléfono, SINPE o factura"><button class="selbtn" id="selbtn" type="button">Seleccionar</button></div></div>
 </header>
 <main id="list"><div class="empty">Cargando…</div></main>
 <main id="sales" hidden></main>
 <div class="saved" id="toast">Guardado ✓</div>
+<div class="bulk" id="bulk" hidden><div class="bulk__top"><span id="selN">0 seleccionados</span><span><button id="selall" type="button">Seleccionar todos</button> <button id="selx" type="button">Cerrar</button></span></div>
+  <div class="bulk__acts"><select id="bulkSt"><option value="">Cambiar estado a…</option></select><button class="b red" id="bulkDel" type="button">🗑 Borrar</button></div></div>
+<div class="undo" id="undo" hidden><span id="undoT"></span><button id="undoB" type="button">Deshacer</button></div>
 <script>
 const APPV='__APPV__';
 const ST={'incompleto':'Sin terminar','pago-pendiente':'Pago pendiente','pagado':'Pagado','preparando':'Preparando','listo':'Listo','entregado':'Entregado / enviado','cancelado':'Cancelado'};
 const MODE={pickup:'Retiro',delivery:'Uber Flash',courier:'Encomienda'};
 const INV={FE:'Factura electrónica',TN:'Tiquete de caja',TE:'Tiquete electrónico'};const INV_PICK=['FE','TN'];
 const SOLD=['pagado','preparando','listo','entregado'];
+let secOpen={},selecting=false,sel=new Set();
 let orders=[],sums=[],cfg={},filter='activos',open={},known=null,ver=null,view='pedidos',q='',period='hoy',from='',to='';
 const $=s=>document.querySelector(s);
 const money=n=>'₡'+String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'\u202f');
@@ -142,47 +172,52 @@ function tabs(){const c={activos:0,todos:orders.length,nofac:0};orders.forEach(o
 function inFilter(o){if(filter==='todos')return true;if(filter==='activos')return!['entregado','cancelado'].includes(o.status);if(filter==='nofac')return SOLD.includes(o.status)&&!hasInv(o);return o.status===filter}
 function card(o){
   const isNew=known&&!known.has(o.key), loc=coords(o.location), uber=uberUrl(o);
-  const top='<div class="o__top" data-toggle><div class="o__main"><div class="o__name">'+esc(o.name)+' · '+esc(o.code)+'</div><div class="o__sub">'+esc(MODE[o.mode]||o.mode)+' · '+o.items.length+' producto'+(o.items.length>1?'s':'')+'</div>'+
+  const top='<div class="o__top" data-toggle><span class="o__chk" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div class="o__main"><div class="o__name">'+esc(o.name)+' · '+esc(o.code)+'</div><div class="o__sub">'+esc(MODE[o.mode]||o.mode)+' · '+o.items.length+' producto'+(o.items.length>1?'s':'')+'</div>'+
     '<span class="pill s-'+o.status+'">'+ST[o.status]+'</span>'+(pending(o)?'<span class="pill p-var">⚖️ Pesar</span>':'')+(o.mode!=='pickup'&&!o.shipping&&!['entregado','cancelado'].includes(o.status)?'<span class="pill p-ship">Cotizar envío</span>':'')+(SOLD.includes(o.status)&&!hasInv(o)?'<span class="pill p-nofac">Sin factura</span>':'')+prepPill(o)+(o.eta?'<div class="when">'+esc(o.eta)+'</div>':'')+'</div>'+
     '<div class="o__tot">'+(pending(o)?'≈ ':'')+money(grand(o))+(o.mode!=='pickup'&&!o.shipping?'<div class="o__ago">+ envío</div>':'')+'<div class="o__ago">'+ago(o.created)+'</div></div></div>';
+  const SEC=(name,title,meta,html,dflt,extra)=>{const id=o.key+'|'+name,on=secOpen[id]!=null?secOpen[id]:!!dflt;
+    return '<details class="sec"'+(extra||'')+' data-sec="'+name+'"'+(on?' open':'')+'><summary><h3>'+title+'</h3><span class="sec__meta">'+(meta||'')+'</span><svg class="sec__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="sec__in">'+html+'</div></details>'};
+  const bad=t=>'<em class="m-bad">'+t+'</em>', ok=t=>'<em class="m-ok">'+t+'</em>';
   // Productos y total
-  let b='<div class="sec"><h3>Pedido</h3><ul class="items">'+o.items.map((i,x)=>'<li><span>'+(o.prep&&(o.prep.checks||[])[x]?'<b style="color:#2f7d32">✓</b> ':'')+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+(o.prep&&(o.prep.weights||{})[x]?' <small style="color:#1f3b63">⚖️ pesó '+esc(o.prep.weights[x])+' g</small>':'')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
+  let b=SEC('pedido','Pedido',o.items.length+' producto'+(o.items.length>1?'s':''),'<ul class="items">'+o.items.map((i,x)=>'<li><span>'+(o.prep&&(o.prep.checks||[])[x]?'<b style="color:#2f7d32">✓</b> ':'')+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+(o.prep&&(o.prep.weights||{})[x]?' <small style="color:#1f3b63">⚖️ pesó '+esc(o.prep.weights[x])+' g</small>':'')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
     '<div class="sum"><span>Productos'+(o.finalTotal?' (pesado)':pending(o)?' (aprox.)':'')+'</span><b>'+money(prod(o))+'</b>'+(o.mode!=='pickup'?'<span>Envío</span><b>'+(o.shipping?money(o.shipping):'—')+'</b>':'')+'<span class="big">Total</span><span class="big">'+money(grand(o))+'</span></div>'+
     (o.unverified?'<p class="warn">⚠️ No se pudieron verificar los precios con la tienda: revisa el total antes de cobrar.</p>':'')+'<p class="hint">Precios con IVA incluido.</p>'+(((o.prep&&o.prep.issues)||[]).map(x=>'<p class="warn">⚠️ '+esc(x.by||'Alistador')+': '+esc(x.text)+'</p>').join(''))+
-    '<div class="f"><label>Nota para quien alista (la ve en la pantalla de Alistar)</label><input data-field="prepNote" value="'+esc(o.prepNote||'')+'" placeholder="Ej. empacar el queso aparte"></div></div>';
+    '<div class="f"><label>Nota para quien alista (la ve en la pantalla de Alistar)</label><input data-field="prepNote" value="'+esc(o.prepNote||'')+'" placeholder="Ej. empacar el queso aparte"></div>',true);
   // Cliente
-  b+='<div class="sec"><h3>Cliente</h3><dl class="kv"><dt>Teléfono</dt><dd><a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a> · <a href="'+wa(o,'')+'" target="_blank">WhatsApp</a></dd>'+(o.payer?'<dt>SINPE a nombre de</dt><dd>'+esc(o.payer)+'</dd>':'')+
+  b+=SEC('cliente','Cliente',esc(o.phone),'<dl class="kv"><dt>Teléfono</dt><dd><a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a> · <a href="'+wa(o,'')+'" target="_blank">WhatsApp</a></dd>'+(o.payer?'<dt>SINPE a nombre de</dt><dd>'+esc(o.payer)+'</dd>':'')+
     (o.fe?'<dt>Pidió factura</dt><dd>'+esc(o.fe)+'</dd>':'<dt>Factura</dt><dd>No pidió factura electrónica</dd>')+
-    '<dt>Fecha</dt><dd>'+new Date(o.created).toLocaleString('es-CR',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+'</dd></dl></div>';
+    '<dt>Fecha</dt><dd>'+new Date(o.created).toLocaleString('es-CR',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+'</dd></dl>');
   // Entrega (editable)
-  b+='<div class="sec"><h3>Entrega</h3><div class="seg">'+Object.keys(MODE).map(m=>'<button data-mode="'+m+'" class="'+(o.mode===m?'on':'')+'">'+MODE[m]+'</button>').join('')+'</div>';
-  if(o.mode==='pickup')b+='<p class="hint">Recoge en '+esc(cfg.pickup)+'.</p>';
+  let en='<div class="seg">'+Object.keys(MODE).map(m=>'<button data-mode="'+m+'" class="'+(o.mode===m?'on':'')+'">'+MODE[m]+'</button>').join('')+'</div>';
+  if(o.mode==='pickup')en+='<p class="hint">Recoge en '+esc(cfg.pickup)+'.</p>';
   if(o.mode==='delivery'){
-    b+=(loc?'<div class="acts"><a class="b uber" href="'+uber+'" target="_blank">Cotizar en Uber</a><a class="b" href="https://maps.google.com/?q='+loc.lat+','+loc.lng+'" target="_blank">Ver en mapa</a></div>':'<p class="warn">Sin ubicación exacta'+(o.location?' ('+esc(o.location)+')':'')+'. Pega abajo el link o las coordenadas que te mande el cliente.</p>')+
+    en+=(loc?'<div class="acts"><a class="b uber" href="'+uber+'" target="_blank">Cotizar en Uber</a><a class="b" href="https://maps.google.com/?q='+loc.lat+','+loc.lng+'" target="_blank">Ver en mapa</a></div>':'<p class="warn">Sin ubicación exacta'+(o.location?' ('+esc(o.location)+')':'')+'. Pega abajo el link o las coordenadas que te mande el cliente.</p>')+
       '<div class="f"><label>Ubicación (link de Google Maps o coordenadas)</label><input data-field="location" value="'+esc(loc?loc.lat+','+loc.lng:'')+'" placeholder="9.9349,-84.0789"></div>'+
       '<div class="f"><label>Señas</label><input data-field="address" value="'+esc(o.address)+'"></div>';
   }
-  if(o.mode==='courier')b+='<div class="f"><label>Zona</label><input data-field="area" value="'+esc(o.area)+'"></div><div class="f"><label>Dirección para la encomienda</label><textarea data-field="address">'+esc(o.address)+'</textarea></div>';
-  b+='</div>';
+  if(o.mode==='courier')en+='<div class="f"><label>Zona</label><input data-field="area" value="'+esc(o.area)+'"></div><div class="f"><label>Dirección para la encomienda</label><textarea data-field="address">'+esc(o.address)+'</textarea></div>';
+  b+=SEC('entrega','Entrega',esc(MODE[o.mode]||o.mode)+(o.mode==='delivery'&&!loc?' · '+bad('sin ubicación'):''),en);
   // Cobro
-  b+='<div class="sec"><h3>Cobro</h3>'+
+  b+=SEC('cobro','Cobro',(o.mode!=='pickup'&&!o.shipping?bad('falta envío'):money(grand(o))),
     (o.variable&&o.variable.length?'<div class="f"><label>⚖️ Total de productos ya pesado ('+esc(o.variable.join(', '))+')</label><input data-field="finalTotal" inputmode="numeric" value="'+(o.finalTotal||'')+'" placeholder="'+Math.round(o.total)+'"></div>':'')+
     (o.mode!=='pickup'?'<div class="f"><label>Costo de envío ('+(o.mode==='delivery'?'Uber Flash':'encomienda')+')</label><input data-field="shipping" inputmode="numeric" value="'+(o.shipping||'')+'" placeholder="₡"></div>':'')+
-    '<div class="acts"><a class="b wa" data-send="total" href="#">Enviar total y SINPE</a></div><p class="hint">Le llega el desglose, el total y el SINPE '+esc(cfg.sinpe)+' a nombre de '+esc(cfg.sinpeName)+'.</p></div>';
+    '<div class="acts"><a class="b wa" data-send="total" href="#">Enviar total y SINPE</a></div><p class="hint">Le llega el desglose, el total y el SINPE '+esc(cfg.sinpe)+' a nombre de '+esc(cfg.sinpeName)+'.</p>');
   // Pago y factura
-  const invs=o.invoices||[];
-  b+='<div class="sec"><h3>Pago y factura</h3><div class="f"><label># de comprobante SINPE Móvil</label><input data-field="sinpeRef" inputmode="numeric" value="'+esc(o.sinpeRef||'')+'" placeholder="Ej. 2026102712345678"></div>'+
-    (SOLD.includes(o.status)&&!o.sinpeRef?'<p class="warn">Falta el # de SINPE.</p>':'')+
+  const invs=o.invoices||[], sold=SOLD.includes(o.status);
+  b+=SEC('pago','Pago y factura',(o.sinpeRef?ok('SINPE ✓'):sold?bad('falta SINPE'):'SINPE —')+' · '+(hasInv(o)?ok('factura ✓'):sold?bad('falta factura'):'factura —'),
+    '<div class="f"><label># de comprobante SINPE Móvil</label><input data-field="sinpeRef" inputmode="numeric" value="'+esc(o.sinpeRef||'')+'" placeholder="Ej. 2026102712345678"></div>'+
+    (sold&&!o.sinpeRef?'<p class="warn">Falta el # de SINPE.</p>':'')+
     '<div class="f"><label>Factura de este pedido</label><div class="row"><select data-inv-type>'+INV_PICK.map(k=>'<option value="'+k+'"'+((o.fe&&k==='FE')||(!o.fe&&k==='TN')?' selected':'')+'>'+INV[k]+'</option>').join('')+'</select></div>'+
     '<div class="row" style="margin-top:6px"><input data-inv-num placeholder="Número / consecutivo"><button class="b dark shrink" data-inv-add>Agregar</button></div></div>'+
     invs.map((i,n)=>'<div class="inv'+(i.voided?' void':'')+'"><div><b>'+INV[i.type]+' '+esc(i.num)+'</b><small>'+new Date(i.t).toLocaleDateString('es-CR',{day:'numeric',month:'short',year:'numeric'})+(i.voided?' · ANULADA':'')+(i.note?' · '+esc(i.note):'')+'</small></div><button class="b sm '+(i.voided?'':'red')+'" data-inv-void="'+n+'">'+(i.voided?'Reactivar':'Anular')+'</button></div>').join('')+
-    (SOLD.includes(o.status)&&!hasInv(o)?'<p class="warn">Este pedido está pagado y todavía no tiene factura.</p>':'')+'</div>';
+    (sold&&!hasInv(o)?'<p class="warn">Este pedido está pagado y todavía no tiene factura.</p>':''));
   // Estado y avisos
-  b+=(o.status==='cancelado'&&o.cancelReason?'<div class="sec" style="background:#fff6f5"><h3>Motivo de cancelación</h3><p style="margin:0">'+esc(o.cancelReason)+'</p></div>':'')+'<div class="sec"><h3>Estado</h3><div class="st">'+Object.keys(ST).map(s=>'<button data-s="'+s+'" class="'+(o.status===s?'on':'')+'">'+ST[s]+'</button>').join('')+'</div>'+
+  b+=(o.status==='cancelado'&&o.cancelReason?'<div class="sec" style="background:#fff6f5"><h3>Motivo de cancelación</h3><p style="margin:0">'+esc(o.cancelReason)+'</p></div>':'')+
+    SEC('estado','Estado y avisos',esc(ST[o.status]),'<div class="st">'+Object.keys(ST).map(s=>'<button data-s="'+s+'" class="'+(o.status===s?'on':'')+'">'+ST[s]+'</button>').join('')+'</div>'+
     '<div class="acts"><a class="b wa" data-send="ready" href="#">'+readyLabel(o)+'</a><a class="b" href="'+wa(o,'')+'" target="_blank">Abrir chat</a></div>'+
     (o.mode==='courier'?'<p class="hint">Después de enviar el mensaje, mándale la foto de la guía en ese mismo chat.</p>':'')+
-    '<div class="f"><label>Nota interna (solo la ves vos)</label><textarea data-field="note">'+esc(o.note||'')+'</textarea></div></div>';
-  return '<article class="o'+(open[o.key]?' open':'')+(isNew?' new':'')+'" data-k="'+esc(o.key)+'">'+top+'<div class="o__body">'+b+'</div></article>'}
+    '<div class="f"><label>Nota interna (solo la ves vos)</label><textarea data-field="note">'+esc(o.note||'')+'</textarea></div>');
+  return '<article class="o'+(open[o.key]?' open':'')+(isNew?' new':'')+(sel.has(o.key)?' is-sel':'')+'" data-k="'+esc(o.key)+'">'+top+'<div class="o__body">'+b+'</div></article>'}
 function prepPill(o){const p=o.prep;if(!p)return '';const n=o.items.length,k=o.items.filter((_,i)=>(p.checks||[])[i]).length;
   if(p.doneAt)return '<span class="pill s-listo">📦 Alistado'+(p.doneBy?' · '+esc(p.doneBy):'')+'</span>'+((p.issues||[]).length?'<span class="pill p-nofac">⚠️ Problema</span>':'');
   return (k?'<span class="pill s-preparando">Alistando '+k+'/'+n+(p.by?' · '+esc(p.by):'')+'</span>':'')+((p.issues||[]).length?'<span class="pill p-nofac">⚠️ Problema</span>':'')}
@@ -243,13 +278,40 @@ async function save(k,patch,silent){const r=await fetch('/panel/api/update',{met
 function rerender(){const a=document.activeElement;if(a&&a.blur)a.blur();render()}
 
 /* ---------- Eventos ---------- */
+/* ---------- Selección múltiple ---------- */
+function visibleKeys(){return orders.filter(o=>inFilter(o)&&match(o)).map(o=>o.key)}
+function setSelecting(on){selecting=on;if(!on)sel.clear();document.body.classList.toggle('selecting',on);$('#selbtn').classList.toggle('on',on);$('#selbtn').textContent=on?'Cancelar':'Seleccionar';$('#bulk').hidden=!on;bulkUI();render()}
+function bulkUI(){const n=sel.size;$('#selN').textContent=n+(n===1?' seleccionado':' seleccionados');$('#bulkDel').disabled=!n;$('#bulkSt').disabled=!n;
+  const vk=visibleKeys();$('#selall').textContent=vk.length&&vk.every(k=>sel.has(k))?'Quitar todos':'Seleccionar todos'}
+$('#bulkSt').innerHTML='<option value="">Cambiar estado a…</option>'+Object.keys(ST).map(s=>'<option value="'+s+'">'+ST[s]+'</option>').join('');
+let undoKeys=[];
+function showUndo(t,keys){undoKeys=keys;$('#undoT').textContent=t;$('#undo').hidden=false;clearTimeout(showUndo.t);showUndo.t=setTimeout(()=>{$('#undo').hidden=true},9000)}
+async function bulkDelete(){const keys=[...sel],L=orders.filter(o=>sel.has(o.key));if(!keys.length)return;
+  const paid=L.filter(o=>SOLD.includes(o.status)).length,inv=L.filter(hasInv).length;
+  const r=await ask({icon:'🗑',title:'¿Borrar '+keys.length+(keys.length===1?' pedido?':' pedidos?'),html:'Se quitan del panel y de las ventas: <b>'+L.slice(0,6).map(o=>esc(o.code)).join(', ')+(L.length>6?'…':'')+'</b>.'+(paid?' <b>Ojo: '+paid+(paid===1?' está pagado':' están pagados')+'</b> y dejarían de contar en Ventas.':'')+(inv?' <b>'+inv+' con factura.</b>':'')+' Podés deshacerlo enseguida.',ok:'Sí, borrar',danger:true});if(!r)return;
+  const res=await fetch('/panel/api/delete',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({keys})});
+  if(!res.ok){toast('⚠️ No se pudo borrar');return}
+  orders=orders.filter(o=>!sel.has(o.key));sums=sums.filter(s=>!sel.has(s.key));sel.clear();bulkUI();render();showUndo(keys.length+(keys.length===1?' pedido borrado':' pedidos borrados'),keys)}
+async function bulkStatus(st){const keys=[...sel];if(!keys.length||!st)return;let note='';
+  if(st==='cancelado'){const r=await ask({icon:'🛑',title:'¿Cancelar '+keys.length+(keys.length===1?' pedido?':' pedidos?'),html:'Todos quedan como <b>Cancelado</b> con el mismo motivo.',ok:'Sí, cancelar',cancel:'No',danger:true,note:'¿Por qué se cancelan? (obligatorio)',noteRequired:true});if(!r)return;note=r.note}
+  else{const r=await ask({icon:'🔁',title:'¿Cambiar '+keys.length+(keys.length===1?' pedido':' pedidos')+' a '+ST[st]+'?',html:'Se actualiza el estado de los pedidos seleccionados.',ok:'Sí, cambiar'});if(!r)return}
+  let n=0;for(const k of keys){const pt={status:st};if(note)pt.cancelReason=note;if(await save(k,pt,true))n++}
+  toast(n+' actualizado'+(n===1?'':'s')+' ✓');sel.clear();bulkUI();render()}
+document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches('details[data-sec]')){const c=d.closest('.o');if(c)secOpen[c.dataset.k+'|'+d.dataset.sec]=d.open}},true);
+$('#bulkSt').addEventListener('change',async e=>{const v=e.target.value;e.target.value='';await bulkStatus(v)});
 document.addEventListener('click',async e=>{
-  const v=e.target.closest('[data-view]');if(v){view=v.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('on',x===v));$('#ptabs').hidden=view!=='pedidos';$('#list').hidden=view!=='pedidos';$('#sales').hidden=view!=='ventas';render();return}
+  if(e.target.closest('#selbtn')){setSelecting(!selecting);return}
+  if(e.target.closest('#selx')){setSelecting(false);return}
+  if(e.target.closest('#selall')){const vk=visibleKeys();if(vk.every(k=>sel.has(k)))vk.forEach(k=>sel.delete(k));else vk.forEach(k=>sel.add(k));bulkUI();render();return}
+  if(e.target.closest('#bulkDel')){bulkDelete();return}
+  if(e.target.closest('#undoB')){$('#undo').hidden=true;const r=await fetch('/panel/api/restore',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({keys:undoKeys})});if(r.ok){toast('Restaurado ✓');load(true)}else toast('⚠️ No se pudo deshacer');return}
+  if(selecting){const so=e.target.closest('.o');if(so&&e.target.closest('[data-toggle]')){const k=so.dataset.k;if(sel.has(k))sel.delete(k);else sel.add(k);so.classList.toggle('is-sel',sel.has(k));bulkUI();return}}
+  const v=e.target.closest('[data-view]');if(v){view=v.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('on',x===v));if(view!=='pedidos'&&selecting)setSelecting(false);$('#ptabs').hidden=view!=='pedidos';$('#list').hidden=view!=='pedidos';$('#sales').hidden=view!=='ventas';render();return}
   const pp=e.target.closest('[data-p]');if(pp){period=pp.dataset.p;renderSales();return}
   if(e.target.closest('#csv')){csv();return}
   const tr=e.target.closest('[data-open]');if(tr){const k=tr.dataset.open;if(!orders.some(o=>o.key===k)){const r=await fetch('/panel/api/order?key='+encodeURIComponent(k));if(r.ok){const d=await r.json();orders.push(d.order)}}
     open[k]=true;filter='todos';q='';$('#q').value='';$('[data-view="pedidos"]').click();setTimeout(()=>{const c=document.querySelector('.o[data-k="'+CSS.escape(k)+'"]');if(c)c.scrollIntoView({block:'start',behavior:'smooth'})},50);return}
-  const t=e.target.closest('[data-f]');if(t){filter=t.dataset.f;render();return}
+  const t=e.target.closest('[data-f]');if(t){filter=t.dataset.f;render();if(selecting)bulkUI();return}
   const c=e.target.closest('.o');if(!c)return;const k=c.dataset.k;const o=orders.find(x=>x.key===k);if(!o)return;
   if(e.target.closest('[data-toggle]')){open[k]=!open[k];c.classList.toggle('open');return}
   const m=e.target.closest('[data-mode]');if(m){if(m.dataset.mode===o.mode)return;const to=m.dataset.mode;const r0=await ask({icon:'🔁',title:'¿Cambiar la forma de entrega?',html:'El pedido <b>'+esc(o.code)+'</b> de '+esc(o.name)+' pasa de <b>'+MODE[o.mode]+'</b> a <b>'+MODE[to]+'</b>.'+(o.shipping?' El costo de envío que pusiste ('+money(o.shipping)+') se va a borrar.':'')+(to==='delivery'?' Vas a necesitar su ubicación para cotizar el Uber.':to==='courier'?' Vas a necesitar su dirección para la encomienda.':''),ok:'Sí, cambiar',note:'Motivo (opcional): ej. el cliente prefiere recoger'});if(!r0)return;await save(k,{mode:to,shipping:0,changeNote:r0.note});rerender();return}
