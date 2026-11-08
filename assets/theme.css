@@ -3257,3 +3257,8 @@ body.is-locked { overscroll-behavior: none; }
 /* Franja de anuncios: arena dorado con letra verde */
 .announcement { background: #efdcae !important; color: #1a4f3b !important; font-weight: 600; letter-spacing: .2px; }
 .announcement__item, .announcement__item a { color: #1a4f3b !important; }
+
+/* Computadora: resultados del buscador con letra oscura (el header verde pone la letra en blanco) */
+.site-header .search-drop, .site-header .search-drop .hsd__item, .site-header .search-drop .hsd__body strong { color: #1d2a1c !important; }
+.site-header .search-drop .hsd__body small { color: #6b7468 !important; }
+.site-header .search-drop .hsd__foot { color: #1d2a1c !important; }
