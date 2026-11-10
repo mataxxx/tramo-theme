@@ -52,7 +52,8 @@
         "pause_on_hover": true,
         "bg_color": "#efdcae",
         "text_color": "#1a4f3b"
-      }
+      },
+      "disabled": true
     },
     "header": {
       "type": "header",

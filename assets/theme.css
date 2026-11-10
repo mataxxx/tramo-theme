@@ -3167,7 +3167,7 @@ body.is-locked { overscroll-behavior: none; }
 @media (max-width: 749px) {
   .site-header .brand-mark { visibility: visible !important; }
   .site-header .brand-mark > :not(.brand-mark__light) { display: none !important; }
-  .site-header .brand-mark__light { display: block; width: 122px; height: auto; margin: 0 auto; }
+  .site-header .brand-mark__light { display: block; width: 150px; height: auto; margin: 0 auto; }
 }
 
 /* Computadora: header verde igual que en celular — logo crema a la izquierda, buscador y carrito a la derecha */
@@ -3175,7 +3175,7 @@ body.is-locked { overscroll-behavior: none; }
   .site-header { display: flex !important; align-items: center; gap: 12px; background: #1a4f3b !important; color: #fff; padding: 17px max(76px, calc((100% - 1188px) / 2)) 17px !important; position: relative; }
   .site-header > .brand-mark { order: 0; margin: 0 !important; visibility: visible !important; flex: 0 0 auto; }
   .site-header .brand-mark > :not(.brand-mark__light) { display: none !important; }
-  .site-header .brand-mark__light { display: block; height: 86px; width: auto; }
+  .site-header .brand-mark__light { display: block; height: 72px; width: auto; }
   .site-header--shrink.is-scrolled .brand-mark { transform: scale(.88); transform-origin: left center; }
   .site-header > .header__actions { order: 1; flex: 1; margin-left: 36px; display: flex !important; align-items: center; gap: 10px; }
   .site-header .header__right { margin-left: auto; }
