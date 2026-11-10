@@ -20,8 +20,8 @@
             "brand_title": "",
             "brand_subtitle": "",
             "text": "<p>Especias, ingredientes y sabores del mundo desde 1946.</p>",
-            "logo_asset": "logo-tramo-claro.png",
-            "logo_width": 150
+            "logo_asset": "logo-tramo-texto-crema.png",
+            "logo_width": 190
           }
         },
         "contact": {
@@ -39,7 +39,8 @@
       "settings": {
         "show_social": true,
         "show_payment_icons": true,
-        "copyright": ""
+        "copyright": "",
+        "since_text": "-"
       }
     }
   },

@@ -3262,3 +3262,11 @@ body.is-locked { overscroll-behavior: none; }
 .site-header .search-drop, .site-header .search-drop .hsd__item, .site-header .search-drop .hsd__body strong { color: #1d2a1c !important; }
 .site-header .search-drop .hsd__body small { color: #6b7468 !important; }
 .site-header .search-drop .hsd__foot { color: #1d2a1c !important; }
+
+/* Pie de página: logo de texto crema; centrado en celular */
+.footer-logo { display: block; height: auto; }
+@media (max-width: 749px) {
+  .footer-block--brand { text-align: center; }
+  .footer-block--brand .footer-logo { margin-left: auto; margin-right: auto; }
+  .footer-block--brand .footer-social { justify-content: center; }
+}
