@@ -361,3 +361,20 @@
 .ord-mapmodal__gps svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
 .ord-mapmodal__gps.is-busy { opacity: .6; }
 .ord-mapmodal__ok { flex: 1; height: 52px; border: 0; border-radius: 14px; background: #1d1d1d; color: #fff; font: 700 16px/1 inherit; font-family: inherit; cursor: pointer; }
+
+/* Ventana del mapa: buscador arriba, botones con más contraste, etiqueta sobre el pin */
+.ord-mapmodal__box { height: min(84dvh, 760px); }
+.ord-mapmodal__head { padding-bottom: 10px; }
+.ord-mapmodal__head b { font-weight: 700; }
+.ord-mapmodal__search { position: relative; z-index: 8; padding: 0 16px 12px; }
+.ord-mapmodal__search .ord-find { margin: 0; box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+.ord-mapmodal__search .ord-find-res { position: absolute; left: 16px; right: 16px; top: calc(100% - 6px); max-height: 46vh; overflow-y: auto; margin: 0; background: #fff; border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,.22); }
+.ord-mapmodal__body { border-top: 1px solid #e6e6e6; }
+.ord-mapmodal__foot { position: relative; z-index: 7; background: #fff; box-shadow: 0 -8px 22px rgba(0,0,0,.10); border-top: 0; padding: 14px 16px max(18px, calc(env(safe-area-inset-bottom) + 12px)); }
+.ord-mapmodal__ok { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 56px; background: var(--color-primary, #1a4f3b); font-size: 17px; box-shadow: 0 6px 16px rgba(26,79,59,.35); }
+.ord-mapmodal__ok svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.ord-mapmodal__gps { height: 56px; border-color: var(--color-primary, #1a4f3b); color: var(--color-primary, #1a4f3b); background: #eef4f0; }
+.ord-mapmodal .ord-cpin::after { content: 'Tu pedido llega aquí'; position: absolute; left: 0; bottom: 52px; transform: translateX(-50%); white-space: nowrap; padding: 6px 11px; border-radius: 999px; background: #1d1d1d; color: #fff; font-size: 12.5px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.25); }
+.ord-mapmodal .ord-cpin.is-lift::after { opacity: .5; }
+.ord-mapmodal .ord-cpin span { transform: scale(1.12) rotate(-45deg); }
+.ord-mapmodal .ord-cpin.is-lift span { transform: translateY(-10px) scale(1.12) rotate(-45deg); }

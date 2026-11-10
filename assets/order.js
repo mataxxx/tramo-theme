@@ -226,7 +226,7 @@
   }
 
   /* ---------- mapa: Google (limpio, estilo Uber, pin fijo al centro) o OpenStreetMap si no hay llave ---------- */
-  var leafletP = null, googleP = null, kind = null, userMoved = false, cpin = null, locked = true, editing = false, manual = false, prevLoc = null, mapHome = null;
+  var leafletP = null, googleP = null, kind = null, userMoved = false, cpin = null, locked = true, editing = false, manual = false, prevLoc = null, mapHome = null, findHome = null;
   var GSTYLE = [
     /* Estilo Uber: fondo gris, calles blancas, casas más claras que el fondo, sin íconos */
     { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
@@ -388,6 +388,8 @@
     if (!mapHome) { mapHome = document.createComment('mapa'); w.parentNode.insertBefore(mapHome, w); }
     prevLoc = loc; editing = true;
     $('[data-map-modal-body]', M).appendChild(w);
+    var fb = $('[data-order-find]', M), fr = $('[data-order-find-res]', M), ms = $('[data-map-modal-search]', M);
+    if (fb && ms) { if (!findHome) { findHome = document.createComment('buscar'); fb.parentNode.insertBefore(findHome, fb); } ms.appendChild(fb); if (fr) ms.appendChild(fr); }
     w.classList.add('is-editing');
     md.hidden = false; requestAnimationFrame(function () { md.classList.add('is-open'); });
     setLock(false); setWaLoc(false);
@@ -409,6 +411,9 @@
     md.classList.remove('is-open'); md.hidden = true;
     w.classList.remove('is-editing');
     if (mapHome && mapHome.parentNode) mapHome.parentNode.insertBefore(w, mapHome.nextSibling);
+    var fb2 = $('[data-order-find]', M), fr2 = $('[data-order-find-res]', M);
+    if (findHome && findHome.parentNode && fb2) { findHome.parentNode.insertBefore(fb2, findHome.nextSibling); if (fr2) { var lr = $('.ord-locrow', M); var anchor = lr ? lr.parentNode : fb2.parentNode; anchor.parentNode.insertBefore(fr2, anchor.nextSibling); } }
+    findMsg('');
     setLock(true);
     refit(loc || center0());
     hint(); validate();
@@ -743,7 +748,7 @@
   document.addEventListener('keydown', function (e) {
     if (!editing) return;
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closePicker(false); }
-    else if (e.key === 'Enter' && !(e.target.matches && e.target.matches('textarea'))) { e.preventDefault(); e.stopPropagation(); closePicker(true); }
+    else if (e.key === 'Enter' && !(e.target.matches && e.target.matches('textarea, [data-order-find-q], button'))) { e.preventDefault(); e.stopPropagation(); closePicker(true); }
   }, true);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !M.hidden) close(); });
   M.addEventListener('keydown', function (e) {
