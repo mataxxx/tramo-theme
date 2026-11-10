@@ -332,3 +332,32 @@
 .ord-mapwrap.is-locked::after { content: ''; position: absolute; inset: 0; border-radius: 14px; box-shadow: inset 0 0 0 1.5px rgba(29,29,29,.55); pointer-events: none; z-index: 4; }
 .ord-mapwrap .leaflet-control-container .leaflet-top.leaflet-left { display: none; }
 
+
+/* Mapa en la página: solo vista (no se mueve al hacer scroll); se cambia en una ventana aparte */
+.ord-mapshield { position: absolute; inset: 0; z-index: 5; border: 0; padding: 0; background: transparent; cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+.ord-mapwrap.is-editing .ord-mapshield { display: none; }
+.ord-mapwrap:not(.is-editing) .ord-mapctl { display: none; }
+.ord-mapwrap.is-locked::after { display: none !important; }
+.ord-mapwrap.is-locked .ord-cpin span { background: var(--color-primary, #1a4f3b) !important; }
+.ord-mapwrap .ord-maplock { z-index: 6; }
+.ord-mapwrap .leaflet-container { touch-action: pan-y; }
+.ord-mapmodal { position: absolute; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; background: rgba(15,22,14,.55); opacity: 0; transition: opacity .2s ease; }
+.ord-mapmodal[hidden] { display: none; }
+.ord-mapmodal.is-open { opacity: 1; }
+.ord-mapmodal__box { width: min(600px, 100%); height: min(90dvh, 760px); display: flex; flex-direction: column; background: #fff; border-radius: 22px 22px 0 0; overflow: hidden; box-shadow: 0 -18px 50px rgba(0,0,0,.3); transform: translateY(24px); transition: transform .28s cubic-bezier(.22,.61,.36,1); }
+.ord-mapmodal.is-open .ord-mapmodal__box { transform: none; }
+@media (min-width: 750px) { .ord-mapmodal { align-items: center; padding: 3vh 16px; } .ord-mapmodal__box { border-radius: 22px; height: min(84vh, 720px); } }
+.ord-mapmodal__head { display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px 20px; }
+.ord-mapmodal__head > div { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.ord-mapmodal__head b { font-size: 18px; color: #1d1d1d; }
+.ord-mapmodal__head small { font-size: 13.5px; color: #6b6b6b; }
+.ord-mapmodal__x { flex: 0 0 auto; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #f2f2f2; display: grid; place-items: center; cursor: pointer; }
+.ord-mapmodal__x svg { width: 18px; height: 18px; fill: none; stroke: #1d1d1d; stroke-width: 2.4; stroke-linecap: round; }
+.ord-mapmodal__body { position: relative; flex: 1; min-height: 0; }
+.ord-mapmodal__body .ord-mapwrap { position: absolute; inset: 0; border-radius: 0; }
+.ord-mapmodal__body .ord-map, .ord-mapmodal__body .ord-mapwrap .ord-map { height: 100% !important; border-radius: 0 !important; }
+.ord-mapmodal__foot { display: flex; gap: 10px; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid #ececec; }
+.ord-mapmodal__gps { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px; padding: 0 16px; height: 52px; border: 1.5px solid #1d1d1d; border-radius: 14px; background: #fff; color: #1d1d1d; font: 600 14.5px/1 inherit; font-family: inherit; cursor: pointer; }
+.ord-mapmodal__gps svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+.ord-mapmodal__gps.is-busy { opacity: .6; }
+.ord-mapmodal__ok { flex: 1; height: 52px; border: 0; border-radius: 14px; background: #1d1d1d; color: #fff; font: 700 16px/1 inherit; font-family: inherit; cursor: pointer; }
