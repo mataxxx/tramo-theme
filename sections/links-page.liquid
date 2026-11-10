@@ -1,0 +1,91 @@
+{%- comment -%} Página tipo Linktree: logo y botones grandes, sin menú ni pie de página {%- endcomment -%}
+<style>
+  html, body.links-body { margin: 0; min-height: 100%; }
+  body.links-body { background: #1a4f3b; color: #fff8e9; font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+  .lk { position: relative; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; padding: max(48px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom)); overflow: hidden; isolation: isolate; }
+  .lk::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(120% 60% at 50% 0%, rgba(255,248,233,.10) 0%, rgba(255,248,233,0) 60%), radial-gradient(90% 50% at 50% 100%, rgba(0,0,0,.22) 0%, rgba(0,0,0,0) 70%); }
+  .lk__inner { width: 100%; max-width: 440px; display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .lk__logo { display: block; width: min(230px, 62vw); height: auto; margin: 6px auto 0; }
+  .lk__tag { margin: 18px 0 0; text-align: center; font-size: 14.5px; line-height: 1.45; letter-spacing: .2px; color: rgba(255,248,233,.82); }
+  .lk__rule { width: 44px; height: 2px; border: 0; margin: 22px auto 26px; background: #efdcae; border-radius: 2px; opacity: .9; }
+  .lk__list { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 14px; }
+  .lk__btn { display: flex; align-items: center; gap: 14px; min-height: 68px; padding: 12px 18px 12px 14px; border-radius: 18px; background: #fff8e9; color: #1a4f3b; text-decoration: none; box-shadow: 0 10px 24px rgba(0,0,0,.18); transition: transform .15s ease, box-shadow .15s ease; -webkit-tap-highlight-color: transparent; }
+  .lk__btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,0,0,.24); }
+  .lk__btn:active { transform: scale(.98); }
+  .lk__btn:focus-visible { outline: 3px solid #efdcae; outline-offset: 3px; }
+  .lk__ico { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: #1a4f3b; color: #fff8e9; }
+  .lk__ico svg { width: 23px; height: 23px; }
+  .lk__ico--whatsapp { background: #25d366; color: #fff; }
+  .lk__ico--facebook { background: #1877f2; color: #fff; }
+  .lk__txt { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  .lk__label { font-family: var(--font-heading); font-size: 19px; line-height: 1.15; font-weight: 600; letter-spacing: -.2px; }
+  .lk__sub { font-size: 13px; color: #5f6b5c; }
+  .lk__go { flex: 0 0 auto; width: 20px; height: 20px; opacity: .55; }
+  .lk__foot { margin-top: auto; padding-top: 34px; text-align: center; font-size: 12px; color: rgba(255,248,233,.55); letter-spacing: .3px; }
+  @media (prefers-reduced-motion: reduce) { .lk__btn { transition: none; } }
+</style>
+
+<main class="lk">
+  <div class="lk__inner">
+    <a href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+      <img class="lk__logo" src="{{ section.settings.logo_asset | default: 'logo-tramo-crema.png' | asset_url }}" alt="{{ shop.name | escape }}" width="600" height="264" fetchpriority="high">
+    </a>
+    {%- if section.settings.tagline != blank -%}<p class="lk__tag">{{ section.settings.tagline }}</p>{%- endif -%}
+    <hr class="lk__rule">
+    <ul class="lk__list" role="list">
+      {%- for block in section.blocks -%}
+        {%- if block.settings.url != blank -%}
+        {%- assign ext = true -%}{%- if block.settings.url contains 'tramosanrafael.com' -%}{%- assign ext = false -%}{%- endif -%}
+        <li {{ block.shopify_attributes }}>
+          <a class="lk__btn" href="{{ block.settings.url }}"{% if ext %} target="_blank" rel="noopener"{% endif %}>
+            <span class="lk__ico lk__ico--{{ block.settings.icon }}" aria-hidden="true">
+              {%- case block.settings.icon -%}
+                {%- when 'whatsapp' -%}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm0 18.16c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 4.54 0 8.24 3.7 8.24 8.24 0 4.55-3.7 8.24-8.24 8.24Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.39 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/></svg>
+                {%- when 'facebook' -%}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21.9v-7.4h2.5l.4-2.9h-2.9V9.8c0-.84.24-1.4 1.44-1.4h1.53V5.8c-.27-.03-1.17-.11-2.23-.11-2.2 0-3.71 1.35-3.71 3.82v2.1H8v2.9h2.5v7.4h3Z"/></svg>
+                {%- when 'instagram' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                {%- when 'map' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+                {%- else -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 4.5 4h15L21 9.5"/><path d="M3 9.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg>
+              {%- endcase -%}
+            </span>
+            <span class="lk__txt">
+              <span class="lk__label">{{ block.settings.label }}</span>
+              {%- if block.settings.sub != blank -%}<span class="lk__sub">{{ block.settings.sub }}</span>{%- endif -%}
+            </span>
+            <svg class="lk__go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          </a>
+        </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+    <p class="lk__foot">© {{ 'now' | date: '%Y' }} {{ shop.name }}</p>
+  </div>
+</main>
+
+{% schema %}
+{
+  "name": "Página de enlaces",
+  "settings": [
+    { "type": "text", "id": "logo_asset", "label": "Logo (archivo del tema)", "default": "logo-tramo-crema.png" },
+    { "type": "text", "id": "tagline", "label": "Texto debajo del logo", "default": "Pedidos en línea · Envíos a todo el país" }
+  ],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Botón",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Texto", "default": "Mi enlace" },
+        { "type": "text", "id": "sub", "label": "Texto pequeño (opcional)" },
+        { "type": "url", "id": "url", "label": "Enlace" },
+        { "type": "select", "id": "icon", "label": "Ícono", "default": "store", "options": [
+          { "value": "store", "label": "Tienda" },
+          { "value": "whatsapp", "label": "WhatsApp" },
+          { "value": "facebook", "label": "Facebook" },
+          { "value": "instagram", "label": "Instagram" },
+          { "value": "map", "label": "Ubicación" }
+        ] }
+      ]
+    }
+  ],
+  "max_blocks": 10
+}
+{% endschema %}

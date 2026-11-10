@@ -1,0 +1,49 @@
+{
+  "layout": "links",
+  "sections": {
+    "main": {
+      "type": "links-page",
+      "blocks": {
+        "tienda": {
+          "type": "link",
+          "settings": {
+            "label": "Tienda en línea",
+            "sub": "Comprá y recibí como querás",
+            "url": "https://tramosanrafael.com",
+            "icon": "store"
+          }
+        },
+        "whatsapp": {
+          "type": "link",
+          "settings": {
+            "label": "WhatsApp",
+            "sub": "Escribinos",
+            "url": "https://wa.me/50671426532",
+            "icon": "whatsapp"
+          }
+        },
+        "facebook": {
+          "type": "link",
+          "settings": {
+            "label": "Facebook",
+            "sub": "Seguinos",
+            "url": "https://www.facebook.com/p/Tramo-San-Rafael-1-100057346663843/?locale=es_LA",
+            "icon": "facebook"
+          }
+        }
+      },
+      "block_order": [
+        "tienda",
+        "whatsapp",
+        "facebook"
+      ],
+      "settings": {
+        "logo_asset": "logo-tramo-crema.png",
+        "tagline": "Pedidos en línea · Envíos a todo el país"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

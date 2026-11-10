@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#1a4f3b">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32.png' | asset_url }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ 'favicon-192.png' | asset_url }}">
+    <link rel="apple-touch-icon" href="{{ 'apple-touch-icon.png' | asset_url }}">
+    <title>{{ page_title }}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}</title>
+    {%- assign seo_desc = page_description | default: settings.seo_description -%}
+    {%- if seo_desc != blank -%}<meta name="description" content="{{ seo_desc | strip_newlines | escape }}">{%- endif -%}
+    {% render 'meta-tags' %}
+    {{ content_for_header }}
+    {%- style -%}
+      {{ settings.type_heading_font | font_face: font_display: 'swap' }}
+      {{ settings.type_body_font | font_face: font_display: 'swap' }}
+      :root {
+        --font-heading: {{ settings.type_heading_font.family }}, {{ settings.type_heading_font.fallback_families }}, Georgia, serif;
+        --font-body: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }}, Arial, sans-serif;
+      }
+    {%- endstyle -%}
+  </head>
+  <body class="links-body">
+    {{ content_for_layout }}
+  </body>
+</html>
