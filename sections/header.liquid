@@ -54,7 +54,7 @@
   {%- endif -%}
 
   <a href="{{ routes.root_url }}" class="brand-mark" aria-label="{{ shop.name | escape }}">
-    <img class="brand-mark__light" src="{{ 'logo-tramo-crema.png' | asset_url }}" alt="{{ shop.name | escape }}" width="600" height="264" loading="eager" fetchpriority="high">
+    <img class="brand-mark__light" src="{{ 'logo-tramo-especias-claro.png' | asset_url }}" alt="{{ shop.name | escape }}" width="900" height="670" loading="eager" fetchpriority="high">
     {%- if s.logo != blank -%}
       {{ s.logo | image_url: width: 800 | image_tag: widths: '200, 300, 400, 600, 800', sizes: '(min-width: 750px) 400px, 200px', class: 'brand-mark__logo', loading: 'eager', alt: shop.name }}
     {%- elsif s.logo_asset != blank -%}
