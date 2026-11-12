@@ -3299,3 +3299,10 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide { background: #fff; }
   #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { object-fit: contain !important; }
 }
+
+/* Computadora: columna de información de la ventana del producto alineada (texto, opciones y botón con el mismo margen) */
+@media (min-width: 750px) {
+  #QuickView .quick-view__content { padding: 34px 34px 22px !important; }
+  #QuickView .quick-view__content > * { margin-left: 0; margin-right: 0; }
+  #QuickView .quick-view > .sticky-add { grid-column: 2 !important; padding: 12px 34px 14px !important; border-top: 0 !important; background: var(--color-surface, #fffdf8) !important; box-shadow: 0 -22px 22px -4px var(--color-surface, #fffdf8) !important; backdrop-filter: none !important; }
+}
