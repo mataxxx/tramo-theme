@@ -3291,3 +3291,11 @@ body.is-locked { overscroll-behavior: none; }
 .quick-view__price .price__unit, .product-info__price .price__unit, .quick-view__price .price__from, .product-info__price .price__from { font-size: 17px !important; font-weight: 600; color: #1a4f3b !important; opacity: .65; }
 @media (min-width: 750px) { .quick-view__price .price__current, .product-info__price .price__current { font-size: 34px !important; } }
 .quick-view__price .price__compare, .product-info__price .price__compare { font-size: 18px; }
+
+/* Computadora: productos con foto ancha (ej. mermelada de naranja) — la ventana se alarga y la foto se ve completa */
+@media (min-width: 750px) {
+  #QuickView.drawer--sheet .drawer__panel:has(.product-gallery[data-shape="wide"]) { width: min(1140px, 100%); height: min(640px, 92vh); height: min(640px, 92dvh); }
+  #QuickView .quick-view:has(.product-gallery[data-shape="wide"]) { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) !important; }
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide { background: #fff; }
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { object-fit: contain !important; }
+}
