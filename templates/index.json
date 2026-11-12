@@ -185,7 +185,8 @@
         "heading": "Queque navideño",
         "search_noun": "producto",
         "filter_tags": "Frutas, Semillas, Especias y más",
-        "products_to_show": 6
+        "products_to_show": 6,
+        "popup_subtitle": "Para queque navideño"
       }
     },
     "tamales": {

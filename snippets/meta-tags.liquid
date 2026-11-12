@@ -1,5 +1,8 @@
 {%- liquid
   assign og_title = page_title | default: shop.name
+  if template.name == 'index'
+    assign og_title = 'Tramo San Rafael #1 | Fundadores | Tienda Online'
+  endif
   assign og_url = canonical_url
   assign og_type = 'website'
   if request.page_type == 'product'
