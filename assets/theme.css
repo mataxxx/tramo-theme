@@ -3285,3 +3285,9 @@ body.is-locked { overscroll-behavior: none; }
   .product-gallery__slide.has-scale { background: #fff; }
   .product-gallery__slide.has-scale img { object-fit: contain !important; transform: scale(var(--slide-scale, 1)) !important; }
 }
+
+/* Ficha de producto: precio más grande, en negrita y en verde de la marca (vende más y se encuentra rápido) */
+.quick-view__price .price__current, .product-info__price .price__current { font-size: 31px !important; font-weight: 700 !important; color: #1a4f3b !important; letter-spacing: -.3px; line-height: 1.1; }
+.quick-view__price .price__unit, .product-info__price .price__unit, .quick-view__price .price__from, .product-info__price .price__from { font-size: 17px !important; font-weight: 600; color: #1a4f3b !important; opacity: .65; }
+@media (min-width: 750px) { .quick-view__price .price__current, .product-info__price .price__current { font-size: 34px !important; } }
+.quick-view__price .price__compare, .product-info__price .price__compare { font-size: 18px; }
