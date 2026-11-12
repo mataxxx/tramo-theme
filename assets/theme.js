@@ -546,7 +546,7 @@
       var strip = $('[data-gallery-strip]', root);
       var vsl = strip ? Array.prototype.slice.call(strip.children) : [];
       var vi = vsl.findIndex(function (sl) { return sl.getAttribute('data-media-id') === String(variant.media_id); });
-      if (strip && vi > -1) strip.scrollTo({ left: vi * strip.clientWidth, behavior: instant ? 'auto' : 'smooth' });
+      if (strip && vi > -1) { if (Math.abs(strip.scrollLeft - vi * strip.clientWidth) > 4) root._prog = true; strip.scrollTo({ left: vi * strip.clientWidth, behavior: instant ? 'auto' : 'smooth' }); }
     }
 
     /* Equivalencia en tazas (si el producto tiene "Gramos por taza") */
@@ -730,25 +730,34 @@
         groups.forEach(function (group, j) { $$('input', group).forEach(function (inp) { inp.checked = inp.value === best.options[j]; }); });
         update(false);
       }
+      var lastI = -1, raf = 0;
+      function check(settled) {
+        var kids = strip.children; if (!kids.length) return;
+        var stride = kids.length > 1 ? (kids[1].offsetLeft - kids[0].offsetLeft) : strip.clientWidth;
+        stride = stride || strip.clientWidth || 1;
+        var pos = strip.scrollLeft / stride, i = Math.round(pos);
+        if (root._prog) { if (settled) { root._prog = false; lastI = i; } return; } /* la foto se movió porque eligieron presentación */
+        if (!settled && Math.abs(pos - i) > 0.2) return; /* espera a que la foto esté casi centrada */
+        if (i === lastI) return; lastI = i;
+        var sl = kids[i]; if (!sl) return;
+        var tag = sl.querySelector('[data-slide-variants]');
+        var cur = findVariant(selectedOptions());
+        if (!tag) { if (i === 0 && initV && cur !== initV) pickVariant(initV); return; }
+        var ids = tag.getAttribute('data-slide-variants').split(',').filter(Boolean);
+        if (cur && ids.indexOf(String(cur.id)) > -1) return;
+        var opts = selectedOptions(), best = null, score = -1;
+        variants.forEach(function (v) {
+          if (ids.indexOf(String(v.id)) < 0) return;
+          var sc = 0; v.options.forEach(function (o, j) { if (o === opts[j]) sc++; });
+          if (sc > score) { score = sc; best = v; }
+        });
+        if (best) pickVariant(best);
+      }
       strip.addEventListener('scroll', function () {
-        clearTimeout(t);
-        t = setTimeout(function () {
-          var i = Math.round(strip.scrollLeft / Math.max(1, strip.clientWidth));
-          var sl = strip.children[i]; if (!sl) return;
-          var tag = sl.querySelector('[data-slide-variants]');
-          var cur = findVariant(selectedOptions());
-          if (!tag) { if (i === 0 && initV && cur !== initV) pickVariant(initV); return; }
-          var ids = tag.getAttribute('data-slide-variants').split(',').filter(Boolean);
-          if (cur && ids.indexOf(String(cur.id)) > -1) return;
-          var opts = selectedOptions(), best = null, score = -1;
-          variants.forEach(function (v) {
-            if (ids.indexOf(String(v.id)) < 0) return;
-            var sc = 0; v.options.forEach(function (o, j) { if (o === opts[j]) sc++; });
-            if (sc > score) { score = sc; best = v; }
-          });
-          if (best) pickVariant(best);
-        }, 160);
+        if (!raf) raf = requestAnimationFrame(function () { raf = 0; check(false); });
+        clearTimeout(t); t = setTimeout(function () { check(true); }, 120);
       }, { passive: true });
+      strip.addEventListener('scrollend', function () { check(true); });
     })();
     /* Al abrir: mostrar la foto de la presentación elegida (ej. la de granel) */
     (function () {
