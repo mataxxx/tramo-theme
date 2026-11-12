@@ -3306,3 +3306,9 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .quick-view__content > * { margin-left: 0; margin-right: 0; }
   #QuickView .quick-view > .sticky-add { grid-column: 2 !important; padding: 12px 34px 14px !important; border-top: 0 !important; background: var(--color-surface, #fffdf8) !important; box-shadow: 0 -22px 22px -4px var(--color-surface, #fffdf8) !important; backdrop-filter: none !important; }
 }
+
+/* Precio del botón de agregar: pequeño "salto" cuando cambia */
+.button__price, .add-price { display: inline-block; transform-origin: center; }
+.button__price.is-bump, .add-price.is-bump { animation: price-bump .45s cubic-bezier(.3,1.6,.5,1); }
+@keyframes price-bump { 0% { transform: scale(1); } 35% { transform: scale(1.28); text-shadow: 0 0 12px rgba(255,248,233,.7); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .button__price.is-bump, .add-price.is-bump { animation: none; } }

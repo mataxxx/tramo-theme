@@ -442,6 +442,11 @@
     $$('[data-product-root]', scope || document).forEach(initProduct);
   }
 
+  /* El precio del botón "crece" un instante cuando cambia (cantidad o gramos), para que se note */
+  function priceBump(el) {
+    if (!el) return;
+    el.classList.remove('is-bump'); void el.offsetWidth; el.classList.add('is-bump');
+  }
   function initProduct(root) {
     if (!root || root._tramoInit) return;
     var jsonEl = $('[data-product-json]', root);
@@ -472,7 +477,15 @@
       var trust = $('[data-sticky-trust]', root);
       if (trust) { trust.hidden = false; bar.appendChild(trust); }
       host.appendChild(bar);
-      function sync() { sb.textContent = (addButton.textContent || '').replace(/\s+/g, ' ').trim(); sb.disabled = addButton.disabled; }
+      var lastPrice = null;
+      function sync() {
+        var lab = addLabel ? addLabel.textContent.replace(/\s+/g, ' ').trim() : (addButton.textContent || '').replace(/\s+/g, ' ').trim();
+        var pr = addPrice ? addPrice.textContent.trim() : '';
+        sb.innerHTML = esc(lab) + (pr ? ' <span class="add-price">' + esc(pr) + '</span>' : '');
+        sb.disabled = addButton.disabled;
+        if (pr && lastPrice !== null && pr !== lastPrice) priceBump(sb.querySelector('.add-price'));
+        lastPrice = pr;
+      }
       sync();
       new MutationObserver(sync).observe(addButton, { childList: true, subtree: true, characterData: true, attributes: true });
       sb.addEventListener('click', function () { addButton.click(); });
@@ -621,7 +634,7 @@
       if (qtyField) qtyField.value = quantity;
       if (addButton) addButton.disabled = false;
       if (addLabel) addLabel.textContent = defaultLabel;
-      if (addPrice) addPrice.textContent = '· ' + formatMoney(variant.price * quantity);
+      if (addPrice) { var np = '· ' + formatMoney(variant.price * quantity); if (addPrice.textContent !== np) { var had = !!addPrice.textContent; addPrice.textContent = np; if (had) priceBump(addPrice); } }
       if (bulkKg) bulkKg.textContent = '';
       renderPrice(variant);
       updateCups(variant, quantity);
