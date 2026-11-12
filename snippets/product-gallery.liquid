@@ -8,6 +8,31 @@
     <div class="product-gallery__strip" data-gallery-strip>
       {%- for media in product.media -%}
         <div class="product-gallery__slide product-gallery__slide--blur" data-media-id="{{ media.id }}" style="--pg-bg: url('{{ media.preview_image | image_url: width: 240 }}')">
+          {%- liquid
+            assign vl = ''
+            assign o1 = ''
+            assign same = true
+            assign cnt = 0
+            for v in product.variants
+              if v.featured_media.id == media.id
+                assign cnt = cnt | plus: 1
+                if cnt == 1
+                  assign vl = v.title
+                  assign o1 = v.option1
+                elsif v.option1 != o1
+                  assign same = false
+                endif
+              endif
+            endfor
+            if cnt > 1
+              if same
+                assign vl = o1
+              else
+                assign vl = ''
+              endif
+            endif
+          -%}
+          {%- if vl != '' and product.variants.size > 1 -%}<span class="pg-vlabel">{{ vl }}</span>{%- endif -%}
           {%- if media.media_type == 'video' -%}
             {%- assign vsrc = nil -%}
             {%- for s in media.sources -%}

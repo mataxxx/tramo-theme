@@ -593,6 +593,7 @@
       var variant = findVariant(options);
       if (errorEl) errorEl.hidden = true;
       markAvailability(options);
+      if (fromUser && variant) scrollToMedia(variant); /* la foto cambia aunque la presentación no tenga precio todavía */
 
       var isBulk = !!(variant && variant.bulk);
       if (normalWrap) normalWrap.hidden = isBulk;
@@ -626,7 +627,6 @@
       updateCups(variant, quantity);
 
       if (fromUser) {
-        scrollToMedia(variant);
         if (!inQuickView && window.history && window.history.replaceState) {
           var url = new URL(window.location.href);
           url.searchParams.set('variant', variant.id);
