@@ -119,7 +119,7 @@
             "icon": "mortar",
             "search_noun": "especia",
             "icon_asset": "cat-condimentos.png",
-            "filters": "De temporada, Parrilla, Tradicionales, Dulces"
+            "filters": "De temporada, Dulces"
           }
         },
         "c": {
@@ -149,7 +149,7 @@
             "title": "Especias",
             "icon": "mortar",
             "search_noun": "especia",
-            "filters": "Picantes, Dulces"
+            "filters": ""
           }
         },
         "h": {
@@ -160,7 +160,8 @@
             "icon": "leaf",
             "search_noun": "producto",
             "filters": "Hierbas, Chiles secos"
-          }
+          },
+          "disabled": true
         }
       },
       "block_order": [
@@ -208,7 +209,7 @@
         "collection": "especias-navidenas",
         "heading": "Condimentos",
         "search_noun": "especia",
-        "filter_tags": "De temporada, Parrilla, Tradicionales, Dulces",
+        "filter_tags": "De temporada, Dulces",
         "products_to_show": 6
       }
     },

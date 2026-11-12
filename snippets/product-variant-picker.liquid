@@ -42,5 +42,6 @@
         {%- endif -%}
       </fieldset>
     {%- endfor -%}
+    {%- if product.media.size > 0 -%}<p class="variant-picker__ref">Foto de referencia: el empaque puede variar según la presentación.</p>{%- endif -%}
   </div>
 {%- endunless -%}
