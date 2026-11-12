@@ -722,6 +722,34 @@
     })();
 
     update(false);
+    /* Al pasar las fotos, se elige la presentación de esa foto. La primera foto general vuelve a la presentación inicial */
+    (function () {
+      var strip = $('[data-gallery-strip]', root); if (!strip || !groups.length) return;
+      var initV = findVariant(selectedOptions()), t = null;
+      function pickVariant(best) {
+        groups.forEach(function (group, j) { $$('input', group).forEach(function (inp) { inp.checked = inp.value === best.options[j]; }); });
+        update(false);
+      }
+      strip.addEventListener('scroll', function () {
+        clearTimeout(t);
+        t = setTimeout(function () {
+          var i = Math.round(strip.scrollLeft / Math.max(1, strip.clientWidth));
+          var sl = strip.children[i]; if (!sl) return;
+          var tag = sl.querySelector('[data-slide-variants]');
+          var cur = findVariant(selectedOptions());
+          if (!tag) { if (i === 0 && initV && cur !== initV) pickVariant(initV); return; }
+          var ids = tag.getAttribute('data-slide-variants').split(',').filter(Boolean);
+          if (cur && ids.indexOf(String(cur.id)) > -1) return;
+          var opts = selectedOptions(), best = null, score = -1;
+          variants.forEach(function (v) {
+            if (ids.indexOf(String(v.id)) < 0) return;
+            var sc = 0; v.options.forEach(function (o, j) { if (o === opts[j]) sc++; });
+            if (sc > score) { score = sc; best = v; }
+          });
+          if (best) pickVariant(best);
+        }, 160);
+      }, { passive: true });
+    })();
     /* Al abrir: mostrar la foto de la presentación elegida (ej. la de granel) */
     (function () {
       var v0 = findVariant(selectedOptions());

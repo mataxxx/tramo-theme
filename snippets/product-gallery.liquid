@@ -10,12 +10,14 @@
         <div class="product-gallery__slide product-gallery__slide--blur" data-media-id="{{ media.id }}" style="--pg-bg: url('{{ media.preview_image | image_url: width: 240 }}')">
           {%- liquid
             assign vl = ''
+            assign vids = ''
             assign o1 = ''
             assign same = true
             assign cnt = 0
             for v in product.variants
               if v.featured_media.id == media.id
                 assign cnt = cnt | plus: 1
+                assign vids = vids | append: v.id | append: ','
                 if cnt == 1
                   assign vl = v.title
                   assign o1 = v.option1
@@ -33,6 +35,7 @@
             endif
           -%}
           {%- if vl != '' and product.variants.size > 1 -%}<span class="pg-vlabel">{{ vl }}</span>{%- endif -%}
+          {%- if vids != '' and product.variants.size > 1 -%}<i hidden data-slide-variants="{{ vids }}"></i>{%- endif -%}
           {%- if media.media_type == 'video' -%}
             {%- assign vsrc = nil -%}
             {%- for s in media.sources -%}
