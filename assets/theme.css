@@ -3383,3 +3383,10 @@ body.is-locked { overscroll-behavior: none; }
 }
 @media (max-width: 749px) { .footer-block--cats { text-align: center; padding-top: 6px; } }
 @media (min-width: 750px) { .footer-block--cats .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; } }
+
+/* Computadora, fotos anchas: en vez de franjas blancas, el fondo se completa con la misma foto difuminada (se ve como una sola pieza) */
+@media (min-width: 750px) {
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide { background: #ecebe8; overflow: hidden; isolation: isolate; }
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide--blur::before { content: '' !important; display: block !important; position: absolute; inset: -80px; z-index: 0; background: var(--pg-bg) center / cover no-repeat; filter: blur(48px) saturate(1.05); transform: scale(1.25); opacity: .95; }
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { position: relative; z-index: 1; }
+}
