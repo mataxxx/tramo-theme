@@ -3342,3 +3342,5 @@ body.is-locked { overscroll-behavior: none; }
 
 /* Círculos de categorías: la fila solo se desliza de lado (antes, al bajar con el dedo, la fila se movía por dentro y escondía los círculos) */
 .cats-section .product-rail { overflow-y: hidden !important; overscroll-behavior-y: none; padding-top: 6px !important; padding-bottom: 14px !important; }
+.cats-section .rail-wrap { overflow: visible !important; }
+.cats-section .product-rail { touch-action: pan-x pan-y; scroll-snap-type: x proximity !important; }

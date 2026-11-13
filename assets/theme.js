@@ -2425,3 +2425,19 @@ document.addEventListener('change', function (e) {
   if ('MutationObserver' in window) new MutationObserver(function () { scan(); }).observe(document.body, { childList: true, subtree: true });
 })();
 
+
+/* Círculos de categorías: la fila nunca se queda corrida hacia arriba (en iPhone escondía los círculos) */
+(function () {
+  function fix() {
+    document.querySelectorAll('.cats-section .product-rail, .cats-section .rail-wrap').forEach(function (r) { if (r.scrollTop) r.scrollTop = 0; });
+  }
+  document.addEventListener('scroll', function (e) {
+    var t = e.target;
+    if (t && t.closest && t.closest('.cats-section') && t.scrollTop) t.scrollTop = 0;
+    else if (t === document || t === window) fix();
+  }, { capture: true, passive: true });
+  window.addEventListener('pageshow', fix);
+  window.addEventListener('load', fix);
+  document.addEventListener('touchend', function () { setTimeout(fix, 50); setTimeout(fix, 400); }, { passive: true });
+  fix();
+})();
