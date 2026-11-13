@@ -7,8 +7,8 @@
     {%- endif -%}
     <div class="product-gallery__strip" data-gallery-strip>
       {%- for media in product.media -%}
-        {%- assign fe_key = media.id | append: '' -%}{%- assign fe = product.metafields.custom.foto_escala.value[fe_key] -%}
-        <div class="product-gallery__slide product-gallery__slide--blur{% if fe %} has-scale{% endif %}" data-media-id="{{ media.id }}" style="--pg-bg: url('{{ media.preview_image | image_url: width: 240 }}'){% if fe %}; --slide-scale: {{ fe }}{% endif %}">
+        {%- assign fe_key = media.id | append: '' -%}{%- assign fe = product.metafields.custom.foto_escala.value[fe_key] -%}{%- assign fem = product.metafields.custom.foto_escala_movil.value[fe_key] -%}
+        <div class="product-gallery__slide product-gallery__slide--blur{% if fe %} has-scale{% endif %}{% if fem %} has-scale-m{% endif %}" data-media-id="{{ media.id }}" style="--pg-bg: url('{{ media.preview_image | image_url: width: 240 }}'){% if fe %}; --slide-scale: {{ fe }}{% endif %}{% if fem %}; --slide-scale-m: {{ fem }}{% endif %}">
           {%- liquid
             assign vl = ''
             assign vids = ''
