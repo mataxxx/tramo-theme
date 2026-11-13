@@ -1759,6 +1759,7 @@
       var href = opener.getAttribute('href'); if (href) window.location.href = href; return;
     }
     catSetup({ title: opener.getAttribute('data-category-title'), question: opener.getAttribute('data-category-question'), filters: scope.getAttribute('data-category-filters'), search: scope.getAttribute('data-category-search'), banner: scope.getAttribute('data-category-banner'), subtitle: scope.getAttribute('data-category-subtitle') });
+    catNotice(scope.getAttribute('data-category-handle'));
     var tmp = document.createElement('div');
     tmp.appendChild(tpl.content.cloneNode(true));
     catFill(tmp.innerHTML);
@@ -1769,11 +1770,17 @@
     function top() { ['[data-drawer="category"]', '[data-drawer="category"] .drawer__panel', '.category-modal', '.category-modal__body', '[data-category-grid]'].forEach(function (sel) { var el = $(sel); if (el) el.scrollTop = 0; }); }
     top(); requestAnimationFrame(top); setTimeout(top, 60);
   }
+  function catNotice(handle) {
+    var n = $('[data-category-notice]'); if (!n) return;
+    var txt = handle && window.TRAMO_CAT_NOTICES ? window.TRAMO_CAT_NOTICES[handle] : '';
+    n.textContent = txt || ''; n.hidden = !txt;
+  }
   function openCategoryByHandle(handle, title, question, extraFilters) {
     var scope = document.querySelector('[data-category-scope][data-category-handle="' + handle + '"]');
     var tpl = scope && $('[data-category-template]', scope);
     var filters = (scope && scope.getAttribute('data-category-filters')) || extraFilters || '';
     catSetup({ title: title, question: question, filters: filters, search: scope ? scope.getAttribute('data-category-search') : 'bar', banner: scope ? scope.getAttribute('data-category-banner') : '', subtitle: scope ? scope.getAttribute('data-category-subtitle') : '' });
+    catNotice(handle);
     if (tpl) {
       var tmp = document.createElement('div');
       tmp.appendChild(tpl.content.cloneNode(true));

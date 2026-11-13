@@ -3336,3 +3336,6 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .quick-view__media:has(.product-gallery[data-bg="claro"]) { background: #fff !important; padding: 0; }
   #QuickView .product-gallery[data-bg="claro"] .product-gallery__slide > img { border-radius: 0 !important; box-shadow: none !important; }
 }
+
+/* Aviso al abrir una categoría (ej. "Estamos actualizando...") */
+.cm-notice { margin: 4px 0 16px; padding: 14px 16px; border-radius: 14px; background: #fff4dc; border: 1px solid #ecd9a8; color: #6b4a12; font-size: 15px; font-weight: 600; line-height: 1.45; text-align: center; }

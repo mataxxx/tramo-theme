@@ -36,6 +36,7 @@
     },
     "hero": {
       "type": "hero",
+      "disabled": true,
       "settings": {
         "heading": "Comprá en línea. Recibí como querás.",
         "text": "",
@@ -119,7 +120,8 @@
             "icon": "mortar",
             "search_noun": "especia",
             "icon_asset": "cat-condimentos.png",
-            "filters": "De temporada, Dulces"
+            "filters": "De temporada, Dulces",
+            "notice": "Estamos trabajando en actualizar la página con nuestros productos. ¡Pronto estarán disponibles!"
           }
         },
         "c": {
@@ -137,6 +139,7 @@
           "settings": {
             "collection": "semillas-y-frutas-secas",
             "title": "Semillas y frutas secas",
+            "image": "shopify://shop_images/9D45BA33-9639-45AE-BD75-5C87724E0802.png",
             "icon": "leaf",
             "search_noun": "producto",
             "filters": "Semillas, Frutas secas"
@@ -149,7 +152,8 @@
             "title": "Especias",
             "icon": "mortar",
             "search_noun": "especia",
-            "filters": ""
+            "filters": "",
+            "notice": "Estamos trabajando en actualizar la página con nuestros productos. ¡Pronto estarán disponibles!"
           }
         },
         "h": {
@@ -168,10 +172,10 @@
         "q",
         "s",
         "t",
+        "c",
         "e",
         "x",
-        "h",
-        "c"
+        "h"
       ],
       "settings": {
         "heading": ""
@@ -245,7 +249,7 @@
     "queque",
     "semillas",
     "tamales",
-    "especias",
-    "conservas"
+    "conservas",
+    "especias"
   ]
 }

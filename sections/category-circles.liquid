@@ -63,6 +63,7 @@
   </section>
 </div>
 
+<script>window.TRAMO_CAT_NOTICES = window.TRAMO_CAT_NOTICES || {};{%- for block in section.blocks -%}{%- if block.settings.notice != blank and block.settings.collection != blank -%}window.TRAMO_CAT_NOTICES[{{ block.settings.collection.handle | json }}] = {{ block.settings.notice | json }};{%- endif -%}{%- endfor -%}</script>
 {% schema %}
 {
   "name": "Círculos de categoría",
@@ -110,7 +111,8 @@
           "default": "leaf"
         },
         { "type": "text", "id": "filters", "label": "Subcategorías (opcional)", "info": "Etiquetas de producto separadas por coma; salen como botones arriba en la ventana. Ej: Queque navideño, Tamales, Especias" },
-        { "type": "text", "id": "search_noun", "label": "Palabra para la pregunta", "info": "Ej: especia → ¿Cuál especia buscas?", "default": "producto" }
+        { "type": "text", "id": "search_noun", "label": "Palabra para la pregunta", "info": "Ej: especia → ¿Cuál especia buscas?", "default": "producto" },
+        { "type": "textarea", "id": "notice", "label": "Aviso al abrir la categoría (opcional)", "info": "Sale arriba de los productos. Ej: Estamos actualizando esta categoría." }
       ]
     }
   ],
