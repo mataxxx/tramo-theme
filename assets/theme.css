@@ -3478,5 +3478,7 @@ body.is-locked { overscroll-behavior: none; }
 /* Escala de foto: el zoom no se sale del cuadro; en celular, metacampo "foto_escala_movil" */
 .product-gallery__slide.has-scale, .product-gallery__slide.has-scale-m { overflow: hidden; }
 @media (max-width: 749px) {
-  .product-gallery__slide.has-scale-m img { transform: scale(var(--slide-scale-m, 1)) !important; }
+  .product-gallery__slide.has-scale-m { background: #fff !important; }
+  .product-gallery__slide.has-scale-m::before { display: none !important; }
+  .product-gallery__slide.has-scale-m img { object-fit: contain !important; transform: scale(var(--slide-scale-m, 1)) !important; }
 }
