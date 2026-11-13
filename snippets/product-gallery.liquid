@@ -1,6 +1,6 @@
 {%- comment -%} Galería del producto: fotos y videos deslizables con puntitos (estilo Instagram) y miniaturas abajo. Parámetros: product, sizes {%- endcomment -%}
 {%- assign pg_ar = product.featured_media.preview_image.aspect_ratio | default: 1 -%}
-<div class="product-gallery" data-gallery{% if product.tags contains 'Fondo claro' %} data-bg="claro"{% endif %}{% if pg_ar > 1.2 or product.metafields.custom.ventana_ancha.value == true %} data-shape="wide"{% endif %} style="--pg-ar: {{ pg_ar }}{% if product.metafields.custom.img_scale.value %}; --img-scale: {{ product.metafields.custom.img_scale.value }}{% endif %}">
+<div class="product-gallery" data-gallery{% if product.tags contains 'Fondo claro' %} data-bg="claro"{% endif %}{% assign va = product.metafields.custom.ventana_ancha.value %}{% if va == true or pg_ar > 1.2 and va != false %} data-shape="wide"{% endif %} style="--pg-ar: {{ pg_ar }}{% if product.metafields.custom.img_scale.value %}; --img-scale: {{ product.metafields.custom.img_scale.value }}{% endif %}">
   <div class="product-gallery__frame">
     {%- if product.metafields.custom.peso_variable.value == true -%}
       <span class="var-badge" title="El precio es aproximado: lo pesamos al preparar tu pedido y te confirmamos el total exacto por WhatsApp antes de pagar.">{% render 'icon', name: 'scale' %}<span>Peso variable · precio aprox.</span></span>
