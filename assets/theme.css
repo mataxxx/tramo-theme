@@ -3451,3 +3451,4 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .quick-view:has(.product-gallery[data-float]) > .sticky-add { border-radius: 0 0 24px 24px !important; }
   #QuickView .drawer__panel:has(.product-gallery[data-float]) .quickview-back { display: none !important; }
 }
+@media (min-width: 750px) { #QuickView .product-gallery[data-float] { display: flex !important; flex-direction: column !important; justify-content: center !important; height: 100% !important; } }
