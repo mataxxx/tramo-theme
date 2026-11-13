@@ -3364,3 +3364,20 @@ body.is-locked { overscroll-behavior: none; }
 .cm-notice__icon { font-size: 40px; line-height: 1; }
 .cm-notice__title { font-size: 22px; color: #1a4f3b; }
 .cm-notice__text { font-size: 16px; line-height: 1.5; color: #4a5446; }
+
+/* Pie de página: logo más pequeño y centrado, info siempre visible, sin tantas líneas */
+.footer-block--brand { text-align: center; }
+.footer-block--brand .footer-logo { width: 130px !important; max-width: 60%; margin-left: auto !important; margin-right: auto !important; }
+.footer-block--brand .rte { margin-left: auto; margin-right: auto; }
+.footer-block--brand .footer-social { justify-content: center; margin-left: auto; margin-right: auto; border-top: 0 !important; padding-top: 0 !important; }
+.footer-social .icon--wa { width: 21px; height: 21px; }
+.footer-acc .footer-heading { margin: 0 0 12px; }
+@media (max-width: 749px) {
+  .footer-block--menu, .footer-block--info { border-top: 0 !important; border-bottom: 0 !important; text-align: center; padding-top: 6px; }
+  .footer-acc .footer-links { padding: 0 0 8px; justify-items: center; align-items: center; }
+  .site-footer__bottom { align-items: center !important; text-align: center; }
+}
+@media (min-width: 750px) {
+  .site-footer__grid { grid-template-columns: 1fr !important; max-width: 640px; text-align: center; }
+  .footer-block--info .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
+}
