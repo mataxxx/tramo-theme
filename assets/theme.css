@@ -3426,3 +3426,13 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .product-gallery .product-gallery__slide.has-scale { background: #fff !important; }
   #QuickView .product-gallery .product-gallery__slide.has-scale img { object-fit: contain !important; transform: scale(var(--slide-scale, 1)) !important; }
 }
+
+/* Computadora: foto "flotante" (metacampo foto_flotante) — la foto va en su propio bloque con margen, separada de la información; ventana más alta */
+@media (min-width: 750px) {
+  #QuickView.drawer--sheet .drawer__panel:has(.product-gallery[data-float]) { width: min(1000px, 96vw) !important; height: min(92vh, 800px) !important; height: min(92dvh, 800px) !important; }
+  #QuickView .quick-view:has(.product-gallery[data-float]) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; }
+  #QuickView .quick-view__media:has(.product-gallery[data-float]) { padding: 28px !important; background: var(--color-bg, #fff8e9); }
+  #QuickView .product-gallery[data-float] .product-gallery__frame { border-radius: 20px; overflow: hidden; background: #fff; box-shadow: 0 14px 34px rgba(0,0,0,.14); }
+  #QuickView .product-gallery[data-float] .product-gallery__slide { background: #fff !important; }
+  #QuickView .product-gallery[data-float] .product-gallery__slide img { object-fit: contain !important; padding: 14px; box-sizing: border-box; }
+}
