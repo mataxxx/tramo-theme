@@ -132,7 +132,7 @@
             "image": "shopify://shop_images/higos-azucarados.jpg",
             "icon": "package",
             "search_noun": "producto",
-            "filters": "Antojos dulces, Encurtidos artesanales"
+            "filters": ""
           }
         },
         "s": {
@@ -227,7 +227,7 @@
         "collection": "conservas-y-dulces",
         "heading": "Conservas y dulces",
         "search_noun": "producto",
-        "filter_tags": "Antojos dulces, Encurtidos artesanales",
+        "filter_tags": "",
         "products_to_show": 6
       }
     },
