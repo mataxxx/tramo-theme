@@ -95,7 +95,7 @@
           "type": "category",
           "settings": {
             "collection": "queque-navideno",
-            "title": "Queque navideño",
+            "title": "Para el queque navideño",
             "icon": "cake",
             "search_noun": "producto",
             "icon_asset": "cat-queque.png",
@@ -129,6 +129,7 @@
           "settings": {
             "collection": "conservas-y-dulces",
             "title": "Conservas y dulces",
+            "image": "shopify://shop_images/higos-azucarados.jpg",
             "icon": "package",
             "search_noun": "producto",
             "filters": "Antojos dulces, Encurtidos artesanales"
