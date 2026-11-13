@@ -57,7 +57,7 @@
 </nav>
 
 {%- if s.show_about -%}
-  <button type="button" class="menu-about" data-open="about">
+  <button type="button" class="menu-about" data-open="help" data-help-title="Quiénes somos">
     <span class="menu-about__icon">{% render 'icon', name: 'info' %}</span>
     <span class="menu-about__text"><strong>{{ s.about_label | default: 'Quiénes somos' }}</strong></span>
     {% render 'icon', name: 'chevron-right' %}

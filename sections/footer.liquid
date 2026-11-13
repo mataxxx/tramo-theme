@@ -91,13 +91,23 @@
       assign info_menu = section.settings.info_menu
       assign info_head = section.settings.info_heading | default: 'Información'
     -%}
+    <nav class="footer-block footer-block--cats" aria-label="Categorías">
+      <div class="footer-acc"><h2 class="footer-heading">Categorías</h2>
+      <ul class="footer-links">
+        {%- for h in 'queque-navideno,semillas-y-frutas-secas,tamales,conservas-y-dulces' | split: ',' -%}
+          {%- assign c = collections[h] -%}
+          {%- if c != blank and c.products_count > 0 -%}<li><a href="{{ c.url }}">{{ c.title }}</a></li>{%- endif -%}
+        {%- endfor -%}
+      </ul>
+      </div>
+    </nav>
     <div class="footer-block footer-block--info">
       <div class="footer-acc"><h2 class="footer-heading">{{ info_head }}</h2>
       <ul class="footer-links">
         {%- if info_menu != blank -%}
           {%- for link in info_menu.links -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endfor -%}
         {%- else -%}
-          <li><button type="button" class="footer-linkbtn" data-open="about">Quiénes somos</button></li>
+          <li><button type="button" class="footer-linkbtn" data-open="help" data-help-title="Quiénes somos">Quiénes somos</button></li>
           {%- if settings.whatsapp_number != blank -%}<li><a href="https://wa.me/{{ settings.whatsapp_number | strip }}" rel="noopener" target="_blank">Contacto</a></li>{%- endif -%}
           {%- if shop.shipping_policy.url != blank -%}<li><a href="{{ shop.shipping_policy.url }}">Envíos y entregas</a></li>{%- endif -%}
           {%- if shop.refund_policy.url != blank -%}<li><a href="{{ shop.refund_policy.url }}">Devoluciones</a></li>{%- endif -%}

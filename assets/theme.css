@@ -3381,3 +3381,5 @@ body.is-locked { overscroll-behavior: none; }
   .site-footer__grid { grid-template-columns: 1fr !important; max-width: 640px; text-align: center; }
   .footer-block--info .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
 }
+@media (max-width: 749px) { .footer-block--cats { text-align: center; padding-top: 6px; } }
+@media (min-width: 750px) { .footer-block--cats .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; } }

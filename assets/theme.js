@@ -161,6 +161,7 @@
     openDrawers().forEach(function (d) { closeDrawer(d, keepFocus); });
   }
 
+  function normHelp(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
   function showHelpTopic(index) {
     var root = $('[data-help]');
     if (!root) return;
@@ -1443,7 +1444,14 @@
         if (rh) { $$('[data-reels] [data-reel]').some(function (r, i) { if (r.getAttribute('data-reel-handle') === rh) { ridx = i; return true; } return false; }); }
         openDrawer(name, { view: rh ? 'feed' : opener.getAttribute('data-reels-view'), index: ridx });
       }
-      else openDrawer(name);
+      else {
+        openDrawer(name);
+        var ht = opener.getAttribute('data-help-title');
+        if (name === 'help' && ht) {
+          var card = $$('[data-help] [data-help-open]').filter(function (c) { return normHelp(c.textContent).indexOf(normHelp(ht)) > -1; })[0];
+          if (card) showHelpTopic(card.getAttribute('data-help-open'));
+        }
+      }
       return;
     }
 
