@@ -3405,3 +3405,12 @@ body.is-locked { overscroll-behavior: none; }
 
 /* Ventana del producto: fotos pegadas una a la otra (sin espacio entre fotos, así al pasar a la segunda no asoma el borde de la primera) */
 #QuickView .product-gallery__strip, .product-page .product-gallery__strip { gap: 0 !important; }
+
+/* Computadora, ventana ancha: el cuadro de la foto toma la forma de la PRIMERA foto y todas las fotos lo llenan igual (sin bordes ni fondos) */
+@media (min-width: 750px) {
+  #QuickView.drawer--sheet .drawer__panel:has(.product-gallery[data-shape="wide"]) { --qv-h: min(88vh, 600px); height: var(--qv-h) !important; width: fit-content !important; max-width: 96vw !important; }
+  #QuickView .quick-view:has(.product-gallery[data-shape="wide"]) { grid-template-columns: auto 400px !important; }
+  #QuickView .product-gallery[data-shape="wide"] { width: calc(var(--qv-h, 600px) * var(--pg-ar, 1.5)) !important; max-width: calc(96vw - 400px) !important; }
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { object-fit: cover !important; }
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide--blur::before { display: none !important; }
+}
