@@ -3339,3 +3339,6 @@ body.is-locked { overscroll-behavior: none; }
 
 /* Aviso al abrir una categoría (ej. "Estamos actualizando...") */
 .cm-notice { margin: 4px 0 16px; padding: 14px 16px; border-radius: 14px; background: #fff4dc; border: 1px solid #ecd9a8; color: #6b4a12; font-size: 15px; font-weight: 600; line-height: 1.45; text-align: center; }
+
+/* Círculos de categorías: la fila solo se desliza de lado (antes, al bajar con el dedo, la fila se movía por dentro y escondía los círculos) */
+.cats-section .product-rail { overflow-y: hidden !important; overscroll-behavior-y: none; padding-top: 6px !important; padding-bottom: 14px !important; }

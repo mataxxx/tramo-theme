@@ -207,6 +207,7 @@
     },
     "especias": {
       "type": "featured-collection",
+      "disabled": true,
       "settings": {
         "icon": "none",
         "popup_search": "icon",
