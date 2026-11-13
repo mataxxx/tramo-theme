@@ -3396,3 +3396,9 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView.drawer--sheet .drawer__panel:has(.product-gallery[data-shape="wide"]) { width: min(96vw, 1360px) !important; height: min(88vh, 600px) !important; height: min(88dvh, 600px) !important; }
   #QuickView .quick-view:has(.product-gallery[data-shape="wide"]) { grid-template-columns: minmax(0, 1fr) 400px !important; }
 }
+
+/* Computadora, fotos anchas: la foto llena todo el espacio (sin márgenes ni recuadro) */
+@media (min-width: 750px) {
+  #QuickView .quick-view__media:has(.product-gallery[data-shape="wide"]) { padding: 0 !important; }
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; object-fit: contain !important; border-radius: 0 !important; box-shadow: none !important; }
+}
