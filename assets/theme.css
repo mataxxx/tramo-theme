@@ -3467,3 +3467,10 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .product-gallery[data-shape="wide"] { width: 100% !important; max-width: none !important; }
   #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { object-fit: cover !important; }
 }
+
+/* Celular: foto girada para verse a lo ancho (metacampo rotar_movil) */
+@media (max-width: 749px) {
+  .product-gallery[data-rotate-m] .product-gallery__slide { aspect-ratio: 1 / var(--pg-ar, 1) !important; height: auto !important; max-height: none !important; position: relative; overflow: hidden; container-type: size; }
+  .product-gallery[data-rotate-m] .product-gallery__slide img { position: absolute !important; top: 50%; left: 50%; width: 100cqh !important; height: 100cqw !important; max-width: none !important; max-height: none !important; object-fit: cover !important; transform: translate(-50%, -50%) rotate(90deg) !important; }
+  .product-gallery[data-rotate-m] .product-gallery__thumbs img { transform: rotate(90deg); }
+}
