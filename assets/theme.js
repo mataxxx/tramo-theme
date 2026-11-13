@@ -1773,7 +1773,10 @@
   function catNotice(handle) {
     var n = $('[data-category-notice]'); if (!n) return;
     var txt = handle && window.TRAMO_CAT_NOTICES ? window.TRAMO_CAT_NOTICES[handle] : '';
-    n.textContent = txt || ''; n.hidden = !txt;
+    n.innerHTML = txt ? '<span class="cm-notice__icon" aria-hidden="true">🌿</span><strong class="cm-notice__title">¡Muy pronto!</strong><span class="cm-notice__text"></span>' : '';
+    if (txt) n.querySelector('.cm-notice__text').textContent = txt;
+    n.hidden = !txt;
+    var cm = $('.category-modal'); if (cm) cm.classList.toggle('has-notice', !!txt);
   }
   function openCategoryByHandle(handle, title, question, extraFilters) {
     var scope = document.querySelector('[data-category-scope][data-category-handle="' + handle + '"]');

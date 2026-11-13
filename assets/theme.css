@@ -3351,3 +3351,16 @@ body.is-locked { overscroll-behavior: none; }
   .cats-section .cats-tile { display: flex !important; flex-direction: column; align-items: center; }
   .cats-section .cats-tile__media.cats-circle.cats-circle { flex: 0 0 auto; width: 74px !important; height: 74px !important; min-height: 74px; aspect-ratio: auto !important; }
 }
+
+/* Categoría "en actualización": solo el aviso, sin buscador, filtros ni lista vacía */
+.category-modal.has-notice [data-category-searchwrap],
+.category-modal.has-notice [data-category-filters],
+.category-modal.has-notice .cm-bar,
+.category-modal.has-notice [data-category-grid],
+.category-modal.has-notice [data-category-empty],
+.category-modal.has-notice .cm-sortwrap,
+.category-modal.has-notice [data-category-search-toggle] { display: none !important; }
+.category-modal.has-notice .cm-notice { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 28px auto 40px; max-width: 420px; padding: 30px 24px; border-radius: 22px; background: #fff; border: 1px solid #e4dcc6; box-shadow: 0 12px 30px rgba(38,61,37,.12); color: #1d2a1c; font-weight: 500; font-size: 16px; }
+.cm-notice__icon { font-size: 40px; line-height: 1; }
+.cm-notice__title { font-size: 22px; color: #1a4f3b; }
+.cm-notice__text { font-size: 16px; line-height: 1.5; color: #4a5446; }
