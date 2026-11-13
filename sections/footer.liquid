@@ -94,7 +94,8 @@
     <nav class="footer-block footer-block--cats" aria-label="Categorías">
       <div class="footer-acc"><h2 class="footer-heading">Categorías</h2>
       <ul class="footer-links">
-        {%- for h in 'queque-navideno,semillas-y-frutas-secas,tamales,conservas-y-dulces' | split: ',' -%}
+        {%- assign cat_handles = 'queque-navideno,semillas-y-frutas-secas,tamales,conservas-y-dulces' | split: ',' -%}
+        {%- for h in cat_handles -%}
           {%- assign c = collections[h] -%}
           {%- if c != blank and c.products_count > 0 -%}<li><a href="{{ c.url }}">{{ c.title }}</a></li>{%- endif -%}
         {%- endfor -%}
