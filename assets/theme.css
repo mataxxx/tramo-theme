@@ -3436,3 +3436,18 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .product-gallery[data-float] .product-gallery__slide { background: #fff !important; }
   #QuickView .product-gallery[data-float] .product-gallery__slide img { object-fit: contain !important; padding: 14px; box-sizing: border-box; }
 }
+
+/* Computadora, "foto flotante" v2: dos módulos separados sobre el fondo oscuro — la foto en su propia tarjeta (con su forma real) y la información en otra */
+@media (min-width: 750px) {
+  #QuickView.drawer--sheet .drawer__panel:has(.product-gallery[data-float]) { background: transparent !important; box-shadow: none !important; overflow: visible !important; border-radius: 0 !important; width: min(1060px, 96vw) !important; }
+  #QuickView .quick-view:has(.product-gallery[data-float]) { gap: 22px !important; background: transparent !important; overflow: visible !important; }
+  #QuickView .quick-view__media:has(.product-gallery[data-float]) { padding: 0 !important; background: transparent !important; display: flex !important; align-items: center; justify-content: center; min-height: 0 !important; }
+  #QuickView .product-gallery[data-float] { height: auto !important; width: 100%; max-height: 100%; display: block !important; }
+  #QuickView .product-gallery[data-float] .product-gallery__frame { aspect-ratio: var(--pg-ar, 1); width: 100%; max-height: min(92vh, 800px); height: auto !important; flex: none !important; border-radius: 24px; overflow: hidden; background: #fff; box-shadow: 0 24px 60px rgba(0,0,0,.35); padding: 0 !important; }
+  #QuickView .product-gallery[data-float] .product-gallery__strip, #QuickView .product-gallery[data-float] .product-gallery__slide { height: 100% !important; }
+  #QuickView .product-gallery[data-float] .product-gallery__slide img { object-fit: cover !important; padding: 0 !important; }
+  #QuickView .product-gallery[data-float] .product-gallery__thumbs { display: none !important; }
+  #QuickView .quick-view:has(.product-gallery[data-float]) .quick-view__content { background: var(--color-surface, #fffdf8) !important; border-radius: 24px 24px 0 0; box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+  #QuickView .quick-view:has(.product-gallery[data-float]) > .sticky-add { border-radius: 0 0 24px 24px !important; }
+  #QuickView .drawer__panel:has(.product-gallery[data-float]) .quickview-back { display: none !important; }
+}
