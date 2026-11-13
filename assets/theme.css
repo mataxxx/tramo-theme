@@ -3452,3 +3452,10 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .drawer__panel:has(.product-gallery[data-float]) .quickview-back { display: none !important; }
 }
 @media (min-width: 750px) { #QuickView .product-gallery[data-float] { display: flex !important; flex-direction: column !important; justify-content: center !important; height: 100% !important; } }
+
+/* Foto flotante para todos: la tarjeta de la foto respeta la forma de la primera foto (o la proporción elegida); fotos giradas en vertical */
+@media (min-width: 750px) {
+  #QuickView .product-gallery[data-float] .product-gallery__frame { aspect-ratio: var(--pg-ar-d, var(--pg-ar, 1)); }
+  #QuickView .product-gallery[data-float][data-rotate] .product-gallery__frame { aspect-ratio: 1 / var(--pg-ar, 1); max-height: min(86vh, 760px); }
+  #QuickView .product-gallery[data-float] .product-gallery__frame { max-height: min(86vh, 760px); }
+}
