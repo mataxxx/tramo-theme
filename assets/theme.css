@@ -3459,3 +3459,11 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .product-gallery[data-float][data-rotate] .product-gallery__frame { aspect-ratio: 1 / var(--pg-ar, 1); max-height: min(86vh, 760px); }
   #QuickView .product-gallery[data-float] .product-gallery__frame { max-height: min(86vh, 760px); }
 }
+
+/* Computadora, fotos horizontales: la información siempre con su ancho cómodo (480 px); la foto ocupa lo que queda y se recorta un poco a los lados si hace falta */
+@media (min-width: 750px) {
+  #QuickView.drawer--sheet .drawer__panel:has(.product-gallery[data-shape="wide"]) { width: min(1140px, 96vw) !important; height: min(88vh, 640px) !important; height: min(88dvh, 640px) !important; }
+  #QuickView .quick-view:has(.product-gallery[data-shape="wide"]) { grid-template-columns: minmax(0, 1fr) 480px !important; }
+  #QuickView .product-gallery[data-shape="wide"] { width: 100% !important; max-width: none !important; }
+  #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { object-fit: cover !important; }
+}
