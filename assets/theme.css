@@ -3390,3 +3390,9 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide--blur::before { content: '' !important; display: block !important; position: absolute; inset: -80px; z-index: 0; background: var(--pg-bg) center / cover no-repeat; filter: blur(48px) saturate(1.05); transform: scale(1.25); opacity: .95; }
   #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { position: relative; z-index: 1; }
 }
+
+/* Computadora, fotos anchas: la ventana se alarga para que la foto (3:2) quepa casi exacta, sin franjas */
+@media (min-width: 750px) {
+  #QuickView.drawer--sheet .drawer__panel:has(.product-gallery[data-shape="wide"]) { width: min(96vw, 1360px) !important; height: min(88vh, 600px) !important; height: min(88dvh, 600px) !important; }
+  #QuickView .quick-view:has(.product-gallery[data-shape="wide"]) { grid-template-columns: minmax(0, 1fr) 400px !important; }
+}
