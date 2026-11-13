@@ -3351,3 +3351,8 @@ body.is-locked { overscroll-behavior: none; }
   .cats-section .cats-tile { display: flex !important; flex-direction: column; align-items: center; }
   .cats-section .cats-tile__media.cats-circle.cats-circle { flex: 0 0 auto; width: 74px !important; height: 74px !important; min-height: 74px; aspect-ratio: auto !important; }
 }
+
+/* Celular: el encabezado verde se desplaza con la página (fijo arriba tapaba los círculos de categorías en el iPhone al esconderse la barra del navegador) */
+@media (max-width: 749px) {
+  .shopify-section:has(> .site-header--sticky) { position: relative !important; top: auto !important; }
+}
