@@ -3402,3 +3402,6 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .quick-view__media:has(.product-gallery[data-shape="wide"]) { padding: 0 !important; }
   #QuickView .product-gallery[data-shape="wide"] .product-gallery__slide img { width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; object-fit: contain !important; border-radius: 0 !important; box-shadow: none !important; }
 }
+
+/* Ventana del producto: fotos pegadas una a la otra (sin espacio entre fotos, así al pasar a la segunda no asoma el borde de la primera) */
+#QuickView .product-gallery__strip, .product-page .product-gallery__strip { gap: 0 !important; }
