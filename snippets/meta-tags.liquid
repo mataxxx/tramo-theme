@@ -18,7 +18,18 @@
   <meta property="og:description" content="{{ og_desc | strip_newlines | escape }}">
 {%- endif -%}
 {%- if page_image %}
-  <meta property="og:image" content="http:{{ page_image | image_url: width: 1200 }}">
-  <meta property="og:image:secure_url" content="https:{{ page_image | image_url: width: 1200 }}">
+  {%- comment -%} Imagen para WhatsApp/Facebook: https, liviana (WhatsApp ignora imágenes pesadas) {%- endcomment -%}
+  {%- assign og_img = page_image | image_url: width: 900, format: 'pjpg' -%}
+  <meta property="og:image" content="https:{{ og_img }}">
+  <meta property="og:image:secure_url" content="https:{{ og_img }}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="900">
+  <meta property="og:image:height" content="{{ 900 | divided_by: page_image.aspect_ratio | round }}">
+  <meta property="og:image:alt" content="{{ og_title | escape }}">
+  <meta name="twitter:image" content="https:{{ og_img }}">
 {%- endif -%}
+{%- if request.page_type == 'product' %}
+  <meta property="og:price:amount" content="{{ product.price | divided_by: 100 }}">
+  <meta property="og:price:currency" content="{{ cart.currency.iso_code }}">
+{%- endif %}
 <meta name="twitter:card" content="summary_large_image">
