@@ -151,6 +151,7 @@
           "settings": {
             "collection": "especias",
             "title": "Especias",
+            "image": "shopify://shop_images/circulo-especias-clavo.jpg",
             "icon": "mortar",
             "search_noun": "especia",
             "filters": "En grano, En polvo"
