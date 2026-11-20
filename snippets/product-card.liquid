@@ -95,7 +95,21 @@
         {%- if product.price_max == 0 -%}
           <span class="price__soon">Precio pronto</span>
         {%- elsif bulk_variant != nil -%}
-          <strong class="price__current">{{ bulk_variant.price | times: per_kg | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</strong><span class="price__unit">/ kg</span>
+          {%- liquid
+            assign min_pres = nil
+            for v in product.variants
+              if v.id != bulk_variant.id and v.price > 0
+                if min_pres == nil or v.price < min_pres
+                  assign min_pres = v.price
+                endif
+              endif
+            endfor
+          -%}
+          {%- if min_pres != nil -%}
+            <span class="price__stack"><span class="price__line"><span class="price__from">Desde</span><strong class="price__current">{{ min_pres | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</strong></span><span class="price__perkg">{{ bulk_variant.price | times: per_kg | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }} el kg</span></span>
+          {%- else -%}
+            <strong class="price__current">{{ bulk_variant.price | times: per_kg | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</strong><span class="price__unit">/ kg</span>
+          {%- endif -%}
         {%- else -%}
         {%- if show_from or product.tags contains 'especiero-modelo' -%}<span class="price__from">Desde</span>{%- endif -%}
         {%- if shown.compare_at_price > shown.price -%}<s class="price__compare">{{ shown.compare_at_price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</s>{%- endif -%}

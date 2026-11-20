@@ -3493,3 +3493,9 @@ body.is-locked { overscroll-behavior: none; }
 @media (min-width: 750px) {
   body.template-index .cats-section { padding-top: 34px !important; }
 }
+
+/* Tarjetas de productos por kilo: "Desde ₡500" grande y el precio del kilo pequeño abajo */
+.price__stack { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.price__line { display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+.price__stack .price__from { margin: 0; }
+.price__perkg { font-size: 11.5px; line-height: 1.2; color: #6b6b6b; font-weight: 500; white-space: nowrap; }
