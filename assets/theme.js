@@ -131,7 +131,7 @@
   }
 
   function shareProduct(btn) {
-    var link = location.origin + (btn.getAttribute('data-url') || location.pathname);
+    var link = location.origin + (btn.getAttribute('data-url') || location.pathname) + '?compartido=1';
     var title = btn.getAttribute('data-title') || document.title;
     if (navigator.share) {
       navigator.share({ title: title, text: title + ' · Tramo San Rafael #1', url: link }).catch(function () {});
@@ -388,6 +388,17 @@
   /* ---------- Vista rápida --------------------------------------------- */
   var quickCache = {};
   var qvPushed = false;
+  /* Enlace compartido (/?producto=nueces): abrir la ventana del producto al cargar la portada */
+  (function () {
+    try {
+      var sp = new URL(location.href).searchParams;
+      var h = sp.get('producto'); if (!h) return;
+      var v = sp.get('variant');
+      history.replaceState({}, '', location.pathname);
+      var go = function () { openQuickView('/products/' + encodeURIComponent(h) + (v ? '?variant=' + encodeURIComponent(v) : '')); };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else setTimeout(go, 0);
+    } catch (e) {}
+  })();
   window.addEventListener('popstate', function (e) {
     if (!qvPushed) return;
     if (e.state && e.state.qv) return;
