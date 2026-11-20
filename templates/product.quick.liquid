@@ -13,7 +13,7 @@
     {%- endif -%}
     <div class="quick-view__titlerow">
       <h2 class="quick-view__title">{{ product.title }}</h2>
-      <button type="button" class="like-btn like-btn--inline" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button>
+      <div class="titlerow__acts"><button type="button" class="share-btn" data-share-product data-url="{{ product.url }}" data-title="{{ product.title | escape }}" aria-label="Compartir producto">{% render 'icon', name: 'share' %}<span>Compartir</span></button><button type="button" class="like-btn like-btn--inline" data-like="{{ product.handle }}" aria-pressed="false" aria-label="Guardar en favoritos">{% render 'icon', name: 'heart' %}</button></div>
     </div>
     {% render 'product-brand', product: product %}
     {%- if settings.quick_show_description and product.description != blank -%}

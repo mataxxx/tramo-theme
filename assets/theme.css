@@ -3482,3 +3482,9 @@ body.is-locked { overscroll-behavior: none; }
   .product-gallery__slide.has-scale-m::before { display: none !important; }
   .product-gallery__slide.has-scale-m img { object-fit: contain !important; transform: scale(var(--slide-scale-m, 1)) !important; }
 }
+
+/* Botón Compartir junto al corazón, en la ficha y en la vista rápida */
+.titlerow__acts { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.share-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border: 1px solid rgba(26,79,59,.25); border-radius: 999px; background: var(--color-bg); color: #1a4f3b; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.share-btn .icon { width: 17px; height: 17px; }
+.share-btn:hover { background: #1a4f3b; color: #fff8e9; }

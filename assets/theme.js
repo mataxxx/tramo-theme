@@ -130,6 +130,18 @@
     showToast._t = setTimeout(function () { toast.hidden = true; }, 3200);
   }
 
+  function shareProduct(btn) {
+    var link = location.origin + (btn.getAttribute('data-url') || location.pathname);
+    var title = btn.getAttribute('data-title') || document.title;
+    if (navigator.share) {
+      navigator.share({ title: title, text: title + ' · Tramo San Rafael #1', url: link }).catch(function () {});
+      return;
+    }
+    function done() { showToast('Enlace copiado. Ya lo podés pegar donde querás.'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { window.prompt('Copiá este enlace:', link); });
+    else window.prompt('Copiá este enlace:', link);
+  }
+
   /* ---------- Paneles --------------------------------------------------- */
   var lastFocus = null;
 
@@ -148,7 +160,7 @@
       if (!drawer.classList.contains('is-open')) drawer.hidden = true;
     }, 280);
     if (drawer.getAttribute('data-drawer') === 'reels') pauseAllReels();
-    if (drawer.getAttribute('data-drawer') === 'quick-view') { closeProductVideo($('.pvideo.is-open')); pauseProductVideos(); }
+    if (drawer.getAttribute('data-drawer') === 'quick-view') { closeProductVideo($('.pvideo.is-open')); pauseProductVideos(); if (qvPushed) { qvPushed = false; try { if (history.state && history.state.qv) history.back(); } catch (e) {} } }
     if (!openDrawers().filter(function (d) { return d !== drawer; }).length) {
       if (!document.body.classList.contains('is-bmodal')) document.body.classList.remove('is-locked');
     }
@@ -375,6 +387,14 @@
 
   /* ---------- Vista rápida --------------------------------------------- */
   var quickCache = {};
+  var qvPushed = false;
+  window.addEventListener('popstate', function (e) {
+    if (!qvPushed) return;
+    if (e.state && e.state.qv) return;
+    qvPushed = false;
+    var d = $('[data-drawer="quick-view"].is-open');
+    if (d) closeDrawer(d, true);
+  });
 
   function openQuickView(url) {
     var catOpen = $('[data-drawer="category"].is-open');
@@ -388,6 +408,14 @@
     }
     var body = $('[data-quick-view-body]');
     if (!drawer || !body) { window.location.href = url; return; }
+    /* La dirección del navegador muestra el producto, para poder copiarla o compartirla */
+    try {
+      var clean = url.split('#')[0];
+      if (window.history && history.pushState && location.pathname + location.search !== clean) {
+        if (qvPushed) history.replaceState({ qv: 1 }, '', clean);
+        else { history.pushState({ qv: 1 }, '', clean); qvPushed = true; }
+      }
+    } catch (e) {}
 
     function render(html) {
       body.innerHTML = html;
@@ -1587,6 +1615,9 @@
 
     var likeBtn = target.closest('[data-like]');
     if (likeBtn) { event.preventDefault(); toggleLike(likeBtn.getAttribute('data-like')); return; }
+
+    var shareBtn = target.closest('[data-share-product]');
+    if (shareBtn) { event.preventDefault(); shareProduct(shareBtn); return; }
 
     var quick = target.closest('[data-quick-view]');
     if (quick) {
