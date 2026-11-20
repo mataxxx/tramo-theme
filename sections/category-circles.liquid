@@ -11,7 +11,7 @@
       {%- assign img = block.settings.image -%}
       {%- capture inner -%}
         <span class="cats-tile__media cats-circle">
-          {%- assign bg = img -%}{%- if bg == blank and coll != blank -%}{%- assign bg = coll.featured_image -%}{%- endif -%}
+          {%- assign bg = img -%}{%- if bg == blank and coll != blank and block.settings.no_photo != true -%}{%- assign bg = coll.featured_image -%}{%- endif -%}
           {%- if bg != blank -%}{{ bg | image_url: width: 300 | image_tag: widths: '150, 300', sizes: '140px', loading: 'lazy', alt: '', class: 'cats-circle__bg' }}{%- endif -%}
           <span class="cats-circle__icon">{% render 'icon', name: block.settings.icon %}</span>
         </span>
@@ -45,7 +45,7 @@
         {%- assign img = block.settings.image -%}
         {%- capture inner -%}
           <span class="cats-tile__media cats-circle">
-          {%- assign bg = img -%}{%- if bg == blank and coll != blank -%}{%- assign bg = coll.featured_image -%}{%- endif -%}
+          {%- assign bg = img -%}{%- if bg == blank and coll != blank and block.settings.no_photo != true -%}{%- assign bg = coll.featured_image -%}{%- endif -%}
           {%- if bg != blank -%}{{ bg | image_url: width: 300 | image_tag: widths: '150, 300', sizes: '140px', loading: 'lazy', alt: '', class: 'cats-circle__bg' }}{%- endif -%}
           <span class="cats-circle__icon">{% render 'icon', name: block.settings.icon %}</span>
         </span>
@@ -89,6 +89,7 @@
         { "type": "text", "id": "title", "label": "Nombre (opcional)", "info": "Si lo dejas vacío usa el de la colección." },
         { "type": "text", "id": "panel_title", "label": "Título al abrir la categoría (opcional)", "info": "Ej: el círculo dice Navidad y la ventana dice Queque navideño." },
         { "type": "image_picker", "id": "image", "label": "Foto del círculo", "info": "Foto cuadrada que llena el círculo. Si la dejas vacía se usa la imagen de la colección." },
+        { "type": "checkbox", "id": "no_photo", "label": "Sin foto (solo el ícono)", "default": false },
         { "type": "text", "id": "icon_asset", "label": "O ícono ilustrado del tema (nombre de archivo)", "info": "PNG transparente que se muestra sobre fondo claro. Ej: cat-queque.png" },
         { "type": "text", "id": "image_asset", "label": "O foto del tema (nombre de archivo)", "info": "Foto completa que llena el círculo. Ej: xmas-tamales-sm.jpg" },
         {

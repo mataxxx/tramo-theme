@@ -95,6 +95,7 @@
           "type": "category",
           "settings": {
             "collection": "queque-navideno",
+            "image": "shopify://shop_images/circulo-queque.png",
             "title": "Para el queque navideño",
             "icon": "cake",
             "search_noun": "producto",
@@ -139,8 +140,8 @@
           "type": "category",
           "settings": {
             "collection": "semillas-y-frutas-secas",
+            "image": "shopify://shop_images/circulo-semillas.png",
             "title": "Semillas y frutas secas",
-            "image": "shopify://shop_images/9D45BA33-9639-45AE-BD75-5C87724E0802.png",
             "icon": "leaf",
             "search_noun": "producto",
             "filters": "Semillas, Frutas secas"
@@ -161,6 +162,7 @@
           "type": "category",
           "settings": {
             "collection": "hierbas-y-chiles-secos",
+            "no_photo": true,
             "title": "Hierbas y chiles secos",
             "icon": "leaf",
             "search_noun": "producto",
