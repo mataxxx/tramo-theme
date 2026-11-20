@@ -3488,3 +3488,8 @@ body.is-locked { overscroll-behavior: none; }
 .share-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border: 1px solid rgba(26,79,59,.25); border-radius: 999px; background: var(--color-bg); color: #1a4f3b; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .share-btn .icon { width: 17px; height: 17px; }
 .share-btn:hover { background: #1a4f3b; color: #fff8e9; }
+
+/* Computadora: mismo aire arriba de los círculos de categorías que el que tienen abajo antes del carrusel */
+@media (min-width: 750px) {
+  body.template-index .cats-section { padding-top: 34px !important; }
+}
