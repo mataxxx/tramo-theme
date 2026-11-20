@@ -590,6 +590,7 @@
       }
       html += '<strong class="price__current" data-price-current>' + formatMoney(variant.bulk ? variant.price * (1000 / BULK.unit) : variant.price) + '</strong>';
       if (variant.bulk) html += '<span class="price__unit">/ kg</span>';
+      else { var vt = String(variant.title || '').toLowerCase(); if (vt.indexOf('unidad') > -1 || vt === 'entera') html += '<span class="price__unit">/ unidad</span>'; }
       priceEl.innerHTML = html;
       priceEl.classList.toggle('price--sale', variant.compare_at_price > variant.price);
     }
