@@ -113,7 +113,7 @@
         {%- else -%}
         {%- if show_from or product.tags contains 'especiero-modelo' -%}<span class="price__from">Desde</span>{%- endif -%}
         {%- if shown.compare_at_price > shown.price -%}<s class="price__compare">{{ shown.compare_at_price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</s>{%- endif -%}
-        <strong class="price__current">{{ shown.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</strong>
+        <strong class="price__current">{{ shown.price | money_without_trailing_zeros | replace: '₡ ', '₡' | replace: '.', ' ' }}</strong>{%- assign st = shown.title | downcase -%}{%- if st contains 'unidad' or st == 'entera' -%}<span class="price__unit">/ unidad</span>{%- endif -%}
         {%- endif -%}
       </div>
       {%- if show_quick_add and settings.card_quick_add and product.available and product.price_max > 0 -%}
