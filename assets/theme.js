@@ -160,6 +160,7 @@
       if (!drawer.classList.contains('is-open')) drawer.hidden = true;
     }, 280);
     if (drawer.getAttribute('data-drawer') === 'reels') pauseAllReels();
+    if (drawer.getAttribute('data-drawer') === 'category' && window.TRAMO_COLL_POPUP) { window.TRAMO_COLL_POPUP = null; setTimeout(function () { window.location.href = ROOT; }, 120); }
     if (drawer.getAttribute('data-drawer') === 'quick-view') { closeProductVideo($('.pvideo.is-open')); pauseProductVideos(); if (qvPushed) { qvPushed = false; try { if (history.state && history.state.qv) history.back(); } catch (e) {} } }
     if (!openDrawers().filter(function (d) { return d !== drawer; }).length) {
       if (!document.body.classList.contains('is-bmodal')) document.body.classList.remove('is-locked');
@@ -1851,6 +1852,12 @@
       .then(function (html) { catFill(html); })
       .catch(function () { catEls().grid.innerHTML = '<p class="category-modal__empty">No se pudo cargar la categoría.</p>'; });
   }
+  /* Página de categoría abierta directo (Google, enlace): se muestra como la ventanita; al cerrarla, a la portada */
+  (function () {
+    var cp = window.TRAMO_COLL_POPUP; if (!cp || !cp.handle) return;
+    var go = function () { try { openCategoryByHandle(cp.handle, cp.title || '', '¿Cuál producto buscas?'); } catch (e) {} };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else setTimeout(go, 0);
+  })();
   document.addEventListener('input', function (event) {
     if (event.target.closest && event.target.closest('[data-category-filter]')) catApply();
   });

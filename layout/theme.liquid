@@ -133,6 +133,11 @@
     {%- unless settings.show_accounts == false -%}{% render 'login-popup' %}{%- endunless -%}
     {% render 'quick-choice' %}
     {% render 'category-modal' %}
+    {%- if template.name == 'collection' and collection and collection.handle != 'all' -%}
+      {%- comment -%} Página de categoría: Google ve la página completa; el cliente la ve como la ventanita de siempre {%- endcomment -%}
+      <div hidden data-category-scope data-category-handle="{{ collection.handle }}" data-category-filters="{{ collection.metafields.custom.filtros | escape }}" data-category-search="bar" data-category-subtitle="{{ collection.metafields.custom.subtitulo | escape }}"></div>
+      <script>window.TRAMO_COLL_POPUP = { handle: {{ collection.handle | json }}, title: {{ collection.title | json }} };</script>
+    {%- endif -%}
     {% render 'blog-modal' %}
     {%- if settings.order_mode -%}{% render 'order-checkout' %}{{ 'order.css' | asset_url | stylesheet_tag }}<script src="{{ 'order.js' | asset_url }}" defer></script>{%- endif -%}
     <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
