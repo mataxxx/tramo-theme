@@ -890,6 +890,16 @@
         "id": "seo_lng",
         "label": "Longitud del local",
         "default": "-84.0789"
+      },
+      {
+        "type": "text",
+        "id": "seo_instagram",
+        "label": "Enlace de Instagram"
+      },
+      {
+        "type": "text",
+        "id": "seo_maps",
+        "label": "Enlace del local en Google Maps"
       }
     ]
   }

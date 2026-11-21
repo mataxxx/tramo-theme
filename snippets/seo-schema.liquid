@@ -23,7 +23,9 @@
       "name": {{ shop.name | json }},
       "alternateName": ["Tramo San Rafael 1", "Tramo San Rafael #1 Fundadores", "Tramo San Rafael Fundadores"],
       "slogan": "Fundadores desde 1946",
-      "sameAs": ["https://www.facebook.com/p/Tramo-San-Rafael-1-100057346663843/"],
+      "sameAs": ["https://www.facebook.com/p/Tramo-San-Rafael-1-100057346663843/"{% if settings.seo_instagram != blank %}, {{ settings.seo_instagram | json }}{% endif %}{% if settings.seo_maps != blank %}, {{ settings.seo_maps | json }}{% endif %}],
+      {%- if settings.seo_maps != blank -%}"hasMap": {{ settings.seo_maps | json }},{%- endif -%}
+      "knowsAbout": ["Especias", "Condimentos", "Frutos secos", "Semillas", "Frutas deshidratadas", "Ingredientes para repostería", "Productos a granel", "Queque navideño", "Tamal costarricense"],
       "url": "{{ base }}/",
       "logo": "https:{{ 'logo-tramo.png' | asset_url }}",
       "image": "https:{{ 'logo-tramo.png' | asset_url }}",
@@ -55,6 +57,22 @@
       "publisher": { "@id": "{{ base }}/#negocio" },
       "potentialAction": { "@type": "SearchAction", "target": "{{ base }}/search?q={search_term_string}", "query-input": "required name=search_term_string" }
     }
+    {%- if request.page_type == 'page' and page.handle == 'preguntas-frecuentes' -%}
+    {%- assign faq_parts = page.content | split: '<h3>' -%}
+    ,{
+      "@type": "FAQPage",
+      "mainEntity": [
+        {%- assign first = true -%}
+        {%- for part in faq_parts -%}
+          {%- if part contains '</h3>' -%}
+            {%- assign qa = part | split: '</h3>' -%}
+            {%- unless first -%},{%- endunless -%}{%- assign first = false -%}
+            { "@type": "Question", "name": {{ qa[0] | strip_html | strip | json }}, "acceptedAnswer": { "@type": "Answer", "text": {{ qa[1] | split: '<h2>' | first | strip_html | strip_newlines | strip | json }} } }
+          {%- endif -%}
+        {%- endfor -%}
+      ]
+    }
+    {%- endif -%}
     {%- if request.page_type == 'product' and product -%}
     {%- liquid
       assign lo = nil
@@ -80,7 +98,7 @@
       "url": "{{ base }}{{ product.url }}",
       "description": {{ product.description | strip_html | strip_newlines | truncate: 500 | json }},
       {%- if product.featured_media -%}"image": ["https:{{ product.featured_media | image_url: width: 1200 }}"],{%- endif -%}
-      "brand": { "@type": "Brand", "name": {{ shop.name | json }} },
+      "brand": { "@type": "Brand", "name": {{ product.metafields.custom.marca.value | default: shop.name | json }} },
       {%- if product.type != blank -%}"category": {{ product.type | json }},{%- endif -%}
       "sku": {{ product.selected_or_first_available_variant.sku | default: product.handle | json }}
       {%- if count > 0 -%}

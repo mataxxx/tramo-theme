@@ -94,7 +94,7 @@
     <nav class="footer-block footer-block--cats" aria-label="Categorías">
       <div class="footer-acc"><h2 class="footer-heading">Categorías</h2>
       <ul class="footer-links">
-        {%- assign cat_handles = 'queque-navideno,semillas-y-frutas-secas,tamales,conservas-y-dulces' | split: ',' -%}
+        {%- assign cat_handles = 'especias,semillas-y-frutas-secas,queque-navideno,tamales,conservas-y-dulces' | split: ',' -%}
         {%- for h in cat_handles -%}
           {%- assign c = collections[h] -%}
           {%- if c != blank and c.products_count > 0 -%}<li><a href="{{ c.url }}">{{ c.title }}</a></li>{%- endif -%}
@@ -108,7 +108,8 @@
         {%- if info_menu != blank -%}
           {%- for link in info_menu.links -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endfor -%}
         {%- else -%}
-          <li><button type="button" class="footer-linkbtn" data-open="help" data-help-title="Quiénes somos">Quiénes somos</button></li>
+          <li><a href="/pages/nosotros" class="footer-linkbtn" data-open="help" data-help-title="Quiénes somos">Quiénes somos</a></li>
+          <li><a href="/pages/preguntas-frecuentes">Preguntas frecuentes</a></li>
           {%- if settings.whatsapp_number != blank -%}<li><a href="https://wa.me/{{ settings.whatsapp_number | strip }}" rel="noopener" target="_blank">Contacto</a></li>{%- endif -%}
           {%- if shop.shipping_policy.url != blank -%}<li><a href="{{ shop.shipping_policy.url }}">Envíos y entregas</a></li>{%- endif -%}
           {%- if shop.refund_policy.url != blank -%}<li><a href="{{ shop.refund_policy.url }}">Devoluciones</a></li>{%- endif -%}
