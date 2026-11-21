@@ -3509,3 +3509,8 @@ body.is-locked { overscroll-behavior: none; }
   #QuickView .quick-view__media .product-gallery[data-land-m] .product-gallery__slide.product-gallery__slide--blur { aspect-ratio: auto !important; height: 100% !important; }
   .product-gallery[data-land-m] .product-gallery__slide img { object-fit: cover !important; }
 }
+/* Celular: foto girada (acostada) dentro del cuadro horizontal bajito */
+@media (max-width: 749px) {
+  .product-gallery[data-rotate-m][data-land-m] .product-gallery__slide { position: relative !important; overflow: hidden !important; container-type: size; }
+  .product-gallery[data-rotate-m][data-land-m] .product-gallery__slide img { position: absolute !important; top: 50% !important; left: 50% !important; width: 100cqh !important; height: 100cqw !important; max-width: none !important; max-height: none !important; object-fit: cover !important; transform: translate(-50%, -50%) rotate(90deg) !important; }
+}
