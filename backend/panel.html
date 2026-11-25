@@ -154,6 +154,9 @@ function msgTotal(o){
   L.push(o.mode==='pickup'?'Al confirmar tu pago te avisamos cuando esté listo para recoger.':o.mode==='delivery'?'Al confirmar tu pago enviamos tu pedido por Uber Flash.':'Al confirmar tu pago despachamos tu encomienda y te mandamos la guía.');
   L.push('','¡Gracias por tu compra! 🙌','','tramosanrafael.com');
   return L.join('\n')}
+function msgPaid(o){
+  const next=o.mode==='pickup'?'Te avisamos por aquí apenas esté *listo para recoger*.':o.mode==='delivery'?'Te avisamos por aquí cuando vaya *en camino* por Uber Flash 🛵.':'Te avisamos por aquí cuando lo despachemos y te mandamos la *guía* 📦.';
+  return '¡Hola '+first(o)+'! ✅ *Recibimos tu pago* del pedido *'+o.code+'*.\n\n🧺 Ya estamos *alistando tu pedido*. '+next+'\n\n¡Gracias por tu compra! 🙌\n\ntramosanrafael.com'}
 function msgReady(o){
   if(o.mode==='pickup')return '¡Hola '+first(o)+'! ✅ Tu pedido *'+o.code+'* ya está *listo para recoger*.\n\n📍 '+cfg.pickup+'\n🕗 Horario: '+cfg.hours+'\n\nSolo menciona tu número de pedido al llegar. ¡Te esperamos!\n\ntramosanrafael.com';
   if(o.mode==='delivery')return '¡Hola '+first(o)+'! 🛵 Tu pedido *'+o.code+'* ya va en camino por Uber Flash.\n\nPor favor estate pendiente para recibirlo. ¡Gracias por tu compra!\n\ntramosanrafael.com';
@@ -214,7 +217,7 @@ function card(o){
   // Estado y avisos
   b+=(o.status==='cancelado'&&o.cancelReason?'<div class="sec" style="background:#fff6f5"><h3>Motivo de cancelación</h3><p style="margin:0">'+esc(o.cancelReason)+'</p></div>':'')+
     SEC('estado','Estado y avisos',esc(ST[o.status]),'<div class="st">'+Object.keys(ST).map(s=>'<button data-s="'+s+'" class="'+(o.status===s?'on':'')+'">'+ST[s]+'</button>').join('')+'</div>'+
-    '<div class="acts"><a class="b wa" data-send="ready" href="#">'+readyLabel(o)+'</a><a class="b" href="'+wa(o,'')+'" target="_blank">Abrir chat</a></div>'+
+    '<div class="acts"><a class="b wa" data-send="paid" href="#">💸 Pago recibido · alistando</a><a class="b wa" data-send="ready" href="#">'+readyLabel(o)+'</a><a class="b" href="'+wa(o,'')+'" target="_blank">Abrir chat</a></div>'+
     (o.mode==='courier'?'<p class="hint">Después de enviar el mensaje, mándale la foto de la guía en ese mismo chat.</p>':'')+
     '<div class="f"><label>Nota interna (solo la ves vos)</label><textarea data-field="note">'+esc(o.note||'')+'</textarea></div>');
   return '<article class="o'+(open[o.key]?' open':'')+(isNew?' new':'')+(sel.has(o.key)?' is-sel':'')+'" data-k="'+esc(o.key)+'">'+top+'<div class="o__body">'+b+'</div></article>'}
@@ -325,9 +328,10 @@ document.addEventListener('click',async e=>{
     if(snd.dataset.send==='total'&&o.mode!=='pickup'&&!(+String(patch.shipping||'').replace(/\D/g,''))){const r3=await ask({icon:'🛵',title:'Falta el costo del envío',html:'Todavía no pusiste cuánto cuesta el '+(o.mode==='delivery'?'Uber Flash':'envío por encomienda')+'. El mensaje dirá "por confirmar".',ok:'Enviar igual',cancel:'Ponerlo primero'});if(!r3){const f=c.querySelector('[data-field=shipping]');if(f)f.focus();return}}
     const w=window.open('','_blank');
     const no=await save(k,patch,true);if(!no){if(w)w.close();return}
-    const url=wa(no,snd.dataset.send==='total'?msgTotal(no):msgReady(no));
+    const url=wa(no,snd.dataset.send==='total'?msgTotal(no):snd.dataset.send==='paid'?msgPaid(no):msgReady(no));
     if(w)w.location.href=url;else location.href=url;
     if(snd.dataset.send==='ready'&&!['entregado','cancelado'].includes(no.status))await save(k,{status:readyStatus(no)},true);
+    if(snd.dataset.send==='paid'&&['incompleto','pago-pendiente','pagado'].includes(no.status))await save(k,{status:'preparando'},true);
     rerender();return}
   if(e.target.closest('[data-inv-add]')){const num=c.querySelector('[data-inv-num]').value.trim();if(!num){c.querySelector('[data-inv-num]').focus();return}
     const type=c.querySelector('[data-inv-type]').value;await save(k,{invoices:(o.invoices||[]).concat({type,num,t:Date.now()})});rerender();return}
