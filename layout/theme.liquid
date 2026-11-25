@@ -8,7 +8,7 @@
         if template.name == 'list-collections'
           assign coll_blocked = true
         elsif template.name == 'collection'
-          unless coll_allow contains collection.handle
+          unless coll_allow contains collection.handle or collection.metafields.custom.filtros != blank
             assign coll_blocked = true
           endunless
         endif

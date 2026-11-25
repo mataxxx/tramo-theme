@@ -63,7 +63,7 @@
   </section>
 </div>
 
-<script>window.TRAMO_CAT_NOTICES = window.TRAMO_CAT_NOTICES || {};{%- for block in section.blocks -%}{%- if block.settings.notice != blank and block.settings.collection != blank -%}window.TRAMO_CAT_NOTICES[{{ block.settings.collection.handle | json }}] = {{ block.settings.notice | json }};{%- endif -%}{%- endfor -%}</script>
+<script>window.TRAMO_CAT_NOTICES = window.TRAMO_CAT_NOTICES || {};{%- for block in section.blocks -%}{%- if block.settings.notice != blank and block.settings.collection != blank and block.settings.collection.products_count == 0 -%}window.TRAMO_CAT_NOTICES[{{ block.settings.collection.handle | json }}] = {{ block.settings.notice | json }};{%- endif -%}{%- endfor -%}</script>
 {% schema %}
 {
   "name": "Círculos de categoría",
