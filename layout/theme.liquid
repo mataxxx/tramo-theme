@@ -14,7 +14,7 @@
         endif
       endif
     -%}
-    {%- if template.name == 'product' -%}<script>/* Enlace compartido: abrir el producto como ventana sobre la portada */(function(){try{var u=new URL(location.href);if(u.searchParams.get('compartido')!=='1')return;var h=location.pathname.split('/products/')[1];if(!h)return;var q='?producto='+encodeURIComponent(h.split('/')[0]);var v=u.searchParams.get('variant');if(v)q+='&variant='+encodeURIComponent(v);location.replace({{ routes.root_url | json }}+q);}catch(e){}})();</script>{%- endif -%}
+    {%- if template.name == 'product' -%}<script>/* Enlace compartido: abrir el producto como ventana sobre la portada */(function(){try{var u=new URL(location.href);var shared=u.searchParams.get('compartido')==='1';var bot=/bot|crawl|spider|slurp|mediapartners|lighthouse|headless/i.test(navigator.userAgent||'');var ref=document.referrer||'';var fromSearch=/google\.|bing\.|yahoo\.|duckduckgo\.|chatgpt\.|perplexity\.|gemini\./i.test(ref);var internal=ref.indexOf(location.host)>-1;if(!shared&&(bot||fromSearch||internal))return;if(bot)return;var h=location.pathname.split('/products/')[1];if(!h)return;var q='?producto='+encodeURIComponent(h.split('/')[0]);var v=u.searchParams.get('variant');if(v)q+='&variant='+encodeURIComponent(v);location.replace({{ routes.root_url | json }}+q);}catch(e){}})();</script>{%- endif -%}
     {%- if coll_blocked -%}<meta http-equiv="refresh" content="0;url={{ routes.root_url }}"><script>location.replace({{ routes.root_url | json }});</script>{%- endif -%}
  {%- capture ecom_header_content -%}{%- render 'ecom_header' -%}{%- endcapture -%}{%- unless ecom_header_content contains 'Liquid error' -%}{{ ecom_header_content }}{%- endunless -%}
     <meta charset="utf-8">
