@@ -454,7 +454,7 @@ async function panelAuthed(request, env) {
   return (await sign(env, role === 'prep' ? m[2] + '.prep' : m[2], role)) === m[1] ? role : null;
 }
 // Cambia con cada versión del panel: las pantallas abiertas se recargan solas
-const APP_V = '2026-11-25-1';
+const APP_V = '2026-11-27-1';
 const SOLD_ST = ['pagado', 'preparando', 'listo', 'entregado'];
 function setStatusOn(o, st, now) {
   if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (SOLD_ST.includes(st) && !o.paidAt) o.paidAt = now; }
@@ -567,6 +567,12 @@ async function handlePanel(request, url, env) {
       cfg: { sinpe: env.SINPE_NUMBER || '7095-5061', sinpeName: env.SINPE_NAME || 'Carlos Garita Rojas', lat: +(env.STORE_LAT || 9.9349), lng: +(env.STORE_LNG || -84.0789),
         pickup: env.PICKUP_TEXT || 'Tramo San Rafael #1, Mercado Central de San José', hours: env.STORE_HOURS || '7:30 a. m. a 5:30 p. m.' } });
   }
+  if (p === '/panel/api/catalog' && request.method === 'GET') {
+    const cat = await publicCatalog(env);
+    const list = Object.keys(cat).map((id) => ({ id, title: (cat[id].product || {}).title || '', variant: cat[id].title === 'Default Title' ? '' : (cat[id].title || ''), price: +cat[id].price || 0 }))
+      .filter((x) => x.title && x.price > 0).sort((a, b) => a.title.localeCompare(b.title, 'es'));
+    return json({ items: list });
+  }
   if (p === '/panel/api/order' && request.method === 'GET') {
     const k = url.searchParams.get('key') || '';
     if (!k.startsWith('o:')) return json({ error: 'datos' }, 400);
@@ -597,6 +603,20 @@ async function handlePanel(request, url, env) {
       o.sinpeRef = clean(P.sinpeRef, 40);
       if (o.sinpeRef && ['incompleto', 'pago-pendiente'].includes(o.status)) setStatus('pagado');
       if (o.sinpeRef && !o.paidAt) o.paidAt = now;
+    }
+    if (Array.isArray(P.items)) {
+      const items = P.items.slice(0, 80).map((it) => {
+        const qty = Math.min(100000, Math.max(1, parseInt(it.qty, 10) || 1));
+        const line = Math.max(0, Math.round((+it.line || 0) * 100) / 100);
+        return { title: clean(it.title, 120), variant: clean(it.variant || '', 80), qty, line };
+      }).filter((it) => it.title);
+      if (!items.length) return json({ error: 'El pedido tiene que tener al menos un producto.' }, 400);
+      o.items = items;
+      o.total = Math.round(items.reduce((a, it) => a + it.line, 0) * 100) / 100;
+      o.variable = items.filter((it) => /granel/i.test(it.variant)).map((it) => it.title);
+      o.finalTotal = undefined;
+      if (o.prep) { o.prep.checks = []; o.prep.weights = {}; }
+      o.history = (o.history || []).concat({ s: 'edicion', t: now });
     }
     if (Array.isArray(P.invoices)) {
       o.invoices = P.invoices.slice(0, 10).map((i) => ({ type: INV_TYPES.includes(i.type) ? i.type : 'TE', num: clean(i.num, 60), voided: !!i.voided, note: clean(i.note || '', 120), t: +i.t || now, vt: i.voided ? (+i.vt || now) : undefined })).filter((i) => i.num);
