@@ -27,7 +27,7 @@ main{padding:12px 12px 60px;max-width:780px;margin:0 auto;display:grid;gap:10px}
 .o__body{display:none;border-top:1px solid var(--line);font-size:14px}.o.open .o__body{display:block}
 .sec{padding:12px 14px;border-bottom:1px solid var(--line)}.sec:last-child{border-bottom:0}
 .sec h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
-.items{margin:0;padding:0;list-style:none}.items li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.ed{max-width:560px;width:calc(100vw - 24px);max-height:88vh;overflow:auto;text-align:left}.ed h2{font-size:19px;margin:0 0 10px}.ed__row{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}.ed__name{font-size:14px;line-height:1.3}.ed__name small{color:#6b6b6b}.ed__unit{display:block}.ed__qty{display:flex;align-items:center;gap:4px}.ed__qty input{width:56px;text-align:center;padding:6px;border:1px solid var(--line);border-radius:8px;font:inherit}.ed__line{min-width:70px;text-align:right}.ed__res{display:flex;flex-direction:column;gap:4px;margin-top:6px;max-height:220px;overflow:auto}.ed__hit{text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font:inherit;font-size:14px;cursor:pointer;display:flex;gap:6px;align-items:baseline}.ed__hit b{margin-left:auto}.ed__hit small{color:#6b6b6b}.ed__tot{margin:12px 0 0;text-align:right}.items{margin:0;padding:0;list-style:none}.items li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
 .items small{color:var(--mut)}.sum{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin-top:8px}.sum .big{font-weight:800;font-size:16px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0}.kv dt{color:var(--mut)}.kv dd{margin:0;word-break:break-word}.kv a{color:var(--g);font-weight:600}
 .seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{flex:1 1 0;min-width:90px;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 6px;font-size:13.5px;font-weight:700}
@@ -140,6 +140,48 @@ function ask(o){return new Promise(res=>{const d=document.createElement('div');d
     const note=ta?ta.value.trim():'';if(o.noteRequired&&note.length<3){ta.classList.add('err');d.querySelector('.ask__err').style.display='block';ta.focus();return}
     close({note})});
 })}
+/* ---------- Editar productos de un pedido ---------- */
+let CAT=null;
+async function loadCat(){if(CAT)return CAT;try{const r=await fetch('/panel/api/catalog');const d=await r.json();CAT=d.items||[]}catch(e){CAT=[]}return CAT}
+const isG=v=>/granel/i.test(v||'');
+function editItems(o){
+  const lines=o.items.map(i=>({title:i.title,variant:i.variant||'',qty:i.qty,unit:i.qty?i.line/i.qty:i.line}));
+  const d=document.createElement('div');d.className='ask';
+  d.innerHTML='<div class="ask__box ed" role="dialog" aria-modal="true"><h2>✏️ Productos del pedido '+esc(o.code||'')+'</h2><div class="ed__list"></div>'+
+    '<div class="f" style="margin-top:12px"><label>Agregar producto</label><input class="ed__q" placeholder="Buscar: canela, nueces, 250 g…" autocomplete="off"><div class="ed__res"></div></div>'+
+    '<p class="ed__tot"></p><div class="ask__btns"><button class="b" data-a="no">Cancelar</button><button class="b dark" data-a="ok">Guardar cambios</button></div></div>';
+  document.body.appendChild(d);
+  const L=d.querySelector('.ed__list'),R=d.querySelector('.ed__res'),Q=d.querySelector('.ed__q'),T=d.querySelector('.ed__tot');
+  function draw(){
+    L.innerHTML=lines.map((l,x)=>'<div class="ed__row"><div class="ed__name">'+esc(l.title)+(l.variant?' <small>'+esc(l.variant)+'</small>':'')+'<small class="ed__unit">'+(isG(l.variant)?money(l.unit*100)+' el kg':money(l.unit)+' c/u')+'</small></div>'+
+      '<div class="ed__qty">'+(isG(l.variant)?'<input data-g="'+x+'" inputmode="numeric" value="'+(l.qty*10)+'"> <small>g</small>':'<button class="b sm" data-m="'+x+'">−</button><input data-q="'+x+'" inputmode="numeric" value="'+l.qty+'"><button class="b sm" data-p="'+x+'">+</button>')+'</div>'+
+      '<b class="ed__line">'+money(Math.round(l.unit*l.qty))+'</b><button class="b sm red" data-x="'+x+'" aria-label="Quitar">✕</button></div>').join('')||'<p class="hint">Sin productos.</p>';
+    T.innerHTML='Total de productos: <b>'+money(Math.round(lines.reduce((a,l)=>a+l.unit*l.qty,0)))+'</b>';
+  }
+  draw();
+  L.addEventListener('input',e=>{const q=e.target.dataset.q,g=e.target.dataset.g;
+    if(q!=null){lines[q].qty=Math.max(1,parseInt(e.target.value,10)||1)}
+    if(g!=null){lines[g].qty=Math.max(1,Math.round((parseInt(e.target.value,10)||10)/10))}
+    const row=e.target.closest('.ed__row'),x=+(q!=null?q:g);row.querySelector('.ed__line').textContent=money(Math.round(lines[x].unit*lines[x].qty));
+    T.innerHTML='Total de productos: <b>'+money(Math.round(lines.reduce((a,l)=>a+l.unit*l.qty,0)))+'</b>'});
+  L.addEventListener('click',e=>{const b=e.target.closest('[data-m],[data-p],[data-x]');if(!b)return;
+    if(b.dataset.x!=null){lines.splice(+b.dataset.x,1)}else if(b.dataset.m!=null){const l=lines[+b.dataset.m];l.qty=Math.max(1,l.qty-1)}else{lines[+b.dataset.p].qty++}
+    draw()});
+  const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  Q.addEventListener('input',async()=>{const cat=await loadCat();const w=norm(Q.value).split(/\s+/).filter(Boolean);
+    if(!w.length){R.innerHTML='';return}
+    const hits=cat.filter(c=>{const t=norm(c.title+' '+c.variant);return w.every(x=>t.includes(x))}).slice(0,12);
+    R.innerHTML=hits.length?hits.map(c=>'<button class="ed__hit" data-id="'+esc(c.id)+'">'+esc(c.title)+(c.variant?' <small>'+esc(c.variant)+'</small>':'')+' <b>'+(isG(c.variant)?money(c.price*100)+' kg':money(c.price))+'</b></button>').join(''):'<p class="hint">No encontré ese producto en la tienda.</p>'});
+  R.addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(!b)return;const c=(CAT||[]).find(x=>x.id===b.dataset.id);if(!c)return;
+    lines.push({title:c.title,variant:c.variant,qty:isG(c.variant)?25:1,unit:c.price});Q.value='';R.innerHTML='';draw()});
+  d.addEventListener('click',async e=>{if(e.target===d){d.remove();return}const b=e.target.closest('[data-a]');if(!b)return;
+    if(b.dataset.a==='no'){d.remove();return}
+    if(!lines.length){toast('Tiene que quedar al menos un producto');return}
+    b.disabled=true;
+    const items=lines.map(l=>({title:l.title,variant:l.variant,qty:l.qty,line:Math.round(l.unit*l.qty)}));
+    const no=await save(o.key,{items});d.remove();if(no)rerender()});
+  loadCat();
+}
 function toast(t){const e=$('#toast');e.textContent=t||'Guardado ✓';e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1400)}
 
 /* ---------- Mensajes de WhatsApp ---------- */
@@ -182,7 +224,7 @@ function card(o){
     return '<details class="sec"'+(extra||'')+' data-sec="'+name+'"'+(on?' open':'')+'><summary><h3>'+title+'</h3><span class="sec__meta">'+(meta||'')+'</span><svg class="sec__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="sec__in">'+html+'</div></details>'};
   const bad=t=>'<em class="m-bad">'+t+'</em>', ok=t=>'<em class="m-ok">'+t+'</em>';
   // Productos y total
-  let b=SEC('pedido','Pedido',o.items.length+' producto'+(o.items.length>1?'s':''),'<ul class="items">'+o.items.map((i,x)=>'<li><span>'+(o.prep&&(o.prep.checks||[])[x]?'<b style="color:#2f7d32">✓</b> ':'')+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+(o.prep&&(o.prep.weights||{})[x]?' <small style="color:#1f3b63">⚖️ pesó '+esc(o.prep.weights[x])+' g</small>':'')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+
+  let b=SEC('pedido','Pedido',o.items.length+' producto'+(o.items.length>1?'s':''),'<ul class="items">'+o.items.map((i,x)=>'<li><span>'+(o.prep&&(o.prep.checks||[])[x]?'<b style="color:#2f7d32">✓</b> ':'')+esc(i.title)+(i.variant?' <small>'+esc(i.variant)+'</small>':'')+(i.variant&&/granel/i.test(i.variant)?'':' <small>× '+i.qty+'</small>')+(o.prep&&(o.prep.weights||{})[x]?' <small style="color:#1f3b63">⚖️ pesó '+esc(o.prep.weights[x])+' g</small>':'')+'</span><b>'+money(i.line)+'</b></li>').join('')+'</ul>'+'<div class="acts" style="margin-top:6px"><button class="b sm" data-edit-items>✏️ Editar productos</button></div>'+
     '<div class="sum"><span>Productos'+(o.finalTotal?' (pesado)':pending(o)?' (aprox.)':'')+'</span><b>'+money(prod(o))+'</b>'+(o.mode!=='pickup'?'<span>Envío</span><b>'+(o.shipping?money(o.shipping):'—')+'</b>':'')+'<span class="big">Total</span><span class="big">'+money(grand(o))+'</span></div>'+
     (o.unverified?'<p class="warn">⚠️ No se pudieron verificar los precios con la tienda: revisa el total antes de cobrar.</p>':'')+'<p class="hint">Precios con IVA incluido.</p>'+(((o.prep&&o.prep.issues)||[]).map(x=>'<p class="warn">⚠️ '+esc(x.by||'Alistador')+': '+esc(x.text)+'</p>').join(''))+
     '<div class="f"><label>Nota para quien alista (la ve en la pantalla de Alistar)</label><input data-field="prepNote" value="'+esc(o.prepNote||'')+'" placeholder="Ej. empacar el queso aparte"></div>',true);
@@ -317,6 +359,7 @@ document.addEventListener('click',async e=>{
   const t=e.target.closest('[data-f]');if(t){filter=t.dataset.f;render();if(selecting)bulkUI();return}
   const c=e.target.closest('.o');if(!c)return;const k=c.dataset.k;const o=orders.find(x=>x.key===k);if(!o)return;
   if(e.target.closest('[data-toggle]')){open[k]=!open[k];c.classList.toggle('open');return}
+  if(e.target.closest('[data-edit-items]')){editItems(o);return}
   const m=e.target.closest('[data-mode]');if(m){if(m.dataset.mode===o.mode)return;const to=m.dataset.mode;const r0=await ask({icon:'🔁',title:'¿Cambiar la forma de entrega?',html:'El pedido <b>'+esc(o.code)+'</b> de '+esc(o.name)+' pasa de <b>'+MODE[o.mode]+'</b> a <b>'+MODE[to]+'</b>.'+(o.shipping?' El costo de envío que pusiste ('+money(o.shipping)+') se va a borrar.':'')+(to==='delivery'?' Vas a necesitar su ubicación para cotizar el Uber.':to==='courier'?' Vas a necesitar su dirección para la encomienda.':''),ok:'Sí, cambiar',note:'Motivo (opcional): ej. el cliente prefiere recoger'});if(!r0)return;await save(k,{mode:to,shipping:0,changeNote:r0.note});rerender();return}
   const s=e.target.closest('[data-s]');if(s){const st=s.dataset.s;if(st===o.status)return;
     if(st==='cancelado'){const r1=await ask({icon:'🛑',title:'¿Cancelar este pedido?',html:'Vas a cancelar el pedido <b>'+esc(o.code)+'</b> de '+esc(o.name)+' por <b>'+money(grand(o))+'</b>.'+(o.sinpeRef?' <b>Ojo: ya tiene un SINPE registrado</b>, recuerda devolver el dinero.':'')+(hasInv(o)?' <b>Tiene factura activa</b>: recuerda anularla en Hacienda.':''),ok:'Sí, cancelar pedido',cancel:'No',danger:true,note:'¿Por qué se cancela? (obligatorio)',noteRequired:true});if(!r1)return;await save(k,{status:st,cancelReason:r1.note});rerender();return}
