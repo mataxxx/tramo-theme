@@ -186,7 +186,9 @@ function toast(t){const e=$('#toast');e.textContent=t||'Guardado ✓';e.classLis
 
 /* ---------- Mensajes de WhatsApp ---------- */
 function msgTotal(o){
-  const L=['¡Hola '+first(o)+'! 👋','Este es el total de tu pedido *'+o.code+'*:',''];
+  const L=['¡Hola '+first(o)+'! 👋','Este es el resumen de tu pedido *'+o.code+'*:',''];
+  o.items.forEach(i=>L.push('• '+i.title+(i.variant?' ('+(/granel/i.test(i.variant)?(i.qty*10)+' g a granel':i.variant)+')':'')+(/granel/i.test(i.variant||'')||i.qty===1?'':' × '+i.qty)+': '+money(i.line)));
+  L.push('');
   L.push('🛒 Productos: '+money(prod(o))+(pending(o)?' (aprox.)':''));
   if(o.mode==='delivery')L.push('🛵 Envío Uber Flash: '+(o.shipping?money(o.shipping):'por confirmar'));
   if(o.mode==='courier')L.push('📦 Envío por encomienda: '+(o.shipping?money(o.shipping):'por confirmar'));
