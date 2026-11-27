@@ -142,7 +142,7 @@ function ask(o){return new Promise(res=>{const d=document.createElement('div');d
 })}
 /* ---------- Editar productos de un pedido ---------- */
 let CAT=null;
-async function loadCat(){if(CAT)return CAT;try{const r=await fetch('/panel/api/catalog');const d=await r.json();CAT=d.items||[]}catch(e){CAT=[]}return CAT}
+let CATERR='';async function loadCat(){if(CAT&&CAT.length)return CAT;try{const r=await fetch('/panel/api/catalog',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();CAT=d.items||[];CATERR=CAT.length?'':'El catálogo vino vacío'+(d.err?': '+d.err:'')}catch(e){CAT=[];CATERR=String(e.message||e)}return CAT}
 const isG=v=>/granel/i.test(v||'');
 function editItems(o){
   const lines=o.items.map(i=>({title:i.title,variant:i.variant||'',qty:i.qty,unit:i.qty?i.line/i.qty:i.line}));
@@ -171,7 +171,7 @@ function editItems(o){
   Q.addEventListener('input',async()=>{const cat=await loadCat();const w=norm(Q.value).split(/\s+/).filter(Boolean);
     if(!w.length){R.innerHTML='';return}
     const hits=cat.filter(c=>{const t=norm(c.title+' '+c.variant);return w.every(x=>t.includes(x))}).slice(0,12);
-    R.innerHTML=hits.length?hits.map(c=>'<button class="ed__hit" data-id="'+esc(c.id)+'">'+esc(c.title)+(c.variant?' <small>'+esc(c.variant)+'</small>':'')+' <b>'+(isG(c.variant)?money(c.price*100)+' kg':money(c.price))+'</b></button>').join(''):'<p class="hint">No encontré ese producto en la tienda.</p>'});
+    R.innerHTML=hits.length?hits.map(c=>'<button class="ed__hit" data-id="'+esc(c.id)+'">'+esc(c.title)+(c.variant?' <small>'+esc(c.variant)+'</small>':'')+' <b>'+(isG(c.variant)?money(c.price*100)+' kg':money(c.price))+'</b></button>').join(''):(CATERR?'<p class="warn">No se pudo cargar el catálogo de la tienda ('+esc(CATERR)+'). Probá de nuevo en un momento.</p>':'<p class="hint">No encontré ese producto en la tienda.</p>')});
   R.addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(!b)return;const c=(CAT||[]).find(x=>x.id===b.dataset.id);if(!c)return;
     lines.push({title:c.title,variant:c.variant,qty:isG(c.variant)?25:1,unit:c.price});Q.value='';R.innerHTML='';draw()});
   d.addEventListener('click',async e=>{if(e.target===d){d.remove();return}const b=e.target.closest('[data-a]');if(!b)return;

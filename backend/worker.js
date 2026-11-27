@@ -454,7 +454,7 @@ async function panelAuthed(request, env) {
   return (await sign(env, role === 'prep' ? m[2] + '.prep' : m[2], role)) === m[1] ? role : null;
 }
 // Cambia con cada versión del panel: las pantallas abiertas se recargan solas
-const APP_V = '2026-11-27-1';
+const APP_V = '2026-11-27-2';
 const SOLD_ST = ['pagado', 'preparando', 'listo', 'entregado'];
 function setStatusOn(o, st, now) {
   if (STATUSES.includes(st) && st !== o.status) { o.status = st; o.history = (o.history || []).concat({ s: st, t: now }); if (SOLD_ST.includes(st) && !o.paidAt) o.paidAt = now; }
@@ -568,10 +568,23 @@ async function handlePanel(request, url, env) {
         pickup: env.PICKUP_TEXT || 'Tramo San Rafael #1, Mercado Central de San José', hours: env.STORE_HOURS || '7:30 a. m. a 5:30 p. m.' } });
   }
   if (p === '/panel/api/catalog' && request.method === 'GET') {
-    const cat = await publicCatalog(env);
-    const list = Object.keys(cat).map((id) => ({ id, title: (cat[id].product || {}).title || '', variant: cat[id].title === 'Default Title' ? '' : (cat[id].title || ''), price: +cat[id].price || 0 }))
-      .filter((x) => x.title && x.price > 0).sort((a, b) => a.title.localeCompare(b.title, 'es'));
-    return json({ items: list });
+    // Catálogo para agregar productos a un pedido: primero desde el admin de Shopify; si falla, el catálogo público
+    let list = [], err = '';
+    try {
+      let after = null;
+      for (let page = 0; page < 6; page++) {
+        const d = await adminGraphql(env, `query ($after: String) { products(first: 100, after: $after, query: "status:active") { pageInfo { hasNextPage endCursor } nodes { title variants(first: 50) { nodes { id title price } } } } }`, { after });
+        (d.products.nodes || []).forEach((pr) => (pr.variants.nodes || []).forEach((v) => list.push({ id: String(v.id).split('/').pop(), title: pr.title, variant: v.title === 'Default Title' ? '' : v.title, price: +v.price || 0 })));
+        if (!d.products.pageInfo.hasNextPage) break;
+        after = d.products.pageInfo.endCursor;
+      }
+    } catch (e) { err = String(e && e.message || e).slice(0, 200); }
+    if (!list.length) {
+      const cat = await publicCatalog(env);
+      list = Object.keys(cat).map((id) => ({ id, title: (cat[id].product || {}).title || '', variant: cat[id].title === 'Default Title' ? '' : (cat[id].title || ''), price: +cat[id].price || 0 }));
+    }
+    list = list.filter((x) => x.title && x.price > 0).sort((a, b) => a.title.localeCompare(b.title, 'es'));
+    return json({ items: list, err });
   }
   if (p === '/panel/api/order' && request.method === 'GET') {
     const k = url.searchParams.get('key') || '';
